@@ -69,3 +69,7 @@ git-inspector:
         - git clone https://github.com/ejwa/gitinspector.git
         - cd gitinspector
         - python2 gitinspector.py --format=htmlembedded --grading=true --file-types='py,md,tex' ../ > ../git.html
+    artifacts:
+      paths:
+        - git.html
+
