@@ -93,4 +93,7 @@ compile-report:
       - exit
     artifacts:
       paths:
-        - docs/build/final-report.pdf
+        - docs/final-report.pdf
+    rules:
+      - changes: 
+        - /*.tex
