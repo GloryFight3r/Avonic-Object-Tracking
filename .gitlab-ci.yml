@@ -73,3 +73,12 @@ git-inspector:
       paths:
         - git.html
 
+compile-report:
+    image: thomasweise/texlive
+    script:
+      - cd docs
+      - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf -output-directory=./build final-report.tex
+      - exit
+    artifacts:
+      paths:
+        - docs/build/final-report.pdf
