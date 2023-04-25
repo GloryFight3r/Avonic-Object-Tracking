@@ -96,4 +96,5 @@ compile-report:
         - docs/final-report.pdf
     rules:
       - changes: 
-        - /*.tex
+        - "*.tex"
+        - "**/*.tex"
