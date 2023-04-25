@@ -23,20 +23,28 @@ cache:
     - .cache/pip
     - venv/
 
-before_script:
-  - python --version  # For debugging
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
+#before_script:
+#  - python --version  # For debugging
+#  - pip install virtualenv
+#  - virtualenv venv
+#  - source venv/bin/activate
 
 test:
   script:
+    - python --version  # For debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
     - python setup.py test
     - pip install tox flake8  # you can also use tox
     - tox -e py36,flake8
 
 run:
   script:
+    - python --version  # For debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
     - python setup.py bdist_wheel
     # an alternative approach is to install and run:
     - pip install dist/*
@@ -47,6 +55,10 @@ run:
 
 pages:
   script:
+    - python --version  # For debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
     - pip install sphinx sphinx-rtd-theme
     - cd doc
     - make html
@@ -74,7 +86,7 @@ git-inspector:
         - git.html
 
 compile-report:
-    image: thomasweise/texlive
+    image: texlive/texlive:latest
     script:
       - cd docs
       - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf -output-directory=./build final-report.tex
