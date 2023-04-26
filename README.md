@@ -5,10 +5,18 @@
 ### General, non-technology-related
 **PLEASE!!** Be available from 9-17 every workday. This means that you have to be able to read messages from all teammates/the TA/Coach/Client on every platform during these specified hours. You should also reply to the message unless you have something extremely important to do at that moment, but do try to get back ASAP.
 
+### Code
+Everyone should follow the Test Driven Development practices - ie. write tests for every method.
+
+### Commits
+Do **NOT** commit to `dev` branch directly unless there is some critical bug that needs fixing ASAP.
+
 ### Requirements
 Each requirement should have one of the MoSCoW labels attached.
 
 ### Issues
+Each issue MUST have a definiton of done.
+
 Each issue should have a milestone.
 
 Each issue's weight should roughly depict its perceived difficulty/how long it will take. Categories are:
@@ -21,9 +29,12 @@ Each issue's weight should roughly depict its perceived difficulty/how long it w
 Each merge request (for a feature) should include both tests and documentation for any new code.
 
 ### Code review
-At least two people should review a merge request.
+At least two people should review a merge request. Everyone should try to review everything.
+
 **ALWAYS** look at the entirety of the code, and try to find at least one problem with the code (there will always be at least one).
 Don't just say *"LGTM"* and approve.
+
+A reviewer should always compare the code with the definition of done and see if it meets it.
 
 ### Use Conventional Commits
 Basically, prepend each commit message with `fix:` for fixes, `feat:` for features, `docs:` for docs, `test:` for tests.
