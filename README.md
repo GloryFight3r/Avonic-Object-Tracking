@@ -2,8 +2,23 @@
 
 ## Rules
 
+### General, non-technology-related
+**PLEASE!!** Be available from 9-17 every workday. This means that you have to be able to read messages from all teammates/the TA/Coach/Client on every platform during these specified hours. You should also reply to the message unless you have something extremely important to do at that moment, but do try to get back ASAP.
+
+### Requirements
+Each requirement should have one of the MoSCoW labels attached.
+
+### Issues
+Each issue should have a milestone.
+
+Each issue's weight should roughly depict its perceived difficulty/how long it will take. Categories are:
+1. Hours
+2. Days
+3. Weeks
+4. Months
+
 ### Merge requests
-Each merge request (for a feature) should include both tests and documentation for new code.
+Each merge request (for a feature) should include both tests and documentation for any new code.
 
 ### Code review
 At least two people should review a merge request.
