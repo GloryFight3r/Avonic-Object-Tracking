@@ -35,6 +35,7 @@ test:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
+    - pip install build
     - python -m build
     - pytest
     #- pip install tox flake8  # you can also use tox
@@ -46,6 +47,7 @@ run:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
+    - pip install build
     - python -m build
     #- python setup.py bdist_wheel
     # an alternative approach is to install and run:
@@ -62,6 +64,7 @@ pages:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
+    - pip install build
     - pip install sphinx sphinx-rtd-theme
     - cd doc
     - make html
