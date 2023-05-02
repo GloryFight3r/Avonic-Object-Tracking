@@ -2,8 +2,43 @@
 
 ## Rules
 
+### General, non-technology-related
+**PLEASE!!** Be available from 9-17 every workday. This means that you have to be able to read messages from all teammates/the TA/Coach/Client on every platform during these specified hours. You should also reply to the message unless you have something extremely important to do at that moment, but do try to get back ASAP.
+
+### Code
+Everyone should follow the Test Driven Development practices - ie. write tests for every method.
+
+### Commits
+Do **NOT** commit to `dev` branch directly unless there is some critical bug that needs fixing ASAP.
+
+### Requirements
+Each requirement should have one of the MoSCoW labels attached.
+
+### Issues
+Each issue MUST have a definiton of done.
+
+Each issue should have a milestone.
+
+Each issue's weight should roughly depict its perceived difficulty/how long it will take. Categories are:
+1. Hours
+2. Days
+3. Weeks
+4. Months
+
+### Merge requests
+Each merge request (for a feature) should include both tests and documentation for any new code.
+
+### Code review
+At least two people should review a merge request. Everyone should try to review everything.
+
+**ALWAYS** look at the entirety of the code, and try to find at least one problem with the code (there will always be at least one).
+Don't just say *"LGTM"* and approve.
+
+A reviewer should always compare the code with the definition of done and see if it meets it.
+
 ### Use Conventional Commits
-[Reference here](https://www.conventionalcommits.org/en/v1.0.0/)
+Basically, prepend each commit message with `fix:` for fixes, `feat:` for features, `docs:` for docs, `test:` for tests.
+[Reference here](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## The Report
 
@@ -16,7 +51,7 @@ Create a new chapter in `chapters` and end it with `.tex`. Edit that file (no ne
 1. Go to Configurations -> Edit configurations
 2. Add New Configuration -> LaTeX
 3. Configure it similar to this (obviously you can choose your own pdf viewer)
-   [configuration](https://cdn.discordapp.com/attachments/1100381425674506282/1100404222769516626/image.png)
+   ![image](https://cdn.discordapp.com/attachments/1100381425674506282/1100404222769516626/image.png)
 4. Click Apply/Ok
 5. Run this configuration
 
@@ -95,7 +130,7 @@ When you're ready to make this README your own, just edit this file and use the 
 Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
 ## Name
-Choose a self-explaining name for your project.
+Avonic SP
 
 ## Description
 Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
@@ -126,10 +161,4 @@ For people who want to make changes to your project, it's helpful to have some d
 You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Izzy van der Giessen, Petr Khartskhaev, Yehor Kozyr, Borislav Semerdzhiev, Ivan Smilenov
