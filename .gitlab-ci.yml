@@ -36,8 +36,8 @@ test:
     - virtualenv venv
     - source venv/bin/activate
     - pip install build
-    - python -m build
-    - pytest
+    - pip install -e '.[test]'
+    - pytest tests/
     #- pip install tox flake8  # you can also use tox
     #- tox -e py36,flake8
 
@@ -49,6 +49,7 @@ run:
     - source venv/bin/activate
     - pip install build
     - python -m build
+    - pip install .
     #- python setup.py bdist_wheel
     # an alternative approach is to install and run:
     #- pip install dist/*

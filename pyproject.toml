@@ -15,7 +15,9 @@ authors = [
     {name = "Ivan Smilenov", email = "i.y.smilenov@student.tudelft.nl"}
 ]
 requires-python = ">=3.8"
-dependencies = []
+dependencies = [
+    "flask"
+]
 
 [project.optional-dependencies]
 test = [

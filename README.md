@@ -24,7 +24,28 @@ Create a new chapter in `chapters` and end it with `.tex`. Edit that file (no ne
 1. Go to the `docs/` directory
 2. Run `$ pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf -output-directory=./build final-report.tex`
 
-## Getting started
+## Installing the project
+
+### Using `build`
+
+1. `$ python -m build`
+2. `$ pip install dist/avonic_speaker_tracker-<version and other info>.whl`
+
+### Without `build`
+
+To install the base package:
+
+`$ pip install .`
+
+To install the test packages, too:
+
+`$ pip install -e '.[test]'`
+
+## Running
+
+`$ flask -app avonic-speaker-tracker run`
+
+## Other stuff idk
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
