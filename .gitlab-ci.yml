@@ -35,9 +35,10 @@ test:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
-    - python setup.py test
-    - pip install tox flake8  # you can also use tox
-    - tox -e py36,flake8
+    - python -m build
+    - pytest
+    #- pip install tox flake8  # you can also use tox
+    #- tox -e py36,flake8
 
 run:
   script:
@@ -45,10 +46,12 @@ run:
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
-    - python setup.py bdist_wheel
+    - python -m build
+    #- python setup.py bdist_wheel
     # an alternative approach is to install and run:
-    - pip install dist/*
+    #- pip install dist/*
     # run the command here
+    #- python -m avonic-camera-api
   artifacts:
     paths:
       - dist/*.whl
