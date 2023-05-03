@@ -1,0 +1,9 @@
+flask
+
+[test]
+build
+pylint
+black
+pytest
+pytest-cov
+pytest-mock

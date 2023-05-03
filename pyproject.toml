@@ -196,7 +196,6 @@ class-naming-style = "PascalCase"
 
 # Naming style matching correct constant names.
 const-naming-style = "UPPER_CASE"
-
 # Regular expression matching correct constant names. Overrides const-naming-
 # style. If left empty, constant names will be checked with the set naming style.
 # const-rgx =
@@ -666,5 +665,3 @@ ignored-argument-names = "_.*|^ignored_|^unused_"
 # List of qualified module names which can have objects that can redefine
 # builtins.
 redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", "builtins", "io"]
-
-

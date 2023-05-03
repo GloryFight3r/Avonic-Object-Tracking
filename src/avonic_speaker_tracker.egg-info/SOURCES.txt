@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/AvonicCameraApi/Message.py
+src/AvonicCameraApi/__init__.py
+src/AvonicCameraApi/zoom.py
+src/avonic-speaker-tracker/__init__.py
+src/avonic_speaker_tracker.egg-info/PKG-INFO
+src/avonic_speaker_tracker.egg-info/SOURCES.txt
+src/avonic_speaker_tracker.egg-info/dependency_links.txt
+src/avonic_speaker_tracker.egg-info/requires.txt
+src/avonic_speaker_tracker.egg-info/top_level.txt
+tests/test_zoom.py
