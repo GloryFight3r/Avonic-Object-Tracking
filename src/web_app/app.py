@@ -1,7 +1,7 @@
 from flask import Flask
-from camera.camera_bp import camera_bp
-from home.home_bp import home_bp
-from microphone.microphone_bp import microphone_bp
+from web_app.camera.camera_bp import camera_bp
+from web_app.home.home_bp import home_bp
+from web_app.microphone.microphone_bp import microphone_bp
 
 app = Flask(__name__)
 

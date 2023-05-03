@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, Response 
-import json 
+import json
 
-from microphone_api.stub_comms_microphone import *
 from avonic_camera_api.converter import *
+from microphone_api.stub_comms_microphone import *
 
 microphone_bp = Blueprint('microphone', __name__,
     template_folder='templates',
