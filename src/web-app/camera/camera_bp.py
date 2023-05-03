@@ -4,6 +4,10 @@ camera_bp = Blueprint('camera', __name__,
     template_folder='templates',
     static_folder='static', static_url_path='assets')
 
+'''
+Another example with blueprints and templates.
+See templates for interesting details.
+'''
 @camera_bp.route('/view')
 def view():
-    return render_template('camera/view.html', title="BIG TITLE", name="GitLab GitLabovych")
+    return render_template('camera/view.html', name="GitLab GitLabovych")
