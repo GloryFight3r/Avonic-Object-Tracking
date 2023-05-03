@@ -151,12 +151,18 @@
               <form action="/camera/reboot" method="post" id="camera-reboot-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Reboot</button></form>
             </div>
             <div class="bg-body-tertiary p-5 rounded">
-              <p>Zoom</p>
-              <form action="/camera/get_zoom" method="get" id="get-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Get zoom</button></form>
+            	  <p>Zoom</p>
+            	  <form action="/camera/get_zoom" method="get" id="get-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Get zoom</button></form>
             </div>
             <div class="bg-body-tertiary p-5 rounded">
-              <p>Zoom</p>
-              <form action="/camera/set_zoom" method="post" id="set-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Set zoom</button></form>
+            	  <p>Zoom</p>
+	    	    <form action="/camera/set_zoom" method="post" id="set-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Set zoom</button>
+	    	      <div>
+	    	        <input type="range" id="zoom-value" name="zoomValue"
+	    	      	min="0" max="16384">
+	    	        <label for="volume">Zoom value</label>
+	    	      </div>
+	    	    </form>
             </div>
         </div>
     </main>
@@ -167,11 +173,13 @@
         function sendPostRequest(e){
           e.preventDefault();
           var action = $(this).attr("action");
-          var data = {};
+	  console.log(e);
+          var data = { e };
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
             url: action,
+	    contentType:'application/json',
             data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
@@ -210,6 +218,8 @@
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
+        $("#get-zoom-form").submit(sendGetRequest);
+        $("#set-zoom-form").submit(sendPostRequest);
 
         (() => {
   'use strict'

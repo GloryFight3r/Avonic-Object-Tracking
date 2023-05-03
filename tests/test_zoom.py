@@ -1,6 +1,6 @@
 import pytest
 
-from src.AvonicCameraApi.zoom import *
+from src.avonic_camera_api.zoom import *
 
 class CameraMock:
     """
