@@ -7,6 +7,8 @@ Currently returns the two angles that are preset
 '''
 Returns the azimuth of the direction 
 from which the sound comes from 
+:param azimuth: currently preset angle 
+:returns: the azimuth angle from microphone
 '''
 def get_azimuth(azimuth: int) -> int:
 
@@ -19,6 +21,8 @@ def get_azimuth(azimuth: int) -> int:
 '''
 Returns the elevation of the direction 
 from which the sound comes from 
+:param elevation: currently preset angle 
+:returns: the elevation angle from microphone
 '''
 def get_elevation(elevation: int) -> int:
 
