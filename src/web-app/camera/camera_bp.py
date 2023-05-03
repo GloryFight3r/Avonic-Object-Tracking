@@ -11,3 +11,8 @@ See templates for interesting details.
 @camera_bp.route('/view')
 def view():
     return render_template('camera/view.html', name="GitLab GitLabovych")
+
+@camera_bp.post('/reboot')
+def post_reboot():
+    # TODO add method from api that sends request to reboot camera
+    return "ok"
