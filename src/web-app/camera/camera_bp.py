@@ -10,9 +10,15 @@ See templates for interesting details.
 '''
 @camera_bp.route('/view')
 def view():
-    return render_template('camera/view.html', name="GitLab GitLabovych")
+    '''
+    Dummy endpoint
+    '''
+    return "ok"
 
 @camera_bp.post('/reboot')
 def post_reboot():
+    '''
+    Endpoint triggers reboot procedure at the camera.
+    '''
     # TODO add method from api that sends request to reboot camera
     return "ok"
