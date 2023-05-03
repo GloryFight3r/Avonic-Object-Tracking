@@ -2,12 +2,15 @@ import socket
 import binascii
 
 class Camera:
+    """
+    This class contains camera information and methods to interact directly with the camera.
+    """
     sock = None
     address = None
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.address = ('192.168.5.93', 1259)
+        self.address = ('192.168.5.93', 1259) # 1259 is the default port for TCP
 
     def send(self, header, command, data):
         self.sock.connect(self.address)
@@ -24,6 +27,9 @@ class Camera:
         return binascii.hexlify(data2).upper()
 
 class API:
+    """
+    The API to communicate with the Avonic camera.
+    """
     camera = None
 
     def __init__(self, camera):

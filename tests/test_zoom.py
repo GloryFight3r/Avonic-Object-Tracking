@@ -3,6 +3,9 @@ import pytest
 from src.AvonicCameraApi.zoom import *
 
 class CameraMock:
+    """
+    Mock camera class to artificially set the zoom value and keep track of amount of requests sent.
+    """
     call_count = None
     zoom = None
 
@@ -23,12 +26,18 @@ class CameraMock:
         return ret
 
 def test_get_zoom():
+    """
+    Test to get the zoom from the Camera.
+    """
     api = API(CameraMock())
     ret = api.get_zoom()
     assert ret == api.camera.zoom
     assert api.camera.call_count == 1
 
 def test_direct_zoom():
+    """
+    Test to set the zoom of the camera.
+    """
     api = API(CameraMock())
 
     # Value of the zoom to set Camera to
@@ -38,6 +47,9 @@ def test_direct_zoom():
     assert api.camera.call_count == 1
 
 def test_insert_zoom_in_hex():
+    """
+    Test to insert the zoom value into the hex message without throwing exceptions.
+    """
     message = "81 01 04 47 0p 0q 0r 0s FF"
     zoom_values = [0, 100, 1000, 15000, 16384]
     results = [
@@ -51,6 +63,9 @@ def test_insert_zoom_in_hex():
         assert insert_zoom_in_hex(message, test[0]) == test[1]
 
 def test_insert_zoom_out_of_range():
+    """
+    Test inserting zoom values that are out of range.
+    """
     message = "81 01 04 47 0p 0q 0r 0s FF"
     with pytest.raises(AssertionError):
         insert_zoom_in_hex(message, 16385)
@@ -59,5 +74,8 @@ def test_insert_zoom_out_of_range():
         insert_zoom_in_hex(message, -1)
 
 def test_insert_zoom_wrong_size_hex():
+    """
+    Test with messages that are too long or too short.
+    """
     short_message = "12 34 56 78 91 12"
     long_message = "12 34 56 78 91 12 34 56 78 91"
