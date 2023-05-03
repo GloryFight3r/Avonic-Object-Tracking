@@ -29,7 +29,7 @@ def test_get_zoom():
     """
     Test to get the zoom from the Camera.
     """
-    api = API(CameraMock())
+    api = CameraAPI(CameraMock())
     ret = api.get_zoom()
     assert ret == api.camera.zoom
     assert api.camera.call_count == 1
@@ -38,7 +38,7 @@ def test_direct_zoom():
     """
     Test to set the zoom of the camera.
     """
-    api = API(CameraMock())
+    api = CameraAPI(CameraMock())
 
     # Value of the zoom to set Camera to
     test_zoom = 100
