@@ -2,8 +2,30 @@ import numpy as np
 
 
 def angle_vector(alpha: int, beta: int) -> np.array:
-    return [alpha,beta,0]
+    """Convert pitch and yaw angles (radians) to a unit vector
+
+    :param alpha: yaw - horizontal angle in rad
+    :param beta: pitch - vertical angle in rad
+    :returns: numpy 3d vector array in the form [x, y, z]
+    looking towards positive z-axis, with the y-axis being the height
+    """
+    cosb = np.cos(beta)
+    return np.array([np.sin(alpha) * cosb, np.sin(beta), np.cos(alpha) * cosb])
 
 
-def vector_angle(v: np.array) -> (int, int):
-    return v[0], v[1]
+def vector_angle(v: np.array) -> (float, float):
+    """Convert directional vector to pitch and yaw angles (radians)
+
+    :param v: the vector [x, y, z] looking towards positive z, with y being the height
+    :returns: alpha - horizontal angle, beta - vertical angle in rad
+    """
+    if len(v) != 3 or not type(v[0]) is float:
+        raise TypeError("vector must contain three floats")
+    norm = np.linalg.norm(v)
+    if norm == 0:
+        raise Exception("vector not normalisable")
+    vec = v / norm  # normalise
+    beta = np.arcsin(vec[1])
+    cosb = np.cos(beta)
+    alpha = np.arcsin(vec[0]/cosb)
+    return alpha, beta
