@@ -37,7 +37,8 @@ class API:
                 zoom_value (int): The value of zoom between 0 (min) and 16384 (max)
         """
         message = "81 09 04 47 FF"
-        ret = str(self.camera.send('', message, ''))[2:-1] # remove b' and '
+        ret = str(self.camera.send('', message, '')) # remove b' and '
+        print(ret)
         hex_res = ret[5] + ret[7] + ret[9] + ret[11]
         return int(hex_res, 16)
 
@@ -51,7 +52,7 @@ class API:
         message = "8x 01 04 47 0p 0q 0r 0s FF"
 
 
-def insert_zoom_in_hex(hex_str, zoom):
+def insert_zoom_in_hex(msg, zoom):
     """
     Inserts the value of the zoom into the hex string in the right format.
 
@@ -62,4 +63,13 @@ def insert_zoom_in_hex(hex_str, zoom):
         Returns:
             message (str): The hex message with inserted values
     """
-    assert zoom > 0 and zoom <= 16384
+    assert zoom >= 0 and zoom <= 16384
+    assert len(msg) == 26
+    insert = hex(zoom)[2:]
+    padded_insert = (4 - len(insert)) * "0" + insert
+    p = padded_insert[0]
+    q = padded_insert[1]
+    r = padded_insert[2]
+    s = padded_insert[3]
+    res = msg[:13] + p + msg[14:16] + q + msg[17:19] + r + msg[20:22] + s + msg[23:]
+    return res

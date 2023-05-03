@@ -17,7 +17,7 @@ def test_get_zoom():
     api = API(CameraMock())
     ret = api.get_zoom()
     assert ret == 16384
-    assert api.call_count == 1
+    assert api.camera.call_count == 1
 
 #def test_direct_zoom():
 #    api = API(CameraMock())
@@ -29,20 +29,26 @@ def test_get_zoom():
 
 
 def test_insert_zoom_in_hex():
-    messages = "81 01 04 47 0p 0q 0r 0s FF"
+    message = "81 01 04 47 0p 0q 0r 0s FF"
     zoom_values = [0, 100, 1000, 15000, 16384]
     results = [
                 "81 01 04 47 00 00 00 00 FF",
                 "81 01 04 47 00 00 06 04 FF",
-                "81 01 04 47 00 03 0E 08 FF",
-                "81 01 04 47 03 0A 09 08 FF",
-                "81 01 04 47 0F 0F 0F 0F FF"
+                "81 01 04 47 00 03 0e 08 FF",
+                "81 01 04 47 03 0a 09 08 FF",
+                "81 01 04 47 04 00 00 00 FF"
               ]
-    for test in zoom_values.zip(results):
+    for test in zip(zoom_values, results):
         assert insert_zoom_in_hex(message, test[0]) == test[1]
 
-    with pytest.raises(Exception):
+def test_insert_zoom_out_of_range():
+    message = "81 01 04 47 0p 0q 0r 0s FF"
+    with pytest.raises(AssertionError):
         insert_zoom_in_hex(message, 16385)
 
-    with pytest.raises(Exception):
+    with pytest.raises(AssertionError):
         insert_zoom_in_hex(message, -1)
+
+def test_insert_zoom_wrong_size_hex():
+    short_message = "12 34 56 78 91 12"
+    long_message = "12 34 56 78 91 12 34 56 78 91"
