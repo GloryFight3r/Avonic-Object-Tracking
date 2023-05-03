@@ -37,7 +37,12 @@ test:
     - source venv/bin/activate
     - pip install build
     - pip install -e '.[test]'
-    - pytest tests/
+    - pytest --cov avonic_camera_api --cov avonic_speaker_tracker --cov-report xml:cov.xml tests/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cov.xml
     #- pip install tox flake8  # you can also use tox
     #- tox -e py36,flake8
 
