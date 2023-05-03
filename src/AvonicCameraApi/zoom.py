@@ -38,18 +38,20 @@ class API:
         """
         message = "81 09 04 47 FF"
         ret = str(self.camera.send('', message, '')) # remove b' and '
-        print(ret)
         hex_res = ret[5] + ret[7] + ret[9] + ret[11]
         return int(hex_res, 16)
 
-    def direct_zoom(self, value):
+    def direct_zoom(self, zoom):
         """
         Change the value of the zoom to the specified value.
 
             Parameters:
                 value (int): The value of zoom between 0 (min) and 16384 (max)
         """
-        message = "8x 01 04 47 0p 0q 0r 0s FF"
+        assert zoom >= 0 and zoom <= 16384
+        message = "81 01 04 47 0p 0q 0r 0s FF"
+        final_message = insert_zoom_in_hex(message, zoom)
+        self.camera.send('', final_message, '')
 
 
 def insert_zoom_in_hex(msg, zoom):
