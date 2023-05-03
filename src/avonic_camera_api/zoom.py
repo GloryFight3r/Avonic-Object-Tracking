@@ -26,7 +26,7 @@ class Camera:
 
         return binascii.hexlify(data2).upper()
 
-class API:
+class CameraAPI:
     """
     The API to communicate with the Avonic camera.
     """

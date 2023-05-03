@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from avonic_camera_api.zoom import Camera, API
 
 camera_bp = Blueprint('camera', __name__,
     template_folder='templates',
@@ -22,3 +23,20 @@ def post_reboot():
     '''
     # TODO add method from api that sends request to reboot camera
     return "ok"
+
+@camera_bp.get('/get_zoom')
+def get_zoom():
+    '''
+    Endpoint triggers reboot procedure at the camera.
+    '''
+    api = API(Camera())
+    return str(api.get_zoom())
+
+@camera_bp.post('/set_zoom')
+def set_zoom():
+    '''
+    Endpoint triggers reboot procedure at the camera.
+    '''
+    api = API(Camera())
+    value = 100
+    return str(api.direct_zoom(value))
