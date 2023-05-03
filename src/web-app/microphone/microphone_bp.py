@@ -10,15 +10,15 @@ microphone_bp = Blueprint('microphone', __name__,
 
 '''
 When a post request is sent to /microphone/direction 
-this method gets the angle from the microphone and 
+this method gets an angle from the microphone and 
 returns a response containing the unit vector in that direction
 '''
 @microphone_bp.post('/direction')
 def get_direction():
-    azimuth = get_azimuth(45)
-    elevation = get_elevation(90)
+    azimuth = get_azimuth(30)
+    elevation = get_elevation(30)
 
-    vec = angle_vector(azimuth,elevation)
+    vec = angle_vector(np.deg2rad(azimuth),np.deg2rad(elevation))
     msg = json.dumps(vec.tolist())
     print(msg)
     return Response(msg,status = 200)
