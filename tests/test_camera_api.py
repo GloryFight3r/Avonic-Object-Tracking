@@ -23,7 +23,6 @@ def test_vector_angle_complex_normalised():
     alpha = -30
     beta = 60
     (a, b) = vector_angle([-0.25, np.sqrt(3)/2, np.sqrt(3)/4])
-    print(np.rad2deg(a))
     assert pytest.approx(a) == np.deg2rad(alpha)
     assert pytest.approx(b) == np.deg2rad(beta)
 
@@ -33,7 +32,6 @@ def test_vector_angle_complex():
     alpha = -30
     beta = 60
     (a, b) = vector_angle([-0.5, np.sqrt(3), np.sqrt(3)/2])
-    print(np.rad2deg(a))
     assert pytest.approx(a) == np.deg2rad(alpha)
     assert pytest.approx(b) == np.deg2rad(beta)
 
