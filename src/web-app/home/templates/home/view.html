@@ -158,9 +158,9 @@
             	  <p>Zoom</p>
 	    	    <form action="/camera/set_zoom" method="post" id="set-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Set zoom</button>
 	    	      <div>
-	    	        <input type="range" id="zoom-value" name="zoomValue"
+	    	        <input type="range" name="zoomValue"
 	    	      	min="0" max="16384">
-	    	        <label for="volume">Zoom value</label>
+	    	        <label id="zoom-value" for="zoomValue">Zoom value</label>
 	    	      </div>
 	    	    </form>
             </div>
@@ -215,10 +215,32 @@
             $('.w-form-fail').css('display','block');
           });
         }
+
+	function getZoomRequest(e){
+          e.preventDefault();
+          var action = $(this).attr("action");
+          var data = {};
+          $(this).serializeArray().map(function(x){data[x.name] = x.value;});
+          $.ajax({
+            type: "GET",
+            url: action,
+            data: JSON.stringify(data),
+            headers: {
+              "Accept": "application/json"
+            },
+            success: function(data) {
+                document.getElementById("zoom-value").innerHTML = data;
+            },
+          }).done(function() {
+            $('.w-form-done').css('display','block');
+          }).fail(function() {
+            $('.w-form-fail').css('display','block');
+          });
+	}
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
-        $("#get-zoom-form").submit(sendGetRequest);
+        $("#get-zoom-form").submit(getZoomRequest);
         $("#set-zoom-form").submit(sendPostRequest);
 
         (() => {
