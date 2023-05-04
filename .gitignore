@@ -8,3 +8,6 @@ venv/
 dist/
 build/
 .pytest_cache/
+cov.xml
+html_cov/
+coverage
