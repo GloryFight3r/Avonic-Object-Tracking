@@ -10,10 +10,10 @@ class Camera:
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.address = ('192.168.5.93', 1259) # 1259 is the default port for TCP
+        self.address = ('192.168.5.94', 1259) # 1259 is the default port for TCP
+        self.sock.connect(self.address)
 
     def send(self, header, command, data):
-        self.sock.connect(self.address)
         header = bytes.fromhex(header)
         command = bytes.fromhex(command)
         data = bytes.fromhex(data)
@@ -21,8 +21,7 @@ class Camera:
 
         self.sock.sendall(message)
 
-        data2 = self.sock.recv(1024)
-        self.sock.close()
+        data2 = self.sock.recv(2048)
 
         return binascii.hexlify(data2).upper()
 
@@ -43,8 +42,9 @@ class CameraAPI:
                 zoom_value (int): The value of zoom between 0 (min) and 16384 (max)
         """
         message = "81 09 04 47 FF"
-        ret = str(self.camera.send('', message, '')) # remove b' and '
-        hex_res = ret[5] + ret[7] + ret[9] + ret[11]
+        ret = str(self.camera.send('', message, ''))
+        hex_res = ret[7] + ret[9] + ret[11] + ret[13]
+        print(ret[13])
         return int(hex_res, 16)
 
     def direct_zoom(self, zoom):

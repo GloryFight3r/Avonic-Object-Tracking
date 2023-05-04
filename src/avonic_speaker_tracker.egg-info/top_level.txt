@@ -1,4 +1,3 @@
-AvonicCameraApi
 avonic_camera_api
 avonic_speaker_tracker
-web-app
+web_app

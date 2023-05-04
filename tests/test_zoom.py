@@ -22,7 +22,7 @@ class CameraMock:
 
         self.call_count += 1
         message = "81 01 04 47 0p 0q 0r 0s FF"
-        ret = insert_zoom_in_hex(message, self.zoom).replace(" ", "")[4:]
+        ret = insert_zoom_in_hex(message, self.zoom).replace(" ", "")[2:]
         return ret
 
 def test_get_zoom():
