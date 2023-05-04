@@ -8,4 +8,3 @@ venv/
 dist/
 build/
 .pytest_cache/
-src/avonic_speaker_tracker.egg-info

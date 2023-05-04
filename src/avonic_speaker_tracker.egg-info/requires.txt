@@ -1,9 +1,0 @@
-flask
-numpy
-
-[test]
-build
-pylint
-black
-pytest
-pytest-cov
