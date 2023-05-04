@@ -47,7 +47,7 @@ class CameraAPI:
         print(ret[13])
         return int(hex_res, 16)
 
-    def direct_zoom(self, zoom):
+    def direct_zoom(self, zoom: int) -> None:
         """
         Change the value of the zoom to the specified value.
 
@@ -60,7 +60,7 @@ class CameraAPI:
         self.camera.send('', final_message, '')
 
 
-def insert_zoom_in_hex(msg, zoom):
+def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """
     Inserts the value of the zoom into the hex string in the right format.
 
