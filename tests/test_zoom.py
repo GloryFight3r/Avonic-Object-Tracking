@@ -17,7 +17,6 @@ class CameraMock:
         if len(command) == 26:
             # to set the zoom of the camera
             hex_res = command[13] + command[16] + command[19] + command[22]
-            print(hex_res.replace(" ", ""))
             self.zoom = int(hex_res, 16)
 
         self.call_count += 1

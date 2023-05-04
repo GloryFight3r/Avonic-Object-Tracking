@@ -44,7 +44,6 @@ class CameraAPI:
         message = "81 09 04 47 FF"
         ret = str(self.camera.send('', message, ''))
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
-        print(ret[13])
         return int(hex_res, 16)
 
     def direct_zoom(self, zoom: int) -> None:
