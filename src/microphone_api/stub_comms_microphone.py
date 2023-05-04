@@ -4,7 +4,7 @@ Currently returns the two angles that are preset
 '''
 
 class MicrophoneAPI:
-
+    
 
     def __init__(self):
         self = self
