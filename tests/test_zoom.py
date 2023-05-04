@@ -1,28 +1,7 @@
 import pytest
 
-from src.avonic_camera_api.zoom import *
-
-class CameraMock:
-    """
-    Mock camera class to artificially set the zoom value and keep track of amount of requests sent.
-    """
-    call_count = None
-    zoom = None
-
-    def __init__(self):
-        self.call_count = 0
-        self.zoom = 16384
-
-    def send(self, header, command, data):
-        if len(command) == 26:
-            # to set the zoom of the camera
-            hex_res = command[13] + command[16] + command[19] + command[22]
-            self.zoom = int(hex_res, 16)
-
-        self.call_count += 1
-        message = "81 01 04 47 0p 0q 0r 0s FF"
-        ret = insert_zoom_in_hex(message, self.zoom).replace(" ", "")[2:]
-        return ret
+from avonic_camera_api.zoom import *
+from tests.CameraMock import CameraMock
 
 def test_get_zoom():
     """
@@ -78,3 +57,7 @@ def test_insert_zoom_wrong_size_hex():
     """
     short_message = "12 34 56 78 91 12"
     long_message = "12 34 56 78 91 12 34 56 78 91"
+    with pytest.raises(AssertionError):
+        insert_zoom_in_hex(short_message, 100)
+    with pytest.raises(AssertionError):
+        insert_zoom_in_hex(long_message, 100)

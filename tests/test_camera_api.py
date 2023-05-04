@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 from avonic_camera_api.converter import angle_vector, vector_angle
 
-
 def test_angle_vector_basic():
     alpha = 0
     beta = 0
