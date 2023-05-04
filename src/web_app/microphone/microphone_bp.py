@@ -15,8 +15,9 @@ this method gets an angle from the microphone and
 '''
 @microphone_bp.post('/direction')
 def get_direction():
-    azimuth = get_azimuth(30)
-    elevation = get_elevation(30)
+    api = MicrophoneAPI()
+    azimuth = api.get_azimuth(30)
+    elevation = api.get_elevation(30)
 
     vec = angle_vector(np.deg2rad(azimuth),np.deg2rad(elevation))
     msg = json.dumps(vec.tolist())
