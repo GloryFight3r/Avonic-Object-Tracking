@@ -1,4 +1,4 @@
-from avonic_camera_api.zoom import insert_zoom_in_hex
+from avonic_camera_api.camera_control_api import insert_zoom_in_hex
 
 class CameraMock:
     """
@@ -21,3 +21,6 @@ class CameraMock:
         message = "81 01 04 47 0p 0q 0r 0s FF"
         ret = insert_zoom_in_hex(message, self.zoom).replace(" ", "")[2:]
         return ret
+
+    def send_no_response(self, header, command, data):
+        pass

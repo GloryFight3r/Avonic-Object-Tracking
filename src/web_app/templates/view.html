@@ -151,18 +151,66 @@
               <form action="/camera/reboot" method="post" id="camera-reboot-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Reboot</button></form>
             </div>
             <div class="bg-body-tertiary p-5 rounded">
-            	  <p>Zoom</p>
-            	  <form action="/camera/get_zoom" method="get" id="get-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Get zoom</button></form>
+                <p>Off</p>
+                <form action="/camera/off" method="post" id="camera-off-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Off</button></form>
+              </div>
+            <div class="bg-body-tertiary p-5 rounded">
+                <p>On</p>
+                <form action="/camera/on" method="post" id="camera-on-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">On</button></form>
             </div>
             <div class="bg-body-tertiary p-5 rounded">
-            	  <p>Zoom</p>
-	    	    <form action="/camera/set_zoom" method="post" id="set-zoom-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Set zoom</button>
-	    	      <div>
-	    	        <input type="range" name="zoomValue"
-	    	      	min="0" max="16384">
-	    	        <label id="zoom-value" for="zoomValue">Zoom value</label>
-	    	      </div>
-	    	    </form>
+              <p>Zoom</p>
+              <form action="/camera/zoom/get" method="get" id="camera-zoom-get-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Get zoom</button></form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+              <p>Zoom</p>
+              <form action="/camera/zoom/set" method="post" id="camera-zoom-set-form">
+                <button type="submit" target="hiddenFrame" class="btn btn-primary">Set zoom</button>
+                <div>
+                  <input type="range" name="zoomValue" min="0" max="16384">
+                  <label id="zoom-value" for="zoomValue">Zoom value</label>
+                </div>
+              </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+              <p>Move absolute</p>
+              <form action="/camera/move/absolute" method="post" id="camera-move-absolute">
+                <input type="number" id="absolute-speed-x" name="absolute-speed-x" value="24">
+                <label for="absolute-speed-x">SpeedX</label><br>
+                <input type="number" id="absolute-speed-y" name="absolute-speed-y" value="24">
+                <label for="absolute-speed-y">SpeedY</label><br>
+                <input type="number" id="absolute-degrees-x" name="absolute-degrees-x" value="90">
+                <label for="absolute-degrees-x">DegreesX</label><br>
+                <input type="number" id="absolute-degrees-y" name="absolute-degrees-y" value="90">
+                <label for="absolute-degrees-y">DegreesY</label><br>
+                <div class="container pt-1">
+                  <button type="submit" target="hiddenFrame" class="btn btn-primary">Move</button>
+                </div>
+              </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+              <p>Move relative</p>
+              <form action="/camera/move/relative" method="post" id="camera-move-relative">
+                <input type="number" id="relative-speed-x" name="relative-speed-x" value="24">
+                <label for="relative-speed-x">SpeedX</label><br>
+                <input type="number" id="relative-speed-y" name="relative-speed-y" value="24">
+                <label for="relative-speed-y">SpeedY</label><br>
+                <input type="number" id="relative-degrees-x" name="relative-degrees-x" value="10">
+                <label for="relative-degrees-x">DegreesX</label><br>
+                <input type="number" id="relative-degrees-y" name="relative-degrees-y" value="10">
+                <label for="relative-degrees-y">DegreesY</label><br>
+                <div class="container pt-1">
+                  <button type="submit" target="hiddenFrame" class="btn btn-primary">Move</button>
+                </div>
+              </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+              <p>Home</p>
+              <form action="/camera/move/home" method="post" id="camera-home-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Home</button></form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+                <p>Stop</p>
+                <form action="/camera/move/stop" method="post" id="camera-stop-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Stop</button></form>
             </div>
         </div>
     </main>
@@ -187,6 +235,7 @@
             success: function(data) {
                 console.log(data);
             },
+            contentType:'application/json'
           }).done(function() {
             $('.w-form-done').css('display','block');
           }).fail(function() {
@@ -194,21 +243,18 @@
           });
         }
 
-        function sendGetRequest(e){
+        function sendGetRequest(e, url_spec, onSuccess){
           e.preventDefault();
-          var action = $(this).attr("action");
           var data = {};
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "GET",
-            url: action,
+            url: url_spec,
             data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
             },
-            success: function(data) {
-                console.log(data);
-            },
+            success: onSuccess
           }).done(function() {
             $('.w-form-done').css('display','block');
           }).fail(function() {
@@ -240,8 +286,16 @@
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
-        $("#get-zoom-form").submit(getZoomRequest);
-        $("#set-zoom-form").submit(sendPostRequest);
+        $("#camera-on-form").submit(sendPostRequest);
+        $("#camera-off-form").submit(sendPostRequest);
+        $("#camera-move-absolute").submit(sendPostRequest);
+        $("#camera-move-relative").submit(sendPostRequest);
+        $("#camera-home-form").submit(sendPostRequest);
+        $("#camera-zoom-get-form").submit(function(e){
+          sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })
+        });
+        $("#camera-zoom-set-form").submit(sendPostRequest);
+        $("#camera-stop-form").submit(sendPostRequest);
 
         (() => {
   'use strict'
