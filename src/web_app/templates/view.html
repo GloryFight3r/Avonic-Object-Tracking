@@ -144,10 +144,12 @@
             <h2 id="microphone-heading">Microphone</h2>
             <div class="bg-body-tertiary p-5 rounded">
               <p>Microphone height</p>
-              <form action="/microphone/set/height" method="post" id="microphone-set-height-form">
-                <input type="number" id="microphone-height" name="microphone-height" value="0" step="0.01">
-                <label for="microphone-height">Meters</label><br>
+              <form action="/microphone/height/set" method="post" id="microphone-set-height-form">
                 <button type="submit" target="hiddenFrame" class="btn btn-primary">Set</button>
+                <div>
+		  <input type="number" name="microphoneHeight" step="0.01" value="0">
+                  <label for="microphoneHeight">Meters</label><br>
+                </div>
               </form>
             </div>
             <h2 id="camera-heading">Camera</h2>
@@ -226,18 +228,17 @@
         function sendPostRequest(e, url_spec=$(this).attr("action"), onSuccess=function(data) {console.log(data)}){
           e.preventDefault();
           //var action = $(this).attr("action");
-          var data = { e };
+	  var data = { e }
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
             url: url_spec,
-	    contentType:'application/json',
             data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
             },
             success: onSuccess,
-            contentType:'application/json'
+	    contentType:'application/json'
           }).done(function() {
             $('.w-form-done').css('display','block');
           }).fail(function() {
@@ -273,13 +274,17 @@
         $("#camera-move-relative").submit(sendPostRequest);
         $("#camera-home-form").submit(sendPostRequest);
         $("#camera-zoom-get-form").submit(function(e){
-          sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })
+		sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
-	$("#microphone-set-height-form").submit(function(e) {
-	  sendPostRequest(e, "/microphone/set/height", function(data) {alert("Height set to")})
-	});
+
+	// For some reason, this results in empty data on the server side
+	//$("#microphone-set-height-form").submit(function(e) {
+	//  sendPostRequest(e);
+	//});
+
+	$("#microphone-set-height-form").submit(sendPostRequest);
 
         (() => {
   'use strict'

@@ -2,14 +2,14 @@ from flask import Flask, session, jsonify, current_app, abort, render_template, 
 import socket
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
-from microphone_api import Microphone
+from microphone_api.microphone_adapter import Microphone
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = ('192.168.5.94', 1259)
 api = CameraAPI(None)
 
-mic =
+mic = Microphone()
 mic_api = MicrophoneAPI(mic)
 
 app = Flask(__name__)
@@ -93,6 +93,10 @@ def stop():
     api.stop()
     return success()
 
-@app.post('/microphone/set/height')
+@app.post('/microphone/height/set')
 def set_height():
-    return success()
+    """
+    Endpoint to set the height of the microphone.
+    """
+    mic_api.set_height(float(request.get_json()["microphoneHeight"]))
+    return str(mic_api.microphone.height)
