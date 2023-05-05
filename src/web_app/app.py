@@ -1,9 +1,7 @@
-
-from flask import Flask, session, jsonify, current_app, abort, render_template, make_response, request, Response
+from flask import Flask, jsonify, abort, render_template, make_response, request, Response
 import socket
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera
-from microphone_api.stub_comms_microphone import *
+from microphone_api.stub_comms_microphone import MicrophoneAPI
 from avonic_camera_api.converter import *
 import json
 
@@ -14,16 +12,20 @@ mic_api = MicrophoneAPI()
 
 app = Flask(__name__)
 
+
 def success():
     return make_response(jsonify({}), 200)
+
 
 @app.get('/fail-me')
 def fail_me():
     abort(418)
 
+
 @app.get('/')
 def view():
     return render_template('view.html')
+
 
 @app.post('/camera/reboot')
 def post_reboot():
@@ -33,6 +35,7 @@ def post_reboot():
     api.reboot()
     return success()
 
+
 @app.post('/camera/on')
 def post_on():
     '''
@@ -40,6 +43,7 @@ def post_on():
     '''
     api.turn_on()
     return success()
+
 
 @app.post('/camera/off')
 def post_off():
@@ -49,6 +53,7 @@ def post_off():
     api.turn_off()
     return success()
 
+
 @app.post('/camera/move/absolute')
 def post_move_absolute():
     data = request.get_json()
@@ -56,16 +61,19 @@ def post_move_absolute():
     api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]), int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     return success()
 
+
 @app.post('/camera/move/relative')
 def post_move_relative():
     data = request.get_json()
     api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]), int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
     return success()
 
+
 @app.post('/camera/move/home')
 def post_home():
     api.home()
     return success()
+
 
 @app.get('/camera/zoom/get')
 def get_zoom():
@@ -76,6 +84,7 @@ def get_zoom():
     print(zoom)
     return str(zoom)
 
+
 @app.post('/camera/zoom/set')
 def set_zoom():
     """
@@ -84,6 +93,7 @@ def set_zoom():
     value = int(request.get_json()["zoomValue"])
     api.direct_zoom(value)
     return success()
+
 
 @app.post('/camera/move/stop')
 def stop():
