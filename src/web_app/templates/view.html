@@ -143,6 +143,7 @@
         <div data-bs-spy="scroll" data-bs-target="#main-navbar" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h2 id="microphone-heading">Microphone</h2>
             <div class="bg-body-tertiary p-5 rounded">
+<<<<<<< HEAD
               <p>Microphone height</p>
               <form action="/microphone/height/set" method="post" id="microphone-set-height-form">
                 <button type="submit" target="hiddenFrame" class="btn btn-primary">Set</button>
@@ -151,6 +152,10 @@
                   <label for="microphoneHeight">Meters</label><br>
                 </div>
               </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+              <p>Some text for reference</p>
+              <form action = "/microphone/direction" method = "post" id = "microphone-direction-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button></form>
             </div>
             <h2 id="camera-heading">Camera</h2>
             <div class="bg-body-tertiary p-5 rounded">
@@ -268,6 +273,7 @@
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
+        $("#microphone-direction-form").submit(sendPostRequest);
         $("#camera-on-form").submit(sendPostRequest);
         $("#camera-off-form").submit(sendPostRequest);
         $("#camera-move-absolute").submit(sendPostRequest);

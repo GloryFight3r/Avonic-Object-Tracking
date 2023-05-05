@@ -1,13 +1,18 @@
-from flask import Flask, session, jsonify, current_app, abort, render_template, make_response, request
+
+from flask import Flask, session, jsonify, current_app, abort, render_template, make_response, request, Response
 import socket
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_adapter import Microphone
 from microphone_api.microphone_control_api import MicrophoneAPI
+from microphone_api.stub_comms_microphone import *
+from avonic_camera_api.converter import *
+import json
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = ('192.168.5.94', 1259)
 api = CameraAPI(None)
+mic_api = MicrophoneAPI()
 
 mic = Microphone()
 mic_api = MicrophoneAPI(mic)
@@ -93,6 +98,7 @@ def stop():
     api.stop()
     return success()
 
+<<<<<<< HEAD
 @app.post('/microphone/height/set')
 def set_height():
     """
@@ -100,3 +106,20 @@ def set_height():
     """
     mic_api.set_height(float(request.get_json()["microphoneHeight"]))
     return str(mic_api.microphone.height)
+=======
+
+@app.post('/microphone/direction')
+def get_direction():
+    '''
+    When a post request is sent to /microphone/direction
+    this method gets an angle from the microphone and
+    :returns: a response containing the unit vector in that direction
+    '''
+    azimuth = mic_api.get_azimuth(30)
+    elevation = mic_api.get_elevation(30)
+
+    vec = angle_vector(np.deg2rad(azimuth),np.deg2rad(elevation))
+    msg = json.dumps(vec.tolist())
+    print(msg)
+    return Response(msg,status = 200)
+>>>>>>> dev
