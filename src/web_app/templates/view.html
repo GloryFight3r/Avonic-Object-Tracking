@@ -228,7 +228,7 @@
         function sendPostRequest(e, url_spec=$(this).attr("action"), onSuccess=function(data) {console.log(data)}){
           e.preventDefault();
           //var action = $(this).attr("action");
-	  var data = { e }
+	  var data = { e };
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
@@ -281,10 +281,10 @@
 
 	// For some reason, this results in empty data on the server side
 	//$("#microphone-set-height-form").submit(function(e) {
-	//  sendPostRequest(e);
+	//	sendPostRequest(e, "/microphone/height/set", function(data) {alert(data);});
 	//});
 
-	$("#microphone-set-height-form").submit(sendPostRequest);
+	//$("#microphone-set-height-form").submit(sendPostRequest);
 
         (() => {
   'use strict'
