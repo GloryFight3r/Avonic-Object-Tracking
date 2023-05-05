@@ -9,7 +9,7 @@ from microphone_api.stub_comms_microphone import MicrophoneAPI
 from avonic_camera_api.converter import *
 
 load_dotenv()
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 address = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
 api = CameraAPI(Camera(sock, address))
 mic_api = MicrophoneAPI()

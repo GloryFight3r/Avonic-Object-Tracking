@@ -12,11 +12,19 @@ class CameraAPI:
             camera: object of type Camera
         """
         self.camera = camera
+        self.counter = 1
+
+    def message_counter(self) -> str:
+        cnt_hex = self.counter.to_bytes(1, 'big').hex()
+
+        self.counter += 1
+
+        return cnt_hex
 
     def reboot(self) -> None:
         """ Reboots the camera - the camera will do a complete reboot
         """
-        self.camera.send_no_response('', '81 0A 01 06 01 FF', '')
+        self.camera.send_no_response('01 00 00 06 00 00 00' + self.message_counter(), '81 0A 01 06 01 FF')
 
         self.camera.reconnect()
 
@@ -28,7 +36,7 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        return self.camera.send('', '81 01 06 01 05 05 03 03 FF', '')
+        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), '81 01 06 01 05 05 03 03 FF', self.counter)
 
     def turn_on(self) -> bytes:
         """ Turns on the camera
@@ -36,7 +44,7 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        return self.camera.send('', '81 01 04 00 02 FF', '')
+        return self.camera.send('01 00 00 06 00 00 00' + self.message_counter(), '81 01 04 00 02 FF', self.counter)
 
     def turn_off(self) -> bytes:
         """ Turns off the camera - the camera continues receiving and responding to requests
@@ -44,7 +52,7 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        return self.camera.send('', '81 01 04 00 03 FF', '')
+        return self.camera.send('01 00 00 06 00 00 00' + self.message_counter(), '81 01 04 00 03 FF', self.counter)
 
     def home(self) -> bytes:
         """ Points the camera towards the 'home' direction
@@ -52,7 +60,7 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        return self.camera.send('', '81 01 06 04 FF', '')
+        return self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), '81 01 06 04 FF', self.counter)
 
     def degrees_to_command(self, degree: float) -> str:
         """ Transforms an angle in degree to a command code for visca call
@@ -93,9 +101,9 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('', '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
+        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(), '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
-                                self.degrees_to_command(degrees_y) + " FF", '')
+                                self.degrees_to_command(degrees_y) + " FF", self.counter)
 
     def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bytes:
         """ Rotates the camera in absolute position (current position does not matter)
@@ -112,9 +120,9 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('', '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
+        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(), '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
-                                self.degrees_to_command(degrees_y) + " FF", '')
+                                self.degrees_to_command(degrees_y) + " FF", self.counter)
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> bytes:
         """ Rotates the camera in the direction of a vector (with home position being [0, 0, 1]
@@ -138,14 +146,7 @@ class CameraAPI:
         """
         message = "81 09 04 47 FF"
 
-        self.camera.send_no_response('', message, '')
-        ret = str(binascii.hexlify(self.camera.sock.recv(2048)).upper())[2:-1].split("FF")
-        ret = list(filter(lambda x : len(x) == 12, ret))
-        while len(ret) == 0:
-            ret = str(binascii.hexlify(self.camera.sock.recv(2048)).upper())[2:-1].split("FF")
-            ret = list(filter(lambda x : len(x) == 12, ret))
-        ret = ret[0] + "FF"
-        assert len(ret) == 14
+        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
         
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
@@ -159,7 +160,7 @@ class CameraAPI:
         assert 0 <= zoom <= 16384
         message = "81 01 04 47 0p 0q 0r 0s FF"
         final_message = insert_zoom_in_hex(message, zoom)
-        self.camera.send('', final_message, '')
+        self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
