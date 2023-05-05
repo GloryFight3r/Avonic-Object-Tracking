@@ -114,7 +114,7 @@ def stop():
     return success()
 
 
-@app.post('/microphone/direction')
+@app.get('/microphone/direction')
 def get_direction():
     '''
     When a post request is sent to /microphone/direction 
