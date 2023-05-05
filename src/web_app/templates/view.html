@@ -206,6 +206,24 @@
               </form>
             </div>
             <div class="bg-body-tertiary p-5 rounded">
+                <p>Move by vector</p>
+                <form action="/camera/move/vector" method="post" id="camera-move-vector">
+                    <input type="number" id="vector-speed-x" name="vector-speed-x" value="24">
+                    <label for="vector-speed-x">SpeedX</label><br>
+                    <input type="number" id="vector-speed-y" name="vector-speed-y" value="24">
+                    <label for="vector-speed-y">SpeedY</label><br>
+                    <input id="vector-x" name="vector-x">
+                    <label for="vector-x">x</label><br>
+                    <input id="vector-y" name="vector-y">
+                    <label for="vector-y">y</label><br>
+                    <input id="vector-z" name="vector-z">
+                    <label for="vector-z">z</label><br>
+                    <div class="container pt-1">
+                        <button type="submit" target="hiddenFrame" class="btn btn-primary">Move</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
               <p>Home</p>
               <form action="/camera/move/home" method="post" id="camera-home-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Home</button></form>
             </div>

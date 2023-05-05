@@ -69,6 +69,14 @@ def post_move_relative():
     return success()
 
 
+@app.post('/camera/move/vector')
+def post_move_vector():
+    value = request.get_json()
+    api.move_vector(int(value["vector-speed-x"]), int(value["vector-speed-y"]),
+                    [float(value["vector-x"]), float(value["vector-y"]), float(value["vector-z"])])
+    return success()
+
+
 @app.post('/camera/move/home')
 def post_home():
     api.home()
