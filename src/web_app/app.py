@@ -9,9 +9,9 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 
 load_dotenv()
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-address = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
-api = CameraAPI(Camera(sock, address))
+cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
+cam_api = CameraAPI(Camera(cam_sock, cam_addr))
 mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
 mic_api = MicrophoneAPI(UDPSocket(mic_addr), int(getenv("MIC_THRESH")))
 
@@ -34,56 +34,56 @@ def view():
 
 @app.post('/camera/reboot')
 def post_reboot():
-    '''
+    """
     Endpoint triggers reboot procedure at the camera.
-    '''
-    api.reboot()
+    """
+    cam_api.reboot()
     return success()
 
 
 @app.post('/camera/on')
 def post_on():
-    '''
+    """
     Endpoint triggers turn on procedure at the camera.
-    '''
-    api.turn_on()
+    """
+    cam_api.turn_on()
     return success()
 
 
 @app.post('/camera/off')
 def post_off():
-    '''
+    """
     Endpoint triggers turn off at the camera.
-    '''
-    api.turn_off()
+    """
+    cam_api.turn_off()
     return success()
 
 
 @app.post('/camera/move/absolute')
 def post_move_absolute():
     data = request.get_json()
-    api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]), int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
+    cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]), int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     return success()
 
 
 @app.post('/camera/move/relative')
 def post_move_relative():
     data = request.get_json()
-    api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]), int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
+    cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]), int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
     return success()
 
 
 @app.post('/camera/move/vector')
 def post_move_vector():
     value = request.get_json()
-    api.move_vector(int(value["vector-speed-x"]), int(value["vector-speed-y"]),
-                    [float(value["vector-x"]), float(value["vector-y"]), float(value["vector-z"])])
+    cam_api.move_vector(int(value["vector-speed-x"]), int(value["vector-speed-y"]),
+                        [float(value["vector-x"]), float(value["vector-y"]), float(value["vector-z"])])
     return success()
 
 
 @app.post('/camera/move/home')
 def post_home():
-    api.home()
+    cam_api.home()
     return success()
 
 
@@ -92,7 +92,7 @@ def get_zoom():
     """
     Endpoint to get the zoom value of the camera.
     """
-    zoom = api.get_zoom()
+    zoom = cam_api.get_zoom()
     return str(zoom)
 
 
@@ -102,7 +102,7 @@ def set_zoom():
     Endpoint to set the zoom value of the camera.
     """
     value = int(request.get_json()["zoomValue"])
-    api.direct_zoom(value)
+    cam_api.direct_zoom(value)
     return success()
 
 
@@ -111,20 +111,22 @@ def stop():
     """
     Endpoint to stop the rotation of the camera.
     """
-    api.stop()
+    cam_api.stop()
     return success()
 
 
 @app.get('/microphone/direction')
 def get_direction():
-    '''
-    When a post request is sent to /microphone/direction 
-    this method gets an angle from the microphone and 
-    :returns: a response containing the unit vector in that direction
-    '''
-    azimuth = mic_api.get_azimuth()
-    elevation = mic_api.get_elevation()
-
-    vec = (azimuth, elevation)
-    msg = json.dumps(vec)
+    """
+    Endpoint to get the direction of the speaker.
+    """
+    msg = json.dumps(mic_api.get_direction())
     return Response(msg, status=200)
+
+
+@app.get('/microphone/speaking')
+def get_speaking():
+    """
+    Endpoint to inquire whether anyone is speaking.
+    """
+    return Response(mic_api.is_speaking(), status=200)

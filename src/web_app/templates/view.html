@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> Home page</title>
+    <title>Home page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="/docs/5.3/assets/js/color-modes.js"></script>
     <style>
@@ -143,8 +143,12 @@
         <div data-bs-spy="scroll" data-bs-target="#main-navbar" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h2 id="microphone-heading">Microphone</h2>
             <div class="bg-body-tertiary p-5 rounded">
-              <p>Some text for reference</p>
+              <p>Direction: </p><p id="mic-direction"></p>
               <form action = "/microphone/direction" method = "get" id = "microphone-direction-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button></form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+                <p>Speaking: </p><p id="mic-speaking"></p>
+                <form action = "/microphone/speaking" method = "get" id = "microphone-speaking-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Is someone speaking?</button></form>
             </div>
             <h2 id="camera-heading">Camera</h2>
             <div class="bg-body-tertiary p-5 rounded">
@@ -304,8 +308,13 @@
 	}
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
+        $("#microphone-direction-form").submit(function (e){
+            sendGetRequest(e, "/microphone/direction", function(data){ $("#mic-direction").val(data)})
+        });
+        $("#microphone-speaking-form").submit(function (e){
+            sendGetRequest(e, "/microphone/speaking", function (data){ $("#mic-speaking").val(data)})
+        })
         $("#camera-reboot-form").submit(sendPostRequest);
-        $("#microphone-direction-form").submit(sendGetRequest);
         $("#camera-on-form").submit(sendPostRequest);
         $("#camera-off-form").submit(sendPostRequest);
         $("#camera-move-absolute").submit(sendPostRequest);
