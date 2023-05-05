@@ -1,13 +1,16 @@
 from flask import Flask, jsonify, abort, render_template, make_response, request, Response
 import socket
+import json
+from dotenv import load_dotenv
+from os import getenv
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.stub_comms_microphone import MicrophoneAPI
 from avonic_camera_api.converter import *
-import json
 
+load_dotenv()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-address = ('84.25.237.235', 1259)
+address = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
 api = CameraAPI(Camera(sock, address))
 mic_api = MicrophoneAPI()
 
