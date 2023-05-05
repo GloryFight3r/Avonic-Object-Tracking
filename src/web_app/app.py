@@ -10,6 +10,7 @@ import json
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = ('192.168.5.94', 1259)
 api = CameraAPI(None)
+mic_api = MicrophoneAPI()
 
 app = Flask(__name__)
 
@@ -100,9 +101,8 @@ def get_direction():
     this method gets an angle from the microphone and 
     :returns: a response containing the unit vector in that direction
     '''
-    api = MicrophoneAPI()
-    azimuth = api.get_azimuth(30)
-    elevation = api.get_elevation(30)
+    azimuth = mic_api.get_azimuth(30)
+    elevation = mic_api.get_elevation(30)
 
     vec = angle_vector(np.deg2rad(azimuth),np.deg2rad(elevation))
     msg = json.dumps(vec.tolist())
