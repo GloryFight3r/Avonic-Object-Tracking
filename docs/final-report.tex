@@ -1,0 +1,47 @@
+% Preamble
+\documentclass[12pt,twoside]{report}
+
+% Packages
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[style=numeric,sorting=ynt,backend=biber]{biblatex}
+\addbibresource{sources.bib}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot[LE,RO]{\{Name of project\}}
+\fancyfoot[LO,RE]{\{Group\}}
+
+% Document
+\begin{document}
+    \begin{titlepage}
+        \begin{center}
+            \vspace*{8cm}
+            \Huge
+            \textbf{Avonic camera microphone integration}
+
+            \vspace{0.5cm}
+            \LARGE
+            Subtitle
+
+            \Large
+            (CSE2000 Software Project Final Report)
+
+            \vfill
+        \end{center}
+        \begin{flushleft}
+            \large
+            Izzy van der Giessen, Petr Khartskhaev, Yehor Kozyr,\\
+            Borislav Semerdzhiev, Ivan Smilenov \\
+            \vspace{0.7cm}
+            June 2023
+        \end{flushleft}
+    \end{titlepage}
+
+    \tableofcontents
+    \chapter{Introduction}
+    \input{chapters/intro}
+
+    \appendix
+    \printbibliography
+\end{document}

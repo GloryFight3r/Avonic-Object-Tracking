@@ -1,0 +1,15 @@
+.idea/
+.vscode/
+__pycache__/
+*.py[cod]
+docs/build/
+git.html
+venv/
+dist/
+build/
+.pytest_cache/
+cov.xml
+html_cov/
+.coverage
+src/avonic_speaker_tracker.egg-info/
+.env
