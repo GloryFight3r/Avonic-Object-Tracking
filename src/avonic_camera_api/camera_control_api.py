@@ -53,7 +53,7 @@ class CameraAPI:
             The response code from the camera
         """
         return self.camera.send('', '81 01 06 04 FF', '')
-    
+
     def degrees_to_command(self, degree:float) -> str:
         """Transforms an angle in degree to a command code for visca call
 
@@ -69,9 +69,9 @@ class CameraAPI:
             degree_divided = ((abs(degree_divided) - 1) ^ ((1 << 16) - 1))
 
         in_bytes = hex(degree_divided)[2:]
-        
+
         in_bytes = '0' * (4 - len(in_bytes)) + in_bytes
-        
+
         answer_string = ''
 
         for t in in_bytes:
@@ -85,7 +85,7 @@ class CameraAPI:
         Args:
             speedX: Integer in the range [0x01(hex) : 0x18(hex)] indicating the pan speed
             speedY: Integer in the range [0x01(hex) : 0x14(hex)] indicating the tilt speed
-            degreesX: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°] 
+            degreesX: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°]
             degreesY: Tilt position, could be a float but precision might be lost - range is [-30° to +90°]
         Returns:
             The response code from the camera
@@ -101,7 +101,7 @@ class CameraAPI:
         Args:
             speedX: Integer in the range [0x01(hex) : 0x18(hex)] indicating the pan speed
             speedY: Integer in the range [0x01(hex) : 0x14(hex)] indicating the tilt speed
-            degreesX: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°] 
+            degreesX: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°]
             degreesY: Tilt position, could be a float but precision might be lost - range is [-30° to +90°]
 
         Returns:
@@ -132,7 +132,7 @@ class CameraAPI:
         print(ret)
         print("DAS")
         assert len(ret) == 14
-        
+
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 

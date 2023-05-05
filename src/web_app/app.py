@@ -2,10 +2,15 @@ from flask import Flask, session, jsonify, current_app, abort, render_template, 
 import socket
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
+from microphone_api import Microphone
+from microphone_api.microphone_control_api import MicrophoneAPI
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = ('192.168.5.94', 1259)
 api = CameraAPI(None)
+
+mic =
+mic_api = MicrophoneAPI(mic)
 
 app = Flask(__name__)
 
