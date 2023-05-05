@@ -7,14 +7,13 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
-from avonic_camera_api.converter import *
 
 load_dotenv()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
 api = CameraAPI(Camera(sock, address))
 mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
-mic_api = MicrophoneAPI(UDPSocket(mic_addr))
+mic_api = MicrophoneAPI(UDPSocket(mic_addr), int(getenv("MIC_THRESH")))
 
 app = Flask(__name__)
 
