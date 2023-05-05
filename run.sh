@@ -8,7 +8,7 @@ if [ "$1" = "test" ]
   then
     pip install -e '.[test]'
     echo "Running tests with coverage"
-    pytest --cov avonic_speaker_tracker --cov avonic_camera_api --cov microphone_api --cov web_app
+    pytest --cov
 else
     pip install .
 fi

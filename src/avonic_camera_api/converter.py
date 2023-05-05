@@ -26,7 +26,10 @@ def vector_angle(v: np.array) -> (float, float):
         alpha - horizontal angle, beta - vertical angle in rad
     """
     if len(v) != 3 or not type(v[0]) is np.float64:
-        raise TypeError("vector must contain three floats")
+        if type(v[0]) is float:
+            np.float64(v)
+        else:
+            raise TypeError("vector must contain three floats")
     norm = np.linalg.norm(v)
     if norm == 0:
         raise Exception("vector not normalisable")
