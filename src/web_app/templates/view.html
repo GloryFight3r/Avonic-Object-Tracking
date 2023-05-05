@@ -144,7 +144,7 @@
             <h2 id="microphone-heading">Microphone</h2>
             <div class="bg-body-tertiary p-5 rounded">
               <p>Some text for reference</p>
-              <form action = "/microphone/direction" method = "post" id = "microphone-direction-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button></form> 
+              <form action = "/microphone/direction" method = "get" id = "microphone-direction-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button></form>
             </div>
             <h2 id="camera-heading">Camera</h2>
             <div class="bg-body-tertiary p-5 rounded">
@@ -178,7 +178,7 @@
               <form action="/camera/move/absolute" method="post" id="camera-move-absolute">
                 <input type="number" id="absolute-speed-x" name="absolute-speed-x" value="24">
                 <label for="absolute-speed-x">SpeedX</label><br>
-                <input type="number" id="absolute-speed-y" name="absolute-speed-y" value="24">
+                <input type="number" id="absolute-speed-y" name="absolute-speed-y" value="20">
                 <label for="absolute-speed-y">SpeedY</label><br>
                 <input type="number" id="absolute-degrees-x" name="absolute-degrees-x" value="90">
                 <label for="absolute-degrees-x">DegreesX</label><br>
@@ -194,7 +194,7 @@
               <form action="/camera/move/relative" method="post" id="camera-move-relative">
                 <input type="number" id="relative-speed-x" name="relative-speed-x" value="24">
                 <label for="relative-speed-x">SpeedX</label><br>
-                <input type="number" id="relative-speed-y" name="relative-speed-y" value="24">
+                <input type="number" id="relative-speed-y" name="relative-speed-y" value="20">
                 <label for="relative-speed-y">SpeedY</label><br>
                 <input type="number" id="relative-degrees-x" name="relative-degrees-x" value="10">
                 <label for="relative-degrees-x">DegreesX</label><br>
@@ -210,7 +210,7 @@
                 <form action="/camera/move/vector" method="post" id="camera-move-vector">
                     <input type="number" id="vector-speed-x" name="vector-speed-x" value="24">
                     <label for="vector-speed-x">SpeedX</label><br>
-                    <input type="number" id="vector-speed-y" name="vector-speed-y" value="24">
+                    <input type="number" id="vector-speed-y" name="vector-speed-y" value="20">
                     <label for="vector-speed-y">SpeedY</label><br>
                     <input id="vector-x" name="vector-x">
                     <label for="vector-x">x</label><br>
@@ -305,11 +305,12 @@
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
-        $("#microphone-direction-form").submit(sendPostRequest);
+        $("#microphone-direction-form").submit(sendGetRequest);
         $("#camera-on-form").submit(sendPostRequest);
         $("#camera-off-form").submit(sendPostRequest);
         $("#camera-move-absolute").submit(sendPostRequest);
         $("#camera-move-relative").submit(sendPostRequest);
+        $("#camera-move-vector").submit(sendPostRequest)
         $("#camera-home-form").submit(sendPostRequest);
         $("#camera-zoom-get-form").submit(function(e){
           sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })

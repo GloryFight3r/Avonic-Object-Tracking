@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, abort, render_template, make_response, request, Response
 import socket
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_adapter import Camera
 from microphone_api.stub_comms_microphone import MicrophoneAPI
 from avonic_camera_api.converter import *
 import json
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-address = ('192.168.5.94', 1259)
-api = CameraAPI(None)
+address = ('84.25.237.235', 1259)
+api = CameraAPI(Camera(sock, address))
 mic_api = MicrophoneAPI()
 
 app = Flask(__name__)
@@ -57,7 +58,6 @@ def post_off():
 @app.post('/camera/move/absolute')
 def post_move_absolute():
     data = request.get_json()
-    print(data)
     api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]), int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     return success()
 
@@ -89,7 +89,6 @@ def get_zoom():
     Endpoint to get the zoom value of the camera.
     """
     zoom = api.get_zoom()
-    print(zoom)
     return str(zoom)
 
 
@@ -124,5 +123,4 @@ def get_direction():
 
     vec = angle_vector(np.deg2rad(azimuth),np.deg2rad(elevation))
     msg = json.dumps(vec.tolist())
-    print(msg)
     return Response(msg,status = 200)

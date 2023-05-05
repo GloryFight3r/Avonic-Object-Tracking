@@ -140,15 +140,11 @@ class CameraAPI:
 
         self.camera.send_no_response('', message, '')
         ret = str(binascii.hexlify(self.camera.sock.recv(2048)).upper())[2:-1].split("FF")
-        print(ret)
         ret = list(filter(lambda x : len(x) == 12, ret))
         while len(ret) == 0:
             ret = str(binascii.hexlify(self.camera.sock.recv(2048)).upper())[2:-1].split("FF")
             ret = list(filter(lambda x : len(x) == 12, ret))
         ret = ret[0] + "FF"
-        print(len(ret))
-        print(ret)
-        print("DAS")
         assert len(ret) == 14
         
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]

@@ -10,7 +10,7 @@ class Camera:
     sock = None
     address = None
 
-    def __init__(self, sock:socket.socket, address):
+    def __init__(self, sock: socket.socket, address):
         """ Constructor for Camera
 
         Args:
