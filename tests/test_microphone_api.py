@@ -9,6 +9,7 @@ def test_azimuth():
     sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":46}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert api.get_azimuth() == 46
+    assert api.azimuth == 46
 
 def test_azimuth_recv_error():
     """ Invalid command
@@ -35,6 +36,7 @@ def test_elevation():
     sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":90}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert api.get_elevation() == 90
+    assert api.elevation == 90
 
 def test_direction():
     sock = mock.Mock()
@@ -42,6 +44,8 @@ def test_direction():
     sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert api.get_direction() == [0.0, 0.0, 1.0]
+    assert api.azimuth == 0
+    assert api.elevation == 0
 
 def test_speaking():
     sock = mock.Mock()
@@ -49,6 +53,7 @@ def test_speaking():
     sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-5}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert api.is_speaking() == True
+    assert api.speaking == True
 
 
 def test_not_speaking():
@@ -57,3 +62,4 @@ def test_not_speaking():
     sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-70}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert api.is_speaking() == False
+    assert api.speaking == False

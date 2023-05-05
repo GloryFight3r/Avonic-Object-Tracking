@@ -5,14 +5,16 @@ from dotenv import load_dotenv
 from os import getenv
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
-from microphone_api.stub_comms_microphone import MicrophoneAPI
+from microphone_api.microphone_control_api import MicrophoneAPI
+from microphone_api.microphone_adapter import UDPSocket
 from avonic_camera_api.converter import *
 
 load_dotenv()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
 api = CameraAPI(Camera(sock, address))
-mic_api = MicrophoneAPI()
+mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
+mic_api = MicrophoneAPI(UDPSocket(mic_addr))
 
 app = Flask(__name__)
 
@@ -114,16 +116,16 @@ def stop():
     return success()
 
 
-@app.post('/microphone/direction')
+@app.get('/microphone/direction')
 def get_direction():
     '''
     When a post request is sent to /microphone/direction 
     this method gets an angle from the microphone and 
     :returns: a response containing the unit vector in that direction
     '''
-    azimuth = mic_api.get_azimuth(30)
-    elevation = mic_api.get_elevation(30)
+    azimuth = mic_api.get_azimuth()
+    elevation = mic_api.get_elevation()
 
-    vec = angle_vector(np.deg2rad(azimuth),np.deg2rad(elevation))
-    msg = json.dumps(vec.tolist())
-    return Response(msg,status = 200)
+    vec = (azimuth, elevation)
+    msg = json.dumps(vec)
+    return Response(msg, status=200)
