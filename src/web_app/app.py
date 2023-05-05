@@ -87,3 +87,7 @@ def stop():
     """
     api.stop()
     return success()
+
+@app.post('/microphone/set/height')
+def set_height():
+    return success()

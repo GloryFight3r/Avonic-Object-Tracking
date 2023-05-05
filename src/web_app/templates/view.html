@@ -143,7 +143,12 @@
         <div data-bs-spy="scroll" data-bs-target="#main-navbar" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h2 id="microphone-heading">Microphone</h2>
             <div class="bg-body-tertiary p-5 rounded">
-              <p>Some text for reference</p>
+              <p>Microphone height</p>
+              <form action="/microphone/set/height" method="post" id="microphone-set-height-form">
+                <input type="number" id="microphone-height" name="microphone-height" value="0" step="0.01">
+                <label for="microphone-height">Meters</label><br>
+                <button type="submit" target="hiddenFrame" class="btn btn-primary">Set</button>
+              </form>
             </div>
             <h2 id="camera-heading">Camera</h2>
             <div class="bg-body-tertiary p-5 rounded">
@@ -218,23 +223,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script type="text/javascript">
-        function sendPostRequest(e){
+        function sendPostRequest(e, url_spec=$(this).attr("action"), onSuccess=function(data) {console.log(data)}){
           e.preventDefault();
-          var action = $(this).attr("action");
-	  console.log(e);
+          //var action = $(this).attr("action");
           var data = { e };
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
-            url: action,
+            url: url_spec,
 	    contentType:'application/json',
             data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
             },
-            success: function(data) {
-                console.log(data);
-            },
+            success: onSuccess,
             contentType:'application/json'
           }).done(function() {
             $('.w-form-done').css('display','block');
@@ -262,27 +264,6 @@
           });
         }
 
-	function getZoomRequest(e){
-          e.preventDefault();
-          var action = $(this).attr("action");
-          var data = {};
-          $(this).serializeArray().map(function(x){data[x.name] = x.value;});
-          $.ajax({
-            type: "GET",
-            url: action,
-            data: JSON.stringify(data),
-            headers: {
-              "Accept": "application/json"
-            },
-            success: function(data) {
-                document.getElementById("zoom-value").innerHTML = data;
-            },
-          }).done(function() {
-            $('.w-form-done').css('display','block');
-          }).fail(function() {
-            $('.w-form-fail').css('display','block');
-          });
-	}
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
@@ -296,6 +277,9 @@
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
+	$("#microphone-set-height-form").submit(function(e) {
+	  sendPostRequest(e, "/microphone/set/height", function(data) {alert("Height set to")})
+	});
 
         (() => {
   'use strict'
