@@ -5,14 +5,12 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_adapter import Microphone
 from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.stub_comms_microphone import *
 from avonic_camera_api.converter import *
 import json
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 address = ('192.168.5.94', 1259)
 api = CameraAPI(None)
-mic_api = MicrophoneAPI()
 
 mic = Microphone()
 mic_api = MicrophoneAPI(mic)
@@ -98,7 +96,6 @@ def stop():
     api.stop()
     return success()
 
-<<<<<<< HEAD
 @app.post('/microphone/height/set')
 def set_height():
     """
@@ -106,7 +103,6 @@ def set_height():
     """
     mic_api.set_height(float(request.get_json()["microphoneHeight"]))
     return str(mic_api.microphone.height)
-=======
 
 @app.post('/microphone/direction')
 def get_direction():
@@ -122,4 +118,3 @@ def get_direction():
     msg = json.dumps(vec.tolist())
     print(msg)
     return Response(msg,status = 200)
->>>>>>> dev
