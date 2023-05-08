@@ -73,6 +73,7 @@ class Camera:
 
         while True:
             split_messages = str(data2).split("'b'")
+            print(data2, split_messages)
             if len(split_messages) > 0:
                 split_messages[0] = split_messages[0][2:]
 

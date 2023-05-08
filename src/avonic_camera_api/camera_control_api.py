@@ -19,6 +19,8 @@ class CameraAPI:
 
         self.counter += 1
 
+        self.counter %= 256
+
         return cnt_hex
 
     def reboot(self) -> None:
