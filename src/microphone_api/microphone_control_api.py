@@ -101,6 +101,6 @@ class MicrophoneAPI:
         ret = self.sock.send(message)[0]
         res = json.loads(ret)["m"]["in1"]["peak"]
         assert isinstance(res, int)
-        if -91 <= res <= 0:
+        if -90 <= res <= 0:
             self.speaking = res > self.threshold
         return self.speaking
