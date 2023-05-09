@@ -62,21 +62,21 @@ def post_off():
 
 @app.post('/camera/move/absolute')
 def post_move_absolute():
-    data = request.get_json()
+    data = request.form
     api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]), int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     return success()
 
 
 @app.post('/camera/move/relative')
 def post_move_relative():
-    data = request.get_json()
+    data = request.form
     api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]), int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
     return success()
 
 
 @app.post('/camera/move/vector')
 def post_move_vector():
-    value = request.get_json()
+    value = request.form
     api.move_vector(int(value["vector-speed-x"]), int(value["vector-speed-y"]),
                     [float(value["vector-x"]), float(value["vector-y"]), float(value["vector-z"])])
     return success()
@@ -102,7 +102,7 @@ def set_zoom():
     """
     Endpoint to set the zoom value of the camera.
     """
-    value = int(request.get_json()["zoomValue"])
+    value = int(request.form["zoom-value"])
     api.direct_zoom(value)
     return success()
 
@@ -120,7 +120,7 @@ def set_height():
     """
     Endpoint to set the height of the microphone.
     """
-    mic_api.set_height(float(request.get_json()["microphoneHeight"]))
+    mic_api.set_height(float(request.form["microphoneHeight"]))
     return str(mic_api.microphone.height)
 
 @app.get('/microphone/direction')
