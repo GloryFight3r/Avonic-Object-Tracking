@@ -20,9 +20,9 @@ class Camera:
         self.sock = sock  # socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.address = address  # ('192.168.5.93', 1259) # 1259 is the default port for TCP
         self.sock.connect(self.address)
-    
+
     def __del__(self):
-        """ Destructor for the current object 
+        """ Destructor for the current object
             Closes the TCP connection
         """
         self.sock.close()
@@ -72,4 +72,3 @@ class Camera:
         data2 = self.sock.recv(2048)
 
         return binascii.hexlify(data2).upper()
-

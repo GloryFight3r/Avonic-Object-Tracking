@@ -68,9 +68,9 @@ class CameraAPI:
             degree_divided = ((abs(degree_divided) - 1) ^ ((1 << 16) - 1))
 
         in_bytes = hex(degree_divided)[2:]
-        
+
         in_bytes = '0' * (4 - len(in_bytes)) + in_bytes
-        
+
         answer_string = ''
 
         for t in in_bytes:
@@ -146,7 +146,7 @@ class CameraAPI:
             ret = list(filter(lambda x : len(x) == 12, ret))
         ret = ret[0] + "FF"
         assert len(ret) == 14
-        
+
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 

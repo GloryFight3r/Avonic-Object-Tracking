@@ -5,6 +5,7 @@ from microphone_api.microphone_adapter import UDPSocket
 
 class MicrophoneAPI:
     sock = None
+    height = None
     elevation = None
     azimuth = None
     speaking = None
@@ -17,10 +18,21 @@ class MicrophoneAPI:
             sock: wrapper for the socket
         """
         self.sock = sock
+        self.height = 0.0
         self.elevation = 0.0
         self.azimuth = 0.0
         self.speaking = False
         self.threshold = threshold
+
+    def set_height(self, height: float):
+        """
+        Sets the height of the microphone.
+
+            Parameters:
+                height (float): the new height
+        """
+        assert height >= 0.0
+        self.height = height
 
     def get_azimuth(self) -> float:
         """ Get azimuth from the camera.
@@ -89,6 +101,6 @@ class MicrophoneAPI:
         ret = self.sock.send(message)[0]
         res = json.loads(ret)["m"]["in1"]["peak"]
         assert isinstance(res, int)
-        if -90 <= res <= 0:
+        if -91 <= res <= 0:
             self.speaking = res > self.threshold
         return self.speaking

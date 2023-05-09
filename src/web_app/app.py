@@ -114,6 +114,13 @@ def stop():
     cam_api.stop()
     return success()
 
+@app.post('/microphone/height/set')
+def set_height():
+    """
+    Endpoint to set the height of the microphone.
+    """
+    mic_api.set_height(float(request.get_json()["microphoneHeight"]))
+    return str(mic_api.microphone.height)
 
 @app.get('/microphone/direction')
 def get_direction():
