@@ -123,7 +123,7 @@ def set_height():
     mic_api.set_height(float(request.get_json()["microphoneHeight"]))
     return str(mic_api.microphone.height)
 
-@app.post('/microphone/direction')
+@app.get('/microphone/direction')
 def get_direction():
     '''
     When a post request is sent to /microphone/direction

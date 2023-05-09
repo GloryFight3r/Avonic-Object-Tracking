@@ -250,7 +250,7 @@
         function sendPostRequest(e){
           e.preventDefault();
           var action = $(this).attr("action");
-	  var data = { e };
+	        var data = {};
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
@@ -270,12 +270,9 @@
 
         function sendGetRequest(e, url_spec, onSuccess){
           e.preventDefault();
-          var data = {};
-          $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "GET",
             url: url_spec,
-            data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
             },
@@ -290,7 +287,6 @@
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
-        $("#microphone-direction-form").submit(sendGetRequest);
         $("#camera-on-form").submit(sendPostRequest);
         $("#camera-off-form").submit(sendPostRequest);
         $("#camera-move-absolute").submit(sendPostRequest);
@@ -302,7 +298,10 @@
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
-	$("#microphone-set-height-form").submit(sendPostRequest);
+	    $("#microphone-set-height-form").submit(sendPostRequest);
+        $("#microphone-direction-form").submit(function(e){
+		sendGetRequest(e, "/microphone/direction", function(data){ alert("new height set" + data); })
+        });
 
         (() => {
   'use strict'
