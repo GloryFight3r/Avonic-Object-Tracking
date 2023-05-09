@@ -299,10 +299,10 @@
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
 	$("#microphone-set-height-form").submit(function(e) {
-		sendPostRequest(e, this, function(data) {alert(data)});
+		sendPostRequest(e, this, function(data) {alert("The height of the microphone is set to: " + data)});
 	});
         $("#microphone-direction-form").submit(function(e){
-		sendGetRequest(e, "/microphone/direction", function(data){ alert("new height set" + data); })
+		sendGetRequest(e, "/microphone/direction", function(data){ alert("The direction is: " + data); })
         });
 
         (() => {
