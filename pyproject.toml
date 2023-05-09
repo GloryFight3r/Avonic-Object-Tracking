@@ -27,7 +27,8 @@ test = [
     "pylint",
     "black",
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "mutmut"
 ]
 
 [tool.pytest.ini_options]
