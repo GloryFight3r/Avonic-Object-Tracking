@@ -143,6 +143,16 @@
         <div data-bs-spy="scroll" data-bs-target="#main-navbar" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h2 id="microphone-heading">Microphone</h2>
             <div class="bg-body-tertiary p-5 rounded">
+              <p>Microphone height</p>
+              <form action="/microphone/height/set" method="post" id="microphone-set-height-form">
+                <button type="submit" target="hiddenFrame" class="btn btn-primary">Set</button>
+                <div>
+		  <input type="number" name="microphoneHeight" step="0.01" value="0">
+                  <label for="microphoneHeight">Meters</label><br>
+                </div>
+              </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
               <p>Some text for reference</p>
               <form action = "/microphone/direction" method = "get" id = "microphone-direction-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button></form>
             </div>
@@ -240,21 +250,17 @@
         function sendPostRequest(e){
           e.preventDefault();
           var action = $(this).attr("action");
-	  console.log(e);
-          var data = { e };
+	        var data = {};
           $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
             url: action,
-	    contentType:'application/json',
             data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
             },
-            success: function(data) {
-                console.log(data);
-            },
-            contentType:'application/json'
+	    success: function(data) { console.log(data); },
+	    contentType:'application/json'
           }).done(function() {
             $('.w-form-done').css('display','block');
           }).fail(function() {
@@ -264,12 +270,9 @@
 
         function sendGetRequest(e, url_spec, onSuccess){
           e.preventDefault();
-          var data = {};
-          $(this).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "GET",
             url: url_spec,
-            data: JSON.stringify(data),
             headers: {
               "Accept": "application/json"
             },
@@ -281,31 +284,9 @@
           });
         }
 
-	function getZoomRequest(e){
-          e.preventDefault();
-          var action = $(this).attr("action");
-          var data = {};
-          $(this).serializeArray().map(function(x){data[x.name] = x.value;});
-          $.ajax({
-            type: "GET",
-            url: action,
-            data: JSON.stringify(data),
-            headers: {
-              "Accept": "application/json"
-            },
-            success: function(data) {
-                document.getElementById("zoom-value").innerHTML = data;
-            },
-          }).done(function() {
-            $('.w-form-done').css('display','block');
-          }).fail(function() {
-            $('.w-form-fail').css('display','block');
-          });
-	}
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
         $("#camera-reboot-form").submit(sendPostRequest);
-        $("#microphone-direction-form").submit(sendGetRequest);
         $("#camera-on-form").submit(sendPostRequest);
         $("#camera-off-form").submit(sendPostRequest);
         $("#camera-move-absolute").submit(sendPostRequest);
@@ -313,10 +294,14 @@
         $("#camera-move-vector").submit(sendPostRequest)
         $("#camera-home-form").submit(sendPostRequest);
         $("#camera-zoom-get-form").submit(function(e){
-          sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })
+		sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
+	    $("#microphone-set-height-form").submit(sendPostRequest);
+        $("#microphone-direction-form").submit(function(e){
+		sendGetRequest(e, "/microphone/direction", function(data){ alert("new height set" + data); })
+        });
 
         (() => {
   'use strict'
