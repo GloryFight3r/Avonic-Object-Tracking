@@ -12,13 +12,13 @@ class UDPSocket:
                  sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)):
         """ Constructor for Microphone
 
-        :param address: the ip and port in the format (ip, port)
-        :param sock: a UDP socket
+        Args:
+            address: the ip and port in the format (ip, port)
+            sock: a UDP socket
         """
 
         self.address = address
         self.sock = sock
-        #self.sock.bind(self.address)
 
     def __del__(self):
         """ Destructor for Microphone
@@ -29,10 +29,9 @@ class UDPSocket:
     def send(self, command: str, responses: int = 1) -> [str]:
         """ Send a command and wait for a response
 
-        :param command: the command in JSON format (refer to
-        https://assets.sennheiser.com/global-downloads/file/12146/TI_1245_v1.8.0_Sennheiser_Sound_Control_Protocol_TCC2_EN.pdf
-        )
-        :param responses: how many responses are expected to arrive back
+        Args:
+            command: the command in JSON format (refer to https://assets.sennheiser.com/global-downloads/file/12146/TI_1245_v1.8.0_Sennheiser_Sound_Control_Protocol_TCC2_EN.pdf)
+            responses: how many responses are expected to arrive back
         """
         res = []
         self.sock.sendto(bytes(command, 'ascii'), self.address)
