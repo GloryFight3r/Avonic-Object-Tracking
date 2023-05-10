@@ -17,9 +17,7 @@ class CameraAPI:
     def message_counter(self) -> str:
         cnt_hex = self.counter.to_bytes(1, 'big').hex()
 
-        self.counter += 1
-
-        self.counter %= 256
+        self.counter = (self.counter + 1) % 256
 
         return cnt_hex
 
@@ -29,8 +27,6 @@ class CameraAPI:
         self.camera.send_no_response('01 00 00 06 00 00 00' + self.message_counter(), '81 0A 01 06 01 FF')
 
         self.camera.reconnect()
-
-        return None
 
     def stop(self) -> bytes:
         """ Stops the camera from rotating
@@ -78,9 +74,9 @@ class CameraAPI:
             degree_divided = ((abs(degree_divided) - 1) ^ ((1 << 16) - 1))
 
         in_bytes = hex(degree_divided)[2:]
-        
+
         in_bytes = '0' * (4 - len(in_bytes)) + in_bytes
-        
+
         answer_string = ''
 
         for t in in_bytes:

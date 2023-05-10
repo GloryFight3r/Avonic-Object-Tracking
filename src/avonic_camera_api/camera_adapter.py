@@ -21,9 +21,9 @@ class Camera:
         self.sock = sock  # socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.address = address  # ('192.168.5.93', 1259) # 1259 is the default port for TCP
         self.sock.connect(self.address)
-    
+
     def __del__(self):
-        """ Destructor for the current object 
+        """ Destructor for the current object
             Closes the TCP connection
         """
         self.sock.close()
@@ -73,14 +73,11 @@ class Camera:
 
         while True:
             split_messages = str(data2).split("'b'")
-            print(data2, split_messages)
             if len(split_messages) > 0:
                 split_messages[0] = split_messages[0][2:]
 
             for x in split_messages[:]:
-                if x[16:][2:4] == '51': # its a completion message
-                    continue
-                else:
+                if x[16:][2:4] != '51': # its a completion message
                     self.message_dict[int('0x' + x[14:16], 16)] = "b'" + x[16:]
 
             if message_counter - 1 in self.message_dict:
@@ -90,4 +87,3 @@ class Camera:
             else:
                 self.sock.settimeout(5.0)
                 data2 = binascii.hexlify(self.sock.recv(2048).upper())
-

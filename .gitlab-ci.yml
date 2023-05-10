@@ -30,6 +30,15 @@ cache:
 #  - source venv/bin/activate
 
 test:
+  variables:
+    CAM_IP: "0.0.0.0"
+    # PORT of Camera
+    CAM_PORT: 1259
+    # IP address of Microphone
+    MIC_IP: "192.168.5.62"
+    # PORT of Microphone
+    MIC_PORT: 45
+    MIC_THRESH: 55
   script:
     - python --version  # For debugging
     - pip install virtualenv
@@ -88,23 +97,6 @@ run:
   artifacts:
     paths:
       - dist/*.whl
-
-pages:
-  script:
-    - python --version  # For debugging
-    - pip install virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
-    - pip install build
-    - pip install sphinx sphinx-rtd-theme
-    - cd doc
-    - make html
-    - mv build/html/ ../public/
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 deploy:
   stage: deploy

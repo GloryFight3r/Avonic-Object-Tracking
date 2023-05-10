@@ -13,4 +13,4 @@ else
     pip install .
 fi
 
-flask --app src/web_app/app.py run
+flask --app src/web_app run
