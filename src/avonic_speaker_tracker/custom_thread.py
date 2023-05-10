@@ -1,8 +1,9 @@
 from time import sleep
-from threading import Thread, Event
+from threading import Thread
 
-# Custom thread class use a skeleton
+
 class CustomThread(Thread):
+    # Custom thread class use a skeleton
     def __init__(self, event):
         """ Class constructor
 

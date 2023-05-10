@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title> Home page</title>
+    <title>Home page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="/docs/5.3/assets/js/color-modes.js"></script>
     <style>
@@ -147,14 +147,23 @@
               <form action="/microphone/height/set" method="post" id="microphone-set-height-form">
                 <button type="submit" target="hiddenFrame" class="btn btn-primary">Set</button>
                 <div>
-		  <input type="number" name="microphoneHeight" step="0.01" value="0">
+		  <input type="number" name="microphoneHeight" id="microphone-height" step="0.01" value="0">
                   <label for="microphoneHeight">Meters</label><br>
                 </div>
               </form>
             </div>
             <div class="bg-body-tertiary p-5 rounded">
-              <p>Some text for reference</p>
-              <form action = "/microphone/direction" method = "get" id = "microphone-direction-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button></form>
+              <p>Direction: </p>
+              <form action = "/microphone/direction" method = "get" id = "microphone-direction-form">
+                  <input type="number" step="0.001" id="direction-x" readonly>
+                  <input type="number" step="0.001" id="direction-y" readonly>
+                  <input type="number" step="0.001" id="direction-z" readonly>
+                  <button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Get Direction</button>
+              </form>
+            </div>
+            <div class="bg-body-tertiary p-5 rounded">
+                <p>Speaking: </p><input id="mic-speaking" readonly>
+                <form action = "/microphone/speaking" method = "get" id = "microphone-speaking-form"><button type = "submit" target = "hiddenFrame" class = "btn btn-primary">Is someone speaking?</button></form>
             </div>
             <h2 id="camera-heading">Camera</h2>
             <div class="bg-body-tertiary p-5 rounded">
@@ -293,6 +302,18 @@
 
         // Use this method to stop redirecting
         // Put the ID of the form in jQuery, and request method you want to use
+        $("#microphone-set-height-form").submit(sendPostRequest);
+        $("#microphone-direction-form").submit(function (e){
+            sendGetRequest(e, "/microphone/direction", function(data){
+                const d = data["microphone-direction"]
+                $("#direction-x").val(d[0]);
+                $("#direction-y").val(d[1]);
+                $("#direction-z").val(d[2]);
+            })
+        });
+        $("#microphone-speaking-form").submit(function (e){
+            sendGetRequest(e, "/microphone/speaking", function (data){ $("#mic-speaking").val(data["microphone-speaking"])})
+        })
         $("#camera-reboot-form").submit(sendPostRequest);
         $("#camera-on-form").submit(sendPostRequest);
         $("#camera-off-form").submit(sendPostRequest);
@@ -305,13 +326,6 @@
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
-	$("#microphone-set-height-form").submit(function(e) {
-		sendPostRequest(e, this, function(data) {alert("The height of the microphone is set to: " + data)});
-	});
-        $("#microphone-direction-form").submit(function(e){
-		sendGetRequest(e, "/microphone/direction", function(data){ alert("The direction is: " + data); })
-        });
-
         $("#thread-start-form").submit(function(e){
 		sendGetRequest(e, "/thread/start", function(data){ console.log(data); })
         });
@@ -321,7 +335,7 @@
         $("#thread-value-form").submit(function(e){
 		sendGetRequest(e, "/thread/value", function(data){ console.log(data); })
         });
-        
+
 
         (() => {
   'use strict'
