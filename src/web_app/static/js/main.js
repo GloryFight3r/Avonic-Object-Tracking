@@ -41,13 +41,34 @@ async function onSpeaking(data) {
     document.getElementById("speaking").value = d["microphone-speaking"]
 }
 
+async function addedCalibration(data) {
+    refreshCalibration()
+}
+
+async function refreshCalibration() {
+    fetch("/calibration/get_count", {method: "get"}).then(data => data.json()).then(jsonData => {
+	const count = parseInt(jsonData["count"])
+    	const checks = document.getElementsByClassName("calibration-checkbox")
+	console.log(count, checks.length)
+    	if (count == checks.length) {
+    	    document.getElementById("submit-calibration").disabled = true
+    	} else {
+    	    document.getElementById("submit-calibration").disabled = false
+	}
+    	for (let i = 0; i < count; i++) {
+    	    checks[i].checked = true
+    	}
+    })
+}
+
 onSuccess = {
     "camera-off-form": hideOff,
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "microphone-get-direction-form": onDirectionGet,
     "microphone-speaking-form": onSpeaking,
-    "thread-value-form": onValueGet
+    "thread-value-form": onValueGet,
+    "add-calibration-form": addedCalibration
 };
 
 [...document.forms].forEach(f => f.onsubmit = async(e) => {
@@ -81,3 +102,4 @@ onSuccess = {
 
 hideOn()
 selectMovement()
+refreshCalibration()

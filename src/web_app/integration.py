@@ -8,7 +8,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
-from microphone.avonic_speaker_tracker import Environment
+from avonic_speaker_tracker.environment import Environment
 
 class GeneralController():
     def __init__(self):
@@ -17,11 +17,11 @@ class GeneralController():
 
     def load_env(self):
         load_dotenv()
-        cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
+        cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.cam_api = CameraAPI(Camera(cam_sock, cam_addr))
-        mic_sock = UDPSocket(mic_addr)
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
+        mic_sock = UDPSocket(mic_addr)
         self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
         self.environment = Environment()
 

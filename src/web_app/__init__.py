@@ -10,6 +10,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
+import web_app.general_endpoints
 import web_app.tracking
 from web_app.integration import GeneralController
 
@@ -127,8 +128,12 @@ def create_app(test_controller=None):
 
     @app.get('/calibration/add_position')
     def add_calibration_position():
-        return web_app.general_endpoints.add_calibration_position(cam_api, mic_api, environment)
+        return web_app.general_endpoints.add_calibration_position(integration)
 
+
+    @app.get('/calibration/get_count')
+    def get_calibration_count():
+        return web_app.general_endpoints.get_calibration_count(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
