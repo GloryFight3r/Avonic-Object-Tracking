@@ -64,11 +64,12 @@ def move_stop_camera_endpoint(integration: GeneralController):
 
 def zoom_get_camera_endpoint(integration: GeneralController):
     zoom = integration.cam_api.get_zoom()
-    return make_response(jsonify({"zoom": zoom}), 200)
+    return make_response(jsonify({"zoom-value": zoom}), 200)
 
 
 def zoom_set_camera_endpoint(integration: GeneralController):
     try:
         integration.cam_api.direct_zoom(int(request.form["zoom-value"]))
+        return success()
     except AssertionError:
         return make_response(jsonify({}), 400)

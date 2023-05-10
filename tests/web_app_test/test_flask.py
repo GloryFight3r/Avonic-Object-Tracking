@@ -92,54 +92,54 @@ def test_home(client):
 
 def test_move_absolute(client):
     """Test a move absolute endpoint."""
-    req_data = json.dumps({"absolute-speed-x" : 20, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15})
-    rv = client.post('/camera/move/absolute', data=req_data,  content_type='application/json')
+    req_data = {"absolute-speed-x" : 20, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15}
+    rv = client.post('/camera/move/absolute', data=req_data)
     assert rv.status_code == 200
 
 def test_bad_move_absolute(client):
     """Test a move absolute endpoint."""
-    req_data = json.dumps({"absolute-speed-x" : 30, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15})
-    rv = client.post('/camera/move/absolute', data=req_data,  content_type='application/json')
+    req_data = {"absolute-speed-x" : 30, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15}
+    rv = client.post('/camera/move/absolute', data=req_data)
     assert rv.status_code == 400
 
 def test_move_relative(client):
     """Test a move relative endpoint."""
-    req_data = json.dumps({"relative-speed-x" : 20, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15})
-    rv = client.post('/camera/move/relative', data=req_data,  content_type='application/json')
+    req_data = {"relative-speed-x" : 20, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15}
+    rv = client.post('/camera/move/relative', data=req_data)
     assert rv.status_code == 200
 
 def test_move_vector(client):
     """Test a move towards a vector endpoint."""
-    req_data = json.dumps({"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5})
-    rv = client.post('/camera/move/vector', data=req_data,  content_type='application/json')
+    req_data = {"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5}
+    rv = client.post('/camera/move/vector', data=req_data)
     assert rv.status_code == 200
 
 def bad_move_vector(client):
     """Test a move towards a vector endpoint."""
-    req_data = json.dumps({"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5})
-    rv = client.post('/camera/move/vector', data=req_data,  content_type='application/json')
+    req_data = {"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5}
+    rv = client.post('/camera/move/vector', data=req_data)
     assert rv.status_code == 400
 
 def test_bad_move_relative(client):
     """Test a move relative endpoint."""
-    req_data = json.dumps({"relative-speed-x" : 30, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15})
-    rv = client.post('/camera/move/relative', data=req_data,  content_type='application/json')
+    req_data = {"relative-speed-x" : 30, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15}
+    rv = client.post('/camera/move/relative', data=req_data)
     assert rv.status_code == 400
 
 def test_set_zoom(client):
-    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : 0}),  content_type='application/json')
+    rv = client.post('/camera/zoom/set', data={"zoom-value" : 0})
     assert rv.status_code == 200
 
 def test_bad_lower_bound_set_zoom(client):
-    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : -1}),  content_type='application/json')
+    rv = client.post('/camera/zoom/set', data={"zoom-value" : -1})
     assert rv.status_code == 400
 
 def test_bad_upper_bound_set_zoom(client):
-    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : 16385}),  content_type='application/json')
+    rv = client.post('/camera/zoom/set', data={"zoom-value" : 16385})
     assert rv.status_code == 400
 
 def test_upper_bound_set_zoom(client):
-    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : 16384}),  content_type='application/json')
+    rv = client.post('/camera/zoom/set', data=dict({"zoom-value" : 16384}))
     assert rv.status_code == 200
 
 def test_move_stop_camera(client):
@@ -148,10 +148,10 @@ def test_move_stop_camera(client):
 
 def test_get_zoom(client):
     rv = client.get('/camera/zoom/get')
-    assert rv.status_code == 200 and rv.data == bytes("{\"zoom\":128}\n", "utf-8")
+    assert rv.status_code == 200 and rv.data == bytes("{\"zoom-value\":128}\n", "utf-8")
 
 def test_set_microphone_height(client):
-    rv = client.post('/microphone/height/set', data=json.dumps({"microphone-height" : 1.7}),  content_type='application/json') 
+    rv = client.post('/microphone/height/set', data={"microphone-height" : 1.7})
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-height\":1.7}\n", "utf-8")
 
 def test_get_microphone_direction(client):
