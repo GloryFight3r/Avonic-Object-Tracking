@@ -27,7 +27,7 @@ def move_home_camera_endpoint(integration: GeneralController):
 
 
 def move_absolute_camera_endpoint(integration: GeneralController):
-    data = request.get_json()
+    data = request.form
     try:
         integration.cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
                           int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
@@ -37,7 +37,7 @@ def move_absolute_camera_endpoint(integration: GeneralController):
 
 
 def move_relative_camera_endpoint(integration: GeneralController):
-    data = request.get_json()
+    data = request.form
     try:
         integration.cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]),
                           int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
@@ -47,7 +47,7 @@ def move_relative_camera_endpoint(integration: GeneralController):
 
 
 def move_vector_camera_endpoint(integration: GeneralController):
-    data = request.get_json()
+    data = request.form
     try:
         integration.cam_api.move_vector(int(data["vector-speed-x"]), int(data["vector-speed-y"]),
                     [float(data["vector-x"]), float(data["vector-y"]),
@@ -69,7 +69,6 @@ def zoom_get_camera_endpoint(integration: GeneralController):
 
 def zoom_set_camera_endpoint(integration: GeneralController):
     try:
-        integration.cam_api.direct_zoom(int(request.get_json()["zoom-value"]))
+        integration.cam_api.direct_zoom(int(request.form["zoom-value"]))
     except AssertionError:
         return make_response(jsonify({}), 400)
-    return success()
