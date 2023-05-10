@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>Avonic Camera Control</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </head>
 <body>
-<div class="grid">
-<div id="cam" class="container">
+<main class="grid">
+<article id="cam" class="container">
     <h1>Camera</h1>
     <h2>Basic Commands</h2>
     <div class="grid">
@@ -35,10 +36,10 @@
                 <label for="zoom-value">Zoom value [0-16384]: </label>
                 <input type="number" name="zoom-value" id="zoom-value" min="0" max="16384">
             </div>
-            <button type="submit" class="btn btn-primary">Set zoom</button>
+            <button type="submit">Set zoom</button>
         </form>
         <form action="/camera/zoom/get" method="get" id="camera-zoom-get-form">
-            <button type="submit" class="btn btn-primary">Get zoom</button>
+            <button type="submit">Get zoom</button>
         </form>
     </div>
     <div class="grid">
@@ -98,9 +99,9 @@
         </div>
         <button type="submit">Move</button>
     </form>
-</div>
+</article>
 <div>
-    <div id="mic" class="container">
+    <article id="mic" class="container">
         <h1>Microphone</h1>
         <form action="/microphone/height/set" method="post" id="microphone-set-height-form" class="grid">
             <label for="microphone-height">Height [m]: </label>
@@ -114,9 +115,11 @@
             <input type="number" id="mic-direction-z" readonly>
             <button type="submit">Get</button>
         </form>
-    </div>
+    </article>
+    <article id="vis" class="container">
+        <h1>Visualisation</h1>
+    </article>
 </div>
-</div>
-
+</main>
 </body>
 </html>

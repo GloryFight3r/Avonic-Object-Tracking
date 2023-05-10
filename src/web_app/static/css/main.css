@@ -1,0 +1,14 @@
+:root {
+    --primary: #3d7cc9 !important;
+    margin-left: 1rem !important;
+    margin-right: 1rem !important;
+}
+
+main {
+    padding: 1rem !important;
+}
+
+article {
+    margin-top: 0.5rem !important;
+    padding: 0.5rem !important;
+}
