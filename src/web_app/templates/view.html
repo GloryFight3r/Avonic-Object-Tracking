@@ -247,11 +247,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script type="text/javascript">
-        function sendPostRequest(e){
+        function sendPostRequest(e, context=this, onSuccess=console.log){
           e.preventDefault();
-          var action = $(this).attr("action");
+          var action = $(context).attr("action");
 	        var data = {};
-          $(this).serializeArray().map(function(x){data[x.name] = x.value;});
+          $(context).serializeArray().map(function(x){data[x.name] = x.value;});
           $.ajax({
             type: "POST",
             url: action,
@@ -259,7 +259,7 @@
             headers: {
               "Accept": "application/json"
             },
-	    success: function(data) { console.log(data); },
+	    success: onSuccess,
 	    contentType:'application/json'
           }).done(function() {
             $('.w-form-done').css('display','block');
@@ -298,9 +298,11 @@
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
-	    $("#microphone-set-height-form").submit(sendPostRequest);
+	$("#microphone-set-height-form").submit(function(e) {
+		sendPostRequest(e, this, function(data) {alert("The height of the microphone is set to: " + data)});
+	});
         $("#microphone-direction-form").submit(function(e){
-		sendGetRequest(e, "/microphone/direction", function(data){ alert("new height set" + data); })
+		sendGetRequest(e, "/microphone/direction", function(data){ alert("The direction is: " + data); })
         });
 
         (() => {
