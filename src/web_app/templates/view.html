@@ -299,6 +299,7 @@
         $("#microphone-direction-form").submit(function (e){
             sendGetRequest(e, "/microphone/direction", function(data){
                 const d = JSON.parse(data)
+                $("#direction-x").val(d[0]);
                 $("#direction-y").val(d[1]);
                 $("#direction-z").val(d[2]);
             })

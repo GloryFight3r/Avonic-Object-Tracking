@@ -89,7 +89,8 @@ class MicrophoneAPI:
             (aka. Sennheiser logo should point away from camera by default)
         """
         cose = np.cos(self.elevation)
-        return np.array([np.sin(self.azimuth) * cose, -np.sin(self.elevation), np.cos(self.azimuth) * cose])
+        return np.array([np.sin(self.azimuth) * cose,
+                         -np.sin(self.elevation), np.cos(self.azimuth) * cose])
 
     def is_speaking(self):
         """ Determine whether someone is speaking based on the peak loudness

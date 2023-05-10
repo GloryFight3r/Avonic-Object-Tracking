@@ -1,6 +1,6 @@
+from unittest import mock
 import pytest
 import numpy as np
-from unittest import mock
 from microphone_api.microphone_adapter import UDPSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 
@@ -49,7 +49,8 @@ def test_azimuth_recv_error():
     """
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), None)
+    sock.recvfrom.return_value = \
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     with pytest.raises(Exception):
         api.get_azimuth()
@@ -65,7 +66,8 @@ def test_azimuth_sendto_error():
 def test_direction_basic():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
+    sock.recvfrom.return_value = \
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert np.allclose(api.get_direction(), [0.0, 0.0, 1.0])
     assert api.azimuth == np.deg2rad(0)
@@ -75,7 +77,8 @@ def test_direction_basic():
 def test_direction_vertical():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":0,"elevation":90}}}\r\n', "ascii"), None)
+    sock.recvfrom.return_value = \
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":90}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert np.allclose(api.get_direction(), [0.0, -1.0, 0.0])
     assert api.azimuth == np.deg2rad(0)

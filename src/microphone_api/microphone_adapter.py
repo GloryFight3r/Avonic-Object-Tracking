@@ -8,7 +8,8 @@ class UDPSocket:
     sock = None
     address = None
 
-    def __init__(self, address, sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)):
+    def __init__(self, address,
+                 sock: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)):
         """ Constructor for Microphone
 
         :param address: the ip and port in the format (ip, port)

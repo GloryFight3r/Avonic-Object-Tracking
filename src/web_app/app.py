@@ -62,14 +62,16 @@ def post_off():
 @app.post('/camera/move/absolute')
 def post_move_absolute():
     data = request.get_json()
-    cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]), int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
+    cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
+                          int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     return success()
 
 
 @app.post('/camera/move/relative')
 def post_move_relative():
     data = request.get_json()
-    cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]), int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
+    cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]),
+                          int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
     return success()
 
 
@@ -77,7 +79,8 @@ def post_move_relative():
 def post_move_vector():
     value = request.get_json()
     cam_api.move_vector(int(value["vector-speed-x"]), int(value["vector-speed-y"]),
-                        [float(value["vector-x"]), float(value["vector-y"]), float(value["vector-z"])])
+                        [float(value["vector-x"]), float(value["vector-y"]),
+                         float(value["vector-z"])])
     return success()
 
 
