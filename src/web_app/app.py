@@ -9,6 +9,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
+from avonic_speaker_tracker.environment import Environment
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.general_endpoints
@@ -21,6 +22,7 @@ cam_api = CameraAPI(Camera(cam_sock, cam_addr))
 mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
 mic_sock = UDPSocket(mic_addr)
 mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
+environment = Environment()
 
 app = Flask(__name__)
 
@@ -127,7 +129,7 @@ def get_speaking():
 
 @app.get('/calibration/add_position')
 def add_calibration_position():
-    return web_app.general_endpoints.add_calibration_position(cam_api, mic_api)
+    return web_app.general_endpoints.add_calibration_position(cam_api, mic_api, environment)
 
 # THIS IS FOR DEMO PURPOSES ONLY
 # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED

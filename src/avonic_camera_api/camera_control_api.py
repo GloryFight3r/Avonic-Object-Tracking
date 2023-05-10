@@ -161,7 +161,7 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('', final_message, '')
 
-    def get_direction(self) -> (int, int):
+    def get_direction(self) -> np.array:
         """ Get the direction, pan and tilt, from the camera.
 
             Returns:
@@ -177,7 +177,7 @@ class CameraAPI:
         pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
         tilt = int(tilt_hex, 16)
         tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
-        return (pan_adjusted, tilt_adjusted)
+        return np.array([pan_adjusted, tilt_adjusted])
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
