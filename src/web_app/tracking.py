@@ -1,28 +1,28 @@
 from threading import Event
 from flask import make_response, jsonify
 from avonic_speaker_tracker.custom_thread import CustomThread
+from web_app import GeneralController
 
-
-def start_thread_endpoint(event: Event, thread):
+def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     print("Started thread")
-    if thread[0] is None:
-        thread[0] = CustomThread(event)
-        thread[0].set_calibration(2)
-        event.clear()
-        thread[0].start()
+    if integration.thread is None:
+        integration.thread = CustomThread(integration.event)
+        integration.thread.set_calibration(2)
+        integration.event.clear()
+        integration.thread.start()
     else:
-        old_calibration = thread[0].value
-        thread[0] = CustomThread(event)
-        thread[0].set_calibration(old_calibration)
-        event.clear()
-        thread[0].start()
+        old_calibration = integration.thread.value
+        integration.thread = CustomThread(integration.event)
+        integration.thread.set_calibration(old_calibration)
+        integration.event.clear()
+        integration.thread.start()
     return make_response(jsonify({}), 200)
 
 
-def stop_thread_endpoint(event: Event, thread):
+def stop_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     print("Stopping thread")
-    event.set()
-    thread[0].join()
+    integration.event.set()
+    integration.thread.join()
     return make_response(jsonify({}), 200)

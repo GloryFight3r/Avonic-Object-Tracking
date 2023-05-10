@@ -5,6 +5,7 @@ import web_app
 def client():
     """A test client for the app."""
     app = web_app.create_app()
+    app.config['TESTING'] = True
     return app.test_client()
 
 
