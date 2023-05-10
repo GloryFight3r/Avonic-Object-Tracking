@@ -1,3 +1,7 @@
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function hideOff() {
     document.getElementById("camera-off-form").style.display = "none"
     document.getElementById("camera-on-form").style.display = "block"
@@ -62,6 +66,16 @@ onSuccess = {
     const fun = onSuccess[f.id]
     if (response.status === 200 && fun !== undefined) {
         fun(response.json())
+    }
+    if (response.status !== 200) {
+        const b = f.getElementsByTagName("button")[0]
+        b.classList.add("contrast")
+        await sleep(350)
+        b.classList.remove("contrast")
+        await sleep(250)
+        b.classList.add("contrast")
+        await sleep(350)
+        b.classList.remove("contrast")
     }
 })
 
