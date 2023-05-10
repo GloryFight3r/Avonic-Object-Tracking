@@ -10,7 +10,7 @@
 <body>
 <main class="grid">
 <article id="cam" class="container">
-    <h1>Camera</h1>
+    <h1>Camera 🎥</h1>
     <h2>Basic Commands</h2>
     <div class="grid">
         <form action="/camera/reboot" method="post" id="camera-reboot-form">
@@ -33,7 +33,7 @@
     <div class="grid">
         <form action="/camera/zoom/set" method="post" id="camera-zoom-set-form">
             <div class="grid">
-                <label for="zoom-value">Zoom value [0-16384]: </label>
+                <label for="zoom-value">Zoom value [0-16384]:</label>
                 <input type="number" name="zoom-value" id="zoom-value" min="0" max="16384">
             </div>
             <button type="submit">Set zoom</button>
@@ -102,7 +102,7 @@
 </article>
 <div>
     <article id="mic" class="container">
-        <h1>Microphone</h1>
+        <h1>Microphone 🎙️</h1>
         <form action="/microphone/height/set" method="post" id="microphone-set-height-form" class="grid">
             <label for="microphone-height">Height [m]: </label>
                 <input type="number" id="microphone-height" step="0.01" value="1" />
@@ -110,9 +110,9 @@
         </form>
         <form action="/microphone/direction" method="get" id="microphone-get-direction-form" class="grid">
             <label for="mic-direction-x">Direction [x, y, z]: </label>
-            <input type="number" id="mic-direction-x" readonly>
-            <input type="number" id="mic-direction-y" readonly>
-            <input type="number" id="mic-direction-z" readonly>
+            <input id="mic-direction-x" readonly>
+            <input id="mic-direction-y" readonly>
+            <input id="mic-direction-z" readonly>
             <button type="submit">Get</button>
         </form>
         <form action="/microphone/speaking" method="get" id="microphone-speaking-form" class="grid">
@@ -121,7 +121,7 @@
         </form>
     </article>
     <article id="thread" class="container">
-        <h1>Thread</h1>
+        <h1>Thread 🧵</h1>
         <div class="grid">
         <form action="/thread/start" method="post" id="thread-start-form">
             <button type="submit">Start</button>
@@ -131,14 +131,14 @@
         </form>
         </div>
         <form action="/thread/value" method="get" id="thread-value-form" class="grid">
-            <input type="number" id="thread-value" readonly>
+            <input id="thread-value" readonly>
             <button type="submit">Get value</button>
         </form>
     </article>
 </div>
 </main>
 <article id="vis" class="container">
-    <h1>Visualisation</h1>
+    <h1>Visualisation 📺</h1>
 </article>
 </body>
 </html>

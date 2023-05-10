@@ -59,5 +59,5 @@ def zoom_get_camera_endpoint(cam_api: CameraAPI):
 
 
 def zoom_set_camera_endpoint(cam_api: CameraAPI):
-    cam_api.direct_zoom(int(request.form["zoomValue"]))
+    cam_api.direct_zoom(int(request.form["zoom-value"]))
     return success()
