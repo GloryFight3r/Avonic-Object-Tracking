@@ -9,7 +9,8 @@ function hideOn() {
 }
 
 async function onZoomGet (data) {
-    document.getElementById("zoom-value").value = await data
+    const d = await data
+    document.getElementById("zoom-value").value = d["zoom"]
 }
 
 function selectMovement() {
@@ -19,10 +20,30 @@ function selectMovement() {
     document.getElementById(document.getElementById("movement-select").value).style.display = "block"
 }
 
+async function onDirectionGet(data) {
+    const d = (await data)["microphone-direction"]
+    document.getElementById("mic-direction-x").value = d[0]
+    document.getElementById("mic-direction-y").value = d[1]
+    document.getElementById("mic-direction-z").value = d[2]
+}
+
+async function onValueGet(data) {
+    const d = await data
+    document.getElementById("thread-value").value = d["value"]
+}
+
+async function onSpeaking(data) {
+    const d = await data
+    document.getElementById("speaking").value = d["microphone-speaking"]
+}
+
 onSuccess = {
     "camera-off-form": hideOff,
     "camera-on-form": hideOn,
-    "camera-zoom-get-form": onZoomGet
+    "camera-zoom-get-form": onZoomGet,
+    "microphone-get-direction-form": onDirectionGet,
+    "microphone-speaking-form": onSpeaking,
+    "thread-value-form": onValueGet
 };
 
 [...document.forms].forEach(f => f.onsubmit = async(e) => {

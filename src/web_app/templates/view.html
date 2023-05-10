@@ -115,11 +115,30 @@
             <input type="number" id="mic-direction-z" readonly>
             <button type="submit">Get</button>
         </form>
+        <form action="/microphone/speaking" method="get" id="microphone-speaking-form" class="grid">
+            <button type="submit">Is someone speaking?</button>
+            <input id="speaking" readonly>
+        </form>
     </article>
-    <article id="vis" class="container">
-        <h1>Visualisation</h1>
+    <article id="thread" class="container">
+        <h1>Thread</h1>
+        <div class="grid">
+        <form action="/thread/start" method="post" id="thread-start-form">
+            <button type="submit">Start</button>
+        </form>
+        <form action="/thread/stop" method="post" id="thread-stop-form">
+            <button type="submit">Stop</button>
+        </form>
+        </div>
+        <form action="/thread/value" method="get" id="thread-value-form" class="grid">
+            <input type="number" id="thread-value" readonly>
+            <button type="submit">Get value</button>
+        </form>
     </article>
 </div>
 </main>
+<article id="vis" class="container">
+    <h1>Visualisation</h1>
+</article>
 </body>
 </html>
