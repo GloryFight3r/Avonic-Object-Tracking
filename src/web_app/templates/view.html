@@ -241,6 +241,13 @@
                 <p>Stop</p>
                 <form action="/camera/move/stop" method="post" id="camera-stop-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Stop</button></form>
             </div>
+
+            <div class="bg-body-tertiary p-5 rounded">
+                <p>THREAD</p>
+                <form action="/thread/start" method="get" id="thread-start-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Start</button></form>
+                <form action="/thread/stop" method="get" id="thread-stop-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Stop</button></form>
+                <form action="/thread/value" method="get" id="thread-value-form"><button type="submit" target="hiddenFrame" class="btn btn-primary">Get value</button></form>
+            </div>
         </div>
     </main>
 
@@ -294,7 +301,7 @@
         $("#camera-move-vector").submit(sendPostRequest)
         $("#camera-home-form").submit(sendPostRequest);
         $("#camera-zoom-get-form").submit(function(e){
-		sendGetRequest(e, "/camera/zoom/get", function(data){ document.getElementById("zoom-value").innerHTML = data; })
+		sendGetRequest(e, "/camera/zoom/get", function(data){ console.log(data); document.getElementById("zoom-value").innerHTML = data["zoom"]; })
         });
         $("#camera-zoom-set-form").submit(sendPostRequest);
         $("#camera-stop-form").submit(sendPostRequest);
@@ -302,6 +309,17 @@
         $("#microphone-direction-form").submit(function(e){
 		sendGetRequest(e, "/microphone/direction", function(data){ alert("new height set" + data); })
         });
+
+        $("#thread-start-form").submit(function(e){
+		sendGetRequest(e, "/thread/start", function(data){ console.log(data); })
+        });
+        $("#thread-stop-form").submit(function(e){
+		sendGetRequest(e, "/thread/stop", function(data){ console.log(data); })
+        });
+        $("#thread-value-form").submit(function(e){
+		sendGetRequest(e, "/thread/value", function(data){ console.log(data); })
+        });
+        
 
         (() => {
   'use strict'
