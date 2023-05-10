@@ -4,7 +4,7 @@ import web_app
 @pytest.fixture
 def client():
     """A test client for the app."""
-    app = web_app.create_app()
+    app = web_app.create_app(test_config=True)
     app.config['TESTING'] = True
     return app.test_client()
 
