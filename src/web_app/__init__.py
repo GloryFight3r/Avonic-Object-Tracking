@@ -143,12 +143,12 @@ def create_app(test_controller=None):
 
     # create the event and start the thread
 
-    @app.get('/thread/start')
+    @app.post('/thread/start')
     def thread_start():
         return web_app.tracking.start_thread_endpoint(integration)
 
 
-    @app.get('/thread/stop')
+    @app.post('/thread/stop')
     def thread_stop():
         return web_app.tracking.stop_thread_endpoint(integration)
 
