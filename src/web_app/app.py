@@ -11,6 +11,7 @@ from microphone_api.microphone_adapter import Microphone
 from microphone_api.microphone_control_api import MicrophoneAPI
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
+import web_app.general_endpoints
 import web_app.tracking
 
 load_dotenv()
@@ -110,6 +111,10 @@ def get_direction():
     """
     return web_app.microphone_endpoints.direction_get_microphone_endpoint(mic_api)
 
+@app.get('/calibration/add_position')
+def add_calibration_position():
+    return web_app.general_endpoints.add_calibration_position(cam_api, mic_api)
+
 # THIS IS FOR DEMO PURPOSES ONLY
 # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
 
@@ -124,7 +129,7 @@ def get_direction():
 # <CustomThread> (should pick a better name) contains all code for the actual tracking.
 # Use set calibration to set the calibration parameters that are going to be used when tracking
 
-# The thread is started at the start of the program to avoid 
+# The thread is started at the start of the program to avoid
 # python's "global" identifier and because threads can't be paused
 
 # create the event and start the thread
