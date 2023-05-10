@@ -1,7 +1,7 @@
 from flask import make_response, jsonify, request
 
 from microphone_api.microphone_control_api import MicrophoneAPI
-from web_app import GeneralController
+from web_app.integration import GeneralController
 
 def height_set_microphone_endpoint(integration: GeneralController):
     integration.mic_api.set_height(float(request.get_json()["microphoneHeight"]))
