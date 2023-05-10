@@ -10,8 +10,6 @@ def success():
 
 def add_calibration_position(cam_api: CameraAPI, mic_api: MicrophoneAPI):
     cam_dir = cam_api.get_direction()
-    azimuth = mic_api.get_azimuth(30)
-    elevation = mic_api.get_elevation(30)
-    vec = angle_vector(np.deg2rad(azimuth), np.deg2rad(elevation))
-    print(cam_dir, vec)
+    mic_dir = mic_api.get_direction()
+    print(cam_dir, mic_dir)
     return success()
