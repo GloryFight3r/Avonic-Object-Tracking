@@ -161,6 +161,22 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('', final_message, '')
 
+    def get_direction(self) -> (int, int):
+        """ Get the direction, pan and tilt, from the camera.
+
+            Returns:
+                (pan, tilt): The pan and tilt of the camera. Pan ranges between 0xF670 (-2447) and 0x0990 (2448)
+                                                             Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
+        """
+        message = "81 09 06 12 FF"
+        ret_msg = str(self.camera.send('', message, ''))[2:-1] # remove the b' and '
+        pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
+        tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
+
+        pan = int(pan_hex, 16)
+        tilt = int(tilt_hex, 16)
+        return (pan, tilt)
+
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.
