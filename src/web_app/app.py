@@ -151,12 +151,12 @@ thread.start()
 thread.set_calibration(2)
 
 
-@app.get('/thread/start')
+@app.post('/thread/start')
 def thread_start():
     return web_app.tracking.start_thread_endpoint(event)
 
 
-@app.get('/thread/stop')
+@app.post('/thread/stop')
 def thread_stop():
     return web_app.tracking.stop_thread_endpoint(event)
 
@@ -165,4 +165,4 @@ def thread_stop():
 def thread_value():
     # Retrieves the thread value (only for demo/debug purposes)
     print(thread.value)
-    return make_response(jsonify({"value" : thread.value}), 200)
+    return make_response(jsonify({"value": thread.value}), 200)
