@@ -30,6 +30,15 @@ cache:
 #  - source venv/bin/activate
 
 test:
+  variables:
+    CAM_IP: "0.0.0.0"
+    # PORT of Camera
+    CAM_PORT: 1259
+    # IP address of Microphone
+    MIC_IP: "192.168.5.62"
+    # PORT of Microphone
+    MIC_PORT: 45
+    MIC_THRESH: 55
   script:
     - python --version  # For debugging
     - pip install virtualenv
