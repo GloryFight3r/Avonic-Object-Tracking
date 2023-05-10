@@ -120,14 +120,14 @@ def set_height():
     Endpoint to set the height of the microphone.
     """
     mic_api.set_height(float(request.get_json()["microphoneHeight"]))
-    return str(mic_api.microphone.height)
+    return str(mic_api.height)
 
 @app.get('/microphone/direction')
 def get_direction():
     """
     Endpoint to get the direction of the speaker.
     """
-    msg = json.dumps(mic_api.get_direction())
+    msg = json.dumps(list(mic_api.get_direction()))
     return Response(msg, status=200)
 
 
@@ -136,4 +136,4 @@ def get_speaking():
     """
     Endpoint to inquire whether anyone is speaking.
     """
-    return Response(mic_api.is_speaking(), status=200)
+    return Response(json.dumps(mic_api.is_speaking()), status=200)
