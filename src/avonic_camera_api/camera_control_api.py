@@ -174,8 +174,10 @@ class CameraAPI:
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
         pan = int(pan_hex, 16)
+        pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
         tilt = int(tilt_hex, 16)
-        return (pan, tilt)
+        tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
+        return (pan_adjusted, tilt_adjusted)
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
