@@ -4,7 +4,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from web_app.integration import GeneralController
 
 def height_set_microphone_endpoint(integration: GeneralController):
-    integration.mic_api.set_height(float(request.get_json()["microphoneHeight"]))
+    integration.mic_api.set_height(float(request.get_json()["microphone-height"]))
     return make_response(jsonify({"microphone-height": integration.mic_api.height}), 200)
 
 

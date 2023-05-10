@@ -8,6 +8,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 import web_app
 import json
+import numpy as np
 
 @pytest.fixture()
 def camera(monkeypatch):
@@ -32,8 +33,11 @@ def camera(monkeypatch):
     cam_api = CameraAPI(Camera(sock, None))
     def mocked_camera_reconnect():
         pass
+    def mocked_get_zoom():
+        return 128
 
     monkeypatch.setattr(cam_api.camera, "reconnect", mocked_camera_reconnect)
+    monkeypatch.setattr(cam_api, "get_zoom", mocked_get_zoom)
 
     return cam_api
 
@@ -42,7 +46,8 @@ def client(camera):
     """A test client for the app."""
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":90}}}\r\n', "ascii"), None)
+    sock.recvfrom.return_value = \
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
     mic_api = MicrophoneAPI(UDPSocket(None, sock))
 
     cam_api = camera
@@ -91,6 +96,12 @@ def test_move_absolute(client):
     rv = client.post('/camera/move/absolute', data=req_data,  content_type='application/json')
     assert rv.status_code == 200
 
+def test_bad_move_absolute(client):
+    """Test a move absolute endpoint."""
+    req_data = json.dumps({"absolute-speed-x" : 30, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15})
+    rv = client.post('/camera/move/absolute', data=req_data,  content_type='application/json')
+    assert rv.status_code == 400
+
 def test_move_relative(client):
     """Test a move relative endpoint."""
     req_data = json.dumps({"relative-speed-x" : 20, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15})
@@ -103,6 +114,47 @@ def test_move_vector(client):
     rv = client.post('/camera/move/vector', data=req_data,  content_type='application/json')
     assert rv.status_code == 200
 
+def bad_move_vector(client):
+    """Test a move towards a vector endpoint."""
+    req_data = json.dumps({"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5})
+    rv = client.post('/camera/move/vector', data=req_data,  content_type='application/json')
+    assert rv.status_code == 400
+
+def test_bad_move_relative(client):
+    """Test a move relative endpoint."""
+    req_data = json.dumps({"relative-speed-x" : 30, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15})
+    rv = client.post('/camera/move/relative', data=req_data,  content_type='application/json')
+    assert rv.status_code == 400
+
 def test_set_zoom(client):
-    rv = client.post('/camera/zoom/set', data=json.dumps({"zoomValue" : 20}),  content_type='application/json')
+    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : 0}),  content_type='application/json')
     assert rv.status_code == 200
+
+def test_bad_lower_bound_set_zoom(client):
+    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : -1}),  content_type='application/json')
+    assert rv.status_code == 400
+
+def test_bad_upper_bound_set_zoom(client):
+    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : 16385}),  content_type='application/json')
+    assert rv.status_code == 400
+
+def test_upper_bound_set_zoom(client):
+    rv = client.post('/camera/zoom/set', data=json.dumps({"zoom-value" : 16384}),  content_type='application/json')
+    assert rv.status_code == 200
+
+def test_move_stop_camera(client):
+    rv = client.post('/camera/move/stop')
+    assert rv.status_code == 200
+
+def test_get_zoom(client):
+    rv = client.get('/camera/zoom/get')
+    assert rv.status_code == 200 and rv.data == bytes("{\"zoom\":128}\n", "utf-8")
+
+def test_set_microphone_height(client):
+    rv = client.post('/microphone/height/set', data=json.dumps({"microphone-height" : 1.7}),  content_type='application/json') 
+    assert rv.status_code == 200 and rv.data == bytes("{\"microphone-height\":1.7}\n", "utf-8")
+
+def test_get_microphone_direction(client):
+    rv = client.get('microphone/direction')
+    res_vec = json.loads(rv.data)["microphone-direction"]
+    assert rv.status_code == 200 and np.allclose(res_vec, [0.0, 0.0, 1.0])
