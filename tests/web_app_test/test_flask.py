@@ -87,7 +87,7 @@ def test_reboot(client):
 def test_home(client):
     """Test a home endpoint."""
 
-    rv = client.post('/camera/reboot')
+    rv = client.post('/camera/move/home')
     assert rv.status_code == 200
 
 def test_move_absolute(client):
