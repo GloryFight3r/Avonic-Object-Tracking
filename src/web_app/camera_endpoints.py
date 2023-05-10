@@ -27,7 +27,7 @@ def move_home_camera_endpoint(cam_api: CameraAPI):
 
 
 def move_absolute_camera_endpoint(cam_api: CameraAPI):
-    data = request.get_json()
+    data = request.form
     cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
                           int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     return success()
