@@ -4,7 +4,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 
 def height_set_microphone_endpoint(mic_api: MicrophoneAPI):
-    mic_api.set_height(float(request.form["microphoneHeight"]))
+    mic_api.set_height(float(request.form["microphone-height"]))
     return make_response(jsonify({"microphone-height": mic_api.height}), 200)
 
 

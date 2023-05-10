@@ -10,7 +10,7 @@ function hideOn() {
 
 async function onZoomGet (data) {
     const d = await data
-    document.getElementById("zoom-value").value = d["zoom"]
+    document.getElementById("zoom-value").value = d["zoom-value"]
 }
 
 function selectMovement() {

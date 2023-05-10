@@ -55,7 +55,7 @@ def move_stop_camera_endpoint(cam_api: CameraAPI):
 
 def zoom_get_camera_endpoint(cam_api: CameraAPI):
     zoom = cam_api.get_zoom()
-    return make_response(jsonify({"zoom": zoom}), 200)
+    return make_response(jsonify({"zoom-value": zoom}), 200)
 
 
 def zoom_set_camera_endpoint(cam_api: CameraAPI):
