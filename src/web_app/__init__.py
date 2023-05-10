@@ -1,13 +1,5 @@
-from threading import Event
-from os import getenv
-import socket
-from dotenv import load_dotenv
 from flask import Flask, jsonify, abort, render_template, make_response
-
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import UDPSocket
+from flask_socketio import SocketIO, emit
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.tracking
@@ -15,14 +7,24 @@ from web_app.integration import GeneralController
 
 integration = GeneralController()
 
+
 def create_app(test_controller=None):
     # create and configure the app
     app = Flask(__name__)
 
     if test_controller is None:
         integration.load_env()
+        app.config['SECRET_KEY'] = integration.secret
     else:
         integration.copy(test_controller)
+        app.config['SECRET_KEY'] = 'test'
+
+    socketio = SocketIO(app)
+
+    @socketio.on('my event')
+    def handle_connection(json):
+        print("received json: " + str(json))
+        emit('my response', json, broadcast=True)
 
     @app.get('/fail-me')
     def fail_me():

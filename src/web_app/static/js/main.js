@@ -1,3 +1,5 @@
+let socket = io()
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -17,12 +19,6 @@ async function onZoomGet (data) {
     document.getElementById("zoom-value").value = d["zoom-value"]
 }
 
-function selectMovement() {
-    document.getElementById("camera-move-absolute").style.display = "none"
-    document.getElementById("camera-move-relative").style.display = "none"
-    document.getElementById("camera-move-vector").style.display = "none"
-    document.getElementById(document.getElementById("movement-select").value).style.display = "block"
-}
 
 async function onDirectionGet(data) {
     const d = (await data)["microphone-direction"]
@@ -77,6 +73,49 @@ onSuccess = {
         await sleep(350)
         b.classList.remove("contrast")
     }
+})
+
+function selectMovement() {
+    document.getElementById("camera-move-absolute").style.display = "none"
+    document.getElementById("camera-move-relative").style.display = "none"
+    document.getElementById("camera-move-vector").style.display = "none"
+    document.getElementById(document.getElementById("movement-select").value).style.display = "block"
+}
+
+function socketConnect() {
+    socket = io()
+    socket.emit('my event', {data: "connettado!!!"})
+}
+
+function socketDisconnect() {
+    socket = null
+}
+
+socket.on('my response', (args) => {
+    console.log(args["data"])
+})
+
+socket.on('new-microphone-direction', async(args) => {
+    await onDirectionGet(args)
+})
+
+socket.on('new-microphone-speaking', async(args) => {
+    await onSpeaking(args)
+})
+
+socket.on('new-camera-video', (args) => {
+    switch(args["state"]) {
+        case "on":
+            hideOn()
+            break
+        case "off":
+            hideOff()
+            break
+    }
+})
+
+socket.on('new-camera-zoom', async(args) => {
+    await onZoomGet(args)
 })
 
 hideOn()

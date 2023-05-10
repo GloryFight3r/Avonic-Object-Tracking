@@ -17,6 +17,7 @@ authors = [
 requires-python = ">=3.8"
 dependencies = [
     "flask",
+    "flask-socketio",
     "numpy",
     "python-dotenv"
 ]
