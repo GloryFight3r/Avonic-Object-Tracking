@@ -13,7 +13,8 @@ cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
 cam_api = CameraAPI(Camera(cam_sock, cam_addr))
 mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
-mic_api = MicrophoneAPI(UDPSocket(mic_addr), int(getenv("MIC_THRESH")))
+mic_sock = UDPSocket(mic_addr)
+mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
 
 app = Flask(__name__)
 
