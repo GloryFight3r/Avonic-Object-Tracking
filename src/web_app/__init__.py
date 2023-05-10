@@ -15,14 +15,14 @@ from web_app.integration import GeneralController
 
 integration = GeneralController()
 
-def create_app(test_config=None):
+def create_app(test_controller=None):
     # create and configure the app
     app = Flask(__name__)
-    
-    if test_config is None:
+
+    if test_controller is None:
         integration.load_env()
     else:
-        integration.load_mock()
+        integration.copy(test_controller)
 
     @app.get('/fail-me')
     def fail_me():
