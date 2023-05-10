@@ -17,3 +17,9 @@ article {
 .contrast {
     background-color: #ff6929;
 }
+
+#viscanv {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}

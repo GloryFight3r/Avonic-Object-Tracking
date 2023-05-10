@@ -52,6 +52,8 @@ onSuccess = {
 
 [...document.forms].forEach(f => f.onsubmit = async(e) => {
     e.preventDefault()
+    const b = f.getElementsByTagName("button")[0]
+    b.ariaBusy = "true"
     const method = f.method
     let body = {}
     switch(method) {
@@ -68,7 +70,6 @@ onSuccess = {
         fun(response.json())
     }
     if (response.status !== 200) {
-        const b = f.getElementsByTagName("button")[0]
         b.classList.add("contrast")
         await sleep(350)
         b.classList.remove("contrast")
@@ -77,6 +78,7 @@ onSuccess = {
         await sleep(350)
         b.classList.remove("contrast")
     }
+    b.ariaBusy = "false"
 })
 
 hideOn()

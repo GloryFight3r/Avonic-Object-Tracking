@@ -5,6 +5,17 @@
     <title>Avonic Camera Control</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+        {
+            "imports": {
+            "three": "{{ url_for('static', filename='js/three.js-master/build/three.module.js')}}",
+            "three/addons/": "{{ url_for('static', filename='js/three.js-master/examples/jsm/')}}"
+            }
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/scene.js')}}" type="module" defer></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </head>
 <body>
@@ -110,9 +121,9 @@
         </form>
         <form action="/microphone/direction" method="get" id="microphone-get-direction-form" class="grid">
             <label for="mic-direction-x">Direction [x, y, z]: </label>
-            <input id="mic-direction-x" readonly>
-            <input id="mic-direction-y" readonly>
-            <input id="mic-direction-z" readonly>
+            <input id="mic-direction-x" value="0" readonly>
+            <input id="mic-direction-y" value="0" readonly>
+            <input id="mic-direction-z" value="1" readonly>
             <button type="submit">Get</button>
         </form>
         <form action="/microphone/speaking" method="get" id="microphone-speaking-form" class="grid">
@@ -139,6 +150,8 @@
 </main>
 <article id="vis" class="container">
     <h1>Visualisation 📺</h1>
+    <div id="viscanv" style="width: 900px; height: 625px;">
+    </div>
 </article>
 </body>
 </html>
