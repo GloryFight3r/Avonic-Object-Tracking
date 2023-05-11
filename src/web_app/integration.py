@@ -16,7 +16,7 @@ class GeneralController():
     
     def load_env(self):
         load_dotenv()
-        cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        cam_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
         self.cam_api = CameraAPI(Camera(cam_sock, cam_addr))
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
