@@ -1,4 +1,4 @@
-let socket = io()
+const socket = io()
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -19,7 +19,6 @@ async function onZoomGet (data) {
     document.getElementById("zoom-value").value = d["zoom-value"]
 }
 
-
 async function onDirectionGet(data) {
     const d = (await data)["microphone-direction"]
     document.getElementById("mic-direction-x").value = d[0]
@@ -27,14 +26,14 @@ async function onDirectionGet(data) {
     document.getElementById("mic-direction-z").value = d[2]
 }
 
-async function onValueGet(data) {
-    const d = await data
-    document.getElementById("thread-value").value = d["value"]
-}
-
 async function onSpeaking(data) {
     const d = await data
     document.getElementById("speaking").value = d["microphone-speaking"]
+}
+
+async function onValueGet(data) {
+    const d = await data
+    document.getElementById("thread-value").value = d["value"]
 }
 
 onSuccess = {
@@ -82,25 +81,13 @@ function selectMovement() {
     document.getElementById(document.getElementById("movement-select").value).style.display = "block"
 }
 
-function socketConnect() {
-    socket = io()
-    socket.emit('my event', {data: "connettado!!!"})
-}
-
-function socketDisconnect() {
-    socket = null
-}
-
 socket.on('my response', (args) => {
     console.log(args["data"])
 })
 
-socket.on('new-microphone-direction', async(args) => {
-    await onDirectionGet(args)
-})
-
-socket.on('new-microphone-speaking', async(args) => {
-    await onSpeaking(args)
+socket.on('microphone-update', async(args) => {
+    onDirectionGet(args).then()
+    onSpeaking(args).then()
 })
 
 socket.on('new-camera-video', (args) => {

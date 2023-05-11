@@ -1,6 +1,6 @@
 from flask import make_response, jsonify, request
-from avonic_camera_api.camera_control_api import CameraAPI
 from web_app.integration import GeneralController
+
 
 def success():
     return make_response(jsonify({}), 200)

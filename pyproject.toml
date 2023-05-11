@@ -19,7 +19,8 @@ dependencies = [
     "flask",
     "flask-socketio",
     "numpy",
-    "python-dotenv"
+    "python-dotenv",
+    "requests"
 ]
 
 [project.optional-dependencies]

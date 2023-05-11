@@ -2,8 +2,6 @@ from threading import Event
 from os import getenv
 import socket
 from dotenv import load_dotenv
-from flask import Flask, jsonify, abort, render_template, make_response
-
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -16,6 +14,7 @@ class GeneralController():
         self.cam_api = None
         self.mic_api = None
         self.secret = None
+        self.ws = None
 
     def load_env(self):
         load_dotenv()

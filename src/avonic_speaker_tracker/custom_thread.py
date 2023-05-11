@@ -1,10 +1,14 @@
 from time import sleep
 from threading import Thread
+import requests
+import asyncio
+from avonic_camera_api.camera_control_api import CameraAPI
+from microphone_api.microphone_control_api import MicrophoneAPI
 
 
 class CustomThread(Thread):
     # Custom thread class use a skeleton
-    def __init__(self, event):
+    def __init__(self, event, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         """ Class constructor
 
         Args:
@@ -13,6 +17,8 @@ class CustomThread(Thread):
         super(CustomThread, self).__init__()
         self.event = event
         self.value = None
+        self.cam_api = cam_api
+        self.mic_api = mic_api
  
     def run(self):
         """ Actual body of the thread.
@@ -26,8 +32,21 @@ class CustomThread(Thread):
                 continue
             print('Worker thread running...')
             self.value += 1
-            sleep(1)
+            asyncio.run(self.send_update(self.get_mic_info(), '/update/microphone'))
+            sleep(0.1)
         print('Worker closing down')
 
     def set_calibration(self, value):
         self.value = value
+
+    def get_mic_info(self):
+        return {
+            "microphone-direction": list(self.mic_api.get_direction()),
+            "microphone-speaking": self.mic_api.is_speaking()
+        }
+
+    async def send_update(self, data: dict, path: str):
+        url = 'http://127.0.0.1:5000'
+        response = requests.post(url + path, json=data)
+        if response.status_code != 200:
+            print("Could not update microphone data")

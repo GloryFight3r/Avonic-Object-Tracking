@@ -19,7 +19,8 @@ def create_app(test_controller=None):
         integration.copy(test_controller)
         app.config['SECRET_KEY'] = 'test'
 
-    socketio = SocketIO(app)
+    integration.ws = SocketIO(app)
+    socketio = integration.ws
 
     @socketio.on('my event')
     def handle_connection(json):
@@ -34,14 +35,12 @@ def create_app(test_controller=None):
     def view():
         return render_template('view.html')
 
-
     @app.post('/camera/reboot')
     def post_reboot():
         """
         Endpoint triggers reboot procedure at the camera.
         """
         return web_app.camera_endpoints.reboot_camera_endpoint(integration)
-
 
     @app.post('/camera/on')
     def post_turn_on_camera():
@@ -50,7 +49,6 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.turn_on_camera_endpoint(integration)
 
-
     @app.post('/camera/off')
     def post_off():
         """
@@ -58,26 +56,21 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.turn_off_camera_endpoint(integration)
 
-
     @app.post('/camera/move/absolute')
     def post_move_absolute():
         return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
-
 
     @app.post('/camera/move/relative')
     def post_move_relative():
         return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
 
-
     @app.post('/camera/move/vector')
     def post_move_vector():
         return web_app.camera_endpoints.move_vector_camera_endpoint(integration)
 
-
     @app.post('/camera/move/home')
     def post_home():
         return web_app.camera_endpoints.move_home_camera_endpoint(integration)
-
 
     @app.post('/camera/move/stop')
     def stop():
@@ -85,7 +78,6 @@ def create_app(test_controller=None):
         Endpoint to stop the rotation of the camera.
         """
         return web_app.camera_endpoints.move_stop_camera_endpoint(integration)
-
 
     @app.get('/camera/zoom/get')
     def get_zoom():
@@ -102,7 +94,6 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.zoom_set_camera_endpoint(integration)
 
-
     @app.post('/microphone/height/set')
     def set_height():
         """
@@ -110,14 +101,12 @@ def create_app(test_controller=None):
         """
         return web_app.microphone_endpoints.height_set_microphone_endpoint(integration)
 
-
     @app.get('/microphone/direction')
     def get_direction():
         """
         Endpoint to get the direction of the speaker.
         """
         return web_app.microphone_endpoints.direction_get_microphone_endpoint(integration)
-
 
     @app.get('/microphone/speaking')
     def get_speaking():
@@ -162,5 +151,9 @@ def create_app(test_controller=None):
             return make_response(jsonify({"value" : "NONE"}), 200)
         print(integration.thread.value)
         return make_response(jsonify({"value" : integration.thread.value}), 200)
+
+    @app.post('/update/microphone')
+    def thread_microphone():
+        return web_app.tracking.update_microphone(integration)
 
     return app
