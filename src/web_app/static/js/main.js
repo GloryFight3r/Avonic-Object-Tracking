@@ -51,6 +51,37 @@ async function onSpeaking(data) {
   document.getElementById("speaking").value = d["microphone-speaking"];
 }
 
+async function refreshCalibration() {
+  const submitCalButton = document.getElementById("submit-calibration");
+  submitCalButton.innerHTML = "Add position";
+  submitCalButton.disabled = false;
+  fetch("/calibration/get_count", { method: "get" })
+    .then((data) => data.json())
+    .then((jsonData) => {
+      const count = parseInt(jsonData["count"]);
+      const checks = document.getElementsByClassName("calibration-checkbox");
+      console.log(count, checks.length);
+      if (count == checks.length) {
+        document.getElementById("submit-calibration").disabled = true;
+      } else {
+        document.getElementById("submit-calibration").disabled = false;
+      }
+      for (let i = 0; i < checks.length; i++) {
+        if (i < count) {
+          checks[i].checked = true;
+        } else {
+          checks[i].checked = false;
+        }
+      }
+    });
+}
+
+function onWaitCalibration() {
+  const submitCalButton = document.getElementById("submit-calibration");
+  submitCalButton.innerHTML = "Please speak up...";
+  submitCalButton.disabled = true;
+}
+
 onSuccess = {
   "camera-off-form": hideOff,
   "camera-on-form": hideOn,
@@ -59,6 +90,12 @@ onSuccess = {
   "microphone-get-direction-form": onDirectionGet,
   "microphone-speaking-form": onSpeaking,
   "thread-value-form": onValueGet,
+  "add-calibration-form": refreshCalibration,
+  "reset-calibration-form": refreshCalibration,
+};
+
+onWait = {
+  "add-calibration-form": onWaitCalibration,
 };
 
 [...document.forms].forEach(
@@ -95,3 +132,4 @@ onSuccess = {
 
 hideOn();
 selectMovement();
+refreshCalibration();

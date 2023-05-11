@@ -181,6 +181,24 @@ class CameraAPI:
 
         return (pan_position * 0.0625, tilt_position * 0.0625)
 
+    def get_direction(self) -> np.array:
+        """ Get the direction, pan and tilt, from the camera.
+
+            Returns:
+                (pan, tilt): The pan and tilt of the camera. Pan ranges between 0xF670 (-2447) and 0x0990 (2448)
+                                                             Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
+        """
+        message = "81 09 06 12 FF"
+        ret_msg = str(self.camera.send('', message, ''))[2:-1] # remove the b' and '
+        pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
+        tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
+
+        pan = int(pan_hex, 16)
+        pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
+        tilt = int(tilt_hex, 16)
+        tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
+        return np.array([pan_adjusted, tilt_adjusted])
+
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.
