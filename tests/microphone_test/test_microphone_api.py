@@ -1,5 +1,6 @@
 from unittest import mock
 import pytest
+from hypothesis import given, strategies as st
 import numpy as np
 from microphone_api.microphone_adapter import UDPSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -101,3 +102,31 @@ def test_not_speaking():
     api = MicrophoneAPI(UDPSocket(None, sock))
     assert not api.is_speaking()
     assert not api.speaking
+
+
+@given(st.integers(min_value=0, max_value=359),
+       st.integers(min_value=0, max_value=90))
+def test_direction_unit(alpha, beta):
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('{"m":{"beam":{"azimuth":' + str(alpha) + ',"elevation":' + str(beta) + '}}}\r\n', "ascii"), None)
+    api = MicrophoneAPI(UDPSocket(None, sock))
+    res = api.get_direction()
+    sum = np.sum(res ** 2)
+    assert api.azimuth == np.deg2rad(alpha)
+    assert api.elevation == np.deg2rad(beta)
+    assert np.isclose(sum, 1)
+    assert res[0] <= 1
+    assert res[1] <= 1
+    assert res[2] <= 1
+
+
+@given(st.integers(min_value=0, max_value=90))
+def test_elevation_prop(a):
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":' + str(a) + '}}}\r\n', "ascii"), None)
+    api = MicrophoneAPI(UDPSocket(None, sock))
+    assert api.get_elevation() == np.deg2rad(a)
+    assert api.elevation == np.deg2rad(a)

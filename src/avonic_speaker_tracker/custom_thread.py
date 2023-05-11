@@ -8,7 +8,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 class CustomThread(Thread):
     # Custom thread class use a skeleton
-    def __init__(self, event, cam_api: CameraAPI, mic_api: MicrophoneAPI):
+    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         """ Class constructor
 
         Args:
@@ -17,6 +17,7 @@ class CustomThread(Thread):
         super(CustomThread, self).__init__()
         self.event = event
         self.value = None
+        self.url = 'http://' + url
         self.cam_api = cam_api
         self.mic_api = mic_api
  
@@ -46,7 +47,6 @@ class CustomThread(Thread):
         }
 
     async def send_update(self, data: dict, path: str):
-        url = 'http://127.0.0.1:5000'
-        response = requests.post(url + path, json=data)
+        response = requests.post(self.url + path, json=data)
         if response.status_code != 200:
             print("Could not update microphone data")

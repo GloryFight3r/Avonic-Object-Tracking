@@ -30,7 +30,8 @@ test = [
     "black",
     "pytest",
     "pytest-cov",
-    "mutmut"
+    "mutmut",
+    "hypothesis"
 ]
 
 [tool.pytest.ini_options]

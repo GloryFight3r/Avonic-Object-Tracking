@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, abort, render_template, make_response
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.tracking
@@ -20,12 +20,6 @@ def create_app(test_controller=None):
         app.config['SECRET_KEY'] = 'test'
 
     integration.ws = SocketIO(app)
-    socketio = integration.ws
-
-    @socketio.on('my event')
-    def handle_connection(json):
-        print("received json: " + str(json))
-        emit('my response', json, broadcast=True)
 
     @app.get('/fail-me')
     def fail_me():

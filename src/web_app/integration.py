@@ -11,6 +11,7 @@ class GeneralController():
     def __init__(self):
         self.event = Event()
         self.thread = None
+        self.url = '127.0.0.1:5000'
         self.cam_api = None
         self.mic_api = None
         self.secret = None

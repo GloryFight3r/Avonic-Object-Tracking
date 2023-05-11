@@ -6,13 +6,13 @@ def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     print("Started thread")
     if integration.thread is None:
-        integration.thread = CustomThread(integration.event, integration.cam_api, integration.mic_api)
+        integration.thread = CustomThread(integration.event, integration.url, integration.cam_api, integration.mic_api)
         integration.thread.set_calibration(2)
         integration.event.clear()
         integration.thread.start()
     else:
         old_calibration = integration.thread.value
-        integration.thread = CustomThread(integration.event, integration.cam_api, integration.mic_api)
+        integration.thread = CustomThread(integration.event, integration.url, integration.cam_api, integration.mic_api)
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
         integration.thread.start()
