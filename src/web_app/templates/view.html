@@ -137,18 +137,8 @@
     </article>
     <article id="vis" class="container">
         <h1>Calibration</h1>
-	<h5>Please point the camera towards a person, click the button below and speak up.</h5>
-        <form action="/calibration/add_position" method="get" id="add-calibration-form">
-            <button id="submit-calibration" type="submit">Add position</button>
-            <div class="grid">
-                <input class="calibration-checkbox" type="checkbox" id="first-calibration-value" readonly>
-                <input class="calibration-checkbox" type="checkbox" id="second-calibration-value" readonly>
-                <input class="calibration-checkbox" type="checkbox" id="third-calibration-value" readonly>
-	    </div>
-        </form>
-        <form action="/calibration/reset" method="get" id="reset-calibration-form">
-            <button id="reset-calibration" type="submit">Reset calibration</button>
-	</form>
+	<h5 id="calibration-instruction">To start calibration, please click below.</h5>
+    	<button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
     </article>
 </div>
 </main>

@@ -126,18 +126,25 @@ def create_app(test_controller=None):
         return web_app.microphone_endpoints.speaking_get_microphone_endpoint(integration)
 
 
-    @app.get('/calibration/add_position')
-    def add_calibration_position():
-        return web_app.general_endpoints.add_calibration_position(integration)
+    @app.get('/calibration/add_directions_to_speaker')
+    def add_calibration_speaker():
+        return web_app.general_endpoints.add_calibration_speaker(integration)
 
+    @app.get('/calibration/add_direction_to_mic')
+    def add_calibration_mic():
+        return web_app.general_endpoints.add_calibration_to_mic(integration)
 
-    @app.get('/calibration/get_count')
-    def get_calibration_count():
-        return web_app.general_endpoints.get_calibration_count(integration)
+    @app.get('/calibration/add_direction_to_cam')
+    def add_calibration_cam():
+        return web_app.general_endpoints.add_calibration_to_cam(integration)
 
     @app.get('/calibration/reset')
     def reset_calibration():
         return web_app.general_endpoints.reset_calibration(integration)
+
+    @app.get('/calibration/is_set')
+    def calibration_is_set():
+        return web_app.general_endpoints.is_calibrated(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED

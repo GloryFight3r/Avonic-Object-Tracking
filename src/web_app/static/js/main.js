@@ -41,33 +41,92 @@ async function onSpeaking(data) {
     document.getElementById("speaking").value = d["microphone-speaking"]
 }
 
-async function refreshCalibration() {
-    const submitCalButton = document.getElementById("submit-calibration")
-    submitCalButton.innerHTML = "Add position"
-    submitCalButton.disabled = false
-    fetch("/calibration/get_count", {method: "get"}).then(data => data.json()).then(jsonData => {
-	const count = parseInt(jsonData["count"])
-    	const checks = document.getElementsByClassName("calibration-checkbox")
-	console.log(count, checks.length)
-    	if (count == checks.length) {
-    	    document.getElementById("submit-calibration").disabled = true
-    	} else {
-    	    document.getElementById("submit-calibration").disabled = false
+async function calibrationIsSet() {
+    const body = {method: "get"}
+    fetch("/calibration/is_set", body).then(data => data.json()).then((json) => {
+	if (json["is_set"]) {
+	    const button = document.getElementById("calibration-button")
+    	    const instructionText = document.getElementById("calibration-instruction")
+    	    instructionText.innerHTML = "Press the button below to reset the calibration."
+	    button.innerHTML = "Reset calibration"
+            button.onclick = () => resetCalibration(button)
+	} else {
+	    //const button = document.getElementById("calibration-button")
+    	    //const instructionText = document.getElementById("calibration-instruction")
+    	    //instructionText.innerHTML = "To start calibration, please click below."
+	    //button.innerHTML = "Start calibration"
 	}
-    	for (let i = 0; i < checks.length; i++) {
-	    if (i < count) {
-    	    	checks[i].checked = true
-	    } else {
-    	    	checks[i].checked = false
-	    }
-    	}
     })
 }
 
-function onWaitCalibration() {
-    const submitCalButton = document.getElementById("submit-calibration")
-    submitCalButton.innerHTML = "Please speak up..."
-    submitCalButton.disabled = true
+async function startCalibration(button) {
+    const instructionText = document.getElementById("calibration-instruction")
+    instructionText.innerHTML = "Please stand somewhere in the room and speak up."
+    button.innerHTML = "Listening..."
+    button.disabled = true
+    const body = {method: "get"}
+    fetch("/calibration/add_directions_to_speaker", body).then(async function (res) {
+	button.disabled = false
+	if (res.status != 200) {
+	    onError(button)
+	} else {
+	    button.disabled = false
+	    button.innerHTML = "Next"
+    	    button.onclick = () => pointSpeakerCalibration(button)
+	}
+    })
+}
+
+function pointSpeakerCalibration(button) {
+    const instructionText = document.getElementById("calibration-instruction")
+    instructionText.innerHTML = "Please make a noise next to the camera."
+    const body = {method: "get"}
+    button.disabled = true
+    fetch("/calibration/add_direction_to_cam", body).then(async function (res) {
+	button.disabled = false
+	if (res.status != 200) {
+	    onError(button)
+	} else {
+	    button.disabled = false
+    	    button.onclick = () => pointCameraCalibration(button)
+	}
+    })
+}
+
+function pointCameraCalibration(button) {
+    const instructionText = document.getElementById("calibration-instruction")
+    instructionText.innerHTML = "Please point the camera directly to the microphone."
+    button.onclick = () => {
+    	button.disabled = true
+    	const body = {method: "get"}
+        fetch("/calibration/add_direction_to_mic", body).then(async function (res) {
+            button.disabled = false
+            if (res.status != 200) {
+                onError(button)
+            } else {
+                button.disabled = false
+                button.innerHTML = "Reset calibration"
+    		instructionText.innerHTML = "Press the button below to reset the calibration."
+        	button.onclick = () => resetCalibration(button)
+            }
+        })
+    }
+}
+
+function resetCalibration(button) {
+    const body = {method: "get"}
+    fetch("/calibration/reset", body).then(async function (res) {
+	button.disabled = true
+	if (res.status != 200) {
+	    onError(button)
+	} else {
+    	    const instructionText = document.getElementById("calibration-instruction")
+    	    instructionText.innerHTML = "To start calibration, please click below."
+	    button.disabled = false
+	    button.innerHTML = "Start calibration"
+    	    button.onclick = () => startCalibration(button)
+	}
+    })
 }
 
 onSuccess = {
@@ -76,14 +135,8 @@ onSuccess = {
     "camera-zoom-get-form": onZoomGet,
     "microphone-get-direction-form": onDirectionGet,
     "microphone-speaking-form": onSpeaking,
-    "thread-value-form": onValueGet,
-    "add-calibration-form": refreshCalibration,
-    "reset-calibration-form": refreshCalibration
+    "thread-value-form": onValueGet
 };
-
-onWait = {
-    "add-calibration-form": onWaitCalibration
-}
 
 [...document.forms].forEach(f => f.onsubmit = async(e) => {
     e.preventDefault()
@@ -104,16 +157,20 @@ onWait = {
     }
     if (response.status !== 200) {
         const b = f.getElementsByTagName("button")[0]
-        b.classList.add("contrast")
-        await sleep(350)
-        b.classList.remove("contrast")
-        await sleep(250)
-        b.classList.add("contrast")
-        await sleep(350)
-        b.classList.remove("contrast")
+	onError(b)
     }
 })
 
+async function onError(button) {
+    button.classList.add("contrast")
+    await sleep(350)
+    button.classList.remove("contrast")
+    await sleep(250)
+    button.classList.add("contrast")
+    await sleep(350)
+    button.classList.remove("contrast")
+}
+
 hideOn()
 selectMovement()
-refreshCalibration()
+calibrationIsSet()

@@ -8,7 +8,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
-from avonic_speaker_tracker.environment import Environment
+from avonic_speaker_tracker.calibration import Calibration
 
 class GeneralController():
     def __init__(self):
@@ -23,7 +23,7 @@ class GeneralController():
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         mic_sock = UDPSocket(mic_addr)
         self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
-        self.environment = Environment()
+        self.calibration = Calibration()
 
     def load_mock(self):
         self.cam_api = CameraAPI(None)
