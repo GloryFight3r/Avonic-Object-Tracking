@@ -100,6 +100,13 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.zoom_set_camera_endpoint(integration)
 
+    @app.get('/camera/position/get')
+    def get_position():
+        """
+        Endpoint to get the position value of the camera.
+        """
+        return web_app.camera_endpoints.position_get_camera_endpoint(integration)
+
 
     @app.post('/microphone/height/set')
     def set_height():
