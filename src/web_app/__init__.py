@@ -135,6 +135,10 @@ def create_app(test_controller=None):
     def get_calibration_count():
         return web_app.general_endpoints.get_calibration_count(integration)
 
+    @app.get('/calibration/reset')
+    def reset_calibration():
+        return web_app.general_endpoints.reset_calibration(integration)
+
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
 

@@ -41,11 +41,10 @@ async function onSpeaking(data) {
     document.getElementById("speaking").value = d["microphone-speaking"]
 }
 
-async function addedCalibration(data) {
-    refreshCalibration()
-}
-
 async function refreshCalibration() {
+    const submitCalButton = document.getElementById("submit-calibration")
+    submitCalButton.innerHTML = "Add position"
+    submitCalButton.disabled = false
     fetch("/calibration/get_count", {method: "get"}).then(data => data.json()).then(jsonData => {
 	const count = parseInt(jsonData["count"])
     	const checks = document.getElementsByClassName("calibration-checkbox")
@@ -55,10 +54,20 @@ async function refreshCalibration() {
     	} else {
     	    document.getElementById("submit-calibration").disabled = false
 	}
-    	for (let i = 0; i < count; i++) {
-    	    checks[i].checked = true
+    	for (let i = 0; i < checks.length; i++) {
+	    if (i < count) {
+    	    	checks[i].checked = true
+	    } else {
+    	    	checks[i].checked = false
+	    }
     	}
     })
+}
+
+function onWaitCalibration() {
+    const submitCalButton = document.getElementById("submit-calibration")
+    submitCalButton.innerHTML = "Please speak up..."
+    submitCalButton.disabled = true
 }
 
 onSuccess = {
@@ -68,8 +77,13 @@ onSuccess = {
     "microphone-get-direction-form": onDirectionGet,
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
-    "add-calibration-form": addedCalibration
+    "add-calibration-form": refreshCalibration,
+    "reset-calibration-form": refreshCalibration
 };
+
+onWait = {
+    "add-calibration-form": onWaitCalibration
+}
 
 [...document.forms].forEach(f => f.onsubmit = async(e) => {
     e.preventDefault()

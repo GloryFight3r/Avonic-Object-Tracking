@@ -9,8 +9,8 @@ def success():
     return make_response(jsonify({}), 200)
 
 def add_calibration_position(integration: GeneralController):
-    #while not integration.mic_api.is_speaking():
-    #    sleep(0.1)
+    while not integration.mic_api.is_speaking():
+        sleep(0.1)
     mic_dir = integration.mic_api.get_direction()
     cam_dir = integration.cam_api.get_direction()
 
@@ -21,3 +21,7 @@ def add_calibration_position(integration: GeneralController):
 def get_calibration_count(integration: GeneralController):
     count = len(integration.environment.plane.points)
     return make_response(jsonify({"count": count}), 200)
+
+def reset_calibration(integration: GeneralController):
+    integration.environment.reset_plane()
+    return success()
