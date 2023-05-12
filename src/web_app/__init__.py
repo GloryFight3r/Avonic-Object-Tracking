@@ -80,7 +80,6 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.zoom_get_camera_endpoint(integration)
 
-
     @app.post('/camera/zoom/set')
     def set_zoom():
         """
@@ -132,19 +131,17 @@ def create_app(test_controller=None):
     def thread_start():
         return web_app.tracking.start_thread_endpoint(integration)
 
-
     @app.post('/thread/stop')
     def thread_stop():
         return web_app.tracking.stop_thread_endpoint(integration)
-
 
     @app.get('/thread/value')
     def thread_value():
         # Retrieves the thread value (only for demo/debug purposes)
         if integration.thread is None:
-            return make_response(jsonify({"value" : "NONE"}), 200)
+            return make_response(jsonify({"value": "NONE"}), 200)
         print(integration.thread.value)
-        return make_response(jsonify({"value" : integration.thread.value}), 200)
+        return make_response(jsonify({"value": integration.thread.value}), 200)
 
     @app.post('/update/microphone')
     def thread_microphone():

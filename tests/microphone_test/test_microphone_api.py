@@ -110,13 +110,14 @@ def test_direction_unit(alpha, beta):
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":' + str(alpha) + ',"elevation":' + str(beta) + '}}}\r\n', "ascii"), None)
+        (bytes('{"m":{"beam":{"azimuth":' + str(alpha) +
+               ',"elevation":' + str(beta) + '}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
     res = api.get_direction()
-    sum = np.sum(res ** 2)
-    assert api.azimuth == np.deg2rad(alpha)
-    assert api.elevation == np.deg2rad(beta)
-    assert np.isclose(sum, 1)
+    sumofsquares = np.sum(res ** 2)
+    assert np.isclose(api.azimuth, np.deg2rad(alpha))
+    assert np.isclose(api.elevation, np.deg2rad(beta))
+    assert np.isclose(sumofsquares, 1)
     assert res[0] <= 1
     assert res[1] <= 1
     assert res[2] <= 1
@@ -126,7 +127,8 @@ def test_direction_unit(alpha, beta):
 def test_elevation_prop(a):
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":' + str(a) + '}}}\r\n', "ascii"), None)
+    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":' +
+                                        str(a) + '}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(UDPSocket(None, sock))
-    assert api.get_elevation() == np.deg2rad(a)
-    assert api.elevation == np.deg2rad(a)
+    assert np.isclose(api.get_elevation(), np.deg2rad(a))
+    assert np.isclose(api.elevation, np.deg2rad(a))
