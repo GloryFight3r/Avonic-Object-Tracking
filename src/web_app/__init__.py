@@ -10,6 +10,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
+import web_app.preset_locations_endpoints
 import web_app.general_endpoints
 import web_app.tracking
 from web_app.integration import GeneralController
@@ -145,6 +146,18 @@ def create_app(test_controller=None):
     @app.get('/calibration/reset')
     def reset_calibration():
         return web_app.general_endpoints.reset_calibration(integration)
+
+    @app.post('/preset/add')
+    def add_preset():
+        return web_app.preset_locations_endpoints.add_preset_location(integration)
+    
+    @app.post('/preset/edit')
+    def edit_preset():
+        return web_app.preset_locations_endpoints.edit_preset_location(integration)
+    
+    @app.post('/preset/remove')
+    def remove_preset():
+        return web_app.preset_locations_endpoints.remove_preset_location(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED

@@ -12,7 +12,7 @@ def direction_get_microphone_endpoint(integration: GeneralController):
 
 
 def height_set_microphone_endpoint(integration: GeneralController):
-    mic_api.set_height(float(request.get_json()["microphoneHeight"]))
+    integration.mic_api.set_height(float(request.get_json()["microphoneHeight"]))
     return make_response(jsonify({"microphone-height": integration.mic_api.height}), 200)
 
 

@@ -160,7 +160,7 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
-    def get_current_position(self) -> (float, float):
+    """def get_current_position(self) -> (float, float):
         message = "81 09 06 12 FF"
 
         ret = self.camera.send("01 00 00 05 00 00 00" + self.message_counter(), message, self.counter)[2:-1]
@@ -180,24 +180,29 @@ class CameraAPI:
         #print(ret, pan_position, tilt_position)
 
         return (pan_position * 0.0625, tilt_position * 0.0625)
+    """
 
     def get_direction(self) -> np.array:
         """ Get the direction, pan and tilt, from the camera.
 
             Returns:
-                (pan, tilt): The pan and tilt of the camera. Pan ranges between 0xF670 (-2447) and 0x0990 (2448)
-                                                             Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
+                (pan, tilt): The pan and tilt of the camera. Pan ranges between 0xF670 (-2447) and 0x0990 (2448) while pan_adjusted ranges between (-170) and (+170)
+                                                             Tilt ranges between 0xFE45 (-442) and 0x0510 (1296) while tilt_adjusted ranges between (-30) and (+90)
         """
         message = "81 09 06 12 FF"
-        ret_msg = str(self.camera.send('', message, ''))[2:-1] # remove the b' and '
+        ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
         pan = int(pan_hex, 16)
-        pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
+        pan_adjusted = pan
         tilt = int(tilt_hex, 16)
-        tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
-        return np.array([pan_adjusted, tilt_adjusted])
+        tilt_adjusted = tilt
+        if ret_msg[5] == "F":
+            pan_adjusted = -((pan ^ ((1 << 16) - 1)) + 1)
+        if ret_msg[13] == "F":
+            tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
+        return np.array([pan_adjusted * 0.0625, tilt_adjusted * 0.0625])
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:

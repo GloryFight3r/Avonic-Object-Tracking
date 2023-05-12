@@ -25,6 +25,15 @@ async function onPositionGet(data) {
     d["position-beta-value"];
 }
 
+async function onPositionSet(data) {
+  const d = await data;
+  document.getElementById("camera-direction-alpha").value =
+    d["position-alpha-value"];
+
+  document.getElementById("camera-direction-beta").value =
+    d["position-beta-value"];
+}
+
 function selectMovement() {
   document.getElementById("camera-move-absolute").style.display = "none";
   document.getElementById("camera-move-relative").style.display = "none";
@@ -87,6 +96,7 @@ onSuccess = {
   "camera-on-form": hideOn,
   "camera-zoom-get-form": onZoomGet,
   "camera-position-get-form": onPositionGet,
+  "camera-position-set-form": onPositionSet,
   "microphone-get-direction-form": onDirectionGet,
   "microphone-speaking-form": onSpeaking,
   "thread-value-form": onValueGet,
@@ -112,6 +122,8 @@ onWait = {
           body = { method: method, body: new FormData(f) };
           break;
       }
+      console.log("DSADSADSA");
+      console.log(body);
       const response = await fetch(f.action, body);
       const fun = onSuccess[f.id];
       if (response.status === 200 && fun !== undefined) {
@@ -130,6 +142,48 @@ onWait = {
     })
 );
 
+const presetform = document.getElementById("preset-form");
+
+presetform.onsubmit = async (e) => {
+  e.preventDefault();
+  const button_id = e.submitter.id;
+  let body = {};
+  switch (button_id) {
+    case "add-preset-button":
+      presetform.setAttribute("method", "POST");
+      presetform.action = "/preset/add";
+      body = { method: presetform.method, body: new FormData(presetform) };
+      break;
+    case "edit-preset-button":
+      console.log("TARAS");
+      presetform.setAttribute("method", "POST");
+      presetform.action = "/preset/edit";
+      body = { method: presetform.method, body: new FormData(presetform) };
+      break;
+    case "remove-preset-button":
+      presetform.setAttribute("method", "POST");
+      presetform.action = "/preset/remove";
+      body = { method: presetform.method, body: new FormData(presetform) };
+      break;
+  }
+  const response = await fetch(presetform.action, body);
+  const fun = onSuccess[presetform.id];
+  if (response.status === 200 && fun !== undefined) {
+    fun(response.json());
+  }
+  if (response.status !== 200) {
+    const b = e.submitter;
+    b.classList.add("contrast");
+    await sleep(350);
+    b.classList.remove("contrast");
+    await sleep(250);
+    b.classList.add("contrast");
+    await sleep(350);
+    b.classList.remove("contrast");
+  }
+};
+
 hideOn();
 selectMovement();
+selectPreset();
 refreshCalibration();

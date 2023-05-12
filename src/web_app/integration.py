@@ -9,6 +9,7 @@ from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 from avonic_speaker_tracker.environment import Environment
+from avonic_speaker_tracker.preset import PresetCollection
 
 class GeneralController():
     def __init__(self):
@@ -24,6 +25,7 @@ class GeneralController():
         mic_sock = UDPSocket(mic_addr)
         self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
         self.environment = Environment()
+        self.preset_locations = PresetCollection()
 
     def load_mock(self):
         self.cam_api = CameraAPI(None)

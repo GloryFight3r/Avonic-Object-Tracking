@@ -283,6 +283,58 @@
             <button type="submit">Get value</button>
           </form>
         </article>
+        <article id="presets" class "container">
+          <h1>Presets</h1>
+          <h5>
+            Click add preset which will add a new preset to the list. After that click record sound direction and the
+            system will wait for the first audible noise and record its direction. After that point the camera to the speaker
+            and click record camera direction
+          </h5>
+
+          <form
+            action="put"
+            id="preset-form"
+            method="put"
+          >
+          <label for="preset-select">Select an item:</label>
+          <select id="preset-select" name="preset-select">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+          </select>
+          <div class="grid">
+              <input id="mic-direction-x" name = "mic-direction-x" />
+              <input id="mic-direction-y" name = "mic-direction-y" />
+              <input id="mic-direction-z" name = "mic-direction-z" />
+          </div>
+          <div class = "grid">
+            <input id="camera-direction-alpha" name = "camera-direction-alpha"/>
+            <input id="camera-direction-beta" name = "camera-direction-beta"/>
+          </div>
+          <button id="add-preset-button" type="submit"> Add new preset </button>
+          <button id="edit-preset-button" type="submit"> Edit current preset </button>
+          <button id="remove-preset-button" type="submit"> Remove current preset </button>
+          </form>
+
+          <div class="grid">
+          <form
+            action="/camera/position/get"
+            method="get"
+            id="camera-position-set-form"
+          >
+           <button type="submit">Set camera position</button>
+          </form>
+          <form
+            action="/microphone/direction"
+            method="get"
+            id="microphone-set-direction-form"
+            class="grid"
+          >
+
+              <button type="submit">Set microphone position</button>
+            </form>
+          </div>
+        </article>
         <article id="cal" class="container">
           <h1>Calibration</h1>
           <h5>
