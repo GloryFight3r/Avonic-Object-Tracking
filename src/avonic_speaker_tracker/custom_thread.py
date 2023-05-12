@@ -20,7 +20,7 @@ class CustomThread(Thread):
         self.url = 'http://' + url
         self.cam_api = cam_api
         self.mic_api = mic_api
- 
+
     def run(self):
         """ Actual body of the thread.
         Method should start with self.event.wait() to make sure that on

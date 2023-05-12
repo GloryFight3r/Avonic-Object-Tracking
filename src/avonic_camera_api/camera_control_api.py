@@ -167,7 +167,7 @@ class CameraAPI:
                                                              Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
         """
         message = "81 09 06 12 FF"
-        ret_msg = str(self.camera.send('', message, ''))[2:-1] # remove the b' and '
+        ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 

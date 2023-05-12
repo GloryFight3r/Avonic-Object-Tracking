@@ -34,3 +34,6 @@ def update_microphone(integration: GeneralController):
     data = request.get_json()
     integration.ws.emit('microphone-update', data)
     return make_response(jsonify({}), 200)
+
+def is_running_endpoint(integration: GeneralController):
+    return make_response(jsonify({"is-running": integration.thread and integration.thread.is_alive()}))

@@ -118,10 +118,6 @@ def create_app(test_controller=None):
     def add_calibration_mic():
         return web_app.general_endpoints.add_calibration_to_mic(integration)
 
-    @app.get('/calibration/add_direction_to_cam')
-    def add_calibration_cam():
-        return web_app.general_endpoints.add_calibration_to_cam(integration)
-
     @app.get('/calibration/reset')
     def reset_calibration():
         return web_app.general_endpoints.reset_calibration(integration)
@@ -156,6 +152,11 @@ def create_app(test_controller=None):
     @app.post('/thread/stop')
     def thread_stop():
         return web_app.tracking.stop_thread_endpoint(integration)
+
+    @app.get('/thread/running')
+    def thread_is_running():
+        # checks whether thread is running
+        return web_app.tracking.is_running_endpoint(integration)
 
     @app.get('/thread/value')
     def thread_value():

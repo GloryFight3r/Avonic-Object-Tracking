@@ -44,7 +44,19 @@ async function calibrationIsSet() {
     })
 }
 
+async function startThread() {
+    const body = {method: "get"}
+    fetch("/thread/running", body).then(async function (res) {
+	console.log(res)
+	if (!res["is-running"]) {
+	    const post_body = {method: "post", data: {}}
+	    fetch("thread/start", post_body)
+	}
+    })
+}
+
 async function startCalibration(button) {
+    await startThread()
     const instructionText = document.getElementById("calibration-instruction")
     instructionText.innerHTML = "Please stand somewhere in the room and speak up."
     button.innerHTML = "Listening..."
@@ -99,6 +111,7 @@ function resetCalibration(button) {
     	    button.onclick = () => startCalibration(button)
 	}
     })
+}
 
 async function onValueGet(data) {
     const d = await data
