@@ -4,7 +4,7 @@ from avonic_speaker_tracker.math_helper import angle_between_vectors
 
 class Calibration:
     # height of the microphone above the speaker
-    mic_height: float = 1
+    mic_height: float = 1.0
     mic_to_cam: np.array = None
 
     # variables of calibration
@@ -32,13 +32,12 @@ class Calibration:
 
     def is_calibrated(self) -> bool:
         return not (self.speaker_point is None or self.to_mic_direction is None \
-                    or self.to_cam_direction is None)
-
+            or self.to_cam_direction is None)
 
     def calculate_distance(self) -> np.array:
         cam_vecw = angle_vector(self.speaker_point[0][0], self.speaker_point[0][1])
         mic_vecw = self.speaker_point[1]
-        print(cam_vecw)
+        assert mic_vecw[1] != 0.0 and self.mic_height != 0.0
 
         # calculate the length of the mic_vec
         mic_vec = mic_vecw / mic_vecw[1] * -self.mic_height
@@ -46,9 +45,8 @@ class Calibration:
         # calculate the two angles needed
         alpha = angle_between_vectors(cam_vecw, mic_vecw)
         beta = angle_between_vectors(cam_vecw, angle_vector(self.to_mic_direction[0], self.to_mic_direction[1]))
-        print(alpha, beta)
+        assert beta != 0.0
 
         mic_to_cam_dist = np.linalg.norm(mic_vec) / np.sin(beta) * np.sin(alpha)
-        print(mic_to_cam_dist)
         self.mic_to_cam = self.to_cam_direction / np.linalg.norm(self.to_cam_direction) * mic_to_cam_dist
         return self.mic_to_cam

@@ -93,3 +93,28 @@ def test_calculate_distance(height, speaker, to_mic, to_cam, mic_to_cam):
     assert abs(cal.mic_to_cam[0] - mic_to_cam[0]) <= e
     assert abs(cal.mic_to_cam[1] - mic_to_cam[1]) <= e
     assert abs(cal.mic_to_cam[2] - mic_to_cam[2]) <= e
+
+def test_calculate_distance_one_line():
+    cal = Calibration()
+    cal.set_height(1)
+    cal.add_speaker_point((np.array([math.pi/2, 0]), np.array([0, -1, 0])))
+    cal.add_direction_to_cam(np.array([0, -1, 0]))
+    cal.add_direction_to_mic(np.array([math.pi/2, 0]))
+
+    with pytest.raises(AssertionError):
+        cal.calculate_distance()
+
+def test_zero_height():
+    cal = Calibration()
+    cal.set_height(0)
+    cal.add_speaker_point((np.array([0, -0.245]), np.array([0, -4, 0])))
+    cal.add_direction_to_cam(np.array([0, -3, -4]))
+    cal.add_direction_to_mic(np.array([0, 0.6435]))
+
+    with pytest.raises(AssertionError):
+        cal.calculate_distance()
+
+    cal.add_speaker_point((np.array([0, -0.245]), np.array([1, 0, 0])))
+
+    with pytest.raises(AssertionError):
+        cal.calculate_distance()
