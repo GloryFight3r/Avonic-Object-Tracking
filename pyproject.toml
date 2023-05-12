@@ -17,8 +17,10 @@ authors = [
 requires-python = ">=3.8"
 dependencies = [
     "flask",
+    "flask-socketio",
     "numpy",
-    "python-dotenv"
+    "python-dotenv",
+    "requests"
 ]
 
 [project.optional-dependencies]
@@ -28,7 +30,8 @@ test = [
     "black",
     "pytest",
     "pytest-cov",
-    "mutmut"
+    "mutmut",
+    "hypothesis"
 ]
 
 [tool.pytest.ini_options]

@@ -1,3 +1,5 @@
+const socket = io()
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -17,28 +19,21 @@ async function onZoomGet (data) {
     document.getElementById("zoom-value").value = d["zoom-value"]
 }
 
-function selectMovement() {
-    document.getElementById("camera-move-absolute").style.display = "none"
-    document.getElementById("camera-move-relative").style.display = "none"
-    document.getElementById("camera-move-vector").style.display = "none"
-    document.getElementById(document.getElementById("movement-select").value).style.display = "block"
-}
-
 async function onDirectionGet(data) {
     const d = (await data)["microphone-direction"]
-    document.getElementById("mic-direction-x").value = d[0]
-    document.getElementById("mic-direction-y").value = d[1]
-    document.getElementById("mic-direction-z").value = d[2]
-}
-
-async function onValueGet(data) {
-    const d = await data
-    document.getElementById("thread-value").value = d["value"]
+    document.getElementById("mic-direction-x").value = d[0].toFixed(3)
+    document.getElementById("mic-direction-y").value = d[1].toFixed(3)
+    document.getElementById("mic-direction-z").value = d[2].toFixed(3)
 }
 
 async function onSpeaking(data) {
     const d = await data
     document.getElementById("speaking").value = d["microphone-speaking"]
+}
+
+async function onValueGet(data) {
+    const d = await data
+    document.getElementById("thread-value").value = d["value"]
 }
 
 onSuccess = {
@@ -79,6 +74,37 @@ onSuccess = {
         b.classList.remove("contrast")
     }
     b.ariaBusy = "false"
+})
+
+function selectMovement() {
+    document.getElementById("camera-move-absolute").style.display = "none"
+    document.getElementById("camera-move-relative").style.display = "none"
+    document.getElementById("camera-move-vector").style.display = "none"
+    document.getElementById(document.getElementById("movement-select").value).style.display = "block"
+}
+
+socket.on('my response', (args) => {
+    console.log(args["data"])
+})
+
+socket.on('microphone-update', async(args) => {
+    onDirectionGet(args).then()
+    onSpeaking(args).then()
+})
+
+socket.on('camera-video-update', (args) => {
+    switch(args["state"]) {
+        case "on":
+            hideOn()
+            break
+        case "off":
+            hideOff()
+            break
+    }
+})
+
+socket.on('new-camera-zoom', async(args) => {
+    await onZoomGet(args)
 })
 
 hideOn()
