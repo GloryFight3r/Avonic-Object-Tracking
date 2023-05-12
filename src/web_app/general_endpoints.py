@@ -22,19 +22,11 @@ def add_calibration_to_mic(integration: GeneralController):
     integration.calibration.add_direction_to_mic(cam_dir)
     return success()
 
-def add_calibration_to_cam(integration: GeneralController):
-    while not integration.mic_api.is_speaking():
-        sleep(0.1)
-    mic_dir = integration.mic_api.get_direction()
-    integration.calibration.add_direction_to_cam(mic_dir)
-    return success()
-
 def reset_calibration(integration: GeneralController):
     integration.calibration.reset_calibration()
     return success()
 
 def is_calibrated(integration: GeneralController):
-    print(integration.calibration.calculate_distance())
     return make_response(jsonify({
         "is_set": integration.calibration.is_calibrated()
     }), 200)

@@ -65,25 +65,10 @@ async function startCalibration(button) {
 	if (res.status != 200) {
 	    onError(button)
 	} else {
-	    button.disabled = false
-	    button.innerHTML = "Next"
-    	    button.onclick = () => pointSpeakerCalibration(button)
-	}
-    })
-}
-
-function pointSpeakerCalibration(button) {
-    const instructionText = document.getElementById("calibration-instruction")
-    instructionText.innerHTML = "Please make a noise next to the camera."
-    const body = {method: "get"}
-    button.disabled = true
-    fetch("/calibration/add_direction_to_cam", body).then(async function (res) {
-	button.disabled = false
-	if (res.status != 200) {
-	    onError(button)
-	} else {
-	    button.disabled = false
-    	    button.onclick = () => pointCameraCalibration(button)
+    	    button.disabled = true
+	    setTimeout(() => {
+		pointCameraCalibration(button)
+	    }, 500)
 	}
     })
 }
@@ -91,6 +76,8 @@ function pointSpeakerCalibration(button) {
 function pointCameraCalibration(button) {
     const instructionText = document.getElementById("calibration-instruction")
     instructionText.innerHTML = "Please point the camera directly to the microphone."
+    button.innerHTML = "Done."
+    button.disabled = false
     button.onclick = () => {
     	button.disabled = true
     	const body = {method: "get"}
@@ -101,7 +88,7 @@ function pointCameraCalibration(button) {
             } else {
                 button.disabled = false
                 button.innerHTML = "Reset calibration"
-    		instructionText.innerHTML = "Press the button below to reset the calibration."
+    		instructionText.innerHTML = "Don't forget to set the height too. Press below to reset the calibration."
         	button.onclick = () => resetCalibration(button)
             }
         })
