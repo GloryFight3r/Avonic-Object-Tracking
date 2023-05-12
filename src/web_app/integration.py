@@ -2,8 +2,6 @@ from threading import Event
 from os import getenv
 import socket
 from dotenv import load_dotenv
-from flask import Flask, jsonify, abort, render_template, make_response
-
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -13,7 +11,12 @@ class GeneralController():
     def __init__(self):
         self.event = Event()
         self.thread = None
-    
+        self.url = '127.0.0.1:5000'
+        self.cam_api = None
+        self.mic_api = None
+        self.secret = None
+        self.ws = None
+
     def load_env(self):
         load_dotenv()
         cam_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -22,6 +25,7 @@ class GeneralController():
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         mic_sock = UDPSocket(mic_addr)
         self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
+        self.secret = getenv("SECRET_KEY")
     
     def load_mock(self):
         self.cam_api = CameraAPI(None)

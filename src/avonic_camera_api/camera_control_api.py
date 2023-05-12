@@ -1,7 +1,6 @@
 from avonic_camera_api.camera_adapter import Camera
 import numpy as np
 from avonic_camera_api import converter
-import binascii
 
 
 class CameraAPI:

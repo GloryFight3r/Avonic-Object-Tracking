@@ -35,6 +35,7 @@ class UDPSocket:
         """
         res = []
         self.sock.sendto(bytes(command, 'ascii'), self.address)
+        self.sock.settimeout(5)
         received = 0
         while received < responses:
             data, addr = self.sock.recvfrom(1024)
