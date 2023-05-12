@@ -28,12 +28,14 @@ class GeneralController():
     def load_mock(self):
         self.cam_api = CameraAPI(None)
         self.mic_api = MicrophoneAPI(None, 55)
+        self.calibration = Calibration()
 
     def copy(self, new_controller):
         self.event = new_controller.event
         self.thread = new_controller.thread
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
+        self.calibration = new_controller.calibration
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api

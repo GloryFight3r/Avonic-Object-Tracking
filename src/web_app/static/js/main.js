@@ -50,11 +50,6 @@ async function calibrationIsSet() {
     	    instructionText.innerHTML = "Press the button below to reset the calibration."
 	    button.innerHTML = "Reset calibration"
             button.onclick = () => resetCalibration(button)
-	} else {
-	    //const button = document.getElementById("calibration-button")
-    	    //const instructionText = document.getElementById("calibration-instruction")
-    	    //instructionText.innerHTML = "To start calibration, please click below."
-	    //button.innerHTML = "Start calibration"
 	}
     })
 }

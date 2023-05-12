@@ -22,14 +22,14 @@ def camera(monkeypatch):
         pass
 
     def mocked_recv(size):
-        return bytes.fromhex("9041FF") 
+        return bytes.fromhex("9041FF")
 
     sock = socket.socket
     monkeypatch.setattr(sock, "connect", mocked_connect)
     monkeypatch.setattr(sock, "close", mocked_close)
     monkeypatch.setattr(sock, "sendall", mocked_send_all)
     monkeypatch.setattr(sock, "recv", mocked_recv)
-    
+
     cam_api = CameraAPI(Camera(sock, None))
     def mocked_camera_reconnect():
         pass

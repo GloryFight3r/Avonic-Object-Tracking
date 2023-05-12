@@ -177,7 +177,7 @@ class CameraAPI:
         pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
         tilt = int(tilt_hex, 16)
         tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
-        return np.array([pan_adjusted, tilt_adjusted])
+        return np.array([pan_adjusted * 0.0625, tilt_adjusted * 0.0625])
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
