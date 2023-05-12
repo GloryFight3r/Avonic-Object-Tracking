@@ -2,6 +2,7 @@ from flask import make_response, jsonify, request
 from avonic_speaker_tracker.custom_thread import CustomThread
 from web_app.integration import GeneralController
 
+
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     print("Started thread")

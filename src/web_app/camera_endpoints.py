@@ -13,11 +13,13 @@ def reboot_camera_endpoint(integration: GeneralController):
 
 def turn_on_camera_endpoint(integration: GeneralController):
     integration.cam_api.turn_on()
+    integration.ws.emit('camera-video-update', {"state": "on"})
     return success()
 
 
 def turn_off_camera_endpoint(integration: GeneralController):
     integration.cam_api.turn_off()
+    integration.ws.emit('camera-video-update', {"state": "off"})
     return success()
 
 

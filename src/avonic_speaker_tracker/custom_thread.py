@@ -41,12 +41,20 @@ class CustomThread(Thread):
         self.value = value
 
     def get_mic_info(self):
+        """ Get information about the microphone.
+        """
         return {
             "microphone-direction": list(self.mic_api.get_direction()),
             "microphone-speaking": self.mic_api.is_speaking()
         }
 
     async def send_update(self, data: dict, path: str):
+        """ Send an HTTP request to the flask server to update the webpages.
+
+        Args:
+            data: The data in dictionary format
+            path: The path to send to
+        """
         response = requests.post(self.url + path, json=data)
         if response.status_code != 200:
-            print("Could not update microphone data")
+            print("Could not update flask at path " + path)

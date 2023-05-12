@@ -90,7 +90,7 @@ socket.on('microphone-update', async(args) => {
     onSpeaking(args).then()
 })
 
-socket.on('new-camera-video', (args) => {
+socket.on('camera-video-update', (args) => {
     switch(args["state"]) {
         case "on":
             hideOn()
