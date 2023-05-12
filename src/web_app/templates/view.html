@@ -5,6 +5,7 @@
     <title>Avonic Camera Control</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </head>
 <body>
@@ -131,6 +132,7 @@
         </form>
         </div>
         <form action="/thread/value" method="get" id="thread-value-form" class="grid">
+            <label for="thread-value">Value:</label>
             <input id="thread-value" readonly>
             <button type="submit">Get value</button>
         </form>
