@@ -42,10 +42,13 @@ class MicrophoneAPI:
         """
         message = '{"m":{"beam":{"azimuth":null}}}'
         ret = self.sock.send(message)[0]
-        res = json.loads(ret)["m"]["beam"]["azimuth"]
-        assert isinstance(res, int)
-        if 0 <= res <= 360:
-            self.azimuth = np.deg2rad(res)
+        try:
+            res = json.loads(ret)["m"]["beam"]["azimuth"]
+            assert isinstance(res, int)
+            if 0 <= res <= 360:
+                self.azimuth = np.deg2rad(res)
+        except KeyError:
+            print("Unable to get azimuth from the microphone, response was: " + ret)
         return self.azimuth
 
     def get_elevation(self) -> float:
@@ -56,29 +59,36 @@ class MicrophoneAPI:
         """
         message = '{"m":{"beam":{"elevation":null}}}'
         ret = self.sock.send(message)[0]
-        res = json.loads(ret)["m"]["beam"]["elevation"]
-        assert isinstance(res, int)
-        if 0 <= res <= 90:
-            self.elevation = np.deg2rad(res)
+        try:
+            res = json.loads(ret)["m"]["beam"]["elevation"]
+            assert isinstance(res, int)
+            if 0 <= res <= 90:
+                self.elevation = np.deg2rad(res)
+        except KeyError:
+            print("Unable to get elevation from microphone, response was: " + ret)
         return self.elevation
 
     def get_direction(self) -> np.array:
-        """ Get direction vector from the camera.
+        """ Get direction vector from the microphone.
 
         Returns:
             the direction vector (normalised)
         """
         message = '{"m":{"beam":{"azimuth":null,"elevation":null}}}'
         ret = self.sock.send(message)[0]
-        json_object = json.loads(ret)["m"]["beam"]
-        azimuth = json_object["azimuth"]
-        elevation = json_object["elevation"]
-        assert isinstance(azimuth, int)
-        assert isinstance(elevation, int)
-        if 0 <= elevation <= 90:
-            self.elevation = np.deg2rad(elevation)
-        if 0 <= azimuth < 360:
-            self.azimuth = np.deg2rad(azimuth)
+        try:
+            json_object = json.loads(ret)["m"]["beam"]
+            azimuth = json_object["azimuth"]
+            elevation = json_object["elevation"]
+            assert isinstance(azimuth, int)
+            assert isinstance(elevation, int)
+            if 0 <= elevation <= 90:
+                self.elevation = np.deg2rad(elevation)
+            if 0 <= azimuth < 360:
+                self.azimuth = np.deg2rad(azimuth)
+        except KeyError:
+            print("Unable to get direction from microphone, response was: " + ret)
+
         return self.vector()
 
     def vector(self):
@@ -100,8 +110,11 @@ class MicrophoneAPI:
         """
         message = '{"m":{"in1":{"peak":null}}}'
         ret = self.sock.send(message)[0]
-        res = json.loads(ret)["m"]["in1"]["peak"]
-        assert isinstance(res, int)
-        if -90 <= res <= 0:
-            self.speaking = res > self.threshold
+        try:
+            res = json.loads(ret)["m"]["in1"]["peak"]
+            assert isinstance(res, int)
+            if -90 <= res <= 0:
+                self.speaking = res > self.threshold
+        except KeyError:
+            print("Unable to get peak loudness, response was: " + ret)
         return self.speaking
