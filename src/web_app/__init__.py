@@ -159,6 +159,14 @@ def create_app(test_controller=None):
     def remove_preset():
         return web_app.preset_locations_endpoints.remove_preset_location(integration)
 
+    @app.get('/preset/get_list')
+    def get_preset_list():
+        return web_app.preset_locations_endpoints.get_preset_list(integration)
+
+    @app.post('/preset/get_preset_info')
+    def get_preset_info():
+        return web_app.preset_locations_endpoints.get_preset_info(integration)
+
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
 

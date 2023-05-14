@@ -291,46 +291,66 @@
             and click record camera direction
           </h5>
 
+          <div class="grid">
+              <form
+              action="/preset/get_list"
+              id="preset-get-list-form"
+              method="get">
+              
+                <button id="reload-preset-button" type="submit">Reload list</button>
+              </form>
+          </div>
           <form
             action="put"
             id="preset-form"
             method="put"
           >
-          <label for="preset-select">Select an item:</label>
-          <select id="preset-select" name="preset-select">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-          </select>
-          <div class="grid">
-              <input id="mic-direction-x" name = "mic-direction-x" />
-              <input id="mic-direction-y" name = "mic-direction-y" />
-              <input id="mic-direction-z" name = "mic-direction-z" />
-          </div>
-          <div class = "grid">
-            <input id="camera-direction-alpha" name = "camera-direction-alpha"/>
-            <input id="camera-direction-beta" name = "camera-direction-beta"/>
-          </div>
+
+            <div class="grid">
+              <label for="preset-select">Select an existing preset:</label>
+              <select id="preset-select" name="preset-select" onchange="changePreset()">
+              </select>
+            </div>
+            <div class="grid">
+              <label for="preset-name">Type preset name:</label>
+              <input id="preset-name" name="preset-name">
+            </div>
+            <div class="grid">
+              <label for="mic-direction-x2">Mic direction x</label>
+              <label for="mic-direction-y2">Microphone direction y</label>
+              <label for="mic-direction-z2">Microphone direction z</label>
+            </div>
+            <div class="grid">
+              <input id="mic-direction-x2" name="mic-direction-x" readonly/>
+              <input id="mic-direction-y2" name="mic-direction-y" readonly/>
+              <input id="mic-direction-z2" name="mic-direction-z" readonly/>
+            </div>
+            <div class="grid">
+              <label for="camera-direction-alpha">Camera degrees pan</label>
+              <label for="camera-direction-beta">Camera degrees tilt</label>
+            </div>
+            <div class="grid">
+              <input id="camera-direction-alpha" name = "camera-direction-alpha" readonly/>
+              <input id="camera-direction-beta" name = "camera-direction-beta" readonly/>
+            </div>
           <button id="add-preset-button" type="submit"> Add new preset </button>
           <button id="edit-preset-button" type="submit"> Edit current preset </button>
           <button id="remove-preset-button" type="submit"> Remove current preset </button>
           </form>
 
           <div class="grid">
-          <form
-            action="/camera/position/get"
-            method="get"
-            id="camera-position-set-form"
-          >
-           <button type="submit">Set camera position</button>
-          </form>
-          <form
-            action="/microphone/direction"
-            method="get"
-            id="microphone-set-direction-form"
-            class="grid"
-          >
-
+            <form
+              action="/camera/position/get"
+              method="get"
+              id="camera-position-set-form"
+            >
+              <button type="submit">Set camera position</button>
+            </form>
+            <form
+              action="/microphone/direction"
+              method="get"
+              id="microphone-set-direction-form"
+            >
               <button type="submit">Set microphone position</button>
             </form>
           </div>

@@ -6,8 +6,15 @@ def success():
     return make_response(jsonify({}), 200)
 
 def add_preset_location(integration: GeneralController):
+    """ Adds a preset location using the data from the request
+
+    Args:
+        integration: The controller containing all the dependencies
+
+    Returns: A http response which indicates success(200) or failure(400)
+        
+    """
     data = request.form
-    print(data)
     try:
         camera_angles = np.array([
             float(data["camera-direction-alpha"]),
@@ -18,12 +25,20 @@ def add_preset_location(integration: GeneralController):
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.add_preset(camera_angles, microphone_direction)
+        integration.preset_locations.add_preset(data["preset-name"], camera_angles, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
 
 def edit_preset_location(integration: GeneralController):
+    """ Edits the preset using the new data from the request
+
+    Args:
+        integration: The controller containing all the dependencies
+
+    Returns: A http response which indicates success(200) or failure(400)
+        
+    """
     data = request.form
     try:
         camera_angles = np.array([
@@ -35,16 +50,49 @@ def edit_preset_location(integration: GeneralController):
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.edit_preset(int(data["preset-select"]), camera_angles, microphone_direction)
+        integration.preset_locations.edit_preset(data["preset-name"], camera_angles, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
 
 def remove_preset_location(integration: GeneralController):
+    """ Removes the preset using the new index from the request
+
+    Args:
+        integration: The controller containing all the dependencies
+
+    Returns: A http response which indicates success(200) or failure(400)
+        
+    """
     data = request.form
     try:
-        integration.preset_locations.remove_preset(int(data["preset-select"]))
+        integration.preset_locations.remove_preset(data["preset-name"])
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
 
+def get_preset_list(integration: GeneralController):
+    """ Gets the 
+
+    Args:
+        integration: The controller containing all the dependencies
+
+    Returns: A http response which indicates success(200) or failure(400)
+        
+    """
+    try:
+        return make_response(jsonify({"preset-list":integration.preset_locations.get_preset_list()}), 200)
+    except AssertionError:
+        return make_response(jsonify({}), 400)
+
+def get_preset_info(integration: GeneralController):
+    data = request.json
+    try:
+        info = integration.preset_locations.get_preset_info(data["preset-select"])
+        return make_response(jsonify({
+            "position-alpha-value":info[0][0],
+            "position-beta-value":info[0][1],
+            "microphone-direction":[info[1][0], info[1][1], info[1][2]],
+        }), 200)
+    except AssertionError:
+        return make_response(jsonify({}), 400)
