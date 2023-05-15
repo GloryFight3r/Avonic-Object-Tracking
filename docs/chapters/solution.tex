@@ -1,8 +1,14 @@
-This chapter aims to present our motivations when developing and picking a solution, a solution that our team picked for the project and other solutions that we considered, but which were not chosen because of varying reasons.
+This chapter aims to present our motivations when developing a solution, a detailed description of the solution that our team picked for the project and other solutions that we considered, but which were not chosen because of varying reasons.
 \section{Challenges that must be overcome}
 \subsection{Technical limitations}
+As outlined in the requirements, system should act as a middleware device, that can be put in the same network as the microphone and the camera, which adds a limitation on amount of available resources.
+We could rely on the cloud computing power, but that would lead to big delay in camera movement and additional risks for security and maintainability.
+Additionally, our project relies on 2 special hardware devices - a camera, and a microphone, therefore final product should account for all of those limitations.
+Unfortunately, microphone does not provide with location information, as it is quite difficult technical challenge. \textbf{(MAYBE PUT REFERENCE TO THE URBANA RESEARCH FROM QUO)}.
+So the list of important limitations, that significantly impact the project can be formulated with 2 limitations:
 \begin{itemize}
     \item The system should run on a single board computer(SBC)
+    \item The system should be able to run in the same network as a camera and a microphone.
     \item Microphone does not provided distance information
 \end{itemize}
 \subsection{User limitations}
@@ -23,11 +29,13 @@ In our final solution, the three following assumptions are used:
     \item If a camera, presenter's plane, or a microphone were moved, the system must be recalibrated.
     \item The system is well calibrated and are not moved during the tracking.
 \end{enumerate}
-Through the process of the research and iteration, with the amount of time we are given, taking in account all of the limitations, we have identified these assumptions as minimal.
+Through the process of the research and reiteration on our proposals, with the amount of time we are given, taking in account all of the limitations, we have identified these assumptions as minimal.
 While assumptions 2 and 3 are in place to guarantee the intended way of using the system, assumption 3 is formulated to determine the distance from the microphone to the speaker.
 From all of our attempts to come up with the solution, we have identified that the distance of the vector from microphone to speaker is crucial. 
-But as our system is closed under only 2 devices, and microphone's API does not have a way to retrieve distance, the assumption needed to be made to somehow describe the distance function in the environment.
-We have chosen the scenario where we look for intersection of the ray from the microphone with the "speaker plane", as the plane is the most probable scenario for the presenter's environment.
+But as our system is closed under only 2 devices, and microphone's API does not have a way to retrieve distance, the assumptions are needed to somehow describe the distance function in the environment.
+We have chosen the scenario where we look for an intersection of the ray from the microphone with the "speaker plane", as the plane is the most probable scenario for the presenter's environment.
+Flat plane is the most probable case, of how the available place for the presenter on stage looks, small inconsistencies in not precisely flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
+Height difference between the speakers can be neglected, due to probably big distance from the camera to the presenters, and we expect not to be significant, especially in scenarios where people are sitting \textbf{(MAYBE PUT REFERENCE HERE)}. 
 In future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we view it to be infeasible for us in 10 weeks.
 \subsection{Calibration}
 \section{Alternative approaches}
