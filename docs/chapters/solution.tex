@@ -1,2 +1,37 @@
+This chapter aims to present our motivations when developing and picking a solution, a solution that our team picked for the project and other solutions that we considered, but which were not chosen because of varying reasons.
+\section{Challenges that must be overcome}
+\subsection{Technical limitations}
+\begin{itemize}
+\item The system should run on a single board computer(SBC)
+\item Microphone does not provided distance information
+\end{itemize}
+\subsection{User limitations}
+In addition to technical criteria, the main criterion of the solution we were going to implement were based on the certain non-functional requirements which client has emphasized during our meetings:
+\begin{itemize}
+    \item The system should be easy to install and calibration can be done by teachers or presenters themselves, it should not require any technical knowledge.
+\end{itemize}
+As this criterion can be interpreted ambiguously, as the difficulty of calibration can vary per person, we needed to reiterate on our solutions multiple times and verify them with our client.
+Meeting this criterion was difficult, as we spent the first week of our project solely working on different solutions, trying and prove their correctness, while not disrupting their calibration and installation simplicity.
+
 \section{Implemented solution}
+As described previously, there are certain challenges that needed to be overcome in the implemented solution.
+Experimenting with different solutions, we identified that the most difficult limitation is the fact that the microphone cannot retrieve distance information.
+Because the system cannot contain any extra device, that would give as extra , assumptions 
 \section{Alternative approaches}
+\subsection{Single coordinate system}
+One of the most obvious solutions that we came up with, is providing the system with coordinates of both microphone and the camera, in coordination with microphone providing distance to the speaker.
+As you can see, this solution served a lot of inspiration for the final solution, but it has two important problems:
+\begin{itemize}
+    \item Distance information from the microphone is not obtainable.
+    \item Manually inputting measures that would describe coordinate system and points of the camera and the microphone, was considered too complex by our client.
+\end{itemize}
+\subsection{Interpolation model}
+One of solutions we came up with, was inspired by a concept of interpolation, first introduced to us in Computer Graphics course.
+The proposed solution followed this algorithm for calibration and tracking:
+\begin{enumerate}
+    \item Record three positions by retrieving beams' directions and camera position for each of the recorded placements.
+    \item Depending on the angle of the beam, using angles that describe its direction, translate those angles to angles of the camera and point it toward the derived direction.
+\end{enumerate}
+Although this solution might sound fascinating and simple, but it does not represent the reality.
+This algorithm would only be possible if the camera was located in the same point as the microphone, or in completely opposite position from the microphone, with relation to the calibration points.
+Unfortunately, this is not always the case, as the system should work with arbitrary position of the camera, therefore we left this solution behind(IDK, GOTTA FIND A BETTER WAY TO WRITE IT).
