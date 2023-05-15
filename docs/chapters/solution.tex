@@ -1,37 +1,61 @@
-This chapter aims to present our motivations when developing and picking a solution, a solution that our team picked for the project and other solutions that we considered, but which were not chosen because of varying reasons.
+This chapter aims to present our motivations when developing a solution, a detailed description of the solution that our team picked for the project and other solutions that we considered, but which were not chosen because of varying reasons.
 \section{Challenges that must be overcome}
 \subsection{Technical limitations}
+As outlined in the requirements, the system should act as a middleware device, that can be put on the same network as the microphone and the camera, which adds a limitation on the amount of available resources.
+We could rely on cloud computing power, but that would lead to a big delay in camera movement and additional risks to security and maintainability.
+Additionally, our project relies on 2 special hardware devices - a camera, and a microphone, therefore the final product should account for all of those limitations.
+Unfortunately, the microphone does not provide location information, as it is quite a difficult technical challenge.\textbf{(MAYBE PUT REFERENCE TO THE URBANA RESEARCH FROM QUO)}.
+So the list of important limitations, that significantly impact the project can be formulated with 2 limitations:
 \begin{itemize}
-\item The system should run on a single board computer(SBC)
-\item Microphone does not provided distance information
+    \item The system should run on a single-board computer(SBC)
+    \item The system should be able to run on the same network as a camera and a microphone.
+    \item Microphone does not provide distance information
 \end{itemize}
 \subsection{User limitations}
-In addition to technical criteria, the main criterion of the solution we were going to implement were based on the certain non-functional requirements which client has emphasized during our meetings:
+In addition to technical criteria, the main criterion of the solution we were going to implement is based on a certain non-functional requirement which client has emphasized multiple times during our meetings:
 \begin{itemize}
-    \item The system should be easy to install and calibration can be done by teachers or presenters themselves, it should not require any technical knowledge.
+    \item The system should be easy to install and calibration can be done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
 \end{itemize}
-As this criterion can be interpreted ambiguously, as the difficulty of calibration can vary per person, we needed to reiterate on our solutions multiple times and verify them with our client.
+As this criterion can be interpreted ambiguously, as the difficulty of calibration can vary per person, we needed to reiterate our solutions multiple times and verify them with our client.
 Meeting this criterion was difficult, as we spent the first week of our project solely working on different solutions, trying and prove their correctness, while not disrupting their calibration and installation simplicity.
-
 \section{Implemented solution}
-As described previously, there are certain challenges that needed to be overcome in the implemented solution.
+As described earlier, there are certain challenges that needed to be overcome in the implemented solution.
 Experimenting with different solutions, we identified that the most difficult limitation is the fact that the microphone cannot retrieve distance information.
-Because the system cannot contain any extra device, that would give as extra , assumptions 
+Because the system cannot contain any extra device, that would give as extra information about the system's deployment environment, assumptions need to be made.
+\subsection{Assumptions}
+In our final solution, the three following assumptions are used:
+\begin{enumerate}
+    \item Distance between the speaker and the plane of the ceiling, to which the microphone is mounter, is constant.
+    \item If a camera, presenter's plane, or a microphone were moved, the system must be recalibrated.
+    \item The system is well-calibrated and no components of it are moved during the tracking.
+\end{enumerate}
+Through the process of the research and reiteration of our proposals, with the amount of time we are given, taking in account all of the limitations, we have identified these assumptions as minimal.
+While assumptions 2 and 3 are in place to guarantee the intended way of using the system, assumption 3 is formulated to determine the distance from the microphone to the speaker.
+From all of our attempts to come up with the solution, we have identified that the distance of the vector from the microphone to the speaker is crucial. 
+But as our system is closed under only 2 devices, and the microphone's API \textbf{(MAYBE PUT REFERENCE TO THE MANUAL)} does not have a way to retrieve distance, the assumptions are needed to somehow describe the distance function in the environment.
+We have chosen the scenario where we look for an intersection of the ray from the microphone with the "speaker plane", as the plane is the most probable scenario for the presenter's environment.
+Flat plane is the most probable case, of how the available place for the presenter on stage looks, small inconsistencies in not precisely a flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
+The height difference between the speakers can be neglected, due to probably big distance from the camera to the presenters, and we expect it to be insignificant, especially in scenarios where people are sitting \textbf{(MAYBE PUT REFERENCE HERE)}. 
+In the future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we view it to be infeasible for us in 10 weeks.
+\subsection{Calibration}
 \section{Alternative approaches}
 \subsection{Single coordinate system}
-One of the most obvious solutions that we came up with, is providing the system with coordinates of both microphone and the camera, in coordination with microphone providing distance to the speaker.
-As you can see, this solution served a lot of inspiration for the final solution, but it has two important problems:
+One of the most obvious solutions that we came up with, is providing the system with coordinates of both microphone and the camera, in coordination with the microphone providing distance to the speaker.
+As you can see, this solution served as inspiration for the final solution, but it has two important problems:
 \begin{itemize}
     \item Distance information from the microphone is not obtainable.
     \item Manually inputting measures that would describe coordinate system and points of the camera and the microphone, was considered too complex by our client.
 \end{itemize}
 \subsection{Interpolation model}
-One of solutions we came up with, was inspired by a concept of interpolation, first introduced to us in Computer Graphics course.
+One of the solutions we came up with, was inspired by a concept of interpolation, first introduced to us in the Computer Graphics course.
 The proposed solution followed this algorithm for calibration and tracking:
 \begin{enumerate}
-    \item Record three positions by retrieving beams' directions and camera position for each of the recorded placements.
-    \item Depending on the angle of the beam, using angles that describe its direction, translate those angles to angles of the camera and point it toward the derived direction.
+    \item Record three positions by retrieving the beams' directions and the camera's position for each of the recorded placements.
+    \item Depending on the angle of the beam, using angles that describe its direction, translate those angles to angles of the camera and point it toward the derived direction.    
 \end{enumerate}
-Although this solution might sound fascinating and simple, but it does not represent the reality.
-This algorithm would only be possible if the camera was located in the same point as the microphone, or in completely opposite position from the microphone, with relation to the calibration points.
-Unfortunately, this is not always the case, as the system should work with arbitrary position of the camera, therefore we left this solution behind(IDK, GOTTA FIND A BETTER WAY TO WRITE IT).
+Although this solution might sound fascinating and simple, it does not represent the reality.
+This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points. 
+This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra \textbf{(PUT REFERENCE HERE)}.
+Unfortunately, this is not always the case, as the system should work with the arbitrary position of the camera, therefore we left this solution behind \textbf{(IDK, GOTTA FIND A BETTER WAY TO WRITE IT)}.
+\section{Application overview}
+Something Flask, Something
