@@ -1,2 +1,62 @@
+This chapter presents an overview of the required functionality of the speaker tracking camera. 
+These requirements dictate the design of our system. 
+We have ordered them using the MoSCoW method which we will describe in (4.1). 
+All of the requirements fall under one of the following categories ‘Must-have’, 
+‘Should-have’, ‘Could-have’, ‘Would-have’. We have listed all of the final requirements in (4.2).
+Finally, we also go through the evolution of the requirements in (4.3).
+\section{MoSCoW method}
+Since we have a limited amount of time, we decided to prioritise the requirements in order to make progress 
+and keep to deadlines. MoSCoW is a prioritisation technique for helping to understand and manage priorities. The letters stand
+for 
+\begin{itemize}
+  \item \textbf{M}ust have - Needs to be implemented in order to have a working system. Even if a single Must Have requirements is not
+    implemented the system is a failure.
+  \item \textbf{S}hould have - Describe requirements that if missing would significantly affect the usability of the system, but
+    for which a workaround exists.
+  \item \textbf{C}ould have - Describe requirements that if missing do not have a dramatic impact on the usability of the system. They
+    are nice to haves.
+  \item \textbf{W}ont have - Describe requirements that are outside of the current scope of the project.
+\end{itemize}
+Furthermore, the requirements are first divided into 
+\begin{itemize}
+  \item Functional requirements - Describe what a product must do.
+  \item Non-functional requirements - Describe how the system works.
+\end{itemize}
 \section{Final requirements}
+\subsection{Must have}
+Role: The \textbf{user} must
+\begin{itemize}
+  \item Be able to send requests and receive acknowledgments from the Sennheiser TeamConnect Ceiling 2 microphone.
+  \item Be able to get the direction to the speaker’s location from the microphone API.
+  \item Be able to send requests to the Avonic CM-70 camera.
+  \item Be able to point the camera in a certain direction.
+  \item Be able to point the camera to specific pre-set locations, choosing the closest one to where the microphone is 
+    currently pointing.
+\end{itemize}
+Role: The \textbf{system} must
+\begin{itemize}
+  \item Be able to follow the speakers, knowing the camera's and microphone's defined position, assuming that all speakers are
+    located in the same plane.
+  \item Have a web interface for easy use of the camera’s API.
+\end{itemize}
+\subsection{Should have}
+Role: The \textbf{system} should
+\begin{itemize}
+  \item Be able to find the relative position between the camera and the microphone provided only 
+    the height of the microphone and the speaker plane.
+  \item Translate the calculated coordinates relative to the microphone to coordinates the camera can point to.
+\end{itemize} 
+Role: The \textbf{user} should
+\begin{itemize}
+  \item Be able to calibrate the system with data such as specifying the height of the microphone above the speaker plane.
+\end{itemize}
+\subsection{Could have}
+Role: The system could
+\begin{itemize}
+  \item Be able to adapt the camera’s speed depending on how fast the speaker is moving.
+  \item Add visual tracking6 to improve the positioning of the camera.
+  \item Enable the camera to zoom in appropriately depending on the speaker’s distance from it.
+\end{itemize}
+\subsection{Wont have}
+Role: The system won't
 \section{Evolution of requirements}
