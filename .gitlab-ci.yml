@@ -110,6 +110,8 @@ compile-report:
     script:
       - cd docs
       - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf final-report.tex
+      - biber final-report
+      - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf final-report.tex
       - exit
     artifacts:
       paths:
