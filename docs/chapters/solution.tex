@@ -33,7 +33,7 @@ Through the process of the research and reiteration of our proposals, with the a
 While assumptions 2 and 3 are in place to guarantee the intended way of using the system, assumption 3 is formulated to determine the distance from the microphone to the speaker.
 From all of our attempts to come up with the solution, we have identified that the distance of the vector from the microphone to the speaker is crucial. 
 But as our system is closed under only 2 devices, and the microphone's API\cite{microphone-manual} does not have a way to retrieve distance, the assumptions are needed to somehow describe the distance function in the environment.
-We have chosen the scenario where we look for an intersection of the ray from the microphone with the ``speaker plane''̈ as the plane is the most probable scenario for the presenter's environment.
+We have chosen the scenario where we look for an intersection of the ray from the microphone with the ``speaker plane'' as the plane is the most probable scenario for the presenter's environment.
 Flat plane is the most probable case, of how the available place for the presenter on stage looks, small inconsistencies in not precisely a flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
 The height difference between the speakers can be neglected, due to probably big distance from the camera to the presenters, and we expect it to be insignificant, especially in scenarios where people are sitting \textbf{(MAYBE PUT REFERENCE HERE)}. 
 In the future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we view it to be infeasible for us in 10 weeks.

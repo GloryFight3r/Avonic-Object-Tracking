@@ -109,7 +109,7 @@ compile-report:
     image: texlive/texlive:latest
     script:
       - cd docs
-      - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf final-report.tex
+      - pdflatex -interaction=nonstopmode final-report.tex
       - biber final-report
       - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf final-report.tex
       - exit
