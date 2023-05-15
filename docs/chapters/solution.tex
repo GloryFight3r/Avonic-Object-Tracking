@@ -72,9 +72,13 @@ The proposed solution followed this algorithm for calibration and tracking:
     \item Record three positions by retrieving the beams' directions and the camera's position for each of the recorded placements.
     \item Depending on the angle of the beam, using angles that describe its direction, translate those angles to angles of the camera and point it toward the derived direction.    
 \end{enumerate}
-Although this solution might sound fascinating and simple, it does not represent the reality.
+Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points. 
 This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra \cite{geogebra}.
-Unfortunately, this is not always the case, as the system should work with the arbitrary position of the camera, therefore we left this solution behind \textbf{(IDK, GOTTA FIND A BETTER WAY TO WRITE IT)}.
+Unfortunately, this is not always the case, as the system should work with any arbitrary position of the camera, we had to leave this solution behind.
 \section{Application overview}
-Something Flask, Something
+In this section, we will discuss our application's structure.
+Our application includes not only the functionality to track the speaker with the camera, but also an easy to use Web-UI.
+This helps a user set everything up and calibrate (or potentially define pre-sets).
+The back-end of this app is written in python using the Flask framework.
+The front-end is written in HTML, CSS and JavaScript.
