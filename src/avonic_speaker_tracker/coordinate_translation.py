@@ -1,6 +1,7 @@
 import numpy as np
 
-def translate_microphone_to_camera_vector(cam_to_mic: np.array, mic_to_speaker: np.array, mic_height: float):
+def translate_microphone_to_camera_vector(cam_to_mic: np.array, \
+    mic_to_speaker: np.array, mic_height: float):
     """ This method calculates the vector of the real distance from camera to the speaker.
 
     Args:
@@ -14,7 +15,6 @@ def translate_microphone_to_camera_vector(cam_to_mic: np.array, mic_to_speaker: 
     if len(mic_to_speaker.shape) > 2 or (mic_to_speaker.shape[0] != 3) \
         or (len(mic_to_speaker.shape) == 2 and mic_to_speaker.shape[1] != 1):
         raise TypeError("Not a 3D vector")
-    
     intersection_point = mic_to_speaker * mic_height / abs(mic_to_speaker[1])
 
     return intersection_point + cam_to_mic

@@ -32,15 +32,19 @@ def generate_bad_pairs_of_combinations():
         1.7),
     ]
 
-@pytest.mark.parametrize("camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance, expected", generate_good_pairs_of_combinations())
-def test_translate_good_weather(camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance, expected):
+@pytest.mark.parametrize("camera_to_microphone, from_microphone_to_speaker,\
+     from_speaker_ceiling_distance, expected", generate_good_pairs_of_combinations())
+def test_translate_good_weather(camera_to_microphone, \
+    from_microphone_to_speaker, from_speaker_ceiling_distance, expected):
     assert np.allclose(
         avonic_speaker_tracker.coordinate_translation.translate_microphone_to_camera_vector(
             camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance)
             , expected)
 
-@pytest.mark.parametrize("camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance", generate_bad_pairs_of_combinations())
-def test_translate_bad_weather(camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance):
+@pytest.mark.parametrize("camera_to_microphone, from_microphone_to_speaker,\
+     from_speaker_ceiling_distance", generate_bad_pairs_of_combinations())
+def test_translate_bad_weather(camera_to_microphone, \
+    from_microphone_to_speaker, from_speaker_ceiling_distance):
     with pytest.raises (TypeError) as excinfo:
         avonic_speaker_tracker.coordinate_translation.translate_microphone_to_camera_vector(
             camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance)
