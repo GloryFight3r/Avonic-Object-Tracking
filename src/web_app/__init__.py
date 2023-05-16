@@ -1,13 +1,5 @@
-from threading import Event
-from os import getenv
-import socket
-from dotenv import load_dotenv
 from flask import Flask, jsonify, abort, render_template, make_response
-
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import UDPSocket
+from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.preset_locations_endpoints
@@ -17,14 +9,19 @@ from web_app.integration import GeneralController
 
 integration = GeneralController()
 
+
 def create_app(test_controller=None):
     # create and configure the app
     app = Flask(__name__)
 
     if test_controller is None:
         integration.load_env()
+        app.config['SECRET_KEY'] = integration.secret
     else:
         integration.copy(test_controller)
+        app.config['SECRET_KEY'] = 'test'
+
+    integration.ws = SocketIO(app)
 
     @app.get('/fail-me')
     def fail_me():
@@ -34,14 +31,12 @@ def create_app(test_controller=None):
     def view():
         return render_template('view.html')
 
-
     @app.post('/camera/reboot')
     def post_reboot():
         """
         Endpoint triggers reboot procedure at the camera.
         """
         return web_app.camera_endpoints.reboot_camera_endpoint(integration)
-
 
     @app.post('/camera/on')
     def post_turn_on_camera():
@@ -50,7 +45,6 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.turn_on_camera_endpoint(integration)
 
-
     @app.post('/camera/off')
     def post_off():
         """
@@ -58,26 +52,21 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.turn_off_camera_endpoint(integration)
 
-
     @app.post('/camera/move/absolute')
     def post_move_absolute():
         return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
-
 
     @app.post('/camera/move/relative')
     def post_move_relative():
         return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
 
-
     @app.post('/camera/move/vector')
     def post_move_vector():
         return web_app.camera_endpoints.move_vector_camera_endpoint(integration)
 
-
     @app.post('/camera/move/home')
     def post_home():
         return web_app.camera_endpoints.move_home_camera_endpoint(integration)
-
 
     @app.post('/camera/move/stop')
     def stop():
@@ -86,14 +75,12 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.move_stop_camera_endpoint(integration)
 
-
     @app.get('/camera/zoom/get')
     def get_zoom():
         """
         Endpoint to get the zoom value of the camera.
         """
         return web_app.camera_endpoints.zoom_get_camera_endpoint(integration)
-
 
     @app.post('/camera/zoom/set')
     def set_zoom():
@@ -108,8 +95,7 @@ def create_app(test_controller=None):
         Endpoint to get the position value of the camera.
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
-
-
+ 
     @app.post('/microphone/height/set')
     def set_height():
         """
@@ -117,14 +103,19 @@ def create_app(test_controller=None):
         """
         return web_app.microphone_endpoints.height_set_microphone_endpoint(integration)
 
-
     @app.get('/microphone/direction')
     def get_direction():
         """
-        Endpoint to get the direction of the speaker.
+        Endpoint to get the direction of the last speaker.
         """
         return web_app.microphone_endpoints.direction_get_microphone_endpoint(integration)
 
+    @app.get('/microphone/speaker/direction')
+    def get_speaker_direction():
+        """ 
+        Endpoint to get the direction of the active speaker.
+        """
+        return web_app.microphone_endpoints.get_speaker_direction_endpoint(integration)
 
     @app.get('/microphone/speaking')
     def get_speaking():
@@ -133,15 +124,13 @@ def create_app(test_controller=None):
         """
         return web_app.microphone_endpoints.speaking_get_microphone_endpoint(integration)
 
+    @app.get('/calibration/add_directions_to_speaker')
+    def add_calibration_speaker():
+        return web_app.general_endpoints.add_calibration_speaker(integration)
 
-    @app.get('/calibration/add_position')
-    def add_calibration_position():
-        return web_app.general_endpoints.add_calibration_position(integration)
-
-
-    @app.get('/calibration/get_count')
-    def get_calibration_count():
-        return web_app.general_endpoints.get_calibration_count(integration)
+    @app.get('/calibration/add_direction_to_mic')
+    def add_calibration_mic():
+        return web_app.general_endpoints.add_calibration_to_mic(integration)
 
     @app.get('/calibration/reset')
     def reset_calibration():
@@ -170,6 +159,10 @@ def create_app(test_controller=None):
     @app.get('/preset/point')
     def point_to_preset():
         return web_app.tracking.point(integration)
+    
+    @app.get('/calibration/is_set')
+    def calibration_is_set():
+        return web_app.general_endpoints.is_calibrated(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
@@ -194,18 +187,25 @@ def create_app(test_controller=None):
     def thread_start():
         return web_app.tracking.start_thread_endpoint(integration)
 
-
     @app.post('/thread/stop')
     def thread_stop():
         return web_app.tracking.stop_thread_endpoint(integration)
 
+    @app.get('/thread/running')
+    def thread_is_running():
+        # checks whether thread is running
+        return web_app.tracking.is_running_endpoint(integration)
 
     @app.get('/thread/value')
     def thread_value():
         # Retrieves the thread value (only for demo/debug purposes)
         if integration.thread is None:
-            return make_response(jsonify({"value" : "NONE"}), 200)
+            return make_response(jsonify({"value": "NONE"}), 200)
         print(integration.thread.value)
-        return make_response(jsonify({"value" : integration.thread.value}), 200)
+        return make_response(jsonify({"value": integration.thread.value}), 200)
+
+    @app.post('/update/microphone')
+    def thread_microphone():
+        return web_app.tracking.update_microphone(integration)
 
     return app

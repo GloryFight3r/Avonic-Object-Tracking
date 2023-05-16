@@ -23,9 +23,9 @@ def camera(monkeypatch):
 
     def mocked_recv(size):
         return b'\x01\x00\x00\x00\x00\x00\x00\x01\x90\x41\xff'
+
     def mocked_timeout(ms):
         pass
-
 
     sock = socket.socket
     monkeypatch.setattr(sock, "connect", mocked_connect)
@@ -33,7 +33,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "sendall", mocked_send_all)
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
-    
+
     cam_api = CameraAPI(Camera(sock, None))
     def mocked_camera_reconnect():
         pass
