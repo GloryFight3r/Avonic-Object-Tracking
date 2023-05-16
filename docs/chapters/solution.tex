@@ -34,9 +34,9 @@ While assumptions 2 and 3 are in place to guarantee the intended way of using th
 From all of our attempts to come up with the solution, we have identified that the distance of the vector from the microphone to the speaker is crucial.
 But as our system is closed under only 2 devices, and the microphone's API\cite{microphone-manual} does not have a way to retrieve distance, the assumptions are needed to somehow describe the distance function in the environment.
 We have chosen the scenario where we look for an intersection of the ray from the microphone with the ``speaker plane'' as the plane is the most probable scenario for the presenter's environment.
-A flat plane is the most probable case of how the available place for the presenter on stage looks; small inconsistencies in not precisely a flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
+It is the most probable case of how the available place for the presenter on stage looks; small inconsistencies in not precisely a flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
 The height difference between the speakers can be neglected, due to the expected big distance from the camera to the presenters, and we expect it to be insignificant, especially in scenarios where people are sitting \textbf{(MAYBE PUT REFERENCE HERE)}.
-In the future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we viewed it to be infeasible for us in 10 weeks.
+In the future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we view it to be infeasible for us in 10 weeks.
 \subsection{Calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
 We assume the longest one of the horizontal coordinates to be the $z$ one.
@@ -87,8 +87,26 @@ This algorithm would only be possible if the camera was located at the same poin
 This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
 Unfortunately, this is not always the case, as the system should work with any arbitrary position of the camera, we had to leave this solution behind.
 \section{Application overview}
-In this section, we will discuss our application's structure.
-Our application includes not only the functionality to track the speaker with the camera, but also an easy to use Web-UI.
-This helps a user set everything up and calibrate (or potentially define pre-sets).
+In this section, we will discuss our application's structure and out motivations behind it.
+\subsection{Project modules}
+After splitting our project in core domains, we have identified 4 of them:
+\begin{itemize}
+    \item Camera API - responsible for a simplifying communication with the camera.
+    \item Microphone API - responsible for a simplifying communication with the microphone.
+    \item Tracking - responsible for all of the tracking related function. For example, calculating direction of the camera, performing communication with camera and the microphone via API.
+    \item WebUI - responsible for providing a user-friendly interface for a user.
+\end{itemize}
+We took a decision to create separate Python modules for each of the identified domains, to make our code base more systematic. 
+It also allows to potentially distribute some of the modules separately, allowing other people develop their software using our APIs.
+\subsection{Camera API}
+\textbf{THERE WILL BE DOCUMENTATION AND GENERAL DESCRIPTION OF THE MODULE}
+\subsection{Microphone API}
+\textbf{THERE WILL BE DOCUMENTATION AND GENERAL DESCRIPTION OF THE MODULE}
+\subsection{Tracking}
+\textbf{THERE WILL BE DOCUMENTATION AND GENERAL DESCRIPTION OF THE MODULE}
+\subsection{WebUI}
 The back-end of this app is written in python using the Flask framework.
-The front-end is written in HTML, CSS and JavaScript and includes controls for the camera, the information from the microphone, and a visualization all on one page.
+We have decided to use Flask as it is a well-known light-weight framework, that allows for web development.
+It offers some nice features - creating and managing socket connections with a client for automatically updating values of the system, and being easily modifiable to support testing of the app.
+It is also used by Avonic themselves and was recommended by the client.
+The front-end is written in HTML, CSS and JavaScript and includes controls for the camera, the information from the microphone, and a visualization all on a single page.
