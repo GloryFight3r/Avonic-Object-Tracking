@@ -57,6 +57,16 @@ Angle $\delta$ is easily calculated from the fact that the primary axes of the c
 Now that we know 2 angles and one side length of triangle $CAM$, we can calculate the distance between the camera and microphone -- $d$.
 
 After calibration, we can proceed backwards to calculate the angle to point the camera at from $d$.
+Figure \ref{fig:cal3d} contains a visualization of the same approach, but with vectors instead of angles.
+We can calculate distance $|MA|$ by intersecting the microphone's direction vector with the speaker plane.
+Afterwards, we can use analogous calculations to get the length $|CM|$, since we have all the directions we need.
+This means that we can find the angles between them and calculate the triangle.
+\begin{figure}[h]
+    \caption{Calculation of calibration in 3D}
+    \centering
+    \includegraphics[width=0.8\textwidth]{calibration_3d}
+    \label{fig:cal3d}
+\end{figure}
 \section{Alternative approaches}
 \subsection{Single coordinate system}
 One of the most obvious solutions that we came up with, is providing the system with coordinates of both microphone and the camera, in coordination with the microphone providing distance to the speaker.
