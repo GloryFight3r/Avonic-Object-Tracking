@@ -1,16 +1,102 @@
+This chapter aims to describe the problem this project aims to solve. First we look at the user story from the perspective of Avonic. Then
+we consider three cases of other companies that solved a similar problem and explain how they relate to our own project before describing
+the stakeholders and the ethical implications of our project. Finally, we take a look at some potential bottlenecks of the progress. The goal of this
+chapter is to give a clear idea of why the project was needed, who is impacted by the project and how it stands in relation to other
+projects.
+
+\section{Problem statement}
+As a company, Avonic would like to make it easier to record educational sessions by creating a camera that follows the speaker as he or she
+moves around in a room. For example a camera could be in the back of a lecture hall, and a microphone in the front, next to the
+speaker. This is a common setup for universities. Since these devices
+use their own firmware, it would not be an option to reprogram them. Therefore, using a Raspberry Pi or another single-board
+computer (SBC) for communication
+between the camera and the microphone is the preferred solution. \\
+Lectures are not the only activity such rooms are used for. There may also be meetings or conferences that need to use the available setup
+to record their event, so the camera also needs to be able to detect a speaker in these circumstances. In general, every room with a speaker
+and an audience has to be able to use the camera with the software we are going to create. \\
+Avonic previously tried to let the camera look at the speaker and track them using visual techniques like
+motion detection. Just visuals turned out not to be enough to accurately track speakers, since the visuals do not always show who is speaking: someone
+who is yawning may look like someone who is talking and someone who is speaking may not be facing the camera. This is why Avonic has asked us
+to use the camera in combination with the microphone to locate a speaker. The microphone that has to be used is the Sennheiser TeamConnect
+Ceiling 2, which provides a direction from itself toward the sound that it records. The camera Avonic wants us to use is the Avonic CM-70
+model.
+Using the microphone and the visual information mentioned earlier, the goal is to find a way to automatically move the camera to point at a
+speaker in the same room after minimal manual installation; it should not take more than a few minutes to set up the hardware and start
+recording. Specifically, Avonic has asked us to write an API for both the camera and the microphone and use that to calculate the position
+of a speaker in real-time.
+
 \section{Available solutions}
+We now discuss three different solutions that are already available for customers. These products were created by companies other than Avonic to solve a similar
+problem to the one described in section 1.1. Looking at such products helps to get a better idea of the state of the art.
+For every case below, we contrast the solution with Avonic’s vision and explain how it relates
+to the project we worked on.
+
+\subsection{AVer}
+AVer created a camera that can “automatically track a presenter’s face and movements.”[REF] The camera
+stands alone and is not helped by an external microphone. Instead, it has a so-called 'dual-lens design' that allows to keep a secondary
+panorama view while zooming in on the speaker. In this way, new speakers can still be recognized when they are not recorded by the zoomed in
+lens.
+Avonic does not want to use a dual-lens design. Instead, they chose to use a microphone. This way it is still possible to detect new
+speakers that are not in view of the camera. The video processing techniques used by AVer may be similar to the ones employed by Avonic, but
+since the microphone was an essential part of our project, the AVer camera could not serve as a good source of inspiration.
+
+\subsection{Yealink} On top of a dual-lens design similar to the one AVer used, the Yealink camera has a built-in microphone array which helps
+to localize the sound and track the speaker.[REF] As audio from a microphone array is used to detect the speaker's location, this is similar
+to our project. The big difference is that the Yealink microphone is built into the camera, so there is no
+need for calibration. This changes the nature of the problem. The microphone Avonic uses is not in the same place as the camera, so the most
+important steps in our process differ from Yealink's.
+
+\subsection{Cisco} Using one camera, Cisco locates the speaker and zooms in on that speaker, while another camera is watching the entire room to look for the next
+speaker.[REF] This dual-camera approach helps to switch quickly between different speakers. It can be compared to the dual-lens design used
+by AVer and Yealink; all these products have an option to search for a new speaker while recording the active speaker.
+The use of two cameras thus makes it easier for Cisco to localize the speaker. The overall problem is in this way made
+less complex. Avonic wants to use only one camera and one microphone and try to track speakers as well as companies
+like Cisco do with two or more cameras.
+\\\\
+As we can see, the most common approach to the speaker localization problem is to use a dual-lens or dual-camera design. On behalf of
+Avonic, we experimented with a new approach: one camera and one microphone. This poses new problems. Our proposed solution is described in
+chapter 4.
+
+\section{Stakeholders}
+This section describes who the stakeholders of our project are and how we considered their interests during the ten week process. The
+definition of stakeholder that we are going to use is as follows: “All those who have an interest in the system and who will eventually be
+responsible for its acceptance.”[REF]
+Using this definition, we identified three main types of stakeholders. These people are directly affected by the result of our project.
+The types of stakeholders of our project are as follows:
+
+\subsection{Clients}
+Potential clients of Avonic who are going to make use of our software in the future. This includes university staff or conference
+organizers. Anyone who buys the Avonic camera for personal use falls into this category. It is important to these clients that the camera
+tracks speakers accurately and that it is easy to install.
+\subsection{Developers}
+Developers who are going to be building upon our code in the future. Since we write our code for Avonic, we expect this category to include
+only their developers. It is important to the developers that the code is well written and well documented. Some of the criteria we
+use to determine whether code is well written are test coverage, readability and extendability. These criteria and more are explained in
+chapter 5 when we talk about the workflow.
+\subsection{Avonic}
+Avonic as a company. They influence the requirements of our project. They have the general picture in mind, considering both the clients and
+the developers. It is important to them that the compromises made in the process are carefully considered and explained. This includes a
+clear and elaborate report that explains precisely what steps have been taken to reach the conclusion. Such a report can be used by Avonic
+to decide whether the experiment is worth doing again.
+\\\\
+In order to please every stakeholder as much as possible, we continually talked to people from Avonic. We had weekly meetings with Ali
+Kahawati, one of the software developers at the company, and visited the office three times a week to be able to talk with other employees as well.
+Throughout the project, this helped to stay in touch with the wants of the stakeholders. We had no direct contact with the clients, so this
+group was mainly represented by the Avonic team.
+
 \section{Ethical implications}
-For our project, we try to direct a camera to a speaker in a room, using video and audio information.
-As video and audio information are considered to be personal and can be used with malicious intent, we are cautious and thoughtful with regard to the ethics of the system.
-The ethical implications of the system should be carefully reviewed to not allow any unethical abuse of the system.
-Below we explain our answer to each question in the Ethics Checklist to give more insight into our system and its potential use cases.
+For our project, we are going to make use of video and audio; both can be considered personal data.
+Since personal data can be used with malicious intent, we are cautious and thoughtful with regard to the ethics of the system.
+The ethical implications of the system should be carefully reviewed to disallow any unethical abuse of the system.
+Below we cover five important topics related to ethical use of personal data to give more insight into our system and its potential use cases.
 \subsection{Processing of personal data}
 Our project revolves around working with a microphone and a camera.
 Both of these process personal data in the forms of audio and video and transmit this so that it can be used by people.
-Our system does not use any identifiable part of the data because we only utilize the location information from the speaker.
+Our system does not use any personal part of the data because we only utilize the location information from the speaker.
 Therefore, our system does not, in and of itself, process any personal data, but the hardware that we use together with the system does.
 For instance, the microphone, made in Germany by Sennheiser, processes audio from the room.\\
-We can not modify the camera or microphone (or otherwise alter their behavior), so what we can do to mitigate the ethical risks of our project is to ensure we do not use the transmitted personal information.
+We can not modify the camera or microphone (or otherwise alter their behavior), but what we can do to mitigate the ethical risks of our
+project is to ensure we do not use the transmitted personal information ourselves
 \subsection{Profiling or systematic monitoring}
 Our tools (a camera and a microphone, conceptually) could technically be used in the surveillance of a room of people who have not consented to having video taken of them.
 We have access to the video camera stream, but we are not planning to store anything on the device after processing it locally.
@@ -28,17 +114,23 @@ We can prevent the data obtained from going abroad by limiting the traffic from 
 \subsection{Importing of personal data}
 We do not plan on importing personal data from anywhere.
 We do not personally need the data obtained using the microphone and camera, so we will surely not import any data from non-EU countries.
-Users of the cameras and microphones can use those devices to create personal data and send it abroad, but they could use any camera to do this, and it does not pose any ethical risks besides the ones explained in the second question.
+Users of the cameras and microphones can use those devices to create personal data and send it abroad, but they could use any camera to do
+this, and it does not pose any ethical risks besides the ones explained in section 2.4.2.
 
 \section{Possible pitfalls}
-At the start, we identified a few possible risks which we needed to decide on how to avert.
+At the start of the project, we identified a few possible risks which we needed to decide on how to avert.
 As these risks threatened to slow down our progress, we tried to reduce their impact as much as possible.
 Below are the issues listed in order of severity.
 \subsection{Access to hardware}
 The largest risk was access to the hardware (or lack thereof).
 Since our project relies on the availability of both the camera and microphone, we would have been unable to work on it without them.
 Avonic's representative -- Ali -- notified us that we would only be able to come to the office three days a week, which would have prevented us from working on the project sometimes.\\
-We were allowed to bring a camera home to test, but that was not an option with the very expensive and large ceiling microphone.
+We were allowed to bring a camera home to test, but that was not an option with the expensive and large ceiling microphone.
 We mitigated this by using a virtual private network (VPN) connection to the office.
 This way we at the very least had a way to access the microphone, although we could not test it very well when nobody from the group was at the office.
-\subsection{}
+\subsection{Work space}
+During the project we could visit the office at most three days a week. This meant that we did not always have a place to work together as a
+group. Group meetings required a quiet meeting room, which we were not always able to find.
+On the days that we were not able to go to the office, we tried to find a room on the TU Delft campus. Whenever we were not able to get a
+meeting room, we went to a public place on the campus. In such places we could still have meetings and we could still work closely together.
+All our meetings with Mr. Kahawati happened at days we could visit the office, so those meetings did not suffer from our limited time at the office.
