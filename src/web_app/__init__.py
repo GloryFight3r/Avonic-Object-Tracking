@@ -1,0 +1,150 @@
+from flask import Flask, jsonify, abort, render_template, make_response
+from flask_socketio import SocketIO
+import web_app.camera_endpoints
+import web_app.microphone_endpoints
+import web_app.tracking
+from web_app.integration import GeneralController
+
+integration = GeneralController()
+
+
+def create_app(test_controller=None):
+    # create and configure the app
+    app = Flask(__name__)
+
+    if test_controller is None:
+        integration.load_env()
+        app.config['SECRET_KEY'] = integration.secret
+    else:
+        integration.copy(test_controller)
+        app.config['SECRET_KEY'] = 'test'
+
+    integration.ws = SocketIO(app)
+
+    @app.get('/fail-me')
+    def fail_me():
+        abort(418)
+
+    @app.get('/')
+    def view():
+        return render_template('view.html')
+
+    @app.post('/camera/reboot')
+    def post_reboot():
+        """
+        Endpoint triggers reboot procedure at the camera.
+        """
+        return web_app.camera_endpoints.reboot_camera_endpoint(integration)
+
+    @app.post('/camera/on')
+    def post_turn_on_camera():
+        """
+        Endpoint triggers turn on procedure at the camera.
+        """
+        return web_app.camera_endpoints.turn_on_camera_endpoint(integration)
+
+    @app.post('/camera/off')
+    def post_off():
+        """
+        Endpoint triggers turn off at the camera.
+        """
+        return web_app.camera_endpoints.turn_off_camera_endpoint(integration)
+
+    @app.post('/camera/move/absolute')
+    def post_move_absolute():
+        return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
+
+    @app.post('/camera/move/relative')
+    def post_move_relative():
+        return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
+
+    @app.post('/camera/move/vector')
+    def post_move_vector():
+        return web_app.camera_endpoints.move_vector_camera_endpoint(integration)
+
+    @app.post('/camera/move/home')
+    def post_home():
+        return web_app.camera_endpoints.move_home_camera_endpoint(integration)
+
+    @app.post('/camera/move/stop')
+    def stop():
+        """
+        Endpoint to stop the rotation of the camera.
+        """
+        return web_app.camera_endpoints.move_stop_camera_endpoint(integration)
+
+    @app.get('/camera/zoom/get')
+    def get_zoom():
+        """
+        Endpoint to get the zoom value of the camera.
+        """
+        return web_app.camera_endpoints.zoom_get_camera_endpoint(integration)
+
+    @app.post('/camera/zoom/set')
+    def set_zoom():
+        """
+        Endpoint to set the zoom value of the camera.
+        """
+        return web_app.camera_endpoints.zoom_set_camera_endpoint(integration)
+
+    @app.post('/microphone/height/set')
+    def set_height():
+        """
+        Endpoint to set the height of the microphone.
+        """
+        return web_app.microphone_endpoints.height_set_microphone_endpoint(integration)
+
+    @app.get('/microphone/direction')
+    def get_direction():
+        """
+        Endpoint to get the direction of the speaker.
+        """
+        return web_app.microphone_endpoints.direction_get_microphone_endpoint(integration)
+
+    @app.get('/microphone/speaking')
+    def get_speaking():
+        """
+        Endpoint to inquire whether anyone is speaking.
+        """
+        return web_app.microphone_endpoints.speaking_get_microphone_endpoint(integration)
+
+    # THIS IS FOR DEMO PURPOSES ONLY
+    # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
+
+    # This part of app is responsible for running a thread for tracking.
+    # # Please refer to wiki, if needed.
+
+    # event - acts as a flag for the created thread.
+    # When false (cleared) - the execution of thread is locked
+    # When true (set) - the execution of the thread is allowed
+    # Set to false by default. Respective endpoints set/clear it.
+
+    # <CustomThread> (should pick a better name) contains all code for the actual tracking.
+    # Use set calibration to set the calibration parameters that are going to be used when tracking
+
+    # The thread is started at the start of the program to avoid
+    # python's "global" identifier and because threads can't be paused
+
+    # create the event and start the thread
+
+    @app.post('/thread/start')
+    def thread_start():
+        return web_app.tracking.start_thread_endpoint(integration)
+
+    @app.post('/thread/stop')
+    def thread_stop():
+        return web_app.tracking.stop_thread_endpoint(integration)
+
+    @app.get('/thread/value')
+    def thread_value():
+        # Retrieves the thread value (only for demo/debug purposes)
+        if integration.thread is None:
+            return make_response(jsonify({"value": "NONE"}), 200)
+        print(integration.thread.value)
+        return make_response(jsonify({"value": integration.thread.value}), 200)
+
+    @app.post('/update/microphone')
+    def thread_microphone():
+        return web_app.tracking.update_microphone(integration)
+
+    return app

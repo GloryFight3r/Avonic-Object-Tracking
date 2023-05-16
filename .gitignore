@@ -13,3 +13,5 @@ html_cov/
 .coverage
 src/avonic_speaker_tracker.egg-info/
 .env
+html/
+.mutmut-cache
