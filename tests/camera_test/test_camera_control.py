@@ -203,19 +203,25 @@ def test_turn_off_command(monkeypatch, camera):
 
 def generate_get_direction_commands():
     return [
-        ([0, 0], b'90500000000000000000FF'),
-        ([0.0625/360*2*math.pi, 0.0625/360*2*math.pi], b'90500000000100000001FF'),
-        ([43.75/360*2*math.pi, 0.0625/360*2*math.pi], b'905000020B0C00000001FF'),
-        ([0.0625/360*2*math.pi, 43.75/360*2*math.pi], b'90500000000100020B0CFF'),
-        ([-152.9375/360*2*math.pi, -27.625/360*2*math.pi], b'90500F0607000F0E0405FF'),
+        ([0, 0], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x00\x00\x00\x00\x00\xFF'),
+        ([1, 1], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x01\x00\x00\x00\x01\xFF'),
+        ([700, 1], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x02\x0B\x0C\x00\x00\x00\x01\xFF'),
+        ([1, 700], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x01\x00\x02\x0B\x0C\xFF'),
+        ([-2448, -443], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x0F\x06\x07\x00\x0F\x0E\x04\x05\xFF'),
     ]
 
 @pytest.mark.parametrize("direction, ret_msg", generate_get_direction_commands())
 def test_get_direction(monkeypatch, camera, direction, ret_msg):
-    expected_msg = b'\x81\x09\x06\x12\xFF'
+    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
 
-    def mocked_send(l, message, r):
+    def mocked_send(message):
+        assert message == expected_msg
+    def mocked_return(bytes_receive):
         return ret_msg
+    def mocked_timeout(ms):
+        pass
 
-    monkeypatch.setattr(camera.camera, "send", mocked_send)
-    assert (camera.get_direction() == np.array(direction)).all()
+    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
+    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
+    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
+    assert (camera.get_direction() == np.array(direction) * 0.0625 / 180 * math.pi).all()

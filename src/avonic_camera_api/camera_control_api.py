@@ -173,9 +173,13 @@ class CameraAPI:
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
         pan = int(pan_hex, 16)
-        pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
         tilt = int(tilt_hex, 16)
-        tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
+        pan_adjusted = pan
+        tilt_adjusted = tilt
+        if ret_msg[5] == "F":
+            pan_adjusted = -((pan ^ ((1 << 16) - 1)) + 1)
+        if ret_msg[13] == "F":
+            tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
         pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
         tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
         return np.array([pan_rad, tilt_rad])
