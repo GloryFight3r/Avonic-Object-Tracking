@@ -213,6 +213,12 @@ presetform.onsubmit = async (e) => {
       presetform.action = "/preset/remove";
       body = { method: presetform.method, body: new FormData(presetform) };
       break;
+    case "point-to-closest":
+      presetform.setAttribute("method", "POST");
+      presetform.action = "/preset/point";
+      body = { method: presetform.method, body: new FormData(presetform) };
+      break;
+
   }
   const response = await fetch(presetform.action, body);
   if (response.status === 200) {
