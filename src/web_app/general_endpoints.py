@@ -8,20 +8,30 @@ import numpy as np
 def success():
     return make_response(jsonify({}), 200)
 
-def add_calibration_position(integration: GeneralController):
-    while not integration.mic_api.is_speaking():
-        sleep(0.1)
-    mic_dir = integration.mic_api.get_direction()
+def add_calibration_speaker(integration: GeneralController):
+    mic_dir = wait_for_speaker(integration)
     cam_dir = integration.cam_api.get_direction()
 
-    integration.environment.add_point_to_plane((cam_dir, mic_dir))
-    count = len(integration.environment.plane.points)
+    integration.calibration.add_speaker_point((cam_dir, mic_dir))
     return success()
 
-def get_calibration_count(integration: GeneralController):
-    count = len(integration.environment.plane.points)
-    return make_response(jsonify({"count": count}), 200)
+def add_calibration_to_mic(integration: GeneralController):
+    cam_dir = integration.cam_api.get_direction()
+    integration.calibration.add_direction_to_mic(cam_dir)
+    return success()
 
 def reset_calibration(integration: GeneralController):
-    integration.environment.reset_plane()
+    integration.calibration.reset_calibration()
     return success()
+
+def is_calibrated(integration: GeneralController):
+    return make_response(jsonify({
+        "is_set": integration.calibration.is_calibrated()
+    }), 200)
+
+
+
+def wait_for_speaker(integration: GeneralController):
+    while not integration.mic_api.is_speaking():
+        sleep(0.1)
+    return integration.mic_api.get_direction()

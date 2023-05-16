@@ -37,13 +37,12 @@ class Camera:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.connect(self.address)
 
-    def send_no_response(self, header:str, command:str) -> None:
+    def send_no_response(self, header: str, command: str) -> None:
         """ Sends the reboot command to the camera, but does not wait for a response
 
         Args:
             header: header for the current command
             command: the command the camera has to execute in accordance to the VISCA protocol
-            data: data that is specific to the current command
         """
         header = bytes.fromhex(header)
         command = bytes.fromhex(command)
@@ -57,7 +56,6 @@ class Camera:
         Args:
             header: header for the current command
             command: the command the camera has to execute in accordance to the VISCA protocol
-            data: data that is specific to the current command
 
         Returns:
             Response code from the camera

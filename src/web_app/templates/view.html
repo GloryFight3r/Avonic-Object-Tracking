@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <title>Avonic Camera Control</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/pico.min.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/main.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/presets.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/socket.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/thread.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
   </head>
   <body>
@@ -348,7 +349,7 @@
               <button type="submit">Set camera position</button>
             </form>
             <form
-              action="/microphone/direction"
+              action="/microphone/speaker/direction"
               method="get"
               id="microphone-set-direction-form"
             >
@@ -356,53 +357,12 @@
             </form>
           </div>
         </article>
-        <article id="cal" class="container">
-          <h1>Calibration</h1>
-          <h5>
-            Please point the camera towards a person, click the button below and
-            speak up.
-          </h5>
-          <form
-            action="/calibration/add_position"
-            method="get"
-            id="add-calibration-form"
-          >
-            <button id="submit-calibration" type="submit">Add position</button>
-            <div class="grid">
-              <input
-                class="calibration-checkbox"
-                type="checkbox"
-                id="first-calibration-value"
-                readonly
-              />
-              <input
-                class="calibration-checkbox"
-                type="checkbox"
-                id="second-calibration-value"
-                readonly
-              />
-              <input
-                class="calibration-checkbox"
-                type="checkbox"
-                id="third-calibration-value"
-                readonly
-              />
-            </div>
-          </form>
-          <form
-            action="/calibration/reset"
-            method="get"
-            id="reset-calibration-form"
-          >
-            <button id="reset-calibration" type="submit">
-              Reset calibration
-            </button>
-          </form>
-        </article>
       </div>
-    </main>
-    <article id="vis" class="container">
-      <h1>Visualisation 📺</h1>
+    <article id="cal" class="container">
+        <h1>Calibration</h1>
+	<h5 id="calibration-instruction">To start calibration, please click below.</h5>
+    	<button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
     </article>
+    </main>
   </body>
 </html>
