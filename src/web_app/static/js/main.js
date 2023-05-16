@@ -214,9 +214,9 @@ presetform.onsubmit = async (e) => {
       body = { method: presetform.method, body: new FormData(presetform) };
       break;
     case "point-to-closest":
-      presetform.setAttribute("method", "POST");
+      presetform.setAttribute("method", "GET");
       presetform.action = "/preset/point";
-      body = { method: presetform.method, body: new FormData(presetform) };
+      body = { method: presetform.method};
       break;
 
   }

@@ -167,9 +167,8 @@ def create_app(test_controller=None):
     def get_preset_info():
         return web_app.preset_locations_endpoints.get_preset_info(integration)
         
-    @app.post('/preset/point')
+    @app.get('/preset/point')
     def point_to_preset():
-        print("all fine")
         return web_app.tracking.point(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
