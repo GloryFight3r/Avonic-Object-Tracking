@@ -2,7 +2,8 @@ This chapter presents an overview of the required functionality of the speaker t
 These requirements dictate the design of our system. 
 We have ordered them using the MoSCoW method which we will describe in (4.1). 
 All of the requirements fall under one of the following categories ‘Must-have’, 
-‘Should-have’, ‘Could-have’, ‘Would-have’. We have listed all of the final requirements in (4.2).
+‘Should-have’, ‘Could-have’, ‘Would-have’. Furthermore, we also list some non-functional requirements we have for our system.
+Final requirements are listed in (4.2).
 Finally, we also go through the evolution of the requirements in (4.3).
 \section{MoSCoW method}
 Since we have a limited amount of time, we decided to prioritise the requirements in order to make progress 
@@ -51,12 +52,33 @@ Role: The \textbf{user} should
   \item Be able to calibrate the system with data such as specifying the height of the microphone above the speaker plane.
 \end{itemize}
 \subsection{Could have}
-Role: The system could
+Role: The \textbf{system} could
 \begin{itemize}
   \item Be able to adapt the camera’s speed depending on how fast the speaker is moving.
-  \item Add visual tracking6 to improve the positioning of the camera.
+  \item Add visual tracking to improve the positioning of the camera.
   \item Enable the camera to zoom in appropriately depending on the speaker’s distance from it.
 \end{itemize}
 \subsection{Wont have}
-Role: The system won't
+Role: The \textbf{system} won't
+\begin{itemize}
+  \item If two people are talking at the same time, focus on both. 
+  \item Make the camera work with multiple microphones.
+\end{itemize}
+
+\subsection{Non-functional requirements}
+\begin{itemize}
+  \item The project should be written with Python 3.10.
+  \item Should work with Avonic CM-70 camera.
+  \item The designed system should work on single-board computers.
+  \item There should be more than 80\% test coverage.
+  \item The system should be easy to install and calibration can be 
+    done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
+\end{itemize}
 \section{Evolution of requirements}
+Since the beggining of the project we have came up with few new requirements and have got rid of others we have deemed unnecessary. 
+A short list of the changes we have made is:
+\begin{itemize}
+  \item Added WebUI as a must requirement.
+  \item Added visual tracking as a could requirement.
+  \item Got rid of facial recognition as a could requirement.
+\end{itemize}
