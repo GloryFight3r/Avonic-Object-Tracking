@@ -1,6 +1,7 @@
 from avonic_camera_api.camera_adapter import Camera
 import numpy as np
 from avonic_camera_api import converter
+import math
 
 
 class CameraAPI:
@@ -117,8 +118,8 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(), '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
-                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
+        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(), '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " + \
+                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " + \
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> bytes:
@@ -175,7 +176,9 @@ class CameraAPI:
         pan_adjusted = pan if pan <= 2448 else pan - 65535 # 0xFFFF
         tilt = int(tilt_hex, 16)
         tilt_adjusted = tilt if tilt <= 1296 else tilt - 65535 # 0xFFFF
-        return np.array([pan_adjusted * 0.0625, tilt_adjusted * 0.0625])
+        pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
+        tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
+        return np.array([pan_rad, tilt_rad])
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:

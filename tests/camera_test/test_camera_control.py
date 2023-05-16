@@ -2,6 +2,7 @@ import pytest
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 import socket
+import math
 import numpy as np
 
 def generate_relative_commands():
@@ -203,10 +204,10 @@ def test_turn_off_command(monkeypatch, camera):
 def generate_get_direction_commands():
     return [
         ([0, 0], b'90500000000000000000FF'),
-        ([0.0625, 0.0625], b'90500000000100000001FF'),
-        ([43.75, 0.0625], b'905000020B0C00000001FF'),
-        ([0.0625, 43.75], b'90500000000100020B0CFF'),
-        ([-152.9375, -27.625], b'90500F0607000F0E0405FF'),
+        ([0.0625/360*2*math.pi, 0.0625/360*2*math.pi], b'90500000000100000001FF'),
+        ([43.75/360*2*math.pi, 0.0625/360*2*math.pi], b'905000020B0C00000001FF'),
+        ([0.0625/360*2*math.pi, 43.75/360*2*math.pi], b'90500000000100020B0CFF'),
+        ([-152.9375/360*2*math.pi, -27.625/360*2*math.pi], b'90500F0607000F0E0405FF'),
     ]
 
 @pytest.mark.parametrize("direction, ret_msg", generate_get_direction_commands())
