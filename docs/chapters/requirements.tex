@@ -1,2 +1,86 @@
+This chapter presents an overview of the required functionality of the speaker tracking camera. 
+These requirements dictate the design of our system. 
+We have ordered them using the MoSCoW method \cite{moscow} which we will describe in (4.1). 
+All of the requirements fall under one of the following categories ‘Must-have’, 
+‘Should-have’, ‘Could-have’, ‘Won't-have’. Furthermore, we also list some non-functional requirements we have for our system.
+Final requirements are listed in (4.2).
+Finally, we also go through the evolution of the requirements in (4.3).
+\section{MoSCoW method}
+First, the requirements are divided into two sections.
+\begin{itemize}
+  \item Functional requirements - Describe what a product must do.
+  \item Non-functional requirements - Describe how the system works.
+\end{itemize}
+Furthermore, since we have a limited amount of time, we decided to prioritise the functional requirements in order to make progress 
+and keep to deadlines. MoSCoW is a prioritisation technique for helping to understand and manage priorities. The letters stand
+for 
+\begin{itemize}
+  \item \textbf{M}ust have - Functional requirements that are critical to the current delivery time-box for a
+                              successful project
+  \item \textbf{S}hould have - Functional requirements that are important but not as time-critical as the must-
+                                have requirements. Therefore, they can be delivered in the future delivery time-box.
+  \item \textbf{C}ould have - Functional requirements that are desirable but not necessary. Usually, these
+                                requirements improve user or customer experience.
+  \item \textbf{W}ont have - Requirements that are perceived as the least-critical by stakeholders. This
+                                category includes requirements that are dropped and considered for inclusion in a future
+                                version of the project.
+\end{itemize}
 \section{Final requirements}
+\subsection{Must have}
+Role: The \textbf{user} must
+\begin{itemize}
+  \item Be able to send requests and receive acknowledgments from the Sennheiser TeamConnect Ceiling 2 microphone.
+  \item Be able to get the direction to the speaker’s location from the microphone API.
+  \item Be able to send requests to the Avonic CM-70 camera.
+  \item Be able to point the camera in a certain direction.
+  \item Be able to point the camera to specific pre-set locations, choosing the closest one to where the microphone is 
+    currently pointing.
+\end{itemize}
+Role: The \textbf{system} must
+\begin{itemize}
+  \item Be able to follow the speakers, knowing the camera's and microphone's defined position, assuming that all speakers are
+    located in the same plane.
+  \item Have a web interface for easy use of the camera’s API.
+\end{itemize}
+\subsection{Should have}
+Role: The \textbf{system} should
+\begin{itemize}
+  \item Be able to find the relative position between the camera and the microphone provided only 
+    the height of the microphone and the speaker plane.
+  \item Translate the calculated coordinates relative to the microphone to coordinates the camera can point to.
+\end{itemize} 
+Role: The \textbf{user} should
+\begin{itemize}
+  \item Be able to calibrate the system with data such as specifying the height of the microphone above the speaker plane.
+\end{itemize}
+\subsection{Could have}
+Role: The \textbf{system} could
+\begin{itemize}
+  \item Be able to adapt the camera’s speed depending on how fast the speaker is moving.
+  \item Add visual tracking to improve the positioning of the camera.
+  \item Enable the camera to zoom in appropriately depending on the speaker’s distance from it.
+\end{itemize}
+\subsection{Wont have}
+Role: The \textbf{system} won't
+\begin{itemize}
+  \item If two people are talking at the same time, focus on both. 
+  \item Make the camera work with multiple microphones.
+\end{itemize}
+
+\subsection{Non-functional requirements}
+\begin{itemize}
+  \item The project should be written with Python 3.10.
+  \item Should work with Avonic CM-70 camera.
+  \item The designed system should work on single-board computers.
+  \item There should be more than 80\% test coverage.
+  \item The system should be easy to install and calibration can be 
+    done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
+\end{itemize}
 \section{Evolution of requirements}
+Since the beggining of the project we have came up with few new requirements and have got rid of others we have deemed unnecessary. 
+A short list of the changes we have made is:
+\begin{itemize}
+  \item Added WebUI as a must requirement.
+  \item Added visual tracking as a could requirement.
+  \item Got rid of facial recognition as a could requirement.
+\end{itemize}

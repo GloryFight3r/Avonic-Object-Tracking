@@ -1,2 +1,112 @@
+This chapter aims to present our motivations when developing a solution, a detailed description of the solution that our team picked for the project and other solutions that we considered, but which were not chosen because of varying reasons.
+\section{Challenges that must be overcome}
+\subsection{Technical limitations}
+As outlined in the requirements, the system should act as a middleware device, that can be put on the same network as the microphone and the camera, which adds a limitation on the amount of available resources.
+We could rely on cloud computing power, but that would lead to a big delay in camera movement and additional risks to security and maintainability.
+Additionally, our project relies on 2 special hardware devices - a camera, and a microphone, therefore the final product should account for all of those limitations.
+Unfortunately, the microphone does not provide location information, as it is quite a difficult technical challenge\cite{distance-urbana-hampaign}.
+So the list of important limitations, that significantly impact the project can be formulated with three limitations:
+\begin{itemize}
+    \item The system should run on a single-board computer(SBC)
+    \item The system should be able to run on the same network as a camera and a microphone.
+    \item Microphone does not provide distance information
+\end{itemize}
+\subsection{User limitations}
+In addition to technical criteria, the main criterion of the solution we were going to implement is based on a certain non-functional requirement which client has emphasized multiple times during our meetings:
+\begin{itemize}
+    \item The system should be easy to install and calibration can be done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
+\end{itemize}
+As this criterion can be interpreted ambiguously, as the difficulty of calibration can vary per person, we needed to reiterate our solutions multiple times and verify them with our client.
+Meeting this criterion was difficult, as we spent the first week of our project solely working on different solutions, trying to prove their correctness, while not disrupting their calibration and installation simplicity.
 \section{Implemented solution}
+As described earlier, there are certain challenges that needed to be overcome in the implemented solution.
+Experimenting with different solutions, we identified that the most difficult limitation is the fact that the microphone cannot retrieve distance information.
+Because the system cannot contain any extra device, that would give us extra information about the system's deployment environment, assumptions need to be made.
+\subsection{Assumptions}
+In our final solution, the three following assumptions are used:
+\begin{enumerate}
+    \item Distance between the speaker and the plane of the ceiling, to which the microphone is mounted, is constant.
+    \item If a camera, presenter's plane, or a microphone were moved, the system must be recalibrated.
+    \item The system is well-calibrated and no components of it are moved during the tracking.
+\end{enumerate}
+Through the process of the research and reiteration of our proposals, with the amount of time we are given, taking in account all the limitations, we have identified these assumptions as minimal.
+While assumptions 2 and 3 are in place to guarantee the intended way of using the system, assumption 3 is formulated to determine the distance from the microphone to the speaker.
+From all of our attempts to come up with the solution, we have identified that the distance of the vector from the microphone to the speaker is crucial.
+But as our system is closed under only 2 devices, and the microphone's API\cite{microphone-manual} does not have a way to retrieve distance, the assumptions are needed to somehow describe the distance function in the environment.
+We have chosen the scenario where we look for an intersection of the ray from the microphone with the ``speaker plane'' as the plane is the most probable scenario for the presenter's environment.
+It is the most probable case of how the available place for the presenter on stage looks; small inconsistencies in not precisely a flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
+The height difference between the speakers can be neglected, due to the expected big distance from the camera to the presenters, and we expect it to be insignificant, especially in scenarios where people are sitting \textbf{(MAYBE PUT REFERENCE HERE)}.
+In the future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we view it to be infeasible for us in 10 weeks.
+\subsection{Calibration}
+During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
+We assume the longest one of the horizontal coordinates to be the $z$ one.
+To achieve this, the microphone's height is first set.
+Then, a person is sent into the room, they direct the camera at themselves and speak.
+The direction obtained from the camera and microphone combined with the microphone's height above the so-called speaker plane is enough to calculate all the speaker plane's properties and 3D position.
+
+A simplified, 2D image is shown in figure \ref{fig:cal2d}.
+\begin{figure}[h]
+    \caption{Demonstration of the calculation of calibration in 2D}
+    \centering
+    \includegraphics[width=0.8\textwidth]{calibration_2d}
+    \label{fig:cal2d}
+\end{figure}
+There, we say $M$ is the microphone, $C$ is the camera, and $A$ is the person calibrating the system.
+After directing the camera at the speaker, we find out angles $\alpha$, $\beta$ and distance $a$ from the right-angled triangle between the speaker plane, the one perpendicular to it from the microphone, and the speaker.
+Angle $\delta$ is easily calculated from the fact that the primary axes of the camera and microphone are orthogonal, and because we know $\gamma$ from having directed the camera at the microphone in the second stage of the calibration.
+Now that we know 2 angles and one side length of triangle $CAM$, we can calculate the distance between the camera and microphone -- $d$.
+
+After calibration, we can proceed backwards to calculate the angle to point the camera at from $d$.
+Figure \ref{fig:cal3d} contains a visualization of the same approach, but with vectors instead of angles.
+We can calculate distance $|MA|$ by intersecting the microphone's direction vector with the speaker plane.
+Afterwards, we can use analogous calculations to get the length $|CM|$, since we have all the directions we need.
+This means that we can find the angles between them and calculate the triangle.
+\begin{figure}[h]
+    \caption{Calculation of calibration in 3D}
+    \centering
+    \includegraphics[width=0.8\textwidth]{calibration_3d}
+    \label{fig:cal3d}
+\end{figure}
 \section{Alternative approaches}
+\subsection{Single coordinate system}
+One of the most obvious solutions that we came up with, is providing the system with coordinates of both microphone and the camera, in coordination with the microphone providing distance to the speaker.
+As you can see, this solution served as inspiration for the final solution, but it has two important problems:
+\begin{itemize}
+    \item Distance information from the microphone is not obtainable.
+    \item Manually inputting measures that would describe coordinate system and points of the camera and the microphone, was considered too complex by our client.
+\end{itemize}
+\subsection{Interpolation model}
+One of the solutions we came up with, was inspired by a concept of interpolation, first introduced to us in the Computer Graphics course.
+The proposed solution followed this algorithm for calibration and tracking:
+\begin{enumerate}
+    \item Record three positions by retrieving the beams' directions and the camera's position for each of the recorded placements.
+    \item Depending on the angle of the beam, using angles that describe its direction, translate those angles to angles of the camera and point it toward the derived direction.
+\end{enumerate}
+Although this solution might sound fascinating and simple, it does not work in reality.
+This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
+This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
+Unfortunately, this is not always the case, as the system should work with any arbitrary position of the camera, we had to leave this solution behind.
+\section{Application overview}
+In this section, we will discuss our application's structure and out motivations behind it.
+\subsection{Project modules}
+After splitting our project in core domains, we have identified 4 of them:
+\begin{itemize}
+    \item Camera API - responsible for a simplifying communication with the camera.
+    \item Microphone API - responsible for a simplifying communication with the microphone.
+    \item Tracking - responsible for all of the tracking related function. For example, calculating direction of the camera, performing communication with camera and the microphone via API.
+    \item WebUI - responsible for providing a user-friendly interface for a user.
+\end{itemize}
+We took a decision to create separate Python modules for each of the identified domains, to make our code base more systematic. 
+It also allows to potentially distribute some of the modules separately, allowing other people develop their software using our APIs.
+\subsection{Camera API}
+\textbf{THERE WILL BE DOCUMENTATION AND GENERAL DESCRIPTION OF THE MODULE}
+\subsection{Microphone API}
+\textbf{THERE WILL BE DOCUMENTATION AND GENERAL DESCRIPTION OF THE MODULE}
+\subsection{Tracking}
+\textbf{THERE WILL BE DOCUMENTATION AND GENERAL DESCRIPTION OF THE MODULE}
+\subsection{WebUI}
+The back-end of this app is written in python using the Flask framework.
+We have decided to use Flask as it is a well-known light-weight framework, that allows for web development.
+It offers some nice features - creating and managing socket connections with a client for automatically updating values of the system, and being easily modifiable to support testing of the app.
+It is also used by Avonic themselves and was recommended by the client.
+The front-end is written in HTML, CSS and JavaScript and includes controls for the camera, the information from the microphone, and a visualization all on a single page.
