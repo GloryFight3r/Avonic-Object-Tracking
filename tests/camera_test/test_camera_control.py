@@ -1,6 +1,7 @@
 import pytest
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
+from avonic_camera_api import converter
 import socket
 import math
 import numpy as np
@@ -224,4 +225,5 @@ def test_get_direction(monkeypatch, camera, direction, ret_msg):
     monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
     monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
     monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
-    assert (camera.get_direction() == np.array(direction) * 0.0625 / 180 * math.pi).all()
+    direction =  np.array(direction) * 0.0625 / 180 * math.pi
+    assert (camera.get_direction() == converter.angle_vector(direction[0], direction[1])).all()

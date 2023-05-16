@@ -182,7 +182,7 @@ class CameraAPI:
             tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
         pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
         tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
-        return np.array([pan_rad, tilt_rad])
+        return converter.angle_vector(pan_rad, tilt_rad)
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:

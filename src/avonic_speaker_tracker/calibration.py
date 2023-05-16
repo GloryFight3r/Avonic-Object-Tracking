@@ -56,7 +56,7 @@ class Calibration:
             returns:
                 the 3D vector from the microphone to the camera
         """
-        cam_vecw = angle_vector(self.speaker_point[0][0], self.speaker_point[0][1])
+        cam_vecw = self.speaker_point[0]
         mic_vecw = self.speaker_point[1]
         assert mic_vecw[1] != 0.0 and self.mic_height != 0.0
 
@@ -65,10 +65,9 @@ class Calibration:
 
         # calculate the two angles needed
         alpha = angle_between_vectors(cam_vecw, mic_vecw)
-        beta = angle_between_vectors(cam_vecw, angle_vector(self.to_mic_direction[0], self.to_mic_direction[1]))
+        beta = angle_between_vectors(cam_vecw, self.to_mic_direction)
         assert beta != 0.0
 
         mic_to_cam_dist = np.linalg.norm(mic_vec) / np.sin(beta) * np.sin(alpha)
-        to_mic = angle_vector(self.to_mic_direction[0], self.to_mic_direction[1])
-        self.mic_to_cam = to_mic / np.linalg.norm(to_mic) * -mic_to_cam_dist
+        self.mic_to_cam = self.to_mic_direction / np.linalg.norm(self.to_mic_direction) * -mic_to_cam_dist
         return self.mic_to_cam
