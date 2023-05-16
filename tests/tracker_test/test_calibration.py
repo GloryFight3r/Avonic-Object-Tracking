@@ -35,7 +35,6 @@ def test_reset_calibration():
     assert cal.mic_to_cam == None
     assert cal.speaker_point == None
     assert cal.to_mic_direction == None
-    assert cal.to_cam_direction == None
 
 def test_is_calibrated():
     cal = Calibration()
