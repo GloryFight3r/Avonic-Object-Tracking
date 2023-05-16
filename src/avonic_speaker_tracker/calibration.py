@@ -33,7 +33,6 @@ class Calibration:
         cam_vecw = angle_vector(self.speaker_point[0][0], self.speaker_point[0][1])
         mic_vecw = self.speaker_point[1]
         assert mic_vecw[1] != 0.0 and self.mic_height != 0.0
-        print(mic_vecw)
 
         # calculate the length of the mic_vec
         mic_vec = mic_vecw / mic_vecw[1] * -self.mic_height
@@ -42,7 +41,6 @@ class Calibration:
         alpha = angle_between_vectors(cam_vecw, mic_vecw)
         beta = angle_between_vectors(cam_vecw, angle_vector(self.to_mic_direction[0], self.to_mic_direction[1]))
         assert beta != 0.0
-        print(alpha, beta)
 
         mic_to_cam_dist = np.linalg.norm(mic_vec) / np.sin(beta) * np.sin(alpha)
         to_mic = angle_vector(self.to_mic_direction[0], self.to_mic_direction[1])

@@ -58,7 +58,7 @@ async function startThread() {
 async function startCalibration(button) {
     await startThread()
     const instructionText = document.getElementById("calibration-instruction")
-    instructionText.innerHTML = "Please stand somewhere in the room and speak up."
+    instructionText.innerHTML = "Please stand somewhere in the room, point the camera at your face and speak up."
     button.innerHTML = "Listening..."
     button.disabled = true
     const body = {method: "get"}
