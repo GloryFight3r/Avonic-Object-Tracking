@@ -1,5 +1,4 @@
 import { addCalibrationSpeaker, isCalibrating, calibrationIsSet, startCalibration } from "./calibration.js"
-window.startCalibration = startCalibration
 
 const socket = io()
 
@@ -131,4 +130,6 @@ hideOn()
 selectMovement()
 calibrationIsSet()
 
+window.startCalibration = startCalibration
+window.selectMovement = selectMovement
 export { startThread }
