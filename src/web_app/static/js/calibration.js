@@ -9,21 +9,20 @@ function addCalibrationSpeaker() {
     isCalibrating = false
     const instructionText = document.getElementById("calibration-instruction")
     const innHTML = instructionText.innerHTML
-    instructionText.innerHTML = innHTML.substring(0, innHTML.length-1) + calibratingSpeakerCount
+    instructionText.innerHTML = "Click below to calibrate point " + calibratingSpeakerCount
     const body = {method: "get"}
     const button = document.getElementById("calibration-button")
-    console.log("Add calibration speaker")
     fetch("/calibration/add_directions_to_speaker", body).then(function (res) {
         if (res.status != 200) {
             onError(button)
         } else {
+            button.disabled = false
             if (calibratingSpeakerCount > totalCalibrations) {
-                button.disabled = false
+                calibratingSpeakerCount = 1
                 pointCameraCalibration(button)
             } else {
-                setTimeout(() => {
-                    isCalibrating = true
-                }, 1000)
+                button.innerHTML = "Next point"
+                button.onclick = () => startCalibration(button)
             }
         }
     })
@@ -45,10 +44,9 @@ async function calibrationIsSet() {
 async function startCalibration(button) {
     await startThread()
     const instructionText = document.getElementById("calibration-instruction")
-    instructionText.innerHTML = "Please stand somewhere in the room, point the camera at your face and speak up. \nCalibrating point 1"
+    instructionText.innerHTML = "Please stand somewhere in the room, point the camera at your face and speak up."
     button.innerHTML = "Listening..."
     button.disabled = true
-    calibratingSpeakerCount = 1
     isCalibrating = true
 }
 

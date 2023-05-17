@@ -82,4 +82,5 @@ class Calibration:
             self.mic_to_cams.append(mic_to_cam)
 
         self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)
+        print(self.mic_to_cam)
         return self.mic_to_cam
