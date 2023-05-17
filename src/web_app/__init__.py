@@ -158,7 +158,7 @@ def create_app(test_controller=None):
         
     @app.get('/preset/point')
     def point_to_preset():
-        return web_app.tracking.point(integration)
+        return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
     
     @app.get('/calibration/is_set')
     def calibration_is_set():

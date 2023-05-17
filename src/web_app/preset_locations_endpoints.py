@@ -1,4 +1,5 @@
 from web_app.integration import GeneralController
+from avonic_speaker_tracker.pointer import point
 from flask import make_response, jsonify, request
 import numpy as np
 
@@ -96,3 +97,7 @@ def get_preset_info(integration: GeneralController):
         }), 200)
     except AssertionError:
         return make_response(jsonify({}), 400)
+
+
+def point_to_closest_preset(integration: GeneralController):
+    point(integration.cam_api,integration.mic_api,integration.preset_locations)
