@@ -1,6 +1,4 @@
 import numpy as np
-import functools
-from avonic_camera_api.converter import angle_vector
 from avonic_speaker_tracker.math_helper import angle_between_vectors
 
 class Calibration:

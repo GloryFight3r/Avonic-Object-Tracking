@@ -1,9 +1,5 @@
-from flask import make_response, jsonify, request
-from avonic_camera_api.converter import angle_vector
+from flask import make_response, jsonify
 from web_app.integration import GeneralController
-from time import sleep
-
-import numpy as np
 
 def success():
     return make_response(jsonify({}), 200)
