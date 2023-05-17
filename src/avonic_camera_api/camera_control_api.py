@@ -160,27 +160,6 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
-    """def get_current_position(self) -> (float, float):
-        message = "81 09 06 12 FF"
-
-        ret = self.camera.send("01 00 00 05 00 00 00" + self.message_counter(), message, self.counter)[2:-1]
-
-        assert ret[0:4] == "9050" and len(ret) == 22
-
-        pan_position = int(ret[5] + ret[7] + ret[9] + ret[11], 16)
-
-        tilt_position = int(ret[13] + ret[15] + ret[17] + ret[19], 16)
-
-        if ret[5] == "F":
-            pan_position = -((pan_position ^ ((1 << 16) - 1)) + 1)
-
-        if ret[13] == "F":
-            tilt_position = -((tilt_position ^ ((1 << 16) - 1)) + 1)
-
-        #print(ret, pan_position, tilt_position)
-
-        return (pan_position * 0.0625, tilt_position * 0.0625)
-    """
 
     def get_direction(self) -> np.array:
         """ Get the direction, pan and tilt, from the camera.
