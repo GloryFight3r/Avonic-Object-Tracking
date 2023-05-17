@@ -7,10 +7,12 @@
 \usepackage[style=numeric,sorting=ynt,backend=biber]{biblatex}
 \addbibresource{sources.bib}
 \usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
+\usepackage{graphicx}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\fancyfoot[LE,RO]{\{Name of project\}}
-\fancyfoot[LO,RE]{\{Group\}}
+\graphicspath{ {./images/} }
+\fancyfoot[LE,RO]{Avonic camera-microphone integration}
+\fancyfoot[LO,RE]{Group 11C}
 
 % Document
 \begin{document}
@@ -39,8 +41,27 @@
     \end{titlepage}
 
     \tableofcontents
-    \chapter{Introduction}
-    \input{chapters/intro}
+
+    \chapter{Introduction}\label{ch:introduction}
+    \input{chapters/introduction}
+
+    \chapter{Problem analysis}\label{ch:problem-analysis}
+    \input{chapters/problem-analysis}
+
+    \chapter{Solution}\label{ch:solution}
+    \input{chapters/solution}
+
+    \chapter{Requirements}\label{ch:requirements}
+    \input{chapters/requirements}
+
+    \chapter{Workflow and Teamwork}\label{ch:workflow-and-teamwork}
+    \input{chapters/workflow-and-teamwork}
+
+    \chapter{Reflection}\label{ch:reflection}
+    \input{chapters/reflection}
+
+    \chapter{Conclusion}\label{ch:conclusion}
+    \input{chapters/conclusion}
 
     \appendix
     \printbibliography
