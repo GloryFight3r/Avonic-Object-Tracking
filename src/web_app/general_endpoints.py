@@ -9,9 +9,10 @@ def success():
     return make_response(jsonify({}), 200)
 
 def add_calibration_speaker(integration: GeneralController):
-    mic_dir = wait_for_speaker()
+    mic_dir = integration.mic_api.vector()
     cam_dir = integration.cam_api.get_direction()
 
+    print((cam_dir, mic_dir))
     integration.calibration.add_speaker_point((cam_dir, mic_dir))
     return success()
 
@@ -25,12 +26,7 @@ def reset_calibration(integration: GeneralController):
     return success()
 
 def is_calibrated(integration: GeneralController):
+    integration.calibration.calculate_distance()
     return make_response(jsonify({
         "is_set": integration.calibration.is_calibrated()
     }), 200)
-
-def wait_for_speaker():
-    while not integration.mic_api.speaking:
-        sleep(0.1)
-
-    return integration.mic_api.vector()

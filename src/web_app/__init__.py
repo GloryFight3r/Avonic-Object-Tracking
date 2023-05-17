@@ -5,7 +5,9 @@ import web_app.microphone_endpoints
 import web_app.general_endpoints
 import web_app.tracking
 from web_app.integration import GeneralController
-
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 integration = GeneralController()
 
 
