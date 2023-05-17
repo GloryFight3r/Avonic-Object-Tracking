@@ -6,9 +6,9 @@ from avonic_speaker_tracker.math_helper import angle_between_vectors
 
 def generate_vectors_angles():
     return [
-        ([1, 1, 1], [2, 2, 2], 0),
-        ([1, 0, 0], [0, 1, 1], pi/2),
-        ([1, 0, 0], [1, 1, 0], pi/4),
+        ([1, 1, 1], [2, 2, 2], 1),
+        ([1, 0, 0], [0, 1, 1], np.cos(pi/2)),
+        ([1, 0, 0], [1, 1, 0], np.cos(pi/4)),
     ]
 
 @pytest.mark.parametrize("v1, v2, exp_angle", generate_vectors_angles())

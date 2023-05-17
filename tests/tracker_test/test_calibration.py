@@ -15,7 +15,7 @@ def test_add_speaker_point():
     cal = Calibration()
     p = (np.array([1, 1]), np.array([0, 0, 0]))
     cal.add_speaker_point(p)
-    assert cal.speaker_point == p
+    assert cal.speaker_points[0] == p
 
 def test_add_direction_to_mic():
     cal = Calibration()
@@ -33,7 +33,7 @@ def test_reset_calibration():
 
     cal.reset_calibration()
     assert cal.mic_to_cam == None
-    assert cal.speaker_point == None
+    assert cal.speaker_points == []
     assert cal.to_mic_direction == None
 
 def test_is_calibrated():
@@ -64,26 +64,21 @@ def generate_calibration_setup():
             (1,
                 np.array([0.0, 2**0.5/2, 2**0.5/2]),
                 (np.array([0., 0., 1.]), np.array([0, -1, 0])),
-                #np.array([0, -1/2**0.5, -1/2**0.5]),
                 np.array([0, -1, -1])
              ),
             (1,
                 np.array([2**0.5/2, 0, 2**0.5/2]),
                 (np.array([0., 0., 1.]), np.array([0, -1, 0])),
-                #np.array([-1/2**0.5, -1/2**0.5, 0]),
                 np.array([-1, 0, -1])
              ),
             (2,
                 np.array([0, 2**0.5/2, 2**0.5/2]),
                 (np.array([0, -2**0.5/2, 2**0.5/2]), np.array([0, -1, 0])),
-                #np.array([0, -1/2**0.5, -1/2**0.5]),
                 np.array([0, -1, -1])
              ),
-            #(4, (np.array([0, -0.245]), np.array([0, -4, 0])), np.array([0, 0.6435]), np.array([0, -3, -4]), np.array([0, -3, -4]))
             (4,
                 np.array([0.0, 0.6, 0.8]),
                 (np.array([0, -0.24255632, 0.97013732]), np.array([0, -4, 0])),
-                #np.array([0, -3, -4]),
                 np.array([0, -3, -4])
              )
     ]
@@ -91,6 +86,7 @@ def generate_calibration_setup():
 @pytest.mark.parametrize("height, to_mic, speaker, mic_to_cam", generate_calibration_setup())
 def test_calculate_distance(height, to_mic, speaker, mic_to_cam):
     cal = Calibration()
+    cal.reset_calibration()
     cal.set_height(height)
     cal.add_speaker_point(speaker)
     cal.add_direction_to_mic(to_mic)

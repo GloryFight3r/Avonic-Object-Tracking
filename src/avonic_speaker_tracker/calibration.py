@@ -7,6 +7,7 @@ class Calibration:
     # height of the microphone above the speaker
     mic_height: float = 1.0
     mic_to_cams: [np.array] = []
+    mic_to_cam: np.array = None
 
     # variables of calibration
     speaker_points: [(np.array, np.array)] = []
@@ -40,6 +41,7 @@ class Calibration:
     def reset_calibration(self):
         """ Reset the calibration. To be used in case calibration went wrong or one of the devices moved. """
         self.mic_to_cams = []
+        self.mic_to_cam = None
         self.speaker_points = []
         self.to_mic_direction = None
 
@@ -49,11 +51,13 @@ class Calibration:
             returns:
                 is_calibrated: a boolean indicating whether the system is calibrated
         """
-        return not (self.speaker_points is None or self.to_mic_direction is None)
+        return self.speaker_points != [] and self.to_mic_direction is not None
 
     def calculate_distance(self) -> np.array:
-        """ Calculate the vector from the microphone to the camera using the vectors acquired during calibration.
-            This vector has a norm equal to the distance from the microphone to the camera.
+        """ Calculate the vectors from the microphone to the camera using the vectors acquired during calibration.
+            This vector has a norm equal to the distance from the microphone to the camera. Since multiple points
+            are used for the speaker, we get multiple similar vectors to the camera. The vector to use for further
+            calculations is the average of these (self.mic_to_cam).
 
             returns:
                 the 3D vector from the microphone to the camera
@@ -65,22 +69,17 @@ class Calibration:
 
             # calculate the length of the mic_vec
             mic_vec = mic_vecw / mic_vecw[1] * -self.mic_height
-            print("Mic vec")
-            print(mic_vec)
 
             # calculate the two angles needed
-            alpha = angle_between_vectors(cam_vecw, mic_vecw)
-            beta = angle_between_vectors(cam_vecw, self.to_mic_direction)
-            assert beta != 0.0
-            print("Alpha and beta")
-            print(alpha, beta)
+            alpha_cos = angle_between_vectors(cam_vecw, mic_vecw)
+            beta_cos = angle_between_vectors(cam_vecw, self.to_mic_direction)
+            alpha_sin = (1- alpha_cos**2)**0.5
+            beta_sin = (1- beta_cos**2)**0.5
+            assert beta_sin != 0.0
 
-            mic_to_cam_dist = np.linalg.norm(mic_vec) / np.sin(beta) * np.sin(alpha)
+            mic_to_cam_dist = np.linalg.norm(mic_vec) / beta_sin * alpha_sin
             mic_to_cam = self.to_mic_direction / np.linalg.norm(self.to_mic_direction) * -mic_to_cam_dist
-            print("mic to cam")
-            print(mic_to_cam)
-            print("Mic to cam dist")
-            print(mic_to_cam_dist)
             self.mic_to_cams.append(mic_to_cam)
 
-        return np.mean(self.mic_to_cams)
+        self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)
+        return self.mic_to_cam

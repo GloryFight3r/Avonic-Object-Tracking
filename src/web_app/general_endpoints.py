@@ -12,7 +12,6 @@ def add_calibration_speaker(integration: GeneralController):
     mic_dir = integration.mic_api.vector()
     cam_dir = integration.cam_api.get_direction()
 
-    print((cam_dir, mic_dir))
     integration.calibration.add_speaker_point((cam_dir, mic_dir))
     return success()
 
