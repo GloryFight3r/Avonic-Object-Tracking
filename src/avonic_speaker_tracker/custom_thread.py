@@ -29,6 +29,8 @@ class CustomThread(Thread):
         Method should start with self.event.wait() to make sure that on
         start of the thread with false flag, body of the while-loop is not executed.
         """
+
+        assert len(self.preset_locations.get_preset_list()) > 0
         prev_dir = [0,0]
         while not self.event.is_set():
             if self.value is None:
