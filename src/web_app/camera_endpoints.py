@@ -75,3 +75,7 @@ def zoom_set_camera_endpoint(integration: GeneralController):
         return success()
     except AssertionError:
         return make_response(jsonify({}), 400)
+
+def position_get_camera_endpoint(integration: GeneralController):
+    position = integration.cam_api.get_direction()
+    return make_response(jsonify({"position-alpha-value": position[0], "position-beta-value":position[1]}), 200)

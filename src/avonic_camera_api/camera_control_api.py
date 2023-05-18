@@ -1,6 +1,7 @@
 from avonic_camera_api.camera_adapter import Camera
 import numpy as np
 from avonic_camera_api import converter
+import math
 
 
 class CameraAPI:
@@ -117,8 +118,8 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(), '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
-                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
+        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(), '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " + \
+                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " + \
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> bytes:
@@ -144,7 +145,7 @@ class CameraAPI:
         message = "81 09 04 47 FF"
 
         ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
-        
+
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 
@@ -159,6 +160,51 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
+    """def get_current_position(self) -> (float, float):
+        message = "81 09 06 12 FF"
+
+        ret = self.camera.send("01 00 00 05 00 00 00" + self.message_counter(), message, self.counter)[2:-1]
+
+        assert ret[0:4] == "9050" and len(ret) == 22
+
+        pan_position = int(ret[5] + ret[7] + ret[9] + ret[11], 16)
+
+        tilt_position = int(ret[13] + ret[15] + ret[17] + ret[19], 16)
+
+        if ret[5] == "F":
+            pan_position = -((pan_position ^ ((1 << 16) - 1)) + 1)
+
+        if ret[13] == "F":
+            tilt_position = -((tilt_position ^ ((1 << 16) - 1)) + 1)
+
+        #print(ret, pan_position, tilt_position)
+
+        return (pan_position * 0.0625, tilt_position * 0.0625)
+    """
+
+    def get_direction(self) -> np.array:
+        """ Get the direction, pan and tilt, from the camera.
+
+            Returns:
+                (pan, tilt): The pan and tilt of the camera. Pan ranges between 0xF670 (-2447) and 0x0990 (2448) while pan_adjusted ranges between (-170) and (+170)
+                                                             Tilt ranges between 0xFE45 (-442) and 0x0510 (1296) while tilt_adjusted ranges between (-30) and (+90)
+        """
+        message = "81 09 06 12 FF"
+        ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
+        pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
+        tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
+
+        pan = int(pan_hex, 16)
+        tilt = int(tilt_hex, 16)
+        pan_adjusted = pan
+        tilt_adjusted = tilt
+        if ret_msg[5] == "F":
+            pan_adjusted = -((pan ^ ((1 << 16) - 1)) + 1)
+        if ret_msg[13] == "F":
+            tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
+        pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
+        tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
+        return np.array([pan_rad, tilt_rad])
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.
