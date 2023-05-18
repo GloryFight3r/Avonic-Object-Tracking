@@ -1,7 +1,7 @@
 from threading import Event
 from unittest import mock
 import numpy as np
-from avonic_speaker_tracker.custom_thread import CustomThread
+from avonic_speaker_tracker.updater import UpdateThread
 
 
 def test_constructor():
@@ -11,7 +11,7 @@ def test_constructor():
     mic_api.is_speaking.return_value = True
     cam_api = mock.Mock()
     presets = mock.Mock()
-    ct = CustomThread(e, '', cam_api, mic_api,presets)
+    ct = UpdateThread(e, '', cam_api, mic_api, presets)
     assert ct.event == e
     assert ct.mic_api == mic_api
     assert ct.cam_api == cam_api
@@ -27,7 +27,7 @@ def test_setter():
     mic_api.is_speaking.return_value = True
     cam_api = mock.Mock()
     presets = mock.Mock()
-    ct = CustomThread(e, '', mic_api, cam_api,presets)
+    ct = UpdateThread(e, '', mic_api, cam_api, presets)
     assert ct.event == e
     assert ct.value is None
     ct.set_calibration(2)
