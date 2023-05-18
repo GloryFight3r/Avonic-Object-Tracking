@@ -31,7 +31,6 @@ class CustomThread(Thread):
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
-            #print('Worker thread running...')
             self.value += 1
             asyncio.run(self.send_update(self.get_mic_info(), '/update/microphone'))
             sleep(0.1)
