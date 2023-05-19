@@ -9,6 +9,7 @@ from microphone_api.microphone_adapter import UDPSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
 
+
 class GeneralController():
     def __init__(self):
         self.event = Event()
@@ -18,6 +19,8 @@ class GeneralController():
         self.mic_api = None
         self.secret = None
         self.ws = None
+        self.preset_locations = None
+        self.calibration = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")

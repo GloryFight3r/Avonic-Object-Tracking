@@ -9,7 +9,7 @@ class Preset:
 
 class PresetCollection:
     def __init__(self):
-        self.preset_locations = dict()
+        self.preset_locations = {}
 
     def add_preset(self, to_add: str, cam_angle: np.ndarray, microphone_direction: np.ndarray) -> None:
         """ Adds a preset to the dictionary of presets with the given name

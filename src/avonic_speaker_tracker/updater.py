@@ -16,7 +16,7 @@ class UpdateThread(Thread):
         Args:
             event - event from threading module, that acts as a flag/lock of the thread
         """
-        super(UpdateThread, self).__init__()
+        super().__init__()
         self.event = event
         self.value = None
         self.url = 'http://' + url
