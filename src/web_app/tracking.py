@@ -1,6 +1,7 @@
 from flask import make_response, jsonify, request
 from avonic_speaker_tracker.custom_thread import CustomThread
 from web_app.integration import GeneralController
+import numpy as np
 
 
 def start_thread_endpoint(integration: GeneralController):
@@ -8,7 +9,8 @@ def start_thread_endpoint(integration: GeneralController):
     print("Started thread")
     if integration.thread is None:
         integration.thread = CustomThread(integration.event, integration.url,
-                                          integration.cam_api, integration.mic_api)
+                                          integration.cam_api, integration.mic_api,
+                                          integration.preset_locations)
         integration.thread.set_calibration(2)
         integration.event.clear()
         integration.thread.start()
@@ -20,6 +22,8 @@ def start_thread_endpoint(integration: GeneralController):
         integration.event.clear()
         integration.thread.start()
     return make_response(jsonify({}), 200)
+
+
 
 
 def stop_thread_endpoint(integration: GeneralController):

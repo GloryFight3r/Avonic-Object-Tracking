@@ -113,6 +113,7 @@ class MicrophoneAPI:
         try:
             res = json.loads(ret)["m"]["in1"]["peak"]
             assert isinstance(res, int)
+            print(res)
             if -90 <= res <= 0:
                 self.speaking = res > self.threshold
         except KeyError:
