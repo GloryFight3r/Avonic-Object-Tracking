@@ -215,3 +215,6 @@ def create_app(test_controller=None):
         return web_app.tracking.update_camera(integration)
 
     return app
+
+
+application = create_app()

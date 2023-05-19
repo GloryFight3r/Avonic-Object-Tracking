@@ -205,6 +205,7 @@ class CameraAPI:
         return direction
 
 
+
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.
 

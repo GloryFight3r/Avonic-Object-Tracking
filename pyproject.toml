@@ -34,8 +34,9 @@ test = [
     "hypothesis"
 ]
 prod = [
-    "gunicorn",
-    "gevent"
+    "uwsgi",
+    "gevent",
+    "greenlet"
 ]
 
 [tool.pytest.ini_options]

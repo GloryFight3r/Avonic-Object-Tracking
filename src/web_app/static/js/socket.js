@@ -7,7 +7,6 @@ socket.on("my response", (args) => {
 socket.on("microphone-update", async (args) => {
     onDirectionGet(args).then()
     onSpeaking(args).then()
-
 });
 
 socket.on("camera-update", async (args) => {
