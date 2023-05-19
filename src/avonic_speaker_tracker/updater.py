@@ -42,7 +42,7 @@ class UpdateThread(Thread):
 
             if len(self.preset_locations.get_preset_list()) > 0:
                 prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, prev_dir)
-            
+
             self.value += 1
             sleep(0.1)
         print("Exiting thread")

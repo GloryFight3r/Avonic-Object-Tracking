@@ -5,6 +5,8 @@ import math
 
 
 class CameraAPI:
+    latest_direction = None
+
     def __init__(self, camera: Camera):
         """ Constructor for cameraAPI
 
@@ -14,6 +16,7 @@ class CameraAPI:
         self.camera = camera
         self.counter = 1
         self.video = "on"
+        self.latest_direction = np.array([0, 0, 1])
 
     def message_counter(self) -> str:
         cnt_hex = self.counter.to_bytes(1, 'big').hex()
@@ -175,6 +178,9 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
+    def get_saved_direction(self) -> np.array:
+        return self.latest_direction
+
     def get_direction(self) -> np.array:
         """ Get the direction, pan and tilt, from the camera.
 
@@ -199,7 +205,10 @@ class CameraAPI:
             tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
         pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
         tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
-        return np.array([pan_rad, tilt_rad])
+        direction = converter.angle_vector(pan_rad, tilt_rad)
+        self.latest_direction = direction
+        return direction
+
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:

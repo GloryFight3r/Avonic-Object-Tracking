@@ -1,6 +1,7 @@
 import pytest
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
+from avonic_camera_api import converter
 import socket
 import math
 import numpy as np
@@ -224,31 +225,5 @@ def test_get_direction(monkeypatch, camera, direction, ret_msg):
     monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
     monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
     monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
-
-    assert camera.turn_off() == expected2
-
-def generate_get_direction_commands():
-    return [
-        ([0, 0], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x00\x00\x00\x00\x00\xFF'),
-        ([1, 1], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x01\x00\x00\x00\x01\xFF'),
-        ([700, 1], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x02\x0B\x0C\x00\x00\x00\x01\xFF'),
-        ([1, 700], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x01\x00\x02\x0B\x0C\xFF'),
-        ([-2448, -443], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x0F\x06\x07\x00\x0F\x0E\x04\x05\xFF'),
-    ]
-
-@pytest.mark.parametrize("direction, ret_msg", generate_get_direction_commands())
-def test_get_direction(monkeypatch, camera, direction, ret_msg):
-    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
-
-    def mocked_send(message):
-        assert message == expected_msg
-    def mocked_return(bytes_receive):
-        return ret_msg
-    def mocked_timeout(ms):
-        pass
-
-    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
-    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
-    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
-
-    assert (camera.get_direction() == np.array(direction) * 0.0625 / 180 * math.pi).all()
+    direction =  np.array(direction) * 0.0625 / 180 * math.pi
+    assert (camera.get_direction() == converter.angle_vector(direction[0], direction[1])).all()
