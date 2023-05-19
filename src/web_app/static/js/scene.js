@@ -24,7 +24,7 @@ camera.lookAt(0, 0, 0)
 scene.add(new THREE.AxesHelper(1000))
 const light = new THREE.AmbientLight(0xffffff, 10)
 scene.add(light)
-const planeGeometry = new THREE.PlaneGeometry(10, 10, 100, 100)
+const planeGeometry = new THREE.PlaneGeometry(10, 10, 20, 20)
 const planeMaterial = new THREE.MeshBasicMaterial({
     color: 0xff00ff,
     side: THREE.DoubleSide,
@@ -38,6 +38,11 @@ const mic = new THREE.Vector3(0, 0, 0)
 const micArrow = new THREE.ArrowHelper(micDir, mic, 1, 0xffff00)
 scene.add(micArrow)
 
+const camDir = new THREE.Vector3(0, 0, 1)
+const cam = new THREE.Vector3(0, -1, -1)
+const camArrow = new THREE.ArrowHelper(camDir, cam, 1, 0x00ffff)
+scene.add(camArrow)
+
 async function render() {
     renderer.render(scene, camera)
 }
@@ -49,6 +54,15 @@ async function animate() {
     const micZ = document.getElementById("mic-direction-z").value
     const micDir = new THREE.Vector3(micX, micY, micZ)
     micArrow.setDirection(micDir)
+    const camA = document.getElementById("position-alpha-value").value
+    const camB = document.getElementById("position-beta-value").value
+    const cosb = Math.cos(camB)
+    const camX = Math.sin(camA) * cosb
+    const camY = Math.sin(camB)
+    const camZ = Math.cos(camA) * cosb
+    const camDir = new THREE.Vector3(camX, camY, camZ)
+    camArrow.setDirection(camDir)
+
     plane.position.set(0, -h, 0)
     requestAnimationFrame(animate)
     controls.update()
