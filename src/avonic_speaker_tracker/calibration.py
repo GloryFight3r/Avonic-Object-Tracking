@@ -1,5 +1,4 @@
 import numpy as np
-from avonic_speaker_tracker.math_helper import angle_between_vectors
 
 class Calibration:
     # height of the microphone above the speaker
@@ -82,3 +81,6 @@ class Calibration:
         self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)
         print(self.mic_to_cam)
         return self.mic_to_cam
+
+    def angle_between_vectors(p: np.array, q: np.array) -> float:
+        return p.dot(q) / (np.linalg.norm(p) * np.linalg.norm(q))
