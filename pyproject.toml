@@ -34,7 +34,7 @@ test = [
     "hypothesis"
 ]
 prod = [
-    "gunicorn",
+    "uwsgi",
     "gevent",
     "greenlet"
 ]

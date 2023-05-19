@@ -12,8 +12,9 @@ if [ "$1" = "test" ]
     flask --app src/web_app run --debug
 elif [ "$1" = "prod" ]
   then
+    export SERVER_ADDRESS=0.0.0.0:8000
     pip install -e '.[prod]'
-    gunicorn -b 0.0.0.0 'web_app:create_app()' -k gevent -w 1
+    uwsgi --http :8000 --gevent 1000 --http-websockets --master --module web_app
 else
     pip install .
     flask --app src/web_app run

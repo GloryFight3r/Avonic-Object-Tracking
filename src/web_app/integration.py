@@ -20,6 +20,9 @@ class GeneralController():
         self.ws = None
 
     def load_env(self):
+        url = getenv("SERVER_ADDRESS")
+        if url is not None:
+            self.url = url
         load_dotenv()
         cam_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
