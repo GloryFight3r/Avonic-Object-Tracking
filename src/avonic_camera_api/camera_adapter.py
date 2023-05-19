@@ -72,6 +72,7 @@ class Camera:
             data2 = binascii.hexlify(self.sock.recv(2048)).upper()
         except TimeoutError:
             print("Camera timed out")
+            return bytes(0)
 
         while True:
             split_messages = str(data2).split("'b'")
@@ -92,3 +93,4 @@ class Camera:
                     data2 = binascii.hexlify(self.sock.recv(2048)).upper()
                 except TimeoutError:
                     print("Camera timed out")
+                    return bytes(0)
