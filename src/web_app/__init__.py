@@ -208,4 +208,11 @@ def create_app(test_controller=None):
     def thread_microphone():
         return web_app.tracking.update_microphone(integration)
 
+    @app.post('/update/camera')
+    def thread_camera():
+        return web_app.tracking.update_camera(integration)
+
     return app
+
+
+application = create_app()
