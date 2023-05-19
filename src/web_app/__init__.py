@@ -1,10 +1,11 @@
-from flask import Flask, jsonify, abort, render_template, make_response
+from flask import Flask, jsonify, abort, render_template, make_response, Response
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.preset_locations_endpoints
 import web_app.general_endpoints
 import web_app.tracking
+import web_app.frames
 from web_app.integration import GeneralController
 
 integration = GeneralController()
@@ -30,6 +31,22 @@ def create_app(test_controller=None):
     @app.get('/')
     def view():
         return render_template('view.html')
+
+    @app.get('/camera_control')
+    def camera_view():
+        return render_template('camera.html')
+
+    @app.get('/microphone_control')
+    def microphone_view():
+        return render_template('microphone.html')
+
+    @app.get('/presets_and_calibration')
+    def presets_and_calibration_view():
+        return render_template('presets_and_calibration.html')
+
+    @app.get('/live_footage')
+    def live_footage_view():
+        return render_template('live_footage.html')
 
     @app.post('/camera/reboot')
     def post_reboot():
@@ -211,6 +228,11 @@ def create_app(test_controller=None):
     @app.post('/update/camera')
     def thread_camera():
         return web_app.tracking.update_camera(integration)
+    
+    # Camera footage
+    @app.route('/video_feed')
+    def video_feed():
+        return Response(web_app.frames.gen_frames(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     return app
 

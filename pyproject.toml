@@ -20,7 +20,9 @@ dependencies = [
     "flask-socketio",
     "numpy",
     "python-dotenv",
-    "requests"
+    "requests",
+    "opencv-python",
+    "libgl1-mesa-glx"
 ]
 
 [project.optional-dependencies]
