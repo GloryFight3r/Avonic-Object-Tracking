@@ -1,5 +1,6 @@
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
+from time import sleep
 
 
 def height_set_microphone_endpoint(integration: GeneralController):
