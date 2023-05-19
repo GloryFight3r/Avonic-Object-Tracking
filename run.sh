@@ -13,7 +13,7 @@ if [ "$1" = "test" ]
 elif [ "$1" = "prod" ]
   then
     pip install -e '.[prod]'
-    gunicorn -b 0.0.0.0 'web_app:create_app()' -k gevent -w 4
+    gunicorn -b 0.0.0.0 'web_app:create_app()' -k gevent -w 1
 else
     pip install .
     flask --app src/web_app run

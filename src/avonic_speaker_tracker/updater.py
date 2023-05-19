@@ -29,7 +29,7 @@ class UpdateThread(Thread):
         Method should start with self.event.wait() to make sure that on
         start of the thread with false flag, body of the while-loop is not executed.
         """
-        prev_dir = [0, 0]
+        prev_dir = [0.0, 0.0]
         while not self.event.is_set():
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -41,8 +41,10 @@ class UpdateThread(Thread):
             
             self.value += 1
             asyncio.run(self.send_update(self.get_mic_info(), '/update/microphone'))
-            asyncio.run(self.send_update(self.get_cam_info(), '/update/camera'))
-            sleep(0.2)
+            # to not time out the camera, only update it once in 1.5 seconds
+            if self.value % 15 == 0:
+                asyncio.run(self.send_update(self.get_cam_info(), '/update/camera'))
+            sleep(0.1)
         print("Exiting thread")
 
     def set_calibration(self, value):
@@ -59,11 +61,11 @@ class UpdateThread(Thread):
     def get_cam_info(self):
         """ Get the direction of the camera.
         """
-        dir = self.cam_api.get_direction()
+        direction = self.cam_api.get_direction()
         return {
             "camera-direction": {
-                "position-alpha-value": dir[0],
-                "position-beta-value": dir[1]
+                "position-alpha-value": direction[0],
+                "position-beta-value": direction[1]
             },
             "zoom-value": self.cam_api.get_zoom(),
             "camera-video": self.cam_api.video
