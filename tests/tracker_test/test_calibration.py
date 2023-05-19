@@ -37,8 +37,8 @@ def test_reset_calibration():
 
 def test_is_calibrated():
     cal = Calibration()
-    d = np.array([1, 1])
-    p = (np.array([1, 1]), np.array([0, 0, 0]))
+    d = np.array([1, 1, 1])
+    p = (np.array([1, 1, 0]), np.array([0, 1.0, 0]))
 
     cal.add_speaker_point(p)
     assert not cal.is_calibrated()

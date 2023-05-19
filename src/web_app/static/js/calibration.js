@@ -50,23 +50,6 @@ function pointCameraCalibration(button) {
     };
 }
 
-//async function refreshCalibration() {
-//    const submitCalButton = document.getElementById("submit-calibration");
-//    submitCalButton.innerHTML = "Add position";
-//    submitCalButton.disabled = false;
-//    fetch("/calibration/get_count", { method: "get" })
-//        .then((data) => data.json())
-//        .then((jsonData) => {
-//            const count = parseInt(jsonData["count"]);
-//            const checks = document.getElementsByClassName("calibration-checkbox");
-//            console.log(count, checks.length);
-//            document.getElementById("submit-calibration").disabled = count === checks.length;
-//            for (let i = 0; i < checks.length; i++) {
-//                checks[i].checked = i < count;
-//            }
-//        });
-//}
-
 async function calibrationIsSet() {
     const body = { method: "get" };
     fetch("/calibration/is_set", body)
@@ -96,12 +79,6 @@ async function startCalibration(button) {
     isCalibrating = true
 }
 
-
-//function onWaitCalibration() {
-//    const submitCalButton = document.getElementById("submit-calibration");
-//    submitCalButton.innerHTML = "Please speak up...";
-//    submitCalButton.disabled = true;
-//}
 
 function resetCalibration(button) {
     const body = { method: "get" };

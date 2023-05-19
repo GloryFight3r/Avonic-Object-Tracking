@@ -22,7 +22,7 @@ def reset_calibration(integration: GeneralController):
 
 def is_calibrated(integration: GeneralController):
     # uncomment this to see the calibration results in the terminal
-    integration.calibration.calculate_distance()
+    #integration.calibration.calculate_distance()
     return make_response(jsonify({
         "is_set": integration.calibration.is_calibrated()
     }), 200)
