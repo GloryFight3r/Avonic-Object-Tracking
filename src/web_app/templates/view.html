@@ -18,105 +18,127 @@
 
 <body>
   <main class="grid">
-    <article id="cam" class="container">
-      <h1>Camera 🎥</h1>
-      <h2>Basic Commands</h2>
-      <div class="grid">
-        <form action="/camera/reboot" method="post" id="camera-reboot-form">
-          <button type="submit">Reboot</button>
-        </form>
-        <form action="/camera/off" method="post" id="camera-off-form">
-          <button type="submit">Video Off</button>
-        </form>
-        <form action="/camera/on" method="post" id="camera-on-form">
-          <button type="submit">Video On</button>
-        </form>
-        <form action="/camera/move/home" method="post" id="camera-home-form">
-          <button type="submit">Home</button>
-        </form>
-        <form action="/camera/move/stop" method="post" id="camera-stop-form">
-          <button type="submit">Stop</button>
-        </form>
-      </div>
-      <h2>Zoom</h2>
-      <div class="grid">
-        <form action="/camera/zoom/set" method="post" id="camera-zoom-set-form">
+    <div>
+      <article id="cam" class="container">
+        <h1>Camera 🎥</h1>
+        <h2>Basic Commands</h2>
+        <div class="grid">
+          <form action="/camera/reboot" method="post" id="camera-reboot-form">
+            <button type="submit">Reboot</button>
+          </form>
+          <form action="/camera/off" method="post" id="camera-off-form">
+            <button type="submit">Video Off</button>
+          </form>
+          <form action="/camera/on" method="post" id="camera-on-form">
+            <button type="submit">Video On</button>
+          </form>
+          <form action="/camera/move/home" method="post" id="camera-home-form">
+            <button type="submit">Home</button>
+          </form>
+          <form action="/camera/move/stop" method="post" id="camera-stop-form">
+            <button type="submit">Stop</button>
+          </form>
+        </div>
+        <h2>Zoom</h2>
+        <div class="grid">
+          <form action="/camera/zoom/get" method="get" id="camera-zoom-get-form">
+            <div class="grid">
+              <label for="zoom-value-get">Zoom value:</label>
+              <input type="number" name="zoom-value" id="zoom-value-get" min="0" max="16384" readonly/>
+            </div>
+            <button type="submit">Get zoom</button>
+          </form>
+          <form action="/camera/zoom/set" method="post" id="camera-zoom-set-form">
+            <div class="grid">
+              <label for="zoom-value-set">Set new [0-16384]:</label>
+              <input type="number" name="zoom-value" id="zoom-value-set" min="0" max="16384" />
+            </div>
+            <button type="submit">Set zoom</button>
+          </form>
+        </div>
+        <h2>Position</h2>
+        <div class="grid">
+          <form action="/camera/position/get" method="get" id="camera-position-get-form" class="grid">
+            <label for="position-alpha-value">Pan and Tilt [rad]</label>
+            <input type="number" name="position-alpha-value" id="position-alpha-value" readonly />
+            <input type="number" name="position-beta-value" id="position-beta-value" readonly />
+            <button type="submit">Get position</button>
+          </form>
+        </div>
+        <div class="grid">
+          <h2>Movement</h2>
+          <label>
+            <select id="movement-select" onchange="selectMovement()">
+              <option value="camera-move-absolute">Absolute</option>
+              <option value="camera-move-relative">Relative</option>
+              <option value="camera-move-vector">Vector</option>
+            </select>
+          </label>
+        </div>
+        <form action="/camera/move/absolute" method="post" id="camera-move-absolute">
           <div class="grid">
-            <label for="zoom-value">Zoom value [0-16384]:</label>
-            <input type="number" name="zoom-value" id="zoom-value" min="0" max="16384" />
+            <label for="absolute-speed-x">Speed X</label>
+            <label for="absolute-speed-y">Speed Y</label>
+            <label for="absolute-degrees-x">Degrees X</label>
+            <label for="absolute-degrees-y">Degrees Y</label>
           </div>
-          <button type="submit">Set zoom</button>
+          <div class="grid">
+            <input type="number" id="absolute-speed-x" name="absolute-speed-x" value="24" />
+            <input type="number" id="absolute-speed-y" name="absolute-speed-y" value="20" />
+            <input type="number" id="absolute-degrees-x" name="absolute-degrees-x" value="90" />
+            <input type="number" id="absolute-degrees-y" name="absolute-degrees-y" value="90" />
+          </div>
+          <button type="submit">Move</button>
         </form>
-        <form action="/camera/zoom/get" method="get" id="camera-zoom-get-form">
-          <button type="submit">Get zoom</button>
+        <form action="/camera/move/relative" method="post" id="camera-move-relative">
+          <div class="grid">
+            <label for="relative-speed-x">Speed X</label>
+            <label for="relative-speed-y">Speed Y</label>
+            <label for="relative-degrees-x">Degrees X</label>
+            <label for="relative-degrees-y">Degrees Y</label>
+          </div>
+          <div class="grid">
+            <input type="number" id="relative-speed-x" name="relative-speed-x" value="24" />
+            <input type="number" id="relative-speed-y" name="relative-speed-y" value="20" />
+            <input type="number" id="relative-degrees-x" name="relative-degrees-x" value="90" />
+            <input type="number" id="relative-degrees-y" name="relative-degrees-y" value="90" />
+          </div>
+          <button type="submit">Move</button>
         </form>
-      </div>
-      <h2>Position</h2>
-      <div class="grid">
-        <form action="/camera/position/get" method="get" id="camera-position-get-form">
-          <input type="number" name="position-alpha-value" id="position-alpha-value" readonly />
-          <input type="number" name="position-beta-value" id="position-beta-value" readonly />
-          <button type="submit">Get position</button>
+        <form action="/camera/move/vector" method="post" id="camera-move-vector">
+          <div class="grid">
+            <label for="vector-speed-x">Speed X</label>
+            <label for="vector-speed-y">Speed Y</label>
+            <label for="vector-x">x</label>
+            <label for="vector-y">y</label>
+            <label for="vector-z">z</label>
+          </div>
+          <div class="grid">
+            <input type="number" id="vector-speed-x" name="vector-speed-x" value="24" />
+            <input type="number" id="vector-speed-y" name="vector-speed-y" value="20" />
+            <input type="number" id="vector-x" name="vector-x" value="90" step="0.001" />
+            <input type="number" id="vector-y" name="vector-y" value="90" step="0.001" />
+            <input type="number" id="vector-z" name="vector-z" value="90" step="0.001" />
+          </div>
+          <button type="submit">Move</button>
         </form>
-      </div>
-      <div class="grid">
-        <h2>Movement</h2>
-        <label>
-          <select id="movement-select" onchange="selectMovement()">
-            <option value="camera-move-absolute">Absolute</option>
-            <option value="camera-move-relative">Relative</option>
-            <option value="camera-move-vector">Vector</option>
-          </select>
-        </label>
-      </div>
-      <form action="/camera/move/absolute" method="post" id="camera-move-absolute">
+      </article>
+      <article id="thread" class="container">
+        <h1>Thread 🧵</h1>
         <div class="grid">
-          <label for="absolute-speed-x">Speed X</label>
-          <label for="absolute-speed-y">Speed Y</label>
-          <label for="absolute-degrees-x">Degrees X</label>
-          <label for="absolute-degrees-y">Degrees Y</label>
+          <form action="/thread/start" method="post" id="thread-start-form">
+            <button type="submit">Start</button>
+          </form>
+          <form action="/thread/stop" method="post" id="thread-stop-form">
+            <button type="submit">Stop</button>
+          </form>
         </div>
-        <div class="grid">
-          <input type="number" id="absolute-speed-x" name="absolute-speed-x" value="24" />
-          <input type="number" id="absolute-speed-y" name="absolute-speed-y" value="20" />
-          <input type="number" id="absolute-degrees-x" name="absolute-degrees-x" value="90" />
-          <input type="number" id="absolute-degrees-y" name="absolute-degrees-y" value="90" />
-        </div>
-        <button type="submit">Move</button>
-      </form>
-      <form action="/camera/move/relative" method="post" id="camera-move-relative">
-        <div class="grid">
-          <label for="relative-speed-x">Speed X</label>
-          <label for="relative-speed-y">Speed Y</label>
-          <label for="relative-degrees-x">Degrees X</label>
-          <label for="relative-degrees-y">Degrees Y</label>
-        </div>
-        <div class="grid">
-          <input type="number" id="relative-speed-x" name="relative-speed-x" value="24" />
-          <input type="number" id="relative-speed-y" name="relative-speed-y" value="20" />
-          <input type="number" id="relative-degrees-x" name="relative-degrees-x" value="90" />
-          <input type="number" id="relative-degrees-y" name="relative-degrees-y" value="90" />
-        </div>
-        <button type="submit">Move</button>
-      </form>
-      <form action="/camera/move/vector" method="post" id="camera-move-vector">
-        <div class="grid">
-          <label for="vector-speed-x">Speed X</label>
-          <label for="vector-speed-y">Speed Y</label>
-          <label for="vector-x">x</label>
-          <label for="vector-y">y</label>
-          <label for="vector-z">z</label>
-        </div>
-        <div class="grid">
-          <input type="number" id="vector-speed-x" name="vector-speed-x" value="24" />
-          <input type="number" id="vector-speed-y" name="vector-speed-y" value="20" />
-          <input type="number" id="vector-x" name="vector-x" value="90" step="0.001" />
-          <input type="number" id="vector-y" name="vector-y" value="90" step="0.001" />
-          <input type="number" id="vector-z" name="vector-z" value="90" step="0.001" />
-        </div>
-        <button type="submit">Move</button>
-      </form>
-    </article>
+        <form action="/thread/value" method="get" id="thread-value-form" class="grid">
+          <input id="thread-value" readonly />
+          <button type="submit">Get value</button>
+        </form>
+      </article>
+    </div>
     <div>
       <article id="mic" class="container">
         <h1>Microphone 🎙️</h1>
@@ -137,86 +159,79 @@
           <input id="speaking" readonly />
         </form>
       </article>
-      <article id="thread" class="container">
-        <h1>Thread 🧵</h1>
+      <article class="container">
         <div class="grid">
-          <form action="/thread/start" method="post" id="thread-start-form">
-            <button type="submit">Start</button>
-          </form>
-          <form action="/thread/stop" method="post" id="thread-stop-form">
-            <button type="submit">Stop</button>
-          </form>
+          <h1 id="presets-cali-title">Presets 🔖</h1>
+          <select id="presets-cali-select" onchange="selectCaliTab()">
+            <option value="presets">Presets</option>
+            <option value="cal">Calibration</option>
+          </select>
         </div>
-        <form action="/thread/value" method="get" id="thread-value-form" class="grid">
-          <input id="thread-value" readonly />
-          <button type="submit">Get value</button>
-        </form>
-      </article>
-      <article id="presets" class "container">
-        <h1>Presets</h1>
-        <h5>
-          Click add preset which will add a new preset to the list. After that click record sound direction and the
-          system will wait for the first audible noise and record its direction. After that point the camera to the
-          speaker
-          and click record camera direction
-        </h5>
+        <div id="presets">
+          <h5>
+            Click add preset which will add a new preset to the list. After that click record sound direction and the
+            system will wait for the first audible noise and record its direction. After that point the camera to the
+            speaker
+            and click record camera direction
+          </h5>
 
-        <div class="grid">
-          <form action="/preset/get_list" id="preset-get-list-form" method="get">
+          <div class="grid">
+            <form action="/preset/get_list" id="preset-get-list-form" method="get">
 
-            <button id="reload-preset-button" type="submit">Reload list</button>
+              <button id="reload-preset-button" type="submit">Reload list</button>
+            </form>
+          </div>
+          <form id="preset-form" method="put">
+            <div class="grid">
+              <label for="preset-select">Select an existing preset:</label>
+              <select id="preset-select" name="preset-select" onchange="changePreset()">
+              </select>
+            </div>
+            <div class="grid">
+              <label for="preset-name">Type preset name:</label>
+              <input id="preset-name" name="preset-name">
+            </div>
+            <div class="grid">
+              <label for="mic-direction-x2">Mic direction x</label>
+              <label for="mic-direction-y2">Microphone direction y</label>
+              <label for="mic-direction-z2">Microphone direction z</label>
+            </div>
+            <div class="grid">
+              <input id="mic-direction-x2" name="mic-direction-x" readonly />
+              <input id="mic-direction-y2" name="mic-direction-y" readonly />
+              <input id="mic-direction-z2" name="mic-direction-z" readonly />
+            </div>
+            <div class="grid">
+              <label for="camera-direction-alpha">Camera degrees pan</label>
+              <label for="camera-direction-beta">Camera degrees tilt</label>
+            </div>
+            <div class="grid">
+              <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
+              <input id="camera-direction-beta" name="camera-direction-beta" readonly />
+            </div>
+            <div class="grid">
+              <button id="add-preset-button" type="submit">Add new preset</button>
+              <button id="edit-preset-button" type="submit">Edit current preset</button>
+              <button id="remove-preset-button" type="submit">Remove current preset</button>
+            </div>
+            <button id="point-to-closest" type="submit">Point to closest preset</button>
           </form>
+
+          <div class="grid">
+            <form action="/camera/position/get" method="get" id="camera-position-set-form">
+              <button type="submit">Set camera position</button>
+            </form>
+            <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
+              <button type="submit">Set microphone position</button>
+            </form>
+          </div>
         </div>
-        <form action="put" id="preset-form" method="put">
-
-          <div class="grid">
-            <label for="preset-select">Select an existing preset:</label>
-            <select id="preset-select" name="preset-select" onchange="changePreset()">
-            </select>
-          </div>
-          <div class="grid">
-            <label for="preset-name">Type preset name:</label>
-            <input id="preset-name" name="preset-name">
-          </div>
-          <div class="grid">
-            <label for="mic-direction-x2">Mic direction x</label>
-            <label for="mic-direction-y2">Microphone direction y</label>
-            <label for="mic-direction-z2">Microphone direction z</label>
-          </div>
-          <div class="grid">
-            <input id="mic-direction-x2" name="mic-direction-x" readonly />
-            <input id="mic-direction-y2" name="mic-direction-y" readonly />
-            <input id="mic-direction-z2" name="mic-direction-z" readonly />
-          </div>
-          <div class="grid">
-            <label for="camera-direction-alpha">Camera degrees pan</label>
-            <label for="camera-direction-beta">Camera degrees tilt</label>
-          </div>
-          <div class="grid">
-            <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
-            <input id="camera-direction-beta" name="camera-direction-beta" readonly />
-          </div>
-          <button id="add-preset-button" type="submit"> Add new preset </button>
-          <button id="edit-preset-button" type="submit"> Edit current preset </button>
-          <button id="remove-preset-button" type="submit"> Remove current preset </button>
-          <button id="point-to-closest" type="submit">Point to closest preset</button>
-        </form>
-
-        <div class="grid">
-          <form action="/camera/position/get" method="get" id="camera-position-set-form">
-            <button type="submit">Set camera position</button>
-          </form>
-          <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
-            <button type="submit">Set microphone position</button>
-          </form>
+        <div id="cal">
+          <h5 id="calibration-instruction">Click below to calibrate point 1</h5>
+          <button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
         </div>
       </article>
     </div>
-    <article id="cal" class="container">
-      <h1>Calibration</h1>
-	  <h5 id="calibration-instruction">Click below to calibrate point 1</h5>
-      <button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
-    </article>
   </main>
 </body>
 
