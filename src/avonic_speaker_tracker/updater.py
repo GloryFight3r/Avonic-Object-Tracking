@@ -30,6 +30,10 @@ class UpdateThread(Thread):
         start of the thread with false flag, body of the while-loop is not executed.
         """
         prev_dir = [0.0, 0.0]
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
+        tasks = []
         while not self.event.is_set():
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -40,17 +44,18 @@ class UpdateThread(Thread):
                 prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, prev_dir)
             
             self.value += 1
-            asyncio.run(self.send_update(self.get_mic_info(), '/update/microphone'))
+            tasks.append(loop.create_task(self.send_update(self.get_mic_info, '/update/microphone')))
             # to not time out the camera, only update it once in 1.5 seconds
-            if self.value % 15 == 0:
-                asyncio.run(self.send_update(self.get_cam_info(), '/update/camera'))
+            if self.value % 1 == 0:
+                tasks.append(loop.create_task(self.send_update(self.get_cam_info, '/update/camera')))
             sleep(0.1)
+        asyncio.run(asyncio.wait(tasks))
         print("Exiting thread")
 
     def set_calibration(self, value):
         self.value = value
 
-    def get_mic_info(self):
+    async def get_mic_info(self):
         """ Get information about the microphone.
         """
         return {
@@ -58,7 +63,7 @@ class UpdateThread(Thread):
             "microphone-speaking": self.mic_api.is_speaking()
         }
 
-    def get_cam_info(self):
+    async def get_cam_info(self):
         """ Get the direction of the camera.
         """
         direction = self.cam_api.get_direction()
@@ -71,13 +76,14 @@ class UpdateThread(Thread):
             "camera-video": self.cam_api.video
         }
 
-    async def send_update(self, data: dict, path: str):
+    async def send_update(self, data, path: str):
         """ Send an HTTP request to the flask server to update the webpages.
 
         Args:
             data: The data in dictionary format
             path: The path to send to
         """
-        response = requests.post(self.url + path, json=data)
+        d = await data()
+        response = requests.post(self.url + path, json=d)
         if response.status_code != 200:
             print("Could not update flask at path " + path)

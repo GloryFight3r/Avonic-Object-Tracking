@@ -47,7 +47,8 @@ class CameraAPI:
         """
         res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
                                 '81 01 04 00 02 FF', self.counter)
-        self.video = "on"
+        if res != bytes(0):
+            self.video = "on"
         return res
 
     def turn_off(self) -> bytes:
@@ -58,7 +59,8 @@ class CameraAPI:
         """
         res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
                                 '81 01 04 00 03 FF', self.counter)
-        self.video = "off"
+        if res != bytes(0):
+            self.video = "off"
         return res
 
     def home(self) -> bytes:
@@ -157,7 +159,8 @@ class CameraAPI:
         message = "81 09 04 47 FF"
 
         ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
-
+        if ret == bytes(0):
+            return 0
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 
@@ -181,6 +184,8 @@ class CameraAPI:
         """
         message = "81 09 06 12 FF"
         ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
+        if ret_msg == "":
+            return np.array([0.0, 0.0])
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
