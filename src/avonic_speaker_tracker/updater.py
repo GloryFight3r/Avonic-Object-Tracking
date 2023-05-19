@@ -1,7 +1,6 @@
 from time import sleep
 from threading import Thread
 import requests
-import asyncio
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
@@ -9,6 +8,7 @@ from avonic_speaker_tracker.pointer import point
 
 
 class UpdateThread(Thread):
+    loop = None
     # Custom thread class use a skeleton
     def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection):
         """ Class constructor
@@ -30,10 +30,10 @@ class UpdateThread(Thread):
         start of the thread with false flag, body of the while-loop is not executed.
         """
         prev_dir = [0.0, 0.0]
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_forever()
-        tasks = []
+        thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
+        thread_mic.start()
+        thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
+        thread_cam.start()
         while not self.event.is_set():
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -44,18 +44,13 @@ class UpdateThread(Thread):
                 prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, prev_dir)
             
             self.value += 1
-            tasks.append(loop.create_task(self.send_update(self.get_mic_info, '/update/microphone')))
-            # to not time out the camera, only update it once in 1.5 seconds
-            if self.value % 1 == 0:
-                tasks.append(loop.create_task(self.send_update(self.get_cam_info, '/update/camera')))
             sleep(0.1)
-        asyncio.run(asyncio.wait(tasks))
         print("Exiting thread")
 
     def set_calibration(self, value):
         self.value = value
 
-    async def get_mic_info(self):
+    def get_mic_info(self):
         """ Get information about the microphone.
         """
         return {
@@ -63,7 +58,7 @@ class UpdateThread(Thread):
             "microphone-speaking": self.mic_api.is_speaking()
         }
 
-    async def get_cam_info(self):
+    def get_cam_info(self):
         """ Get the direction of the camera.
         """
         direction = self.cam_api.get_direction()
@@ -76,14 +71,16 @@ class UpdateThread(Thread):
             "camera-video": self.cam_api.video
         }
 
-    async def send_update(self, data, path: str):
+    def send_update(self, data, path: str):
         """ Send an HTTP request to the flask server to update the webpages.
 
         Args:
             data: The data in dictionary format
             path: The path to send to
         """
-        d = await data()
-        response = requests.post(self.url + path, json=d)
-        if response.status_code != 200:
-            print("Could not update flask at path " + path)
+        while not self.event.is_set():
+            d = data()
+            response = requests.post(self.url + path, json=d)
+            if response.status_code != 200:
+                print("Could not update flask at path " + path)
+            sleep(0.1)
