@@ -16,3 +16,5 @@ src/avonic_speaker_tracker.egg-info/
 html/
 .mutmut-cache
 .hypothesis
+.DS_Store
+src/.DS_Store
