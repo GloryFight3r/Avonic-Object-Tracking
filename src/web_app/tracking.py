@@ -47,3 +47,9 @@ def update_camera(integration: GeneralController):
 
 def is_running_endpoint(integration: GeneralController):
     return make_response(jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
+
+
+def preset_use(integration: GeneralController):
+    integration.preset = not integration.preset
+    print(integration.preset)
+    return make_response(jsonify({"preset":integration.preset}), 200)

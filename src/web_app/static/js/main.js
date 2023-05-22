@@ -13,6 +13,7 @@ onSuccess = {
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
     "preset-get-list-form": refreshPresetList,
+    "thread-preset" : usePresets,
 };
 
 async function onError(button) {

@@ -21,6 +21,7 @@ class GeneralController():
         self.ws = None
         self.preset_locations = None
         self.calibration = None
+        self.preset = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
@@ -36,11 +37,13 @@ class GeneralController():
         self.preset_locations = PresetCollection()
         self.calibration = Calibration()
         self.secret = getenv("SECRET_KEY")
+        self.preset = False
 
     def load_mock(self):
         self.cam_api = CameraAPI(None)
         self.mic_api = MicrophoneAPI(None, 55)
         self.calibration = Calibration()
+        self.preset = False
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -48,9 +51,11 @@ class GeneralController():
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
         self.calibration = new_controller.calibration
+        self.preset = new_controller.preset
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api
 
     def set_cam_api(self, new_cam_api):
         self.cam_api = new_cam_api
+
