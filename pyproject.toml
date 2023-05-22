@@ -33,6 +33,11 @@ test = [
     "mutmut",
     "hypothesis"
 ]
+prod = [
+    "uwsgi",
+    "gevent",
+    "greenlet"
+]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
