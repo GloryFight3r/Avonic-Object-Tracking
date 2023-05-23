@@ -10,7 +10,8 @@ from avonic_speaker_tracker.pointer import point
 
 class UpdateThread(Thread):
     # Custom thread class use a skeleton
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection):
+    def __init__(self, event, url: str, cam_api: CameraAPI,
+                 mic_api: MicrophoneAPI, preset_locations: PresetCollection):
         """ Class constructor
 
         Args:
@@ -37,13 +38,16 @@ class UpdateThread(Thread):
                 continue
 
             if len(self.preset_locations.get_preset_list()) > 0:
-                prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, prev_dir)
-            
+                prev_dir = point(self.cam_api, self.mic_api,
+                                 self.preset_locations, prev_dir)
+
             self.value += 1
-            asyncio.run(self.send_update(self.get_mic_info(), '/update/microphone'))
+            asyncio.run(
+                self.send_update(self.get_mic_info(), '/update/microphone'))
             # to not time out the camera, only update it once in 1.5 seconds
             if self.value % 15 == 0:
-                asyncio.run(self.send_update(self.get_cam_info(), '/update/camera'))
+                asyncio.run(
+                    self.send_update(self.get_cam_info(), '/update/camera'))
             sleep(0.1)
         print("Exiting thread")
 

@@ -5,7 +5,7 @@ import web_app.microphone_endpoints
 import web_app.preset_locations_endpoints
 import web_app.general_endpoints
 import web_app.tracking
-import web_app.frames
+import web_app.footage
 from web_app.integration import GeneralController
 
 integration = GeneralController()
@@ -229,11 +229,10 @@ def create_app(test_controller=None):
     def thread_camera():
         return web_app.tracking.update_camera(integration)
     
-    # Camera footage
-    @app.route('/video_feed')
-    def video_feed():
-        return Response(web_app.frames.gen_frames(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
-
+    @integration.ws.on("request-frame")
+    def camera_frame_requested(message):
+        web_app.footage.emit_frame(integration)
+    
     return app
 
 
