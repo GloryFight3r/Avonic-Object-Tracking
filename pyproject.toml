@@ -21,8 +21,8 @@ dependencies = [
     "numpy",
     "python-dotenv",
     "requests",
+    "libgl1"
     "opencv-python",
-    "libgl1-mesa-glx"
 ]
 
 [project.optional-dependencies]
