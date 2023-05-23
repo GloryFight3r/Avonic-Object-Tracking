@@ -1,10 +1,10 @@
-from flask import Flask, jsonify, abort, render_template, make_response
+from flask import Flask, jsonify, abort, render_template, make_response, request
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.preset_locations_endpoints
 import web_app.calibration_endpoints
-import web_app.tracking
+import web_app.tracking_endpoints
 from web_app.integration import GeneralController
 import logging
 
@@ -156,11 +156,11 @@ def create_app(test_controller=None):
     def get_preset_list():
         return web_app.preset_locations_endpoints.get_preset_list(integration)
 
-    @app.post('/preset/get_preset_info')
-    def get_preset_info():
-        return web_app.preset_locations_endpoints.get_preset_info(integration)
+    @app.get('/preset/info/<preset_name>')
+    def get_preset_info(preset_name):
+        return web_app.preset_locations_endpoints.get_preset_info(integration, preset_name)
 
-    @app.get('/preset/point')
+    @app.post('/preset/point')
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
 
@@ -189,16 +189,16 @@ def create_app(test_controller=None):
 
     @app.post('/thread/start')
     def thread_start():
-        return web_app.tracking.start_thread_endpoint(integration)
+        return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():
-        return web_app.tracking.stop_thread_endpoint(integration)
+        return web_app.tracking_endpoints.stop_thread_endpoint(integration)
 
     @app.get('/thread/running')
     def thread_is_running():
         # checks whether thread is running
-        return web_app.tracking.is_running_endpoint(integration)
+        return web_app.tracking_endpoints.is_running_endpoint(integration)
 
     @app.get('/thread/value')
     def thread_value():
@@ -210,11 +210,11 @@ def create_app(test_controller=None):
 
     @app.post('/update/microphone')
     def thread_microphone():
-        return web_app.tracking.update_microphone(integration)
+        return web_app.tracking_endpoints.update_microphone(integration)
 
     @app.post('/update/camera')
     def thread_camera():
-        return web_app.tracking.update_camera(integration)
+        return web_app.tracking_endpoints.update_camera(integration)
 
     return app
 

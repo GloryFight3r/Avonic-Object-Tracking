@@ -78,24 +78,22 @@ def remove_preset_location(integration: GeneralController):
 
 
 def get_preset_list(integration: GeneralController):
-    """ Gets the 
+    """ Gets the
 
     Args:
         integration: The controller containing all the dependencies
 
     Returns: A http response which indicates success(200) or failure(400)
-        
+
     """
-    try:
-        return make_response(jsonify({"preset-list":integration.preset_locations.get_preset_list()}), 200)
-    except AssertionError:
-        return make_response(jsonify({}), 400)
+    return make_response(
+        jsonify({"preset-list":integration.preset_locations.get_preset_list()}
+        ), 200)
 
 
-def get_preset_info(integration: GeneralController):
-    data = request.json
+def get_preset_info(integration: GeneralController, preset_name: str):
     try:
-        info = integration.preset_locations.get_preset_info(data["preset-select"])
+        info = integration.preset_locations.get_preset_info(preset_name)
         return make_response(jsonify({
             "position-alpha-value": info[0][0],
             "position-beta-value": info[0][1],
@@ -108,4 +106,3 @@ def get_preset_info(integration: GeneralController):
 def point_to_closest_preset(integration: GeneralController):
     point(integration.cam_api, integration.mic_api, integration.preset_locations)
     return make_response(jsonify({}), 200)
-
