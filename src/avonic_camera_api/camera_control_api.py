@@ -33,16 +33,19 @@ class CameraAPI:
 
         self.camera.reconnect()
 
-    def stop(self) -> bytes:
+    def stop(self) -> bool:
         """ Stops the camera from rotating
 
         Returns:
             The response code from the camera
         """
-        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
+        res = self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
                                 '81 01 06 01 05 05 03 03 FF', self.counter)
+        if res == bytes(0):
+            return False
+        return True
 
-    def turn_on(self) -> bytes:
+    def turn_on(self) -> bool:
         """ Turns on the camera
 
         Returns:
@@ -52,9 +55,10 @@ class CameraAPI:
                                 '81 01 04 00 02 FF', self.counter)
         if res != bytes(0):
             self.video = "on"
-        return res
+            return True
+        return False
 
-    def turn_off(self) -> bytes:
+    def turn_off(self) -> bool:
         """ Turns off the camera - the camera continues receiving and responding to requests
 
         Returns:
@@ -64,16 +68,20 @@ class CameraAPI:
                                 '81 01 04 00 03 FF', self.counter)
         if res != bytes(0):
             self.video = "off"
-        return res
+            return True
+        return False
 
-    def home(self) -> bytes:
+    def home(self) -> bool:
         """ Points the camera towards the 'home' direction
 
         Returns:
             The response code from the camera
         """
-        return self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
+        res = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
                                 '81 01 06 04 FF', self.counter)
+        if res == bytes(0):
+            return False
+        return True
 
     def degrees_to_command(self, degree: float) -> str:
         """ Transforms an angle in degree to a command code for visca call
@@ -99,7 +107,7 @@ class CameraAPI:
 
         return answer_string
 
-    def move_relative(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bytes:
+    def move_relative(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bool:
         """ Rotates the camera relative to the current rotation degree
 
         Args:
@@ -114,12 +122,15 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
+        res = self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
+        if res == bytes(0):
+            return False
+        return True
 
-    def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bytes:
+    def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bool:
         """ Rotates the camera in absolute position (current position does not matter)
 
         Args:
@@ -134,10 +145,13 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
+        res = self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
+        if res == bytes(0):
+            return False
+        return True
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> bytes:
         """ Rotates the camera in the direction of a vector (with home position being [0, 0, 1]
@@ -163,11 +177,11 @@ class CameraAPI:
 
         ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
         if ret == bytes(0):
-            return 0
+            return -math.inf
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 
-    def direct_zoom(self, zoom: int) -> None:
+    def direct_zoom(self, zoom: int) -> bool:
         """ Change the value of the zoom to the specified value.
 
             Parameters:
@@ -176,7 +190,10 @@ class CameraAPI:
         assert 0 <= zoom <= 16384
         message = "81 01 04 47 0p 0q 0r 0s FF"
         final_message = insert_zoom_in_hex(message, zoom)
-        self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
+        res = self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
+        if res == bytes(0):
+            return False
+        return True
 
     def get_saved_direction(self) -> np.array:
         return self.latest_direction
@@ -191,7 +208,7 @@ class CameraAPI:
         message = "81 09 06 12 FF"
         ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
         if ret_msg == "":
-            return np.array([0.0, 0.0])
+            return np.array([-math.inf, -math.inf])
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
@@ -208,7 +225,6 @@ class CameraAPI:
         direction = converter.angle_vector(pan_rad, tilt_rad)
         self.latest_direction = direction
         return direction
-
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:

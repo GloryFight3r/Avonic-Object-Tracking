@@ -22,6 +22,9 @@ async function setNewPreset(data) {
 
     document.getElementById("camera-direction-beta").value =
         d2["position-beta-value"];
+
+    document.getElementById("camera-zoom-value").value =
+        d2["zoom-value"];
 }
 
 async function changePreset() {

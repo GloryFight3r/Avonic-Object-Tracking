@@ -1,3 +1,4 @@
+import math
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
 
@@ -12,70 +13,83 @@ def reboot_camera_endpoint(integration: GeneralController):
 
 
 def turn_on_camera_endpoint(integration: GeneralController):
-    integration.cam_api.turn_on()
-    integration.ws.emit('camera-video-update', {"state": "on"})
-    return success()
+    if integration.cam_api.turn_on():
+        integration.ws.emit('camera-video-update', {"state": "on"})
+        return success()
+    return make_response(jsonify({}), 504)
 
 
 def turn_off_camera_endpoint(integration: GeneralController):
-    integration.cam_api.turn_off()
-    integration.ws.emit('camera-video-update', {"state": "off"})
-    return success()
+    if integration.cam_api.turn_off():
+        integration.ws.emit('camera-video-update', {"state": "off"})
+        return success()
+    return make_response(jsonify({}), 504)
 
 
 def move_home_camera_endpoint(integration: GeneralController):
-    integration.cam_api.home()
-    return success()
+    if integration.cam_api.home():
+        return success()
+    return make_response(jsonify({}), 504)
 
 
 def move_absolute_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        integration.cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
-                          int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
+        if integration.cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
+                          int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"])):
+            return success()
+        return make_response(jsonify({}), 504)
     except AssertionError:
         return make_response(jsonify({}), 400)
-    return success()
 
 
 def move_relative_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        integration.cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]),
-                          int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
+        if integration.cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]),
+                            int(data["relative-degrees-x"]), int(data["relative-degrees-y"])):
+            return success()
+        return make_response(jsonify({}), 504)
     except AssertionError:
         return make_response(jsonify({}), 400)
-    return success()
 
 
 def move_vector_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        integration.cam_api.move_vector(int(data["vector-speed-x"]), int(data["vector-speed-y"]),
+        if integration.cam_api.move_vector(int(data["vector-speed-x"]), int(data["vector-speed-y"]),
                     [float(data["vector-x"]), float(data["vector-y"]),
-                        float(data["vector-z"])])
+                        float(data["vector-z"])]):
+            return success()
+        return make_response(jsonify({}), 504)
     except AssertionError:
         return make_response(jsonify({}), 400)
-    return success()
 
 
 def move_stop_camera_endpoint(integration: GeneralController):
-    integration.cam_api.stop()
-    return success()
+    if integration.cam_api.stop():
+        return success()
+    return make_response(jsonify({}), 504)
 
 
 def zoom_get_camera_endpoint(integration: GeneralController):
     zoom = integration.cam_api.get_zoom()
+    if zoom < 0:
+        return make_response(jsonify({}), 504)
     return make_response(jsonify({"zoom-value": zoom}), 200)
 
 
 def zoom_set_camera_endpoint(integration: GeneralController):
     try:
-        integration.cam_api.direct_zoom(int(request.form["zoom-value"]))
-        return success()
+        if integration.cam_api.direct_zoom(int(request.form["zoom-value"])):
+            return success()
+        return make_response(jsonify({}), 504)
     except AssertionError:
         return make_response(jsonify({}), 400)
 
+
 def position_get_camera_endpoint(integration: GeneralController):
     position = integration.cam_api.get_direction()
-    return make_response(jsonify({"position-alpha-value": position[0], "position-beta-value":position[1]}), 200)
+    if position[0] == -math.inf:
+        return make_response(jsonify({}), 504)
+    return make_response(jsonify({"position-alpha-value": position[0], "position-beta-value": position[1]}), 200)

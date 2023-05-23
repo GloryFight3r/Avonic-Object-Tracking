@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def cos_similarity(a: np.array, b: np.array) -> float:
     """Calculates cosine similarity between two vectors.
     Holds symmetric property, value is in [-1, 1]
@@ -17,6 +18,7 @@ def cos_similarity(a: np.array, b: np.array) -> float:
     if np.linalg.norm(a) == 0 or np.linalg.norm(b) == 0:
         raise Exception("Impossible to get similarity with zero-vector")
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 def find_most_similar_preset(current: np.array, presets: list[np.array]) -> int:
     """Finds index of the most similar preset in relation to the given vector in the list of presets.

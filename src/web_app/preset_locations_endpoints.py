@@ -19,16 +19,17 @@ def add_preset_location(integration: GeneralController):
     """
     data = request.form
     try:
-        camera_angles = np.array([
+        camera_info = np.array([
             float(data["camera-direction-alpha"]),
-            float(data["camera-direction-beta"])
+            float(data["camera-direction-beta"]),
+            float(data["camera-zoom-value"])
         ])
         microphone_direction = np.array([
             float(data["mic-direction-x"]), 
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.add_preset(data["preset-name"], camera_angles, microphone_direction)
+        integration.preset_locations.add_preset(data["preset-name"], camera_info, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
@@ -45,16 +46,17 @@ def edit_preset_location(integration: GeneralController):
     """
     data = request.form
     try:
-        camera_angles = np.array([
+        camera_info = np.array([
             float(data["camera-direction-alpha"]),
-            float(data["camera-direction-beta"])
+            float(data["camera-direction-beta"]),
+            float(data["camera-zoom-value"])
         ])
         microphone_direction = np.array([
             float(data["mic-direction-x"]), 
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.edit_preset(data["preset-name"], camera_angles, microphone_direction)
+        integration.preset_locations.edit_preset(data["preset-name"], camera_info, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
@@ -87,7 +89,7 @@ def get_preset_list(integration: GeneralController):
         
     """
     try:
-        return make_response(jsonify({"preset-list":integration.preset_locations.get_preset_list()}), 200)
+        return make_response(jsonify({"preset-list": integration.preset_locations.get_preset_list()}), 200)
     except AssertionError:
         return make_response(jsonify({}), 400)
 
@@ -99,6 +101,7 @@ def get_preset_info(integration: GeneralController):
         return make_response(jsonify({
             "position-alpha-value": info[0][0],
             "position-beta-value": info[0][1],
+            "zoom-value": info[0][2],
             "microphone-direction": [info[1][0], info[1][1], info[1][2]],
         }), 200)
     except AssertionError:
