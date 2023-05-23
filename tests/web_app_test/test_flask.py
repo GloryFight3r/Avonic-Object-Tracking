@@ -39,9 +39,12 @@ def camera(monkeypatch):
         pass
     def mocked_get_zoom():
         return 128
+    def mocked_get_direction():
+        return np.array([0, 0, 0])
 
     monkeypatch.setattr(cam_api.camera, "reconnect", mocked_camera_reconnect)
     monkeypatch.setattr(cam_api, "get_zoom", mocked_get_zoom)
+    monkeypatch.setattr(cam_api, "get_direction", mocked_get_direction)
 
     return cam_api
 
@@ -62,6 +65,7 @@ def client(camera):
     test_controller.set_mic_api(mic_api)
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
+
     return app.test_client()
 
 def test_fail(client):
@@ -163,3 +167,20 @@ def test_get_microphone_direction(client):
     rv = client.get('microphone/direction')
     res_vec = json.loads(rv.data)["microphone-direction"]
     assert rv.status_code == 200 and np.allclose(res_vec, [0.0, 0.0, 1.0])
+
+"""def test_add_direction_to_speaker(client):
+    rv = client.get('/calibration/add_directions_to_speaker')
+    assert rv.status_code == 200
+"""
+def test_add_direction_to_mic(client):
+    rv = client.get('/calibration/add_direction_to_mic')
+    assert rv.status_code == 200
+
+def test_calibration_reset(client):
+    rv = client.get('/calibration/reset')
+    assert rv.status_code == 200
+
+def test_calibration_is_set(client):
+    rv = client.get('/calibration/is_set')
+    assert rv.status_code == 200 and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
+
