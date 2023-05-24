@@ -31,26 +31,20 @@ class Yolo:
         cv2.putText(img, label, (left-10,bottom-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0, 0, 0], 2)
 
 
-    def get_bounding_boxes_image(self, image=cv2.imread("src/object_tracker/test_image.jpg")):
-        Width = image.shape[1]
-        Height = image.shape[0]
-        blob = cv2.dnn.blobFromImage(image, self.scale, (416,416), (0,0,0), True, crop=False)
-        self.net.setInput(blob)
-        outs = self.net.forward(self.get_output_layers())
-        return image
+    def get_bounding_boxes_image(self, image):
+        outs = self.get_bounding_boxes(image)
         lass_ids = []
         confidences = []
         boxes = []
         conf_threshold = 0.5
         nms_threshold = 0.6
 
-
         for out in outs:
             for detection in out:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                if confidence > 0.5:
+                if confidence > conf_thresh:
                     center_x = int(detection[0] * Width)
                     center_y = int(detection[1] * Height)
                     w = int(detection[2] * Width)
@@ -61,7 +55,6 @@ class Yolo:
                     confidences.append(float(confidence))
                     boxes.append([x, y, w, h])
 
-
         indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
 
         for i in indices:
@@ -70,21 +63,20 @@ class Yolo:
             except:
                 i = i[0]
                 box = boxes[i]
-
             x = box[0]
             y = box[1]
             w = box[2]
             h = box[3]
             draw_prediction(image, self.labels[class_ids[i]], confidences[i], round(x), round(y), round(x+w), round(y+h))
 
-
-        #cv2.imshow("object detection", image)
-        #cv2.waitKey()
-        #cv2.destroyAllWindows()
-        #cv2.imwrite("object-detection.jpg", image)
         return image
 
 
-        #cv2.imshow("object detection", image)
-        #cv2.waitKey()
-        #cv2.destroyAllWindows()
+    def get_bounding_boxes(self, image):
+        Width = image.shape[1]
+        Height = image.shape[0]
+        blob = cv2.dnn.blobFromImage(image, self.scale, (416,416), (0,0,0), True, crop=False)
+        self.net.setInput(blob)
+        outs = self.net.forward(self.get_output_layers())
+        print(outs[0])
+        return outs

@@ -27,7 +27,7 @@ class FootageThread(Thread):
                 break
             else:
                 t = time.time()
-                self.frame = self.process(self.frame)
+                test = self.process(self.frame)
                 print(time.time() - t)
                 self.ret, self.buffer = cv2.imencode('.jpg', self.frame)
 
@@ -36,5 +36,5 @@ class FootageThread(Thread):
         return data
 
     def process(self, frame):
-        new_frame = self.nn.get_bounding_boxes_image(frame)
+        new_frame = self.nn.get_bounding_boxes(frame)
         return new_frame
