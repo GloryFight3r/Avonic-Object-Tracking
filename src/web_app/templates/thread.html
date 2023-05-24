@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Microphone Control</title>
+  <title>Thread Control</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
@@ -30,23 +30,19 @@
         <li><a href="/live_footage">Live camera footage</a></li>
       </ul>
     </nav>
-    <article id="mic" class="container">
-      <h1>Microphone 🎙️</h1>
-      <form action="/microphone/height/set" method="post" id="microphone-set-height-form" class="grid">
-        <label for="microphone-height">Height [m]: </label>
-        <input type="number" id="microphone-height" name="microphone-height" step="0.01" value="1" />
-        <button type="submit" role="button">Set</button>
-      </form>
-      <form action="/microphone/direction" method="get" id="microphone-get-direction-form" class="grid">
-        <label for="mic-direction-x">Direction [x, y, z]: </label>
-        <input id="mic-direction-x" readonly />
-        <input id="mic-direction-y" readonly />
-        <input id="mic-direction-z" readonly />
-        <button type="submit">Get</button>
-      </form>
-      <form action="/microphone/speaking" method="get" id="microphone-speaking-form" class="grid">
-        <button type="submit">Is someone speaking?</button>
-        <input id="speaking" readonly />
+    <article id="thread" class="container">
+      <h1>Thread 🧵</h1>
+      <div class="grid">
+        <form action="/thread/start" method="post" id="thread-start-form">
+          <button type="submit">Start</button>
+        </form>
+        <form action="/thread/stop" method="post" id="thread-stop-form">
+          <button type="submit">Stop</button>
+        </form>
+      </div>
+      <form action="/thread/value" method="get" id="thread-value-form" class="grid">
+        <input id="thread-value" readonly>
+        <button type="submit">Get value</button>
       </form>
     </article>
   </main>
