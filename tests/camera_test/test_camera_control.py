@@ -60,16 +60,16 @@ def generate_relative_commands_bad_parameters():
         (3, 3, 5, -31)
     ]
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",\
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",
     generate_relative_commands_bad_parameters())
-def test_move_relative_bad_parameters(monkeypatch, camera:CameraAPI,\
+def test_move_relative_bad_parameters(camera:CameraAPI,
     speed_alpha, speed_beta, alpha, beta):
     with pytest.raises (AssertionError):
         camera.move_relative(speed_alpha, speed_beta, alpha, beta)
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",\
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",
     generate_relative_commands_bad_parameters())
-def test_move_absolute_bad_parameters(monkeypatch, camera:CameraAPI,\
+def test_move_absolute_bad_parameters(camera:CameraAPI,
     speed_alpha, speed_beta, alpha, beta):
     with pytest.raises (AssertionError):
         camera.move_absolute(speed_alpha, speed_beta, alpha, beta)
