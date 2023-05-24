@@ -29,7 +29,7 @@ def test_vector_angle_complex_normalised():
 
 
 def test_vector_angle_complex():
-    """ not normalised, length of vector is 2 """
+    """ not normalized, length of vector is 2 """
     alpha = -30
     beta = 60
     (a, b) = vector_angle([-0.5, np.sqrt(3), np.sqrt(3)/2])
@@ -38,12 +38,12 @@ def test_vector_angle_complex():
 
 
 def test_vector_angle_invalid():
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         vector_angle([0.0, 0.0, 0.0])
-    assert "vector not normalisable" == str(excinfo.value)
+    assert "Vector not normalizable" == str(excinfo.value)
 
 
 def test_vector_angle_invalid_type():
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         vector_angle([1, 2])
-    assert "vector must contain three floats" == str(excinfo.value)
+    assert "Vector must contain three floats" == str(excinfo.value)

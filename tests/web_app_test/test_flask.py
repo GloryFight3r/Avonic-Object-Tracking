@@ -1,14 +1,15 @@
 from unittest import mock
-import pytest
 import socket
+import json
+import pytest
+import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 import web_app
-import json
-import numpy as np
+
 
 sock = mock.Mock()
 
@@ -107,42 +108,48 @@ def test_home(client):
 
 def test_move_absolute(client):
     """Test a move absolute endpoint."""
-    req_data = {"absolute-speed-x" : 20, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15}
+    req_data = {"absolute-speed-x" : 20, "absolute-speed-y" : 10,\
+        "absolute-degrees-x" : 40, "absolute-degrees-y" : 15}
     rv = client.post('/camera/move/absolute', data=req_data)
     assert rv.status_code == 200
 
 
 def test_bad_move_absolute(client):
     """Test a move absolute endpoint."""
-    req_data = {"absolute-speed-x" : 30, "absolute-speed-y" : 10, "absolute-degrees-x" : 40, "absolute-degrees-y" : 15}
+    req_data = {"absolute-speed-x" : 30, "absolute-speed-y" : 10,\
+        "absolute-degrees-x" : 40, "absolute-degrees-y" : 15}
     rv = client.post('/camera/move/absolute', data=req_data)
     assert rv.status_code == 400
 
 
 def test_move_relative(client):
     """Test a move relative endpoint."""
-    req_data = {"relative-speed-x" : 20, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15}
+    req_data = {"relative-speed-x" : 20, "relative-speed-y" : 10,\
+        "relative-degrees-x" : 40, "relative-degrees-y" : 15}
     rv = client.post('/camera/move/relative', data=req_data)
     assert rv.status_code == 200
 
 
 def test_move_vector(client):
     """Test a move towards a vector endpoint."""
-    req_data = {"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5}
+    req_data = {"vector-speed-x" : 20, "vector-speed-y" : 10,\
+        "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5}
     rv = client.post('/camera/move/vector', data=req_data)
     assert rv.status_code == 200
 
 
 def bad_move_vector(client):
     """Test a move towards a vector endpoint."""
-    req_data = {"vector-speed-x" : 20, "vector-speed-y" : 10, "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5}
+    req_data = {"vector-speed-x" : 20, "vector-speed-y" : 10,\
+        "vector-x" : 0.5, "vector-y" : 0.5, "vector-z" : 0.5}
     rv = client.post('/camera/move/vector', data=req_data)
     assert rv.status_code == 400
 
 
 def test_bad_move_relative(client):
     """Test a move relative endpoint."""
-    req_data = {"relative-speed-x" : 30, "relative-speed-y" : 10, "relative-degrees-x" : 40, "relative-degrees-y" : 15}
+    req_data = {"relative-speed-x" : 30, "relative-speed-y" : 10,\
+        "relative-degrees-x" : 40, "relative-degrees-y" : 15}
     rv = client.post('/camera/move/relative', data=req_data)
     assert rv.status_code == 400
 
@@ -366,7 +373,9 @@ def test_edit_preset_location(client):
 
 def test_get_preset_list(client):
     rv = client.get("preset/get_list")
-    assert rv.status_code == 200 and rv.data == bytes("{\"preset-list\":[\"test-preset-name\",\"test-another-preset-name\"]}\n", "utf-8")
+    assert rv.status_code == 200\
+        and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","\
+            + "\"test-another-preset-name\"]}\n", "utf-8")
     sock.recvfrom.return_value = \
         (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
     rv = client.post("preset/point")
@@ -401,7 +410,8 @@ def test_get_preset_list(client):
     rv = client.get("preset/info/test-another-preset-name")
     assert rv.status_code == 400
     rv = client.get("preset/get_list")
-    assert rv.status_code == 200 and rv.data == bytes("{\"preset-list\":[\"test-preset-name\"]}\n", "utf-8")
+    assert rv.status_code == 200\
+        and rv.data == bytes("{\"preset-list\":[\"test-preset-name\"]}\n", "utf-8")
     rv = client.post("preset/remove",
     data={"preset-name" : "test-preset-name"})
     assert rv.status_code == 200
@@ -409,4 +419,3 @@ def test_get_preset_list(client):
     assert rv.status_code == 200 and rv.data == bytes("{\"preset-list\":[]}\n", "utf-8")
     rv = client.get("preset/info/test-preset-name")
     assert rv.status_code == 400
-

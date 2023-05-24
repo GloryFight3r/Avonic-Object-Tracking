@@ -51,7 +51,7 @@ def edit_preset_location(integration: GeneralController):
             float(data["camera-direction-beta"])
         ])
         microphone_direction = np.array([
-            float(data["mic-direction-x"]), 
+            float(data["mic-direction-x"]),
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])

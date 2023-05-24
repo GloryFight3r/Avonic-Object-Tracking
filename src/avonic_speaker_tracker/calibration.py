@@ -36,14 +36,16 @@ class Calibration:
         self.to_mic_direction = to_mic
 
     def reset_calibration(self):
-        """ Reset the calibration. To be used in case calibration went wrong or one of the devices moved. """
+        """ Reset the calibration. To be used in case calibration
+        went wrong or one of the devices moved. """
         self.mic_to_cams = []
         self.mic_to_cam = None
         self.speaker_points = []
         self.to_mic_direction = None
 
     def is_calibrated(self) -> bool:
-        """ Check whether the system has been calibrated by checked whether the needed vectors are set.
+        """ Check whether the system has been calibrated by
+        checked whether the needed vectors are set.
 
             returns:
                 is_calibrated: a boolean indicating whether the system is calibrated
@@ -51,10 +53,12 @@ class Calibration:
         return self.speaker_points and self.to_mic_direction is not None
 
     def calculate_distance(self) -> np.array:
-        """ Calculate the vectors from the microphone to the camera using the vectors acquired during calibration.
-            This vector has a norm equal to the distance from the microphone to the camera. Since multiple points
-            are used for the speaker, we get multiple similar vectors to the camera. The vector to use for further
-            calculations is the average of these (self.mic_to_cam).
+        """ Calculate the vectors from the microphone to the camera
+            using the vectors acquired during calibration.
+            This vector has a norm equal to the distance from the
+            microphone to the camera. Since multiple points
+            are used for the speaker, we get multiple similar vectors to the camera.
+            The vector to use for further calculations is the average of these (self.mic_to_cam).
 
             returns:
                 the 3D vector from the microphone to the camera
@@ -75,7 +79,8 @@ class Calibration:
             assert beta_sin != 0.0
 
             mic_to_cam_dist = np.linalg.norm(mic_vec) / beta_sin * alpha_sin
-            mic_to_cam = self.to_mic_direction / np.linalg.norm(self.to_mic_direction) * -mic_to_cam_dist
+            mic_to_cam = self.to_mic_direction \
+                / np.linalg.norm(self.to_mic_direction) * -mic_to_cam_dist
             self.mic_to_cams.append(mic_to_cam)
 
         self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)

@@ -35,7 +35,7 @@ def test_name_already_contained(preset_collection: PresetCollection):
 def test_remove_preset(preset_collection: PresetCollection):
     preset_collection.add_preset("preset", np.array([1, 2]), np.array([1, 2, 3]))
     preset_collection.remove_preset("preset")
-    assert "preset" not in preset_collection.preset_locations 
+    assert "preset" not in preset_collection.preset_locations
 
 def test_get_preset_lists(preset_collection: PresetCollection):
     preset_collection.add_preset("preset", np.array([1, 2]), np.array([1, 2, 3]))

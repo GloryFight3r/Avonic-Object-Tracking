@@ -11,7 +11,7 @@ class PresetCollection:
     def __init__(self):
         self.preset_locations = {}
 
-    def add_preset(self, to_add: str,\
+    def add_preset(self, to_add: str,
         cam_angle: np.ndarray, microphone_direction: np.ndarray) -> None:
         """ Adds a preset to the dictionary of presets with the given name
 
@@ -32,7 +32,8 @@ class PresetCollection:
         assert to_remove in self.preset_locations
         del self.preset_locations[to_remove]
 
-    def edit_preset(self, to_edit: str, new_cam_angle: np.ndarray, new_microphone_direction: np.ndarray):
+    def edit_preset(self, to_edit: str,
+        new_cam_angle: np.ndarray, new_microphone_direction: np.ndarray):
         """ Edits a preset with the given name only
         if it is already inside the dictionary
 
