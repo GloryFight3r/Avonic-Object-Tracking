@@ -21,7 +21,11 @@ dependencies = [
     "numpy",
     "python-dotenv",
     "requests",
+<<<<<<< HEAD
     "opencv-python",
+=======
+    "opencv-python"
+>>>>>>> 807020953ab1ad62990e6e7a94875df0ee047b40
 ]
 
 [project.optional-dependencies]

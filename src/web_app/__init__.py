@@ -112,7 +112,7 @@ def create_app(test_controller=None):
         Endpoint to get the position value of the camera.
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
- 
+
     @app.post('/microphone/height/set')
     def set_height():
         """
@@ -129,7 +129,7 @@ def create_app(test_controller=None):
 
     @app.get('/microphone/speaker/direction')
     def get_speaker_direction():
-        """ 
+        """
         Endpoint to get the direction of the active speaker.
         """
         return web_app.microphone_endpoints.get_speaker_direction_endpoint(integration)
@@ -156,11 +156,11 @@ def create_app(test_controller=None):
     @app.post('/preset/add')
     def add_preset():
         return web_app.preset_locations_endpoints.add_preset_location(integration)
-    
+
     @app.post('/preset/edit')
     def edit_preset():
         return web_app.preset_locations_endpoints.edit_preset_location(integration)
-    
+
     @app.post('/preset/remove')
     def remove_preset():
         return web_app.preset_locations_endpoints.remove_preset_location(integration)
@@ -172,11 +172,11 @@ def create_app(test_controller=None):
     @app.post('/preset/get_preset_info')
     def get_preset_info():
         return web_app.preset_locations_endpoints.get_preset_info(integration)
-        
+
     @app.get('/preset/point')
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
-    
+
     @app.get('/calibration/is_set')
     def calibration_is_set():
         return web_app.general_endpoints.is_calibrated(integration)
@@ -228,15 +228,15 @@ def create_app(test_controller=None):
     @app.post('/update/camera')
     def thread_camera():
         return web_app.tracking.update_camera(integration)
-    
+
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)
-    
-    # Camera footage
-    @app.route('/video_feed')
-    def video_feed():
-        return Response(web_app.camera_endpoints.get_camera_footage(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+#    # Camera footage
+#    @app.route('/video_feed')
+#    def video_feed():
+#        return Response(web_app.camera_endpoints.get_camera_footage(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     return app
 
