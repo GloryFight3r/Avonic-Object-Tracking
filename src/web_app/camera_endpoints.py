@@ -79,3 +79,6 @@ def zoom_set_camera_endpoint(integration: GeneralController):
 def position_get_camera_endpoint(integration: GeneralController):
     position = integration.cam_api.get_direction()
     return make_response(jsonify({"position-alpha-value": position[0], "position-beta-value":position[1]}), 200)
+
+def get_camera_footage(integration: GeneralController):
+    return integration.footage_thread.get_frame()

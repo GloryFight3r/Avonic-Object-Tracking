@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Avonic Camera Control</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
+  <script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/presets.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/socket.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/thread.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+
+<body>
+  <main>
+    <nav>
+      <ul>
+        <li><strong>Navigation</strong></li>
+      </ul>
+      <ul>
+        <li><a href="/camera_control">Camera controls</a></li>
+        <li><a href="/microphone_control">Microphone control</a></li>
+        <li><a href="/presets_and_calibration">Presets &amp calibration</a></li>
+        <li><a href="/live_footage">Live camera footage</a></li>
+      </ul>
+    </nav>
+    <article id="cam" class="container">
+      <h1>Camera 🎥</h1>
+      <h2>Basic Commands</h2>
+      <div class="grid">
+        <form action="/camera/reboot" method="post" id="camera-reboot-form">
+          <button type="submit">Reboot</button>
+        </form>
+        <form action="/camera/off" method="post" id="camera-off-form">
+          <button type="submit">Video Off</button>
+        </form>
+        <form action="/camera/on" method="post" id="camera-on-form">
+          <button type="submit">Video On</button>
+        </form>
+        <form action="/camera/move/home" method="post" id="camera-home-form">
+          <button type="submit">Home</button>
+        </form>
+        <form action="/camera/move/stop" method="post" id="camera-stop-form">
+          <button type="submit">Stop</button>
+        </form>
+      </div>
+      <h2>Zoom</h2>
+      <div class="grid">
+        <form action="/camera/zoom/set" method="post" id="camera-zoom-set-form">
+          <div class="grid">
+            <label for="zoom-value">Zoom value [0-16384]:</label>
+            <input type="number" name="zoom-value" id="zoom-value" min="0" max="16384">
+          </div>
+          <button type="submit">Set zoom</button>
+        </form>
+        <form action="/camera/zoom/get" method="get" id="camera-zoom-get-form">
+          <button type="submit">Get zoom</button>
+        </form>
+      </div>
+      <h2>Position</h2>
+      <div class="grid">
+        <form action="/camera/position/get" method="get" id="camera-position-get-form">
+          <input type="number" name="position-alpha-value" id="position-alpha-value" readonly>
+          <input type="number" name="position-beta-value" id="position-beta-value" readonly>
+          <button type="submit">Get position</button>
+        </form>
+      </div>
+      <div class="grid">
+        <h2>Movement</h2>
+        <label>
+          <select id="movement-select" onchange="selectMovement()">
+            <option value="camera-move-absolute">Absolute</option>
+            <option value="camera-move-relative">Relative</option>
+            <option value="camera-move-vector">Vector</option>
+          </select>
+        </label>
+      </div>
+      <form action="/camera/move/absolute" method="post" id="camera-move-absolute">
+        <div class="grid">
+          <label for="absolute-speed-x">Speed X</label>
+          <label for="absolute-speed-y">Speed Y</label>
+          <label for="absolute-degrees-x">Degrees X</label>
+          <label for="absolute-degrees-y">Degrees Y</label>
+        </div>
+        <div class="grid">
+          <input type="number" id="absolute-speed-x" name="absolute-speed-x" value="24">
+          <input type="number" id="absolute-speed-y" name="absolute-speed-y" value="20">
+          <input type="number" id="absolute-degrees-x" name="absolute-degrees-x" value="90">
+          <input type="number" id="absolute-degrees-y" name="absolute-degrees-y" value="90">
+        </div>
+        <button type="submit">Move</button>
+      </form>
+      <form action="/camera/move/relative" method="post" id="camera-move-relative">
+        <div class="grid">
+          <label for="relative-speed-x">Speed X</label>
+          <label for="relative-speed-y">Speed Y</label>
+          <label for="relative-degrees-x">Degrees X</label>
+          <label for="relative-degrees-y">Degrees Y</label>
+        </div>
+        <div class="grid">
+          <input type="number" id="relative-speed-x" name="relative-speed-x" value="24">
+          <input type="number" id="relative-speed-y" name="relative-speed-y" value="20">
+          <input type="number" id="relative-degrees-x" name="relative-degrees-x" value="90">
+          <input type="number" id="relative-degrees-y" name="relative-degrees-y" value="90">
+        </div>
+        <button type="submit">Move</button>
+      </form>
+      <form action="/camera/move/vector" method="post" id="camera-move-vector">
+        <div class="grid">
+          <label for="vector-speed-x">Speed X</label>
+          <label for="vector-speed-y">Speed Y</label>
+          <label for="vector-x">x</label>
+          <label for="vector-y">y</label>
+          <label for="vector-z">z</label>
+        </div>
+        <div class="grid">
+          <input type="number" id="vector-speed-x" name="vector-speed-x" value="24">
+          <input type="number" id="vector-speed-y" name="vector-speed-y" value="20">
+          <input type="number" id="vector-x" name="vector-x" value="90" step="0.001">
+          <input type="number" id="vector-y" name="vector-y" value="90" step="0.001">
+          <input type="number" id="vector-z" name="vector-z" value="90" step="0.001">
+        </div>
+        <button type="submit">Move</button>
+      </form>
+    </article>
+  </main>
+</body>
+
+</html>
