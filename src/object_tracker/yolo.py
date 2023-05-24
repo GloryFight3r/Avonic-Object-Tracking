@@ -14,7 +14,7 @@ class Yolo:
         with open(path+"yolo.txt", 'r') as f:
             self.labels = [line.strip() for line in f.readlines()]
 
-        self.net = cv2.dnn.readNet(path+"yolo.weights", path+"yolo.cfg")
+        self.net = cv2.dnn.readNet(path+"yolov3-tiny.weights", path+"yolo.cfg")
 
 
     def get_output_layers(self):
@@ -32,19 +32,23 @@ class Yolo:
 
 
     def get_bounding_boxes_image(self, image):
-        outs = self.get_bounding_boxes(image)
-        lass_ids = []
+        Width = image.shape[1]
+        Height = image.shape[0]
+        blob = cv2.dnn.blobFromImage(image, self.scale, (416,416), (0,0,0), True, crop=False)
+        self.net.setInput(blob)
+        outs = self.net.forward(self.get_output_layers())
+
+        class_ids = []
         confidences = []
         boxes = []
         conf_threshold = 0.5
-        nms_threshold = 0.6
 
         for out in outs:
             for detection in out:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                if confidence > conf_thresh:
+                if confidence > conf_threshold:
                     center_x = int(detection[0] * Width)
                     center_y = int(detection[1] * Height)
                     w = int(detection[2] * Width)
@@ -55,6 +59,7 @@ class Yolo:
                     confidences.append(float(confidence))
                     boxes.append([x, y, w, h])
 
+        nms_threshold = 0.6
         indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
 
         for i in indices:
@@ -78,4 +83,20 @@ class Yolo:
         blob = cv2.dnn.blobFromImage(image, self.scale, (416,416), (0,0,0), True, crop=False)
         self.net.setInput(blob)
         outs = self.net.forward(self.get_output_layers())
-        return outs
+
+        confidences = []
+        boxes = []
+
+        for out in outs:
+            for detection in out:
+                scores = detection[5:]
+                class_id = np.argmax(scores)
+                confidence = scores[class_id]
+                if confidence > 0.5:
+                    center_x = int(detection[0] * Width)
+                    center_y = int(detection[1] * Height)
+                    w = int(detection[2] * Width)
+                    h = int(detection[3] * Height)
+                    x = center_x - w / 2
+                    y = center_y - h / 2
+                    boxes.append([x, y, w, h])

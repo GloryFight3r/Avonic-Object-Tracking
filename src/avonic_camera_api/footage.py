@@ -26,7 +26,7 @@ class FootageThread(Thread):
             if not self.success:
                 break
             else:
-                test = self.process(self.frame)
+                self.process(self.frame)
                 self.ret, self.buffer = cv2.imencode('.jpg', self.frame)
 
     def get_frame(self):
@@ -34,5 +34,9 @@ class FootageThread(Thread):
         return data
 
     def process(self, frame):
-        new_frame = self.nn.get_bounding_boxes(frame)
-        return new_frame
+        t = time.time()
+        boxes = self.nn.get_bounding_boxes(frame)
+        print(time.time() - t)
+        # TO-DO
+        # choose box closest to center
+        # move camera to center on this box
