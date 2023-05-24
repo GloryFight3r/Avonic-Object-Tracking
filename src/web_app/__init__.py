@@ -1,3 +1,4 @@
+import logging
 from flask import Flask, jsonify, abort, render_template, make_response, request
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -6,7 +7,6 @@ import web_app.preset_locations_endpoints
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
 from web_app.integration import GeneralController
-import logging
 
 # While testing to keep the log clean
 #log = logging.getLogger('werkzeug')

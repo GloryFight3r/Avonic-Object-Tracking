@@ -60,5 +60,5 @@ class PresetCollection:
             
         """
         assert to_get in self.preset_locations
-        return (self.preset_locations[to_get].camera_angle, 
-                self.preset_locations[to_get].microphone_direction)    
+        return (self.preset_locations[to_get].camera_angle,
+                self.preset_locations[to_get].microphone_direction)

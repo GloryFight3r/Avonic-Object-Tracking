@@ -38,10 +38,12 @@ def test_vector_angle_complex():
 
 
 def test_vector_angle_invalid():
-    with pytest.raises(Exception):
+    with pytest.raises(Exception) as excinfo:
         vector_angle([0.0, 0.0, 0.0])
+    assert "vector not normalisable" == str(excinfo.value)
 
 
 def test_vector_angle_invalid_type():
-    with pytest.raises(Exception):
+    with pytest.raises(Exception) as excinfo:
         vector_angle([1, 2])
+    assert "vector must contain three floats" == str(excinfo.value)

@@ -1,7 +1,7 @@
+import numpy as np
+from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
 from avonic_speaker_tracker.pointer import point
-from flask import make_response, jsonify, request
-import numpy as np
 
 
 def success():

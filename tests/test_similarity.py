@@ -1,6 +1,6 @@
 import pytest
-import avonic_speaker_tracker.preset_control
 import numpy as np
+import avonic_speaker_tracker.preset_control
 
 def generate_good_pairs_of_vectors():
     return [
@@ -33,7 +33,7 @@ def test_bad_weather_cos_similarity(a, b):
 
 def test_cos_similarity_zero_vector():
     a, b = (np.array([1, 0, 0]), np.array([0, 0, 0]))
-    with pytest.raises (Exception) as excinfo:
+    with pytest.raises (ValueError) as excinfo:
         avonic_speaker_tracker.preset_control.cos_similarity(a, b)
     assert "Impossible to get similarity with zero-vector" == str(excinfo.value)
 
@@ -59,6 +59,6 @@ def test_empty_list_most_similar_preset():
 
 def test_zero_vector_list_most_similar_preset():
     current, presets = (np.array([0, 0, 0]), [np.array([1, 0, 0])])
-    with pytest.raises (Exception) as excinfo:
+    with pytest.raises (ValueError) as excinfo:
         avonic_speaker_tracker.preset_control.find_most_similar_preset(current, presets)
     assert "Impossible to get similarity with zero-vector" == str(excinfo.value)

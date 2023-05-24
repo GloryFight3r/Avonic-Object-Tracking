@@ -8,7 +8,7 @@ if [ "$1" = "test" ]
   then
     pip install -e '.[test]'
     echo "Running tests with coverage"
-    pytest --cov
+    pytest --cov --cov-report=html:pytest-html
     flask --app src/web_app run --debug
 elif [ "$1" = "prod" ]
   then

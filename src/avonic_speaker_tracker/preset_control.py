@@ -15,7 +15,7 @@ def cos_similarity(a: np.array, b: np.array) -> float:
     if len(b.shape) > 2 or (b.shape[0] != 3) or (len(b.shape) == 2 and b.shape[1] != 1):
         raise TypeError("Not a 3D vector")
     if np.linalg.norm(a) == 0 or np.linalg.norm(b) == 0:
-        raise Exception("Impossible to get similarity with zero-vector")
+        raise ValueError("Impossible to get similarity with zero-vector")
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def find_most_similar_preset(current: np.array, presets: list[np.array]) -> int:

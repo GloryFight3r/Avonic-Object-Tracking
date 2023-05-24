@@ -1,8 +1,9 @@
+import numpy as np
+
 from avonic_speaker_tracker.preset_control import find_most_similar_preset
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
-import numpy as np
 
 
 def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, prev_dir=None):
