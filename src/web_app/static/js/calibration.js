@@ -99,7 +99,7 @@ function resetCalibration(button) {
 
 async function onCameraCoordsGet(data) {
     const d = (await data)["camera-coords"]
-    document.getElementById("camera-coords-x").value = d[0]
-    document.getElementById("camera-coords-y").value = d[1]
-    document.getElementById("camera-coords-z").value = d[2]
+    document.getElementById("camera-coords-x").value = d[0].toFixed(5)
+    document.getElementById("camera-coords-y").value = d[1].toFixed(5)
+    document.getElementById("camera-coords-z").value = d[2].toFixed(5)
 }

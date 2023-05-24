@@ -15,18 +15,18 @@ async function onZoomGet(data) {
 async function onPositionGet(data) {
     const d = await data
     document.getElementById("position-alpha-value").value =
-        d["position-alpha-value"]
+        d["position-alpha-value"].toFixed(5)
     document.getElementById("position-beta-value").value =
-        d["position-beta-value"]
+        d["position-beta-value"].toFixed(5)
 }
 
 async function onPositionSet(data) {
     const d = await data
     document.getElementById("camera-direction-alpha").value =
-        d["position-alpha-value"]
+        d["position-alpha-value"].toFixed(5)
 
     document.getElementById("camera-direction-beta").value =
-        d["position-beta-value"]
+        d["position-beta-value"].toFixed(5)
 }
 
 function selectMovement() {
