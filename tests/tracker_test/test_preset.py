@@ -17,7 +17,7 @@ def test_edit_preset(preset_collection: PresetCollection):
     preset_collection.add_preset(name, camera_angle, microphone_direction)
     
     current_preset: Preset = preset_collection.preset_locations["preset"]
-    assert np.array_equal(current_preset.microphone_direction, microphone_direction) and np.array_equal(current_preset.camera_angle, camera_angle)
+    assert np.array_equal(current_preset.microphone_direction, microphone_direction) and np.array_equal(current_preset.camera_info, camera_angle)
     
     new_camera_angle:np.ndarray = np.array([2, 3, 0])
     new_microphone_direction:np.ndarray = np.array([1, 3, 5])
@@ -25,7 +25,7 @@ def test_edit_preset(preset_collection: PresetCollection):
     preset_collection.edit_preset(name, new_camera_angle, new_microphone_direction)
 
     new_preset: Preset = preset_collection.preset_locations["preset"]
-    assert np.array_equal(new_preset.microphone_direction, new_microphone_direction) and np.array_equal(new_preset.camera_angle, new_camera_angle)
+    assert np.array_equal(new_preset.microphone_direction, new_microphone_direction) and np.array_equal(new_preset.camera_info, new_camera_angle)
 
 
 def test_name_already_contained(preset_collection: PresetCollection):

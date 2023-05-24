@@ -1,6 +1,6 @@
 import pytest
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera
+from avonic_camera_api.camera_adapter import Camera, ResponseCode
 from avonic_camera_api import converter
 import socket
 import math
@@ -8,11 +8,11 @@ import numpy as np
 
 def generate_relative_commands():
     return [
-        (1, 1, 30, 0, b'\x01\x00\x00\x0f\x00\x00\x00\x01\x81\x01\x06\x03\x01\x01\x00\x01\x0E\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x05\x01\x00\x01\x0E\x00\x00\x03\x0C\x00\xFF', "b'9041FF'"),
-        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x14\x0F\x0D\x03\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x18\x0C\x00\x00\x00\x00\x0F\x0E\x02\x00\xFF', "b'9041FF'"),
-        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', "b'9041FF'"),
+        (1, 1, 30, 0, b'\x01\x00\x00\x0f\x00\x00\x00\x01\x81\x01\x06\x03\x01\x01\x00\x01\x0E\x00\x00\x00\x00\x00\xFF', ResponseCode.ACK),
+        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x05\x01\x00\x01\x0E\x00\x00\x03\x0C\x00\xFF', ResponseCode.ACK),
+        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x14\x0F\x0D\x03\x00\x00\x00\x00\x00\xFF', ResponseCode.ACK),
+        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x18\x0C\x00\x00\x00\x00\x0F\x0E\x02\x00\xFF', ResponseCode.ACK),
+        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', ResponseCode.ACK),
     ]
 
 @pytest.fixture()
@@ -94,11 +94,11 @@ def test_degrees_to_command(camera:CameraAPI, alpha, expected):
 
 def generate_absolute_commands():
     return [
-        (1, 1, 30, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x01\x00\x01\x0E\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x05\x01\x00\x01\x0E\x00\x00\x03\x0C\x00\xFF', "b'9041FF'"),
-        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x14\x0F\x0D\x03\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x18\x0C\x00\x00\x00\x00\x0F\x0E\x02\x00\xFF', "b'9041FF'"),
-        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', "b'9041FF'"),
+        (1, 1, 30, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x01\x00\x01\x0E\x00\x00\x00\x00\x00\xFF', ResponseCode.ACK),
+        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x05\x01\x00\x01\x0E\x00\x00\x03\x0C\x00\xFF', ResponseCode.ACK),
+        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x14\x0F\x0D\x03\x00\x00\x00\x00\x00\xFF', ResponseCode.ACK),
+        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x18\x0C\x00\x00\x00\x00\x0F\x0E\x02\x00\xFF', ResponseCode.ACK),
+        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', ResponseCode.ACK),
     ]
 
 @pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_absolute_commands())
@@ -118,7 +118,7 @@ def test_move_absolute(monkeypatch, camera, speed_alpha, speed_beta, alpha, beta
     assert camera.move_absolute(speed_alpha, speed_beta, alpha, beta) == expected2
 
 def test_home_commands(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x01\x06\x04\xff'
 
     def mocked_send(message):
@@ -155,7 +155,7 @@ def test_reboot_command(monkeypatch, camera):
     assert camera.reboot() == expected2
 
 def test_stop_command(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x09\x00\x00\x00\x01\x81\x01\x06\x01\x05\x05\x03\x03\xff'
 
     def mocked_send(message):
@@ -172,7 +172,7 @@ def test_stop_command(monkeypatch, camera):
     assert camera.stop() == expected2
 
 def test_turn_on_command(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x06\x00\x00\x00\x01\x81\x01\x04\x00\x02\xff'
 
     def mocked_send(message):
@@ -189,7 +189,7 @@ def test_turn_on_command(monkeypatch, camera):
     assert camera.turn_on() == expected2
 
 def test_turn_off_command(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x06\x00\x00\x00\x01\x81\x01\x04\x00\x03\xff'
 
     def mocked_send(message):
@@ -225,5 +225,20 @@ def test_get_direction(monkeypatch, camera, direction, ret_msg):
     monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
     monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
     monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
-    direction =  np.array(direction) * 0.0625 / 180 * math.pi
+    direction = np.array(direction) * 0.0625 / 180 * math.pi
     assert (camera.get_direction() == converter.angle_vector(direction[0], direction[1])).all()
+
+def test_camera_error(monkeypatch, camera):
+    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
+
+    def mocked_send(message):
+        assert message == expected_msg
+    def mocked_return(bytes_receive):
+        raise TimeoutError
+    def mocked_timeout(ms):
+        pass
+
+    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
+    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
+    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
+    assert camera.get_direction() == ResponseCode.TIMED_OUT

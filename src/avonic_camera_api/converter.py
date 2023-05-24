@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def angle_vector(alpha: int, beta: int) -> np.array:
+def angle_vector(alpha: float, beta: float) -> np.array:
     """ Convert pitch and yaw angles (radians) to a unit vector
 
     Args:
