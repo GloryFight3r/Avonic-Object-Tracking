@@ -1,10 +1,11 @@
 import numpy as np
 
+
 class Calibration:
     # height of the microphone above the speaker
     mic_height: float = 1.0
     mic_to_cams: [np.array] = []
-    mic_to_cam: np.array = None
+    mic_to_cam: np.array = np.array([0.0, 0.0, 0.0])
 
     # variables of calibration
     speaker_points: [(np.array, np.array)] = []
@@ -38,7 +39,7 @@ class Calibration:
     def reset_calibration(self):
         """ Reset the calibration. To be used in case calibration went wrong or one of the devices moved. """
         self.mic_to_cams = []
-        self.mic_to_cam = None
+        self.mic_to_cam = np.array([0.0, 0.0, 0.0])
         self.speaker_points = []
         self.to_mic_direction = None
 

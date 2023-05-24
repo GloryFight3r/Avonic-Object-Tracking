@@ -1,6 +1,7 @@
 from unittest import mock
 import pytest
 import socket
+
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import Camera
@@ -63,6 +64,7 @@ def client(camera):
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
+    test_controller.ws = mock.Mock()
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
     return app.test_client()
@@ -182,3 +184,21 @@ def test_calibration_reset(client):
 def test_calibration_is_set(client):
     rv = client.get('/calibration/is_set')
     assert rv.status_code == 200 and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
+
+def test_calibration_get_camera(client):
+    rv = client.get('/calibration/camera')
+    assert rv.status_code == 200 and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+
+def test_update_microphone(client):
+    rv = client.post('/update/microphone', json=json.dumps({"test": "testington"}))
+    assert rv.status_code == 200
+
+
+def test_update_camera(client):
+    rv = client.post('/update/camera', json=json.dumps({"test": "testington"}))
+    assert rv.status_code == 200
+
+
+def test_update_calibration(client):
+    rv = client.post('/update/calibration', json=json.dumps({"test": "testington"}))
+    assert rv.status_code == 200

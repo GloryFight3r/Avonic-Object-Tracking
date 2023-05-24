@@ -13,6 +13,7 @@ onSuccess = {
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
     "preset-get-list-form": refreshPresetList,
+    "camera-coords-get-form": onCameraCoordsGet
 };
 
 async function onError(button) {

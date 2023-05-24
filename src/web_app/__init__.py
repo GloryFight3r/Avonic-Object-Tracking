@@ -6,7 +6,6 @@ import web_app.preset_locations_endpoints
 import web_app.calibration_endpoints
 import web_app.tracking
 from web_app.integration import GeneralController
-import logging
 
 # While testing to keep the log clean
 #log = logging.getLogger('werkzeug')
@@ -21,11 +20,10 @@ def create_app(test_controller=None):
     if test_controller is None:
         integration.load_env()
         app.config['SECRET_KEY'] = integration.secret
+        integration.ws = SocketIO(app)
     else:
         integration.copy(test_controller)
         app.config['SECRET_KEY'] = 'test'
-
-    integration.ws = SocketIO(app)
 
     @app.get('/fail-me')
     def fail_me():
@@ -168,6 +166,10 @@ def create_app(test_controller=None):
     def calibration_is_set():
         return web_app.calibration_endpoints.is_calibrated(integration)
 
+    @app.get('/calibration/camera')
+    def calibration_get_cam_coords():
+        return web_app.calibration_endpoints.get_calibration(integration)
+
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
 
@@ -215,6 +217,10 @@ def create_app(test_controller=None):
     @app.post('/update/camera')
     def thread_camera():
         return web_app.tracking.update_camera(integration)
+
+    @app.post('/update/calibration')
+    def thread_calibration():
+        return web_app.tracking.update_calibration(integration)
 
     return app
 
