@@ -9,6 +9,7 @@ from microphone_api.microphone_adapter import UDPSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
 from avonic_camera_api.footage import FootageThread
+from object_tracker.yolo import Yolo
 import cv2
 
 class GeneralController():
@@ -39,7 +40,7 @@ class GeneralController():
         self.calibration = Calibration()
         self.secret = getenv("SECRET_KEY")
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
-        self.footage_thread = FootageThread(self.url, self.video)
+        self.footage_thread = FootageThread(self.url, self.video, Yolo())
         self.footage_thread.start()
 
     def __del__(self):
