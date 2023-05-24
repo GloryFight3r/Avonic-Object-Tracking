@@ -31,8 +31,9 @@ def move_home_camera_endpoint(integration: GeneralController):
 def move_absolute_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        integration.cam_api.move_absolute(int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
-                          int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
+        integration.cam_api.move_absolute(\
+            int(data["absolute-speed-x"]),int(data["absolute-speed-y"]),
+            int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
@@ -41,8 +42,9 @@ def move_absolute_camera_endpoint(integration: GeneralController):
 def move_relative_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        integration.cam_api.move_relative(int(data["relative-speed-x"]), int(data["relative-speed-y"]),
-                          int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
+        integration.cam_api.move_relative(
+            int(data["relative-speed-x"]), int(data["relative-speed-y"]),
+            int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()

@@ -1,10 +1,13 @@
-from avonic_camera_api.camera_adapter import Camera
-import numpy as np
-from avonic_camera_api import converter
 import math
+import numpy as np
+
+from avonic_camera_api import converter
+from avonic_camera_api.camera_adapter import Camera
 
 
 class CameraAPI:
+    latest_direction = None
+
     def __init__(self, camera: Camera):
         """ Constructor for cameraAPI
 
@@ -14,6 +17,7 @@ class CameraAPI:
         self.camera = camera
         self.counter = 1
         self.video = "on"
+        self.latest_direction = np.array([0, 0, 1])
 
     def message_counter(self) -> str:
         cnt_hex = self.counter.to_bytes(1, 'big').hex()
@@ -47,7 +51,8 @@ class CameraAPI:
         """
         res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
                                 '81 01 04 00 02 FF', self.counter)
-        self.video = "on"
+        if res != bytes(0):
+            self.video = "on"
         return res
 
     def turn_off(self) -> bytes:
@@ -58,7 +63,8 @@ class CameraAPI:
         """
         res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
                                 '81 01 04 00 03 FF', self.counter)
-        self.video = "off"
+        if res != bytes(0):
+            self.video = "off"
         return res
 
     def home(self) -> bytes:
@@ -81,7 +87,7 @@ class CameraAPI:
         degree_divided = int(degree / 0.0625)
 
         if degree_divided < 0:
-            degree_divided = ((abs(degree_divided) - 1) ^ ((1 << 16) - 1))
+            degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
 
         in_bytes = hex(degree_divided)[2:]
 
@@ -157,7 +163,8 @@ class CameraAPI:
         message = "81 09 04 47 FF"
 
         ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
-
+        if ret == bytes(0):
+            return 0
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 
@@ -172,6 +179,9 @@ class CameraAPI:
         final_message = insert_zoom_in_hex(message, zoom)
         self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
+    def get_saved_direction(self) -> np.array:
+        return self.latest_direction
+
     def get_direction(self) -> np.array:
         """ Get the direction, pan and tilt, from the camera.
 
@@ -181,6 +191,8 @@ class CameraAPI:
         """
         message = "81 09 06 12 FF"
         ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
+        if ret_msg == "":
+            return np.array([0.0, 0.0])
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
@@ -194,7 +206,10 @@ class CameraAPI:
             tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
         pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
         tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
-        return np.array([pan_rad, tilt_rad])
+        direction = converter.angle_vector(pan_rad, tilt_rad)
+        self.latest_direction = direction
+        return direction
+
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:

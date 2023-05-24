@@ -72,7 +72,7 @@ class MicrophoneAPI:
         """ Get direction vector from the microphone.
 
         Returns:
-            the direction vector (normalised)
+            the direction vector (normalized)
         """
         message = '{"m":{"beam":{"azimuth":null,"elevation":null}}}'
         ret = self.sock.send(message)[0]
@@ -91,7 +91,7 @@ class MicrophoneAPI:
 
         return self.vector()
 
-    def vector(self):
+    def vector(self) -> np.array:
         """ Get direction vector from local variables
 
         Returns:
@@ -102,7 +102,7 @@ class MicrophoneAPI:
         return np.array([np.sin(self.azimuth) * cose,
                          -np.sin(self.elevation), np.cos(self.azimuth) * cose])
 
-    def is_speaking(self):
+    def is_speaking(self) -> bool:
         """ Determine whether someone is speaking based on the peak loudness
 
         Returns:
@@ -113,7 +113,6 @@ class MicrophoneAPI:
         try:
             res = json.loads(ret)["m"]["in1"]["peak"]
             assert isinstance(res, int)
-            print(res)
             if -90 <= res <= 0:
                 self.speaking = res > self.threshold
         except KeyError:

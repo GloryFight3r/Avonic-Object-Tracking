@@ -1,12 +1,16 @@
-from flask import Flask, jsonify, abort, render_template, make_response, Response
+from flask import Flask, jsonify, abort, render_template, make_response, Response, request
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
 import web_app.preset_locations_endpoints
-import web_app.general_endpoints
-import web_app.tracking
 import web_app.footage
+import web_app.calibration_endpoints
+import web_app.tracking_endpoints
 from web_app.integration import GeneralController
+
+# While testing to keep the log clean
+#log = logging.getLogger('werkzeug')
+#log.setLevel(logging.ERROR)
 
 integration = GeneralController()
 
@@ -111,7 +115,7 @@ def create_app(test_controller=None):
         Endpoint to get the position value of the camera.
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
- 
+
     @app.post('/microphone/height/set')
     def set_height():
         """
@@ -128,7 +132,7 @@ def create_app(test_controller=None):
 
     @app.get('/microphone/speaker/direction')
     def get_speaker_direction():
-        """ 
+        """
         Endpoint to get the direction of the active speaker.
         """
         return web_app.microphone_endpoints.get_speaker_direction_endpoint(integration)
@@ -142,24 +146,24 @@ def create_app(test_controller=None):
 
     @app.get('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
-        return web_app.general_endpoints.add_calibration_speaker(integration)
+        return web_app.calibration_endpoints.add_calibration_speaker(integration)
 
     @app.get('/calibration/add_direction_to_mic')
     def add_calibration_mic():
-        return web_app.general_endpoints.add_calibration_to_mic(integration)
+        return web_app.calibration_endpoints.add_calibration_to_mic(integration)
 
     @app.get('/calibration/reset')
     def reset_calibration():
-        return web_app.general_endpoints.reset_calibration(integration)
+        return web_app.calibration_endpoints.reset_calibration(integration)
 
     @app.post('/preset/add')
     def add_preset():
         return web_app.preset_locations_endpoints.add_preset_location(integration)
-    
+
     @app.post('/preset/edit')
     def edit_preset():
         return web_app.preset_locations_endpoints.edit_preset_location(integration)
-    
+
     @app.post('/preset/remove')
     def remove_preset():
         return web_app.preset_locations_endpoints.remove_preset_location(integration)
@@ -168,17 +172,17 @@ def create_app(test_controller=None):
     def get_preset_list():
         return web_app.preset_locations_endpoints.get_preset_list(integration)
 
-    @app.post('/preset/get_preset_info')
-    def get_preset_info():
-        return web_app.preset_locations_endpoints.get_preset_info(integration)
-        
-    @app.get('/preset/point')
+    @app.get('/preset/info/<preset_name>')
+    def get_preset_info(preset_name):
+        return web_app.preset_locations_endpoints.get_preset_info(integration, preset_name)
+
+    @app.post('/preset/point')
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
-    
+
     @app.get('/calibration/is_set')
     def calibration_is_set():
-        return web_app.general_endpoints.is_calibrated(integration)
+        return web_app.calibration_endpoints.is_calibrated(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
@@ -201,16 +205,16 @@ def create_app(test_controller=None):
 
     @app.post('/thread/start')
     def thread_start():
-        return web_app.tracking.start_thread_endpoint(integration)
+        return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():
-        return web_app.tracking.stop_thread_endpoint(integration)
+        return web_app.tracking_endpoints.stop_thread_endpoint(integration)
 
     @app.get('/thread/running')
     def thread_is_running():
         # checks whether thread is running
-        return web_app.tracking.is_running_endpoint(integration)
+        return web_app.tracking_endpoints.is_running_endpoint(integration)
 
     @app.get('/thread/value')
     def thread_value():
@@ -222,16 +226,15 @@ def create_app(test_controller=None):
 
     @app.post('/update/microphone')
     def thread_microphone():
-        return web_app.tracking.update_microphone(integration)
+        return web_app.tracking_endpoints.update_microphone(integration)
 
     @app.post('/update/camera')
     def thread_camera():
-        return web_app.tracking.update_camera(integration)
+        return web_app.tracking_endpoints.update_camera(integration)
     
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)
-    
     return app
 
 if __name__ == "__main__":

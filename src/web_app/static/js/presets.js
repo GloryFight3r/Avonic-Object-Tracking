@@ -62,6 +62,17 @@ async function requestPresetList() {
   refreshPresetList(response.json());
 }
 
+async function changePreset() {
+    document.getElementById("preset-name").value =
+        document.getElementById("preset-select").value;
+    const response = await fetch("/preset/info/" + document.getElementById("preset-select").value, {
+        method: "GET"
+    });
+    if (response.status === 200) {
+        setNewPreset(response.json());
+    }
+}
+
 set_mic_button.onclick = async () => {
   set_mic_button.ariaBusy = true
 }

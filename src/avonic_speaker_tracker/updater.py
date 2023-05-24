@@ -1,7 +1,6 @@
 from time import sleep
 from threading import Thread
 import requests
-import asyncio
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
@@ -9,6 +8,7 @@ from avonic_speaker_tracker.pointer import point
 
 
 class UpdateThread(Thread):
+    loop = None
     # Custom thread class use a skeleton
     def __init__(self, event, url: str, cam_api: CameraAPI,
                  mic_api: MicrophoneAPI, preset_locations: PresetCollection):
@@ -31,6 +31,10 @@ class UpdateThread(Thread):
         start of the thread with false flag, body of the while-loop is not executed.
         """
         prev_dir = [0.0, 0.0]
+        thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
+        thread_mic.start()
+        thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
+        thread_cam.start()
         while not self.event.is_set():
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -38,16 +42,8 @@ class UpdateThread(Thread):
                 continue
 
             if len(self.preset_locations.get_preset_list()) > 0:
-                prev_dir = point(self.cam_api, self.mic_api,
-                                 self.preset_locations, prev_dir)
-
+                prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, prev_dir)
             self.value += 1
-            asyncio.run(
-                self.send_update(self.get_mic_info(), '/update/microphone'))
-            # to not time out the camera, only update it once in 1.5 seconds
-            if self.value % 15 == 0:
-                asyncio.run(
-                    self.send_update(self.get_cam_info(), '/update/camera'))
             sleep(0.1)
         print("Exiting thread")
 
@@ -75,13 +71,16 @@ class UpdateThread(Thread):
             "camera-video": self.cam_api.video
         }
 
-    async def send_update(self, data: dict, path: str):
+    def send_update(self, data, path: str):
         """ Send an HTTP request to the flask server to update the webpages.
 
         Args:
             data: The data in dictionary format
             path: The path to send to
         """
-        response = requests.post(self.url + path, json=data)
-        if response.status_code != 200:
-            print("Could not update flask at path " + path)
+        while not self.event.is_set():
+            d = data()
+            response = requests.post(self.url + path, json=d)
+            if response.status_code != 200:
+                print("Could not update flask at path " + path)
+            sleep(0.1)

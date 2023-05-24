@@ -51,6 +51,7 @@ class GeneralController():
         self.cam_api = CameraAPI(None)
         self.mic_api = MicrophoneAPI(None, 55)
         self.calibration = Calibration()
+        self.preset_locations = PresetCollection()
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -58,6 +59,7 @@ class GeneralController():
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
         self.calibration = new_controller.calibration
+        self.preset_locations = new_controller.preset_locations
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api

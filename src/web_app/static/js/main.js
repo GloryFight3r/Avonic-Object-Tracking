@@ -14,10 +14,6 @@ onSuccess = {
     "thread-value-form": onValueGet,
 };
 
-onWait = {
-    "add-calibration-form": onWaitCalibration,
-};
-
 async function onError(button) {
     button.classList.add("contrast");
     await sleep(350);

@@ -7,5 +7,10 @@ async function onDirectionGet(data) {
 
 async function onSpeaking(data) {
     const d = await data;
-    document.getElementById("speaking").value = d["microphone-speaking"];
+    const isSpeaking = d["microphone-speaking"]
+    document.getElementById("speaking").value = isSpeaking;
+
+    if (isCalibrating && isSpeaking) {
+        addCalibrationSpeaker()
+    }
 }
