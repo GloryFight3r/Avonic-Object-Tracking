@@ -27,12 +27,8 @@ async function setNewPreset(data) {
 async function changePreset() {
     document.getElementById("preset-name").value =
         document.getElementById("preset-select").value;
-    const response = await fetch("/preset/get_preset_info", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            "preset-select": document.getElementById("preset-select").value,
-        }),
+    const response = await fetch("/preset/info/" + document.getElementById("preset-select").value, {
+        method: "GET"
     });
     if (response.status === 200) {
         setNewPreset(response.json());

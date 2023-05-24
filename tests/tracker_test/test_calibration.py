@@ -1,6 +1,6 @@
+import math
 import pytest
 import numpy as np
-import math
 
 from avonic_speaker_tracker.calibration import Calibration, angle_between_vectors
 
