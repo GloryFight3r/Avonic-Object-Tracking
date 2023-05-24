@@ -60,6 +60,8 @@ class Calibration:
             returns:
                 the 3D vector from the microphone to the camera
         """
+        if len(self.speaker_points) == 0:
+            return self.mic_to_cam
         for speaker in self.speaker_points:
             cam_vecw = speaker[0]
             mic_vecw = speaker[1]

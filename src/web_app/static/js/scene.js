@@ -71,7 +71,7 @@ async function animate() {
     camArrow = new THREE.ArrowHelper(camDir, cam, 1, 0xff00ff)
     scene.add(camArrow)
 
-    plane.position.set(0, -h, 0)
+    plane.position.set(0, h, 0)
     requestAnimationFrame(animate)
     controls.update()
     render().then()

@@ -126,18 +126,6 @@ def create_app(test_controller=None):
         """
         return web_app.microphone_endpoints.speaking_get_microphone_endpoint(integration)
 
-    @app.get('/calibration/add_directions_to_speaker')
-    def add_calibration_speaker():
-        return web_app.calibration_endpoints.add_calibration_speaker(integration)
-
-    @app.get('/calibration/add_direction_to_mic')
-    def add_calibration_mic():
-        return web_app.calibration_endpoints.add_calibration_to_mic(integration)
-
-    @app.get('/calibration/reset')
-    def reset_calibration():
-        return web_app.calibration_endpoints.reset_calibration(integration)
-
     @app.post('/preset/add')
     def add_preset():
         return web_app.preset_locations_endpoints.add_preset_location(integration)
@@ -161,6 +149,18 @@ def create_app(test_controller=None):
     @app.get('/preset/point')
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
+
+    @app.get('/calibration/add_directions_to_speaker')
+    def add_calibration_speaker():
+        return web_app.calibration_endpoints.add_calibration_speaker(integration)
+
+    @app.get('/calibration/add_direction_to_mic')
+    def add_calibration_mic():
+        return web_app.calibration_endpoints.add_calibration_to_mic(integration)
+
+    @app.get('/calibration/reset')
+    def reset_calibration():
+        return web_app.calibration_endpoints.reset_calibration(integration)
 
     @app.get('/calibration/is_set')
     def calibration_is_set():

@@ -57,6 +57,7 @@ def client(camera):
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
     mic_api = MicrophoneAPI(UDPSocket(None, sock))
+    mic_api.height = 1
 
     cam_api = camera
 
@@ -159,22 +160,22 @@ def test_get_zoom(client):
     rv = client.get('/camera/zoom/get')
     assert rv.status_code == 200 and rv.data == bytes("{\"zoom-value\":128}\n", "utf-8")
 
-# TODO FIX TEST
-"""def test_set_microphone_height(client):
-    rv = client.post('/microphone/height/set', data={"microphone-height" : 1.7})
+def test_set_microphone_height(client):
+    rv = client.post('/microphone/height/set', data={"microphone-height": 1.7})
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-height\":1.7}\n", "utf-8")
-"""
+
 def test_get_microphone_direction(client):
     rv = client.get('microphone/direction')
     res_vec = json.loads(rv.data)["microphone-direction"]
     assert rv.status_code == 200 and np.allclose(res_vec, [0.0, 0.0, 1.0])
 
-def test_add_direction_to_speaker(client):
-    rv = client.get('/calibration/add_directions_to_speaker')
+def test_add_direction_to_mic(client):
+    client.get('/calibration/reset')
+    rv = client.get('/calibration/add_direction_to_mic')
     assert rv.status_code == 200
 
-def test_add_direction_to_mic(client):
-    rv = client.get('/calibration/add_direction_to_mic')
+def test_add_direction_to_speaker(client):
+    rv = client.get('/calibration/add_directions_to_speaker')
     assert rv.status_code == 200
 
 def test_calibration_reset(client):
