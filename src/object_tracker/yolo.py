@@ -13,7 +13,7 @@ class Yolo:
         with open(path+"yolo.txt", 'r') as f:
             self.labels = [line.strip() for line in f.readlines()]
 
-        self.net = cv2.dnn.readNet(path+"yolo.weights", path+"yolo.cfg")
+        self.net = cv2.dnn.readNet(path+"yolov3-tiny.weights", path+"yolo.cfg")
 
 
     def get_output_layers(self):
