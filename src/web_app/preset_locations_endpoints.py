@@ -30,7 +30,7 @@ def add_preset_location(integration: GeneralController):
             float(data["mic-direction-z"])
         ])
         integration.preset_locations.add_preset(data["preset-name"],
-             camera_angles, microphone_direction)
+             camera_info, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
@@ -57,7 +57,7 @@ def edit_preset_location(integration: GeneralController):
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.edit_preset(data["preset-name"],
+        integration.preset_locations.edit_preset(data["preset-name"], camera_info, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
