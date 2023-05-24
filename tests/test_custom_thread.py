@@ -11,7 +11,8 @@ def test_constructor():
     mic_api.is_speaking.return_value = True
     cam_api = mock.Mock()
     presets = mock.Mock()
-    ct = UpdateThread(e, '', cam_api, mic_api, presets)
+    calibration = mock.Mock()
+    ct = UpdateThread(e, '', cam_api, mic_api, presets,calibration,False)
     assert ct.event == e
     assert ct.mic_api == mic_api
     assert ct.cam_api == cam_api
@@ -27,7 +28,8 @@ def test_setter():
     mic_api.is_speaking.return_value = True
     cam_api = mock.Mock()
     presets = mock.Mock()
-    ct = UpdateThread(e, '', mic_api, cam_api, presets)
+    calibration = mock.Mock()
+    ct = UpdateThread(e, '', mic_api, cam_api, presets,calibration,False)
     assert ct.event == e
     assert ct.value is None
     ct.set_calibration(2)
