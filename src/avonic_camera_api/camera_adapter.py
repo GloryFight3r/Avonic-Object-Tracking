@@ -9,7 +9,7 @@ class Camera:
     """
     sock = None
     address = None
-    message_dict = dict()
+    message_dict = {}
 
     def __init__(self, sock: socket.socket, address):
         """ Constructor for Camera
@@ -62,7 +62,7 @@ class Camera:
         """
         header = bytes.fromhex(header)
         command = bytes.fromhex(command)
-        message = header + command 
+        message = header + command
 
         self.sock.sendall(message)
 

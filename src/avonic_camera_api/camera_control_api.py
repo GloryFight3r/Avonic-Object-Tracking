@@ -1,7 +1,8 @@
-from avonic_camera_api.camera_adapter import Camera
-import numpy as np
-from avonic_camera_api import converter
 import math
+import numpy as np
+
+from avonic_camera_api import converter
+from avonic_camera_api.camera_adapter import Camera
 
 
 class CameraAPI:
@@ -86,7 +87,7 @@ class CameraAPI:
         degree_divided = int(degree / 0.0625)
 
         if degree_divided < 0:
-            degree_divided = ((abs(degree_divided) - 1) ^ ((1 << 16) - 1))
+            degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
 
         in_bytes = hex(degree_divided)[2:]
 
