@@ -1,7 +1,7 @@
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.preset import Preset
 import pytest
 import numpy as np
+from avonic_speaker_tracker.preset import PresetCollection
+from avonic_speaker_tracker.preset import Preset
 
 @pytest.fixture()
 def preset_collection():
@@ -13,17 +13,19 @@ def test_edit_preset(preset_collection: PresetCollection):
     camera_angle:np.ndarray = np.array([1, 2])
     microphone_direction:np.ndarray = np.array([1, 2, 3])
     preset_collection.add_preset(name, camera_angle, microphone_direction)
-    
+
     current_preset:Preset =  preset_collection.preset_locations["preset"]
-    assert np.array_equal(current_preset.microphone_direction, microphone_direction) and np.array_equal(current_preset.camera_angle, camera_angle)
-    
+    assert np.array_equal(current_preset.microphone_direction, microphone_direction)\
+        and np.array_equal(current_preset.camera_angle, camera_angle)
+
     new_camera_angle:np.ndarray = np.array([2, 3])
     new_microphone_direction:np.ndarray = np.array([1, 3, 5])
-    
+
     preset_collection.edit_preset(name, new_camera_angle, new_microphone_direction)
 
     new_preset:Preset =  preset_collection.preset_locations["preset"]
-    assert np.array_equal(new_preset.microphone_direction, new_microphone_direction) and np.array_equal(new_preset.camera_angle, new_camera_angle)
+    assert np.array_equal(new_preset.microphone_direction, new_microphone_direction)\
+        and np.array_equal(new_preset.camera_angle, new_camera_angle)
 
 def test_name_already_contained(preset_collection: PresetCollection):
     preset_collection.add_preset("preset", np.array([1, 2]), np.array([1, 2, 3]))
@@ -50,4 +52,5 @@ def test_get_preset_info(preset_collection: PresetCollection):
     preset_collection.add_preset("preset4", np.array([4, 5]), np.array([10, 11, 12]))
 
     info = preset_collection.get_preset_info("preset3")
-    assert np.array_equal(info[0], np.array([3, 4])) and np.array_equal(info[1], np.array([7, 8, 9]))
+    assert np.array_equal(info[0], np.array([3, 4]))\
+        and np.array_equal(info[1], np.array([7, 8, 9]))

@@ -1,10 +1,11 @@
+import socket
+import math
 import pytest
+import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from avonic_camera_api import converter
-import socket
-import math
-import numpy as np
+
 
 def generate_relative_commands():
     return [
@@ -59,13 +60,17 @@ def generate_relative_commands_bad_parameters():
         (3, 3, 5, -31)
     ]
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta", generate_relative_commands_bad_parameters())
-def test_move_relative_bad_parameters(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, alpha, beta):
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",\
+    generate_relative_commands_bad_parameters())
+def test_move_relative_bad_parameters(monkeypatch, camera:CameraAPI,\
+    speed_alpha, speed_beta, alpha, beta):
     with pytest.raises (AssertionError):
         camera.move_relative(speed_alpha, speed_beta, alpha, beta)
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta", generate_relative_commands_bad_parameters())
-def test_move_absolute_bad_parameters(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, alpha, beta):
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",\
+    generate_relative_commands_bad_parameters())
+def test_move_absolute_bad_parameters(monkeypatch, camera:CameraAPI,\
+    speed_alpha, speed_beta, alpha, beta):
     with pytest.raises (AssertionError):
         camera.move_absolute(speed_alpha, speed_beta, alpha, beta)
 
@@ -101,8 +106,10 @@ def generate_absolute_commands():
         (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', "b'9041FF'"),
     ]
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_absolute_commands())
-def test_move_absolute(monkeypatch, camera, speed_alpha, speed_beta, alpha, beta, expected, expected2):
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2",\
+     generate_absolute_commands())
+def test_move_absolute(monkeypatch, camera,\
+    speed_alpha, speed_beta, alpha, beta, expected, expected2):
     def mocked_send(message):
         print(message, expected)
         assert message == expected

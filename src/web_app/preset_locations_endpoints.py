@@ -24,11 +24,12 @@ def add_preset_location(integration: GeneralController):
             float(data["camera-direction-beta"])
         ])
         microphone_direction = np.array([
-            float(data["mic-direction-x"]), 
+            float(data["mic-direction-x"]),
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.add_preset(data["preset-name"], camera_angles, microphone_direction)
+        integration.preset_locations.add_preset(data["preset-name"],\
+             camera_angles, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
@@ -41,7 +42,7 @@ def edit_preset_location(integration: GeneralController):
         integration: The controller containing all the dependencies
 
     Returns: A http response which indicates success(200) or failure(400)
-        
+
     """
     data = request.form
     try:
@@ -54,7 +55,8 @@ def edit_preset_location(integration: GeneralController):
             float(data["mic-direction-y"]),
             float(data["mic-direction-z"])
         ])
-        integration.preset_locations.edit_preset(data["preset-name"], camera_angles, microphone_direction)
+        integration.preset_locations.edit_preset(data["preset-name"],\
+            camera_angles, microphone_direction)
     except AssertionError:
         return make_response(jsonify({}), 400)
     return success()
@@ -67,7 +69,7 @@ def remove_preset_location(integration: GeneralController):
         integration: The controller containing all the dependencies
 
     Returns: A http response which indicates success(200) or failure(400)
-        
+
     """
     data = request.form
     try:
