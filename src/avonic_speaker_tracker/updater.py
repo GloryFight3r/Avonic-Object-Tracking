@@ -5,12 +5,13 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.pointer import point
+from avonic_speaker_tracker.calibration import Calibration
 
 
 class UpdateThread(Thread):
     loop = None
     # Custom thread class use a skeleton
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, preset_use: bool):
+    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, calibration: Calibration, preset_use: bool):
         """ Class constructor
 
         Args:
@@ -23,6 +24,7 @@ class UpdateThread(Thread):
         self.cam_api = cam_api
         self.mic_api = mic_api
         self.preset_locations = preset_locations
+        self.calibration = calibration
         self.preset_use = preset_use
 
     def run(self):
@@ -41,14 +43,14 @@ class UpdateThread(Thread):
                 sleep(5)
                 continue
 
-            if len(self.preset_locations.get_preset_list()) > 0 :
-                prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, self.preset_use , prev_dir)
-            else :
+            calibrate = Calibration()
+            if len(self.preset_locations.get_preset_list()) == 0 and self.preset_use :
                 print("No locations preset")
-
+            else :
+                prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, self.preset_use, self.calibration, prev_dir)
 
             self.value += 1
-            sleep(0.1)
+            sleep(1)
         print("Exiting thread")
 
     def set_calibration(self, value):
