@@ -84,7 +84,7 @@ class Camera:
         """
         header = bytes.fromhex(header)
         command = bytes.fromhex(command)
-        message = header + command 
+        message = header + command
 
         self.sock.sendall(message)
 

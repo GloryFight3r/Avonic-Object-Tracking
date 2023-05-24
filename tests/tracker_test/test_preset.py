@@ -1,7 +1,7 @@
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.preset import Preset
 import pytest
 import numpy as np
+from avonic_speaker_tracker.preset import PresetCollection
+from avonic_speaker_tracker.preset import Preset
 
 
 @pytest.fixture()
@@ -21,7 +21,7 @@ def test_edit_preset(preset_collection: PresetCollection):
     
     new_camera_angle:np.ndarray = np.array([2, 3, 0])
     new_microphone_direction:np.ndarray = np.array([1, 3, 5])
-    
+
     preset_collection.edit_preset(name, new_camera_angle, new_microphone_direction)
 
     new_preset: Preset = preset_collection.preset_locations["preset"]
@@ -37,7 +37,7 @@ def test_name_already_contained(preset_collection: PresetCollection):
 def test_remove_preset(preset_collection: PresetCollection):
     preset_collection.add_preset("preset", np.array([1, 2, 5000]), np.array([1, 2, 3]))
     preset_collection.remove_preset("preset")
-    assert "preset" not in preset_collection.preset_locations 
+    assert "preset" not in preset_collection.preset_locations
 
 
 def test_get_preset_lists(preset_collection: PresetCollection):
