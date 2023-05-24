@@ -97,3 +97,23 @@ function resetCalibration(button) {
         }
     });
 }
+
+function selectCaliTab() {
+    document.getElementById("presets").style.display = "none"
+    document.getElementById("cal").style.display = "none"
+    const selected = document.getElementById("presets-cali-select").value
+    document.getElementById(selected).style.display = "block"
+    const header = document.getElementById("presets-cali-title")
+    switch(selected) {
+        case "presets":
+            header.innerText = "Presets 🔖"
+            break
+        case "cal":
+            header.innerText = "Calibration 🧰"
+            break
+        default:
+    }
+}
+
+selectCaliTab()
+calibrationIsSet().then()

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Avonic Camera Control</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
+  <script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/presets.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/socket.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/thread.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+
+<body>
+  <main>
+    <nav>
+      <ul>
+        <li><strong>Navigation</strong></li>
+      </ul>
+      <ul>
+        <li><a href="/camera_control">Camera controls</a></li>
+        <li><a href="/microphone_control">Microphone control</a></li>
+        <li><a href="/presets_and_calibration">Presets &amp calibration</a></li>
+        <li><a href="/live_footage">Live camera footage</a></li>
+      </ul>
+    </nav>
+    <article class="container">
+      <h1 id="presets-cali-title">Presets 🔖</h1>
+      <select id="presets-cali-select" onchange="selectCaliTab()">
+        <option value="presets">Presets</option>
+        <option value="cal">Calibration</option>
+      </select>
+      <div id="presets">
+        <h5>
+          To add a preset type the name you want it to have and after that click 'Set camera position',
+          which will record the direction where the camera is currently pointing. After that click
+          'Set microphone direction' to record the direction of the next noise. Finally, click 'Add new preset'.<br>
+          To edit a preset select the preset you want to change from the preset list and record new camera direction
+          and/or
+          microphone direction in the same manner. <br>
+          To remove a preset, select it from the list and click 'Remove preset'.
+        </h5>
+
+        <form id="preset-form" method="put">
+          <div class="grid">
+            <label for="preset-select">Select an existing preset:</label>
+            <select id="preset-select" name="preset-select" onchange="changePreset()">
+            </select>
+          </div>
+          <div class="grid">
+            <label for="preset-name">Type preset name:</label>
+            <input id="preset-name" name="preset-name">
+          </div>
+          <div class="grid">
+            <label for="mic-direction-x2">Mic direction x</label>
+            <label for="mic-direction-y2">Microphone direction y</label>
+            <label for="mic-direction-z2">Microphone direction z</label>
+          </div>
+          <div class="grid">
+            <input id="mic-direction-x2" name="mic-direction-x" readonly />
+            <input id="mic-direction-y2" name="mic-direction-y" readonly />
+            <input id="mic-direction-z2" name="mic-direction-z" readonly />
+          </div>
+          <div class="grid">
+            <label for="camera-direction-alpha">Camera degrees pan</label>
+            <label for="camera-direction-beta">Camera degrees tilt</label>
+          </div>
+          <div class="grid">
+            <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
+            <input id="camera-direction-beta" name="camera-direction-beta" readonly />
+          </div>
+          <div class="grid">
+            <button id="add-preset-button" type="submit">Add new preset</button>
+            <button id="edit-preset-button" type="submit">Edit current preset</button>
+            <button id="remove-preset-button" type="submit">Remove current preset</button>
+          </div>
+          <button id="point-to-closest" type="submit">Point to closest preset</button>
+        </form>
+        <div class="grid">
+          <form action="/camera/position/get" method="get" id="camera-position-set-form">
+            <button type="submit">Set camera position</button>
+          </form>
+          <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
+            <button id="set-mic-button" type="submit">Set microphone position</button>
+          </form>
+        </div>
+      </div>
+      <div id="cal">
+        <h5 id="calibration-instruction">To start calibration, please click below.</h5>
+        <button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
+      </div>
+    </article>
+  </main>
+</body>
+
+</html>
