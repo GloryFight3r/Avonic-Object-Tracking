@@ -21,11 +21,10 @@ def create_app(test_controller=None):
     if test_controller is None:
         integration.load_env()
         app.config['SECRET_KEY'] = integration.secret
+        integration.ws = SocketIO(app)
     else:
         integration.copy(test_controller)
         app.config['SECRET_KEY'] = 'test'
-
-    integration.ws = SocketIO(app)
 
     @app.get('/fail-me')
     def fail_me():
@@ -37,19 +36,27 @@ def create_app(test_controller=None):
 
     @app.get('/camera_control')
     def camera_view():
-        return render_template('camera.html')
+        return render_template('single_page.html', name="camera")
 
     @app.get('/microphone_control')
     def microphone_view():
-        return render_template('microphone.html')
+        return render_template('single_page.html', name="microphone")
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        return render_template('presets_and_calibration.html')
+        return render_template('single_page.html', name="presets_and_calibration")
 
     @app.get('/live_footage')
     def live_footage_view():
-        return render_template('live_footage.html')
+        return render_template('single_page.html', name="live_footage")
+
+    @app.get('/thread')
+    def thread_view():
+        return render_template('single_page.html', name="thread")
+
+    @app.get('/visualisation')
+    def visualisation_view():
+        return render_template('single_page.html', name="visualisation")
 
     @app.post('/camera/reboot')
     def post_reboot():
@@ -144,18 +151,6 @@ def create_app(test_controller=None):
         """
         return web_app.microphone_endpoints.speaking_get_microphone_endpoint(integration)
 
-    @app.get('/calibration/add_directions_to_speaker')
-    def add_calibration_speaker():
-        return web_app.calibration_endpoints.add_calibration_speaker(integration)
-
-    @app.get('/calibration/add_direction_to_mic')
-    def add_calibration_mic():
-        return web_app.calibration_endpoints.add_calibration_to_mic(integration)
-
-    @app.get('/calibration/reset')
-    def reset_calibration():
-        return web_app.calibration_endpoints.reset_calibration(integration)
-
     @app.post('/preset/add')
     def add_preset():
         return web_app.preset_locations_endpoints.add_preset_location(integration)
@@ -180,9 +175,25 @@ def create_app(test_controller=None):
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
 
+    @app.get('/calibration/add_directions_to_speaker')
+    def add_calibration_speaker():
+        return web_app.calibration_endpoints.add_calibration_speaker(integration)
+
+    @app.get('/calibration/add_direction_to_mic')
+    def add_calibration_mic():
+        return web_app.calibration_endpoints.add_calibration_to_mic(integration)
+
+    @app.get('/calibration/reset')
+    def reset_calibration():
+        return web_app.calibration_endpoints.reset_calibration(integration)
+
     @app.get('/calibration/is_set')
     def calibration_is_set():
         return web_app.calibration_endpoints.is_calibrated(integration)
+
+    @app.get('/calibration/camera')
+    def calibration_get_cam_coords():
+        return web_app.calibration_endpoints.get_calibration(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
@@ -235,6 +246,11 @@ def create_app(test_controller=None):
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)
+
+    @app.post('/update/calibration')
+    def thread_calibration():
+        return web_app.tracking_endpoints.update_calibration(integration)
+
     return app
 
 if __name__ == "__main__":

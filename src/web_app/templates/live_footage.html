@@ -1,41 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <title>Live Footage</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-  <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
-  <script src="{{ url_for('static', filename='js/socket.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/footage.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/presets.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/thread.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
-</head>
-
-<body>
-  <main>
-    <nav>
-      <ul>
-        <li><strong>Navigation</strong></li>
-      </ul>
-      <ul>
-        <li><a href="/camera_control">Camera controls</a></li>
-        <li><a href="/microphone_control">Microphone control</a></li>
-        <li><a href="/presets_and_calibration">Presets &amp calibration</a></li>
-        <li><a href="/thread">Thread control</a></li>
-        <li><a href="/live_footage">Live camera footage</a></li>
-      </ul>
-    </nav>
-    <article class="container">
-      <h1 class="mt-5">Live Streaming</h1>
-      <img id="live-footage" width="100%">
-    </article>
-  </main>
-</body>
-
-</html>
+<article id="footage">
+  <h1 class="mt-5">Live Streaming</h1>
+  <img id="live-footage" width="100%">
+</article>

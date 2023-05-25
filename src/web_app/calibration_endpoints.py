@@ -15,6 +15,7 @@ def add_calibration_speaker(integration: GeneralController):
 def add_calibration_to_mic(integration: GeneralController):
     cam_dir = integration.cam_api.get_direction()
     integration.calibration.add_direction_to_mic(cam_dir)
+    integration.calibration.calculate_distance()
     return success()
 
 def reset_calibration(integration: GeneralController):
@@ -32,3 +33,7 @@ def wait_for_speaker(integration: GeneralController):
     while not integration.mic_api.is_speaking():
         sleep(0.1)
     return integration.mic_api.get_direction()
+def get_calibration(integration: GeneralController):
+    return make_response(jsonify({
+        "camera-coords": list(integration.calibration.mic_to_cam)
+    }), 200)

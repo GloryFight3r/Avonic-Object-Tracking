@@ -15,4 +15,6 @@ src/avonic_speaker_tracker.egg-info/
 .env
 html/
 .mutmut-cache
+.DS_Store
+.erb-lint.yml
 .hypothesis

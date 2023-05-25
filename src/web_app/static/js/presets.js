@@ -24,11 +24,14 @@ async function setNewPreset(data) {
 
   document.getElementById("camera-direction-beta").value =
     d2["position-beta-value"];
+
+
+  document.getElementById("camera-zoom-value").value =
+    d2["zoom-value"];
 }
 
 async function changePreset() {
-  document.getElementById("preset-name").value =
-    document.getElementById("preset-select").value;
+  document.getElementById("preset-name").value = document.getElementById("preset-select").value;
   const response = await fetch("/preset/get_preset_info", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -48,11 +51,8 @@ async function onMicrophoneDirectionSet(data) {
     document.getElementById("mic-direction-y2").value = d[1];
     document.getElementById("mic-direction-z2").value = d[2];
 
-
     set_mic_button.ariaBusy = false
 }
-
-
 
 async function requestPresetList() {
   const response = await fetch("/preset/get_list", {
