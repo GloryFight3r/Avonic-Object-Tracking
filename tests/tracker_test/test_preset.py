@@ -56,4 +56,5 @@ def test_get_preset_info(preset_collection: PresetCollection):
     preset_collection.add_preset("preset4", np.array([4, 5, 0]), np.array([10, 11, 12]))
 
     info = preset_collection.get_preset_info("preset3")
-    assert np.array_equal(info[0], np.array([3, 4, 16000])) and np.array_equal(info[1], np.array([7, 8, 9]))
+    assert np.array_equal(info[0], np.array([3, 4, 16000])) and np.array_equal(
+        info[1], np.array([7, 8, 9]))
