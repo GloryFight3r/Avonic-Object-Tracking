@@ -1,0 +1,31 @@
+import pytest
+from threading import Event
+import cv2
+import base64
+from avonic_camera_api.footage import FootageThread
+
+class MockedCv:
+    def __init__(self):
+        pass
+    def read(self):
+        return (True, "mocked return")
+
+@pytest.fixture
+def footage_thread():
+    mocked_url = ""
+    mocked_cam_footage = MockedCv()
+    event = Event()
+    thread = FootageThread(mocked_url, mocked_cam_footage, event)
+
+    return thread
+
+def test_run(footage_thread, monkeypatch):
+    def mocked_imencode(tp, frame):
+        assert frame == "mocked return"
+        footage_thread.event.set()
+        return (True, b'FEEB')
+
+    monkeypatch.setattr(cv2, "imencode", mocked_imencode)
+    footage_thread.run()
+
+    assert footage_thread.get_frame() == base64.b64encode(b'FEEB').decode('ascii')

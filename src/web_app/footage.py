@@ -1,8 +1,6 @@
-from web_app.integration import GeneralController
 from flask import make_response, jsonify, request
-from web_app.integration import GeneralController
 from flask_socketio import emit
-import base64
+from web_app.integration import GeneralController
 
 def update_footage(integration: GeneralController):
     data = request.get_json()
@@ -14,4 +12,3 @@ def emit_frame(integration: GeneralController):
     emit("new-frame", {
         "base64": frame
     })
-

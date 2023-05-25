@@ -2,14 +2,14 @@ from threading import Event
 from os import getenv
 import socket
 from dotenv import load_dotenv
+import cv2
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
+from avonic_camera_api.footage import FootageThread
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
-from avonic_camera_api.footage import FootageThread
-import cv2
 
 class GeneralController():
     def __init__(self):

@@ -1,9 +1,7 @@
-from time import sleep
 from threading import Thread
-import asyncio
-import cv2
 import base64
 import time
+import cv2
 
 class FootageThread(Thread):
     def __init__(self, url:str, camera_footage: cv2.VideoCapture, event):
@@ -14,16 +12,18 @@ class FootageThread(Thread):
         self.frame = None
         self.url = "http://" + url
         self.event = event
+        self.ret = None
+        self.buffer = None
 
     def run(self):
         while not self.event.is_set():
             time.sleep(0.01)
             self.success, self.frame = self.camera_footage.read()  # read the camera frame
-            if not self.success:
-                break
-            else:
+            if self.success:
                 self.ret, self.buffer = cv2.imencode('.jpg', self.frame)
+            else:
+                break
 
     def get_frame(self):
-        data = base64.b64encode(self.buffer).decode('ascii')  # concat frame one by one and show result
+        data = base64.b64encode(self.buffer).decode('ascii')
         return data
