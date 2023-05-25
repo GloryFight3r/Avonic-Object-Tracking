@@ -6,12 +6,11 @@ function addCalibrationSpeaker() {
     calibratingSpeakerCount++
     isCalibrating = false
     const instructionText = document.getElementById("calibration-instruction")
-    const innHTML = instructionText.innerHTML
     instructionText.innerHTML = "Click below to calibrate point " + calibratingSpeakerCount
     const body = {method: "get"}
     const button = document.getElementById("calibration-button")
     fetch("/calibration/add_directions_to_speaker", body).then(function (res) {
-        if (res.status != 200) {
+        if (res.status !== 200) {
             onError(button)
         } else {
             button.disabled = false
@@ -96,4 +95,11 @@ function resetCalibration(button) {
             button.onclick = () => startCalibration(button);
         }
     });
+}
+
+async function onCameraCoordsGet(data) {
+    const d = (await data)["camera-coords"]
+    document.getElementById("camera-coords-x").value = d[0].toFixed(5)
+    document.getElementById("camera-coords-y").value = d[1].toFixed(5)
+    document.getElementById("camera-coords-z").value = d[2].toFixed(5)
 }

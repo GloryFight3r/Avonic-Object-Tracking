@@ -22,17 +22,16 @@ async function setNewPreset(data) {
 
     document.getElementById("camera-direction-beta").value =
         d2["position-beta-value"];
+
+    document.getElementById("camera-zoom-value").value =
+        d2["zoom-value"];
 }
 
 async function changePreset() {
     document.getElementById("preset-name").value =
         document.getElementById("preset-select").value;
-    const response = await fetch("/preset/get_preset_info", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            "preset-select": document.getElementById("preset-select").value,
-        }),
+    const response = await fetch("/preset/info/" + document.getElementById("preset-select").value, {
+        method: "GET"
     });
     if (response.status === 200) {
         setNewPreset(response.json());

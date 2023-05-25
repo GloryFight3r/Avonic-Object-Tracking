@@ -1,5 +1,8 @@
-from avonic_speaker_tracker.preset_control import find_most_similar_preset
+import numpy as np
+
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_speaker_tracker.preset_control import find_most_similar_preset
+from avonic_speaker_tracker.preset import PresetCollection
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
@@ -7,8 +10,11 @@ from avonic_speaker_tracker.coordinate_translation import translate_microphone_t
 from avonic_camera_api.converter import vector_angle
 import numpy as np
 
-def preset_pointer(mic_api: MicrophoneAPI, preset_locations: PresetCollection, prev_dir):
-    dir = [0.0, 0.0]
+
+def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
+          preset_locations: PresetCollection, prev_cam=None):
+    if prev_cam is None:
+        prev_cam = [0.0, 0.0, 0.0]
     preset_names = np.array(preset_locations.get_preset_list())
     presets_mic = []
     for i in range(len(preset_names)):

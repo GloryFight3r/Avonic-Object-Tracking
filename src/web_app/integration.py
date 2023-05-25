@@ -30,6 +30,11 @@ class GeneralController():
         load_dotenv()
         cam_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
+        assert 0 <= cam_addr[1] <= 65535
+        assert 0 <= int(cam_addr[0].split(".")[0]) <= 255 and \
+            0 <= int(cam_addr[0].split(".")[1]) <= 255 and \
+            0 <= int(cam_addr[0].split(".")[2]) <= 255 and \
+            0 <= int(cam_addr[0].split(".")[3]) <= 255
         self.cam_api = CameraAPI(Camera(cam_sock, cam_addr))
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         mic_sock = UDPSocket(mic_addr)

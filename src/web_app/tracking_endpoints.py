@@ -24,7 +24,7 @@ def start_thread_endpoint(integration: GeneralController):
         integration.thread.start()
     else:
         print("Thread already running!")
-        make_response(jsonify({}), 403)
+        return make_response(jsonify({}), 403)
     return make_response(jsonify({}), 200)
 
 
@@ -47,8 +47,21 @@ def update_camera(integration: GeneralController):
     return make_response(jsonify({}), 200)
 
 
+def update_calibration(integration: GeneralController):
+    data = request.get_json()
+    integration.ws.emit('calibration-update', data)
+    return make_response(jsonify({}), 200)
+
+
 def is_running_endpoint(integration: GeneralController):
-    return make_response(jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
+    return make_response(
+        jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
+
+
+def preset_use(integration: GeneralController):
+    integration.preset = not integration.preset
+    print(integration.preset)
+    return make_response(jsonify({"preset":integration.preset}), 200)
 
 
 def preset_use(integration: GeneralController):

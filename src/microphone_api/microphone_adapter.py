@@ -30,7 +30,8 @@ class UDPSocket:
         """ Send a command and wait for a response
 
         Args:
-            command: the command in JSON format (refer to https://assets.sennheiser.com/global-downloads/file/12146/TI_1245_v1.8.0_Sennheiser_Sound_Control_Protocol_TCC2_EN.pdf)
+            command: the command in JSON format (refer to
+                https://assets.sennheiser.com/global-downloads/file/12146/TI_1245_v1.8.0_Sennheiser_Sound_Control_Protocol_TCC2_EN.pdf)
             responses: how many responses are expected to arrive back
         """
         res = []

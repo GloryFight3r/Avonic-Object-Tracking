@@ -44,9 +44,11 @@ test:
     - source venv/bin/activate
     - pip install build
     - pip install -e '.[test]'
-    - pytest --cov --cov-report xml:cov.xml
+    - pytest --cov --cov-report term --cov-report xml:cov.xml --cov-report html:pytest-html
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
+    paths:
+      - pytest-html
     reports:
       coverage_report:
         coverage_format: cobertura

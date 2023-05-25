@@ -1,6 +1,6 @@
+import math
 import pytest
 import numpy as np
-import math
 
 from avonic_speaker_tracker.calibration import Calibration, angle_between_vectors
 
@@ -32,7 +32,9 @@ def test_reset_calibration():
     cal.add_direction_to_mic(d)
 
     cal.reset_calibration()
-    assert cal.mic_to_cam is None
+    assert cal.mic_to_cam[0] == 0.0
+    assert cal.mic_to_cam[1] == 0.0
+    assert cal.mic_to_cam[2] == 0.0
     assert not cal.speaker_points
     assert cal.to_mic_direction is None
 

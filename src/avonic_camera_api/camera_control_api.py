@@ -1,7 +1,7 @@
-from avonic_camera_api.camera_adapter import Camera
-import numpy as np
-from avonic_camera_api import converter
 import math
+import numpy as np
+from avonic_camera_api.camera_adapter import Camera, ResponseCode
+from avonic_camera_api import converter
 
 
 class CameraAPI:
@@ -33,7 +33,7 @@ class CameraAPI:
 
         self.camera.reconnect()
 
-    def stop(self) -> bytes:
+    def stop(self) -> ResponseCode:
         """ Stops the camera from rotating
 
         Returns:
@@ -42,7 +42,7 @@ class CameraAPI:
         return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
                                 '81 01 06 01 05 05 03 03 FF', self.counter)
 
-    def turn_on(self) -> bytes:
+    def turn_on(self) -> ResponseCode:
         """ Turns on the camera
 
         Returns:
@@ -50,11 +50,11 @@ class CameraAPI:
         """
         res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
                                 '81 01 04 00 02 FF', self.counter)
-        if res != bytes(0):
+        if res == ResponseCode.COMPLETION:
             self.video = "on"
         return res
 
-    def turn_off(self) -> bytes:
+    def turn_off(self) -> ResponseCode:
         """ Turns off the camera - the camera continues receiving and responding to requests
 
         Returns:
@@ -62,11 +62,11 @@ class CameraAPI:
         """
         res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
                                 '81 01 04 00 03 FF', self.counter)
-        if res != bytes(0):
+        if res == ResponseCode.COMPLETION:
             self.video = "off"
         return res
 
-    def home(self) -> bytes:
+    def home(self) -> ResponseCode:
         """ Points the camera towards the 'home' direction
 
         Returns:
@@ -86,7 +86,7 @@ class CameraAPI:
         degree_divided = int(degree / 0.0625)
 
         if degree_divided < 0:
-            degree_divided = ((abs(degree_divided) - 1) ^ ((1 << 16) - 1))
+            degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
 
         in_bytes = hex(degree_divided)[2:]
 
@@ -99,14 +99,16 @@ class CameraAPI:
 
         return answer_string
 
-    def move_relative(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bytes:
+    def move_relative(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> ResponseCode:
         """ Rotates the camera relative to the current rotation degree
 
         Args:
             speed_x: Integer in the range [0x01(hex) : 0x18(hex)] indicating the pan speed
             speed_y: Integer in the range [0x01(hex) : 0x14(hex)] indicating the tilt speed
-            degrees_x: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°]
-            degrees_y: Tilt position, could be a float but precision might be lost - range is [-30° to +90°]
+            degrees_x: Pan position, could be a float but precision might be lost
+               range is [-170° ~ +170°]
+            degrees_y: Tilt position, could be a float but precision might be lost
+               range is [-30° to +90°]
 
         Returns:
             The response code from the camera
@@ -116,17 +118,20 @@ class CameraAPI:
 
         return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
-                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
+                                str(speed_y.to_bytes(1, 'big').hex()) + " " +
+                                self.degrees_to_command(degrees_x) + " " +
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
 
-    def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> bytes:
+    def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> ResponseCode:
         """ Rotates the camera in absolute position (current position does not matter)
 
         Args:
             speed_x: Integer in the range [0x01(hex) : 0x18(hex)] indicating the pan speed
             speed_y: Integer in the range [0x01(hex) : 0x14(hex)] indicating the tilt speed
-            degrees_x: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°]
-            degrees_y: Tilt position, could be a float but precision might be lost - range is [-30° to +90°]
+            degrees_x: Pan position, could be a float but precision might be lost
+                range is [-170° ~ +170°]
+            degrees_y: Tilt position, could be a float but precision might be lost
+                range is [-30° to +90°]
 
         Returns:
             The response code from the camera
@@ -136,10 +141,11 @@ class CameraAPI:
 
         return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
-                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
+                                str(speed_y.to_bytes(1, 'big').hex()) +
+                                " " + self.degrees_to_command(degrees_x) + " " +
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
 
-    def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> bytes:
+    def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> ResponseCode:
         """ Rotates the camera in the direction of a vector (with home position being [0, 0, 1]
 
         Args:
@@ -162,12 +168,12 @@ class CameraAPI:
         message = "81 09 04 47 FF"
 
         ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
-        if ret == bytes(0):
-            return 0
+        if isinstance(ret, ResponseCode):
+            return ret
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         return int(hex_res, 16)
 
-    def direct_zoom(self, zoom: int) -> None:
+    def direct_zoom(self, zoom: int) -> ResponseCode:
         """ Change the value of the zoom to the specified value.
 
             Parameters:
@@ -176,12 +182,12 @@ class CameraAPI:
         assert 0 <= zoom <= 16384
         message = "81 01 04 47 0p 0q 0r 0s FF"
         final_message = insert_zoom_in_hex(message, zoom)
-        self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
+        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
 
     def get_saved_direction(self) -> np.array:
         return self.latest_direction
 
-    def get_direction(self) -> np.array:
+    def get_direction(self):
         """ Get the direction, pan and tilt, from the camera.
 
             Returns:
@@ -189,9 +195,10 @@ class CameraAPI:
                                                              Tilt ranges between 0xFE45 (-442) and 0x0510 (1296) while tilt_adjusted ranges between (-30) and (+90)
         """
         message = "81 09 06 12 FF"
-        ret_msg = str(self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter))[2:-1] # remove the b' and '
-        if ret_msg == "":
-            return np.array([0.0, 0.0])
+        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
+        if isinstance(ret, ResponseCode):
+            return ret
+        ret_msg = str(ret)[2:-1]  # remove b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
 
@@ -208,7 +215,6 @@ class CameraAPI:
         direction = converter.angle_vector(pan_rad, tilt_rad)
         self.latest_direction = direction
         return direction
-
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
