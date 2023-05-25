@@ -1,9 +1,7 @@
-from avonic_camera_api.camera_adapter import Camera, ResponseCode
 import math
 import numpy as np
-
+from avonic_camera_api.camera_adapter import Camera, ResponseCode
 from avonic_camera_api import converter
-from avonic_camera_api.camera_adapter import Camera
 
 
 class CameraAPI:
@@ -107,8 +105,10 @@ class CameraAPI:
         Args:
             speed_x: Integer in the range [0x01(hex) : 0x18(hex)] indicating the pan speed
             speed_y: Integer in the range [0x01(hex) : 0x14(hex)] indicating the tilt speed
-            degrees_x: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°]
-            degrees_y: Tilt position, could be a float but precision might be lost - range is [-30° to +90°]
+            degrees_x: Pan position, could be a float but precision might be lost
+               range is [-170° ~ +170°]
+            degrees_y: Tilt position, could be a float but precision might be lost
+               range is [-30° to +90°]
 
         Returns:
             The response code from the camera
@@ -118,7 +118,8 @@ class CameraAPI:
 
         return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
-                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
+                                str(speed_y.to_bytes(1, 'big').hex()) + " " +
+                                self.degrees_to_command(degrees_x) + " " +
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
 
     def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> ResponseCode:
@@ -127,8 +128,10 @@ class CameraAPI:
         Args:
             speed_x: Integer in the range [0x01(hex) : 0x18(hex)] indicating the pan speed
             speed_y: Integer in the range [0x01(hex) : 0x14(hex)] indicating the tilt speed
-            degrees_x: Pan position, could be a float but precision might be lost - range is [-170° ~ +170°]
-            degrees_y: Tilt position, could be a float but precision might be lost - range is [-30° to +90°]
+            degrees_x: Pan position, could be a float but precision might be lost
+                range is [-170° ~ +170°]
+            degrees_y: Tilt position, could be a float but precision might be lost
+                range is [-30° to +90°]
 
         Returns:
             The response code from the camera
@@ -138,7 +141,8 @@ class CameraAPI:
 
         return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
-                                str(speed_y.to_bytes(1, 'big').hex()) + " " + self.degrees_to_command(degrees_x) + " " +
+                                str(speed_y.to_bytes(1, 'big').hex()) +
+                                " " + self.degrees_to_command(degrees_x) + " " +
                                 self.degrees_to_command(degrees_y) + " FF", self.counter)
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> ResponseCode:

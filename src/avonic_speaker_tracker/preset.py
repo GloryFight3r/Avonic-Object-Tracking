@@ -12,7 +12,7 @@ class PresetCollection:
         self.preset_locations = {}
 
     def add_preset(self, to_add: str,
-        cam_info: np.ndarray, microphone_direction: np.ndarray) -> None:
+                   cam_info: np.ndarray, microphone_direction: np.ndarray) -> None:
         """ Adds a preset to the dictionary of presets with the given name
 
         Args:
@@ -62,4 +62,4 @@ class PresetCollection:
         """
         assert to_get in self.preset_locations
         return (self.preset_locations[to_get].camera_info,
-                self.preset_locations[to_get].microphone_direction)    
+                self.preset_locations[to_get].microphone_direction)

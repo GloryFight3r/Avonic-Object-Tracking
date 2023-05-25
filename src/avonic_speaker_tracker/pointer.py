@@ -6,7 +6,8 @@ from avonic_speaker_tracker.preset import PresetCollection
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 
-def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, prev_cam=None):
+def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
+          preset_locations: PresetCollection, prev_cam=None):
     if prev_cam is None:
         prev_cam = [0.0, 0.0, 0.0]
     preset_names = np.array(preset_locations.get_preset_list())
