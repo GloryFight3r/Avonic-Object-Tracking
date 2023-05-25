@@ -102,4 +102,3 @@ def position_get_camera_endpoint(integration: GeneralController):
         return responses()[position]
     return make_response(jsonify({"position-alpha-value": position[0],
         "position-beta-value": position[1]}), 200)
-

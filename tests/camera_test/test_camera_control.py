@@ -115,9 +115,9 @@ def generate_absolute_commands():
     ]
 
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2",\
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2",
      generate_absolute_commands())
-def test_move_absolute(monkeypatch, camera,\
+def test_move_absolute(monkeypatch, camera,
     speed_alpha, speed_beta, alpha, beta, expected, expected2):
     def mocked_send(message):
         print(message, expected)
