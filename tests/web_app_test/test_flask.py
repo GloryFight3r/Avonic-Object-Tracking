@@ -216,11 +216,13 @@ def test_calibration_reset(client):
 
 def test_calibration_is_set(client):
     rv = client.get('/calibration/is_set')
-    assert rv.status_code == 200 and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
+    assert rv.status_code == 200 \
+        and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
 def test_calibration_get_camera(client):
     rv = client.get('/calibration/camera')
-    assert rv.status_code == 200 and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+    assert rv.status_code == 200 \
+        and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
 
 def test_update_microphone(client):
     rv = client.post('/update/microphone', json=json.dumps({"test": "testington"}))

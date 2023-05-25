@@ -10,7 +10,8 @@ from avonic_speaker_tracker.pointer import point
 class UpdateThread(Thread):
     loop = None
     # Custom thread class use a skeleton
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection):
+    def __init__(self, event, url: str, cam_api: CameraAPI,
+        mic_api: MicrophoneAPI, preset_locations: PresetCollection):
         """ Class constructor
 
         Args:

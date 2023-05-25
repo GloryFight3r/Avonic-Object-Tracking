@@ -5,14 +5,22 @@ from avonic_camera_api.camera_adapter import ResponseCode
 
 def responses():
     return {
-        ResponseCode.ACK: make_response(jsonify({"message": "Command accepted"}), 200),
-        ResponseCode.COMPLETION: make_response(jsonify({"message": "Command executed"}), 200),
-        ResponseCode.SYNTAX_ERROR: make_response(jsonify({"message": "Syntax error"}), 400),
-        ResponseCode.BUFFER_FULL: make_response(jsonify({"message": "Command buffer full"}), 400),
-        ResponseCode.CANCELED: make_response(jsonify({"message": "Command canceled"}), 409),
-        ResponseCode.NO_SOCKET: make_response(jsonify({"message": "No such socket"}), 400),
-        ResponseCode.NOT_EXECUTABLE: make_response(jsonify({"message": "Command cannot be executed"}), 400),
-        ResponseCode.TIMED_OUT: make_response(jsonify({"message": "Camera timed out"}), 504)
+        ResponseCode.ACK:
+            make_response(jsonify({"message": "Command accepted"}), 200),
+        ResponseCode.COMPLETION:
+            make_response(jsonify({"message": "Command executed"}), 200),
+        ResponseCode.SYNTAX_ERROR:
+            make_response(jsonify({"message": "Syntax error"}), 400),
+        ResponseCode.BUFFER_FULL:
+            make_response(jsonify({"message": "Command buffer full"}), 400),
+        ResponseCode.CANCELED:
+            make_response(jsonify({"message": "Command canceled"}), 409),
+        ResponseCode.NO_SOCKET:
+            make_response(jsonify({"message": "No such socket"}), 400),
+        ResponseCode.NOT_EXECUTABLE:
+            make_response(jsonify({"message": "Command cannot be executed"}), 400),
+        ResponseCode.TIMED_OUT:
+            make_response(jsonify({"message": "Camera timed out"}), 504)
     }
 
 
@@ -70,8 +78,9 @@ def move_relative_camera_endpoint(integration: GeneralController):
 def move_vector_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        ret = integration.cam_api.move_vector(int(data["vector-speed-x"]), int(data["vector-speed-y"]),
-                    [float(data["vector-x"]), float(data["vector-y"]), float(data["vector-z"])])
+        ret = integration.cam_api.move_vector(
+            int(data["vector-speed-x"]), int(data["vector-speed-y"]),
+            [float(data["vector-x"]), float(data["vector-y"]), float(data["vector-z"])])
         return responses()[ret]
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)

@@ -3,16 +3,17 @@ import numpy as np
 
 
 class CustomEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, (np.ndarray, np.generic)):
-            return obj.tolist()
-        return obj.__dict__
-    
+    def default(self, o):
+        if isinstance(o, (np.ndarray, np.generic)):
+            return o.tolist()
+        return o.__dict__
+
 
 class Preset:
     def __init__(self, camera_info: np.ndarray, microphone_direction: np.ndarray):
         self.camera_info = camera_info
         self.microphone_direction = microphone_direction
+
 
 class PresetCollection:
     preset_locations = {}
@@ -46,7 +47,8 @@ class PresetCollection:
         del self.preset_locations[to_remove]
         self.record()
 
-    def edit_preset(self, to_edit: str, new_cam_info: np.ndarray, new_microphone_direction: np.ndarray):
+    def edit_preset(self, to_edit: str,
+        new_cam_info: np.ndarray, new_microphone_direction: np.ndarray):
         """ Edits a preset with the given name only if it is already inside the dictionary
 
         Args:
@@ -81,22 +83,23 @@ class PresetCollection:
 
     def record(self):
         if self.filename is not None:
-            with open(self.filename, "w") as outfile:
+            with open(self.filename, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps(self.preset_locations, indent=4, cls=CustomEncoder))
-    
+
     def load(self):
         if self.filename is not None:
             try:
-                f = open(self.filename)
-                f.close()
-            except:
-                with open(self.filename, "x") as outfile:
+                with open(self.filename, encoding="utf-8") as f:
+                    print("Loading json...")
+            except FileNotFoundError:
+                with open(self.filename, "x", encoding="utf-8") as outfile:
+                    print("Create new preset json...")
                     outfile.write(json.dumps({}, indent=4, cls=CustomEncoder))
-            f = open(self.filename)
-            data = json.load(f)
-            print(data)
-            self.preset_locations = {}
-            for key in data:
-                self.preset_locations[key] = Preset(np.array(data[key]["camera_angle"]), np.array(data[key]["microphone_direction"]))
-            print(self.preset_locations)
-            f.close()
+            with open(self.filename, encoding="utf-8") as f:
+                data = json.load(f)
+                print(data)
+                self.preset_locations = {}
+                for key in data:
+                    self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
+                        np.array(data[key]["microphone_direction"]))
+                print(self.preset_locations)
