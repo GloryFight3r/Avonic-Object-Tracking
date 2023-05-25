@@ -11,7 +11,7 @@ from avonic_camera_api.converter import vector_angle
 import numpy as np
 
 
-def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
+def preset_pointer(cam_api: CameraAPI, mic_api: MicrophoneAPI,
           preset_locations: PresetCollection, prev_cam=None):
     if prev_cam is None:
         prev_cam = [0.0, 0.0, 0.0]
@@ -22,7 +22,7 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
     mic_direction = mic_api.get_direction()
     preset_id = find_most_similar_preset(mic_direction,presets_mic)
     preset = preset_locations.get_preset_info(preset_names[preset_id])
-    dir = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1]))]
+    dir = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),int(np.rad2deg(preset[0][2]))]
     return dir
 
 def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_dir):
@@ -41,8 +41,8 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_di
 
 def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, preset_use: bool, calibration: Calibration, prev_dir=None):
     if prev_dir is None:
-        prev_dir = [0.0, 0.0]
-    dir = [0.0, 0.0]
+        prev_dir = [0.0, 0.0, 0.0]
+    dir = [0.0, 0.0, 0.0]
 
     print("pointer")
     if preset_use == True:
@@ -52,6 +52,8 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
     if prev_dir[0] != dir[0] or prev_dir[1] != dir[1]:
         print (dir[0],dir[1],"boohoo")
         cam_api.move_absolute(24,20, dir[0], dir[1])
+        if preset_use == True:
+            cam_api.direct_zoom(dir[3])
         prev_dir = dir
 
     return dir 

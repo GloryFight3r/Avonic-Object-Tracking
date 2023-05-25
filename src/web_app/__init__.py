@@ -199,7 +199,7 @@ def create_app(test_controller=None):
 
     @app.post('/thread/preset')
     def preset_use():
-        return web_app.tracking.preset_use(integration)
+        return web_app.tracking_endpoints.preset_use(integration)
 
     @app.get('/thread/running')
     def thread_is_running():

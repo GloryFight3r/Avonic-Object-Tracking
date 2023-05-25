@@ -62,9 +62,3 @@ def preset_use(integration: GeneralController):
     integration.preset = not integration.preset
     print(integration.preset)
     return make_response(jsonify({"preset":integration.preset}), 200)
-
-
-def preset_use(integration: GeneralController):
-    integration.preset = not integration.preset
-    print(integration.preset)
-    return make_response(jsonify({"preset":integration.preset}), 200)
