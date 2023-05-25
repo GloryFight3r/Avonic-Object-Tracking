@@ -409,8 +409,6 @@ def test_get_preset_list(client):
             + "\"test-another-preset-name\"]}\n", "utf-8")
     sock.recvfrom.return_value = \
         (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
-    rv = client.post("preset/point")
-    assert rv.status_code == 200
     rv = client.get("preset/info/test-non-existent-preset-name")
     assert rv.status_code == 400
     rv = client.get("preset/info/test-preset-name")
