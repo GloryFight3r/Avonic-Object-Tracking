@@ -244,7 +244,14 @@
         </div>
         <div id="cal">
           <h5 id="calibration-instruction">Set the height, then click below to calibrate point 1</h5>
-          <button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
+          <div class="grid">
+            <button class="calibration-button" onclick="startCalibration(this)">Start 1</button>
+            <button class="calibration-button" onclick="startCalibration(this)" disabled="disabled">Start 2</button>
+            <button class="calibration-button" onclick="startCalibration(this)" disabled="disabled">Start 3</button>
+          </div>
+          <button id="camera-direction-button" onclick="pointCameraCalibration(this)" disabled="disabled">
+            Submit current camera direction.
+          </button>
           <form action="/calibration/camera" method="get" id="camera-coords-get-form" class="grid">
             <label for="camera-coords-x">Calculated camera coordinates [x, y, z]:</label>
             <input id="camera-coords-x" />
