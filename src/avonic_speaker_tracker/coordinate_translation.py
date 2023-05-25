@@ -1,6 +1,6 @@
 import numpy as np
 
-def translate_microphone_to_camera_vector(cam_to_mic: np.array, \
+def translate_microphone_to_camera_vector(cam_to_mic: np.array,
     mic_to_speaker: np.array, mic_height: float):
     """ This method calculates the vector of the real distance from camera to the speaker.
 

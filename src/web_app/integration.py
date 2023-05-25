@@ -55,7 +55,7 @@ class GeneralController():
         self.mic_api = new_controller.mic_api
         self.calibration = new_controller.calibration
         self.preset_locations = new_controller.preset_locations
-
+        self.ws = new_controller.ws
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api

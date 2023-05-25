@@ -7,12 +7,14 @@ onSuccess = {
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "camera-position-get-form": onPositionGet,
-    "camera-position-set-form": onPositionSet,
+    "presets-camera-position-set-form": onPositionSet,
+    "presets-camera-zoom-set-form": onZoomSet,
     "microphone-get-direction-form": onDirectionGet,
     "microphone-set-direction-form": onMicrophoneDirectionSet,
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
     "preset-get-list-form": refreshPresetList,
+    "camera-coords-get-form": onCameraCoordsGet
 };
 
 async function onError(button) {
@@ -29,6 +31,8 @@ async function onError(button) {
     (f) =>
         (f.onsubmit = async (e) => {
             e.preventDefault();
+            const b = f.getElementsByTagName("button")[0]
+            b.ariaBusy = "true"
             const method = f.method;
             let body = {};
             switch (method) {
@@ -44,6 +48,7 @@ async function onError(button) {
             if (response.status === 200 && fun !== undefined) {
                 fun(response.json());
             }
+            b.ariaBusy = "false"
             if (response.status !== 200) {
                 const b = f.getElementsByTagName("button")[0];
                 onError(b).then()
@@ -55,6 +60,8 @@ const presetform = document.getElementById("preset-form");
 
 presetform.onsubmit = async (e) => {
     e.preventDefault();
+    const b = f.getElementsByTagName("button")[0]
+    b.ariaBusy = "true"
     const button_id = e.submitter.id;
     let body = {};
     switch (button_id) {
@@ -83,6 +90,7 @@ presetform.onsubmit = async (e) => {
     if (response.status === 200) {
         document.getElementById("reload-preset-button").click();
     }
+    b.ariaBusy = "false"
     if (response.status !== 200) {
         const b = e.submitter;
         onError(b).then();
@@ -103,6 +111,7 @@ function selectCaliTab() {
             header.innerText = "Calibration 🧰"
             break
         default:
+            header.innerText = "Presets 🔖"
     }
 }
 

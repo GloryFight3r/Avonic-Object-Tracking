@@ -10,8 +10,8 @@ class CustomEncoder(json.JSONEncoder):
     
 
 class Preset:
-    def __init__(self, camera_angle: np.ndarray, microphone_direction: np.ndarray):
-        self.camera_angle = camera_angle
+    def __init__(self, camera_info: np.ndarray, microphone_direction: np.ndarray):
+        self.camera_info = camera_info
         self.microphone_direction = microphone_direction
 
 class PresetCollection:
@@ -24,16 +24,16 @@ class PresetCollection:
             self.load()
 
     def add_preset(self, to_add: str,
-        cam_angle: np.ndarray, microphone_direction: np.ndarray) -> None:
+                   cam_info: np.ndarray, microphone_direction: np.ndarray) -> None:
         """ Adds a preset to the dictionary of presets with the given name
 
         Args:
             to_add: Name of the preset
-            cam_angle: Angle of the camera
+            cam_info: Angle + zoom of the camera
             microphone_direction: Direction of the speaker
         """
         assert to_add not in self.preset_locations
-        self.preset_locations[to_add] = Preset(cam_angle, microphone_direction)
+        self.preset_locations[to_add] = Preset(cam_info, microphone_direction)
         self.record()
 
     def remove_preset(self, to_remove: str):
@@ -46,18 +46,16 @@ class PresetCollection:
         del self.preset_locations[to_remove]
         self.record()
 
-    def edit_preset(self, to_edit: str,
-        new_cam_angle: np.ndarray, new_microphone_direction: np.ndarray):
-        """ Edits a preset with the given name only
-        if it is already inside the dictionary
+    def edit_preset(self, to_edit: str, new_cam_info: np.ndarray, new_microphone_direction: np.ndarray):
+        """ Edits a preset with the given name only if it is already inside the dictionary
 
         Args:
             to_edit: Name of the preset
-            new_cam_angle: Angle of the camera
+            new_cam_info: Angle of the camera
             new_microphone_direction: Direction of the speaker
         """
         assert to_edit in self.preset_locations
-        self.preset_locations[to_edit] = Preset(new_cam_angle, new_microphone_direction)
+        self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
     def get_preset_list(self):
@@ -78,7 +76,7 @@ class PresetCollection:
 
         """
         assert to_get in self.preset_locations
-        return (self.preset_locations[to_get].camera_angle,
+        return (self.preset_locations[to_get].camera_info,
                 self.preset_locations[to_get].microphone_direction)
 
     def record(self):
