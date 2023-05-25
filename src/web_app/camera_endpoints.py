@@ -1,6 +1,7 @@
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_adapter import ResponseCode
+from avonic_camera_api.converter import vector_angle
 
 
 def responses():
@@ -100,5 +101,6 @@ def position_get_camera_endpoint(integration: GeneralController):
     position = integration.cam_api.get_direction()
     if isinstance(position, ResponseCode):
         return responses()[position]
-    return make_response(jsonify({"position-alpha-value": position[0],
-        "position-beta-value": position[1]}), 200)
+    pos = vector_angle(position)
+    return make_response(jsonify({"position-alpha-value": pos[0],
+        "position-beta-value": pos[1]}), 200)

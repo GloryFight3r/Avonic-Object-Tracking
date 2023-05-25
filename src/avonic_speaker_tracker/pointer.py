@@ -29,12 +29,17 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_di
     print("continuous")
     mic_direction = mic_api.get_direction()
 
-    m_height = 0.80
-    to_m_dir = np.array([0.0,0.6,-1.5])
+    m_height = 0.65
+    to_m_dir = np.array([0.0,-0.5,1.2])
 
-    cam_vec = translate_microphone_to_camera_vector(to_m_dir,mic_direction,m_height)
+    cam_vec = translate_microphone_to_camera_vector(calibration.to_mic_direction,mic_direction,calibration.mic_height)
+
+    cam_vec = [-cam_vec[0], cam_vec[1], cam_vec[2]]
+
+    #return cam_vec
 
     dir = vector_angle(cam_vec)
+    dir = [int(np.rad2deg(dir[0])),int(np.rad2deg(dir[1]))]
     print(dir,mic_direction)
     return dir
 
@@ -44,7 +49,6 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
         prev_dir = [0.0, 0.0, 0.0]
     dir = [0.0, 0.0, 0.0]
 
-    print("pointer")
     if preset_use == True:
         dir = preset_pointer(mic_api, preset_locations, prev_dir)
     else :

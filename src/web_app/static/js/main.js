@@ -14,7 +14,7 @@ onSuccess = {
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
     "preset-get-list-form": refreshPresetList,
-    "camera-coords-get-form": onCameraCoordsGet
+    "camera-coords-get-form": onCameraCoordsGet,
     "thread-preset" : usePresets,
 };
 
