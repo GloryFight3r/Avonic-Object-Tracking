@@ -50,7 +50,7 @@ class UpdateThread(Thread):
                 prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, self.preset_use, self.calibration, prev_dir)
 
             self.value += 1
-            sleep(1)
+            sleep(0.3)
         print("Exiting thread")
 
     def set_calibration(self, value):
@@ -89,4 +89,4 @@ class UpdateThread(Thread):
             response = requests.post(self.url + path, json=d)
             if response.status_code != 200:
                 print("Could not update flask at path " + path)
-            sleep(0.1)
+            sleep(0.3)

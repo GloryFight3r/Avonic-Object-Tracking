@@ -23,10 +23,13 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_di
     print("continuous")
     mic_direction = mic_api.get_direction()
 
-    cam_vec = translate_microphone_to_camera_vector(calibration.to_mic_direction,mic_direction,calibration.mic_height)
+    m_height = 0.80
+    to_m_dir = np.array([0.0,0.6,-1.5])
+
+    cam_vec = translate_microphone_to_camera_vector(to_m_dir,mic_direction,m_height)
 
     dir = vector_angle(cam_vec)
-    print(dir)
+    print(dir,mic_direction)
     return dir
 
 
@@ -41,6 +44,7 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
     else :
         dir = continuous_pointer(mic_api, calibration,prev_dir)
     if prev_dir[0] != dir[0] or prev_dir[1] != dir[1]:
+        print (dir[0],dir[1],"boohoo")
         cam_api.move_absolute(24,20, dir[0], dir[1])
         prev_dir = dir
 
