@@ -24,9 +24,13 @@ async function onPositionSet(data) {
     const d = await data
     document.getElementById("camera-direction-alpha").value =
         d["position-alpha-value"]
-
     document.getElementById("camera-direction-beta").value =
         d["position-beta-value"]
+}
+
+async function onZoomSet(data) {
+    document.getElementById("camera-zoom-value").value =
+        (await data)["zoom-value"]
 }
 
 function selectMovement() {
