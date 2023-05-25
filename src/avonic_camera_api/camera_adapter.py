@@ -1,6 +1,18 @@
 import socket
 import binascii
 import time
+from enum import Enum
+
+
+class ResponseCode(Enum):
+    ACK = 0
+    COMPLETION = 1
+    SYNTAX_ERROR = 2
+    BUFFER_FULL = 3
+    CANCELED = 4
+    NO_SOCKET = 5
+    NOT_EXECUTABLE = 6
+    TIMED_OUT = 7
 
 
 class Camera:
@@ -10,6 +22,15 @@ class Camera:
     sock = None
     address = None
     message_dict = {}
+    response_codes = {
+        "b'9041FF'": ResponseCode.ACK,
+        "b'9051FF'": ResponseCode.COMPLETION,
+        "b'906002FF'": ResponseCode.SYNTAX_ERROR,
+        "b'906003FF'": ResponseCode.BUFFER_FULL,
+        "b'906104FF'": ResponseCode.CANCELED,
+        "b'906105FF'": ResponseCode.NO_SOCKET,
+        "b'906141FF'": ResponseCode.NOT_EXECUTABLE
+    }
 
     def __init__(self, sock: socket.socket, address):
         """ Constructor for Camera
@@ -50,12 +71,13 @@ class Camera:
 
         self.sock.sendall(message)
 
-    def send(self, header:str, command:str, message_counter: int) -> bytes:
+    def send(self, header: str, command: str, message_counter: int) -> ResponseCode | bytes:
         """ Sends the current command to the camera using the VISCA protocol
 
         Args:
             header: header for the current command
             command: the command the camera has to execute in accordance to the VISCA protocol
+            message_counter: amount of messages received so far
 
         Returns:
             Response code from the camera
@@ -67,30 +89,29 @@ class Camera:
         self.sock.sendall(message)
 
         self.sock.settimeout(5.0)
-        data2 = bytes(0)
         try:
-            data2 = binascii.hexlify(self.sock.recv(2048)).upper()
+            data = binascii.hexlify(self.sock.recv(2048)).upper()
         except TimeoutError:
-            print("Camera timed out")
-            return bytes(0)
+            return ResponseCode.TIMED_OUT
 
         while True:
-            split_messages = str(data2).split("'b'")
+            split_messages = str(data).split("'b'")
             if len(split_messages) > 0:
                 split_messages[0] = split_messages[0][2:]
 
             for x in split_messages[:]:
-                if x[16:][2:4] != '51': # its a completion message
+                if x[16:][2:4] != '51':  # its a completion message
                     self.message_dict[int('0x' + x[14:16], 16)] = "b'" + x[16:]
 
             if message_counter - 1 in self.message_dict:
                 ret = self.message_dict[message_counter - 1]
                 del self.message_dict[message_counter - 1]
+                if ret in self.response_codes:
+                    return self.response_codes[ret]
                 return ret
             else:
                 self.sock.settimeout(5.0)
                 try:
-                    data2 = binascii.hexlify(self.sock.recv(2048)).upper()
+                    data = binascii.hexlify(self.sock.recv(2048)).upper()
                 except TimeoutError:
-                    print("Camera timed out")
-                    return bytes(0)
+                    return ResponseCode.TIMED_OUT

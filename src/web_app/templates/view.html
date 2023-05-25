@@ -215,10 +215,12 @@
             <div class="grid">
               <label for="camera-direction-alpha">Camera degrees pan</label>
               <label for="camera-direction-beta">Camera degrees tilt</label>
+              <label for="camera-zoom-value">Camera zoom value</label>
             </div>
             <div class="grid">
               <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
               <input id="camera-direction-beta" name="camera-direction-beta" readonly />
+              <input id="camera-zoom-value" name="camera-zoom-value" readonly />
             </div>
             <div class="grid">
               <button id="add-preset-button" type="submit">Add new preset</button>
@@ -229,8 +231,11 @@
           </form>
 
           <div class="grid">
-            <form action="/camera/position/get" method="get" id="camera-position-set-form">
+            <form action="/camera/position/get" method="get" id="presets-camera-position-set-form">
               <button type="submit">Set camera position</button>
+            </form>
+            <form action="/camera/zoom/get" method="get" id="presets-camera-zoom-set-form">
+              <button type="submit">Set camera zoom</button>
             </form>
             <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
               <button type="submit">Set microphone position</button>

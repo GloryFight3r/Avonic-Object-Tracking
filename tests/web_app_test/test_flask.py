@@ -275,6 +275,7 @@ def test_add_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0,
@@ -286,6 +287,7 @@ def test_add_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0,
@@ -297,6 +299,7 @@ def test_add_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "preset-name": "test-preset-name"
@@ -307,6 +310,7 @@ def test_add_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-z" : 0,
             "preset-name": "test-preset-name-y-missing"
@@ -317,6 +321,7 @@ def test_add_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0,
             "preset-name": "test-preset-name-x-missing"
@@ -326,6 +331,7 @@ def test_add_preset_location(client):
     rv = client.post("preset/add",
         data={
             "camera-direction-alpha" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0,
@@ -336,6 +342,7 @@ def test_add_preset_location(client):
     rv = client.post("preset/add",
         data={
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0,
@@ -347,6 +354,7 @@ def test_add_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0
@@ -360,6 +368,7 @@ def test_edit_preset_location(client):
         data={
             "camera-direction-alpha" : 0.25,
             "camera-direction-beta" : 0.25,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : -1,
@@ -371,6 +380,7 @@ def test_edit_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 1,
             "mic-direction-y" : 0,
             "mic-direction-z" : 0,
@@ -382,6 +392,7 @@ def test_edit_preset_location(client):
         data={
             "camera-direction-alpha" : 0,
             "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
             "mic-direction-x" : 0,
             "mic-direction-y" : 1,
             "mic-direction-z" : 0,
@@ -406,6 +417,7 @@ def test_get_preset_list(client):
     assert rv.status_code == 200 and bytes("{" \
             + "\"camera-direction-alpha\":0," \
             + "\"camera-direction-beta\":0," \
+            + "\"camera-direction-value\":0," \
             + "\"mic-direction-x\":1," \
             + "\"mic-direction-y\":0," \
             + "\"mic-direction-z\":0," \
@@ -414,6 +426,7 @@ def test_get_preset_list(client):
     assert rv.status_code == 200 and bytes("{" \
             + "\"camera-direction-alpha\":0," \
             + "\"camera-direction-beta\":0," \
+            + "\"camera-direction-value\":0," \
             + "\"mic-direction-x\":0," \
             + "\"mic-direction-y\":1," \
             + "\"mic-direction-z\":0," \
