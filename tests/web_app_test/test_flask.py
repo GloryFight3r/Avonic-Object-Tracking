@@ -8,6 +8,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
+from avonic_speaker_tracker.preset import PresetCollection
 import web_app
 
 
@@ -66,6 +67,7 @@ def client(camera):
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
+    test_controller.set_preset_collection(PresetCollection(filename=None))
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
     return app.test_client()
@@ -372,6 +374,28 @@ def test_edit_preset_location(client):
 
 
 def test_get_preset_list(client):
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "mic-direction-x" : 0,
+            "mic-direction-y" : 1,
+            "mic-direction-z" : 0,
+            "preset-name": "test-another-preset-name"
+        }
+    )
+    assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200\
         and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","\
