@@ -1,5 +1,8 @@
 # 11C - Avonic
 
+## Badges
+`dev branch:` ![dev pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint) ![dev coverage](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/coverage-badge.svg?job=test)
+
 ## Rules
 
 ### General, non-technology-related
@@ -65,9 +68,6 @@ Create a new chapter in `chapters` and end it with `.tex`. Edit that file (no ne
    ![image](https://cdn.discordapp.com/attachments/1100381425674506282/1100404222769516626/image.png)
 4. Click Apply/Ok
 5. Run this configuration
-
-## Badges
-`dev branch:` ![dev pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint) [dev pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint)
 
 #### In the terminal
 
