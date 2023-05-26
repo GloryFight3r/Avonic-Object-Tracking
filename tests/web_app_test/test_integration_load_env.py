@@ -1,6 +1,5 @@
 from unittest import mock
 import socket
-import json
 import pytest
 import numpy as np
 from web_app.integration import GeneralController
