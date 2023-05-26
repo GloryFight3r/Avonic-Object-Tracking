@@ -19,4 +19,4 @@ ENV SECRET_KEY=test
 
 EXPOSE 8000
 
-CMD [ "uwsgi", "--http :8000 --gevent 1000 --http-websockets --master --module web_app" ]
+CMD uwsgi --http :8000 --gevent 1000 --http-websockets --master --module web_app
