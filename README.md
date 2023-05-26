@@ -67,7 +67,7 @@ Create a new chapter in `chapters` and end it with `.tex`. Edit that file (no ne
 5. Run this configuration
 
 ## Badges
-![pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint)
+`dev branch:` ![dev pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint) [dev pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint)
 
 #### In the terminal
 
