@@ -5,8 +5,6 @@ from avonic_camera_api import converter
 
 PAN_STEP = 341/(2448+2448)
 TILT_STEP = 121/(1296+443)
-#PAN_STEP = 0.0625
-#TILT_STEP = PAN_STEP
 
 class CameraAPI:
     latest_direction = None
