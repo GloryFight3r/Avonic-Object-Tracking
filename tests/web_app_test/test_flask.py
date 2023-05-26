@@ -5,9 +5,9 @@ import pytest
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import Camera
+from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import UDPSocket
+from microphone_api.microphone_adapter import MicrophoneSocket
 import web_app
 
 
@@ -37,7 +37,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(Camera(sock, None))
+    cam_api = CameraAPI(CameraSocket(sock=sock))
     def mocked_camera_reconnect():
         pass
     def mocked_get_zoom():
@@ -58,7 +58,7 @@ def client(camera):
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
-    mic_api = MicrophoneAPI(UDPSocket(None, sock))
+    mic_api = MicrophoneAPI(MicrophoneSocket(sock=sock))
     mic_api.height = 1
 
     cam_api = camera

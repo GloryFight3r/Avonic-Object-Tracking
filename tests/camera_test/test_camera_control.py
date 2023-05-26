@@ -2,8 +2,8 @@ import socket
 import math
 import pytest
 import numpy as np
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera, ResponseCode
+from avonic_camera_api.camera_control_api import CameraAPI, degrees_to_command
+from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api import converter
 
 
@@ -33,11 +33,11 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "close", mocked_close)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    return CameraAPI(Camera(sock, None))
+    return CameraAPI(CameraSocket(sock, None))
 
 
 @pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_relative_commands())
-def test_move_relative(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, alpha, beta, expected, expected2):
+def test_move_relative(monkeypatch, camera: CameraAPI, speed_alpha, speed_beta, alpha, beta, expected, expected2):
     def mocked_send(message):
         assert message == expected
     def mocked_return(bytes_receive):
@@ -102,7 +102,7 @@ def generate_degrees_to_commands():
 
 @pytest.mark.parametrize("alpha, expected", generate_degrees_to_commands())
 def test_degrees_to_command(camera:CameraAPI, alpha, expected):
-    assert camera.degrees_to_command(alpha) == expected
+    assert degrees_to_command(alpha) == expected
 
 
 def generate_absolute_commands():

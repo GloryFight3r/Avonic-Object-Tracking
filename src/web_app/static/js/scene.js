@@ -53,14 +53,14 @@ async function animate() {
     const micX = document.getElementById("mic-direction-x").value
     const micY = document.getElementById("mic-direction-y").value
     const micZ = document.getElementById("mic-direction-z").value
-    const micDir = new THREE.Vector3(micX, micY, micZ)
+    const micDir = new THREE.Vector3(-micX, micY, micZ)
     micArrow.setDirection(micDir)
     scene.remove(camArrow)
     camArrow.dispose()
     const camA = document.getElementById("position-alpha-value").value
     const camB = document.getElementById("position-beta-value").value
     const cosb = Math.cos(camB)
-    const camX = -Math.sin(camA) * cosb
+    const camX = Math.sin(camA) * cosb
     const camY = Math.sin(camB)
     const camZ = Math.cos(camA) * cosb
     const camDir = new THREE.Vector3(camX, camY, camZ)
@@ -71,7 +71,7 @@ async function animate() {
     camArrow = new THREE.ArrowHelper(camDir, cam, 1, 0xff00ff)
     scene.add(camArrow)
 
-    plane.position.set(0, h, 0)
+    plane.position.set(0, -h, 0)
     requestAnimationFrame(animate)
     controls.update()
     render().then()

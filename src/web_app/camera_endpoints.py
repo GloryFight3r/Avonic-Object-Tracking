@@ -71,7 +71,8 @@ def move_vector_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
         ret = integration.cam_api.move_vector(int(data["vector-speed-x"]), int(data["vector-speed-y"]),
-                    [float(data["vector-x"]), float(data["vector-y"]), float(data["vector-z"])])
+                                              [float(data["vector-x"]), float(data["vector-y"]),
+                                               float(data["vector-z"])])
         return responses()[ret]
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
@@ -101,4 +102,4 @@ def position_get_camera_endpoint(integration: GeneralController):
     if isinstance(position, ResponseCode):
         return responses()[position]
     return make_response(jsonify({"position-alpha-value": position[0],
-        "position-beta-value": position[1]}), 200)
+                                  "position-beta-value": position[1]}), 200)

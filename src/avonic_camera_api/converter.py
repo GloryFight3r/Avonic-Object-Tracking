@@ -13,7 +13,7 @@ def angle_vector(alpha: float, beta: float) -> np.array:
         looking towards positive z-axis, with the y-axis being the height
     """
     cosb = np.cos(beta)
-    return np.array([np.sin(alpha) * cosb, np.sin(beta), np.cos(alpha) * cosb])
+    return np.array([-np.sin(alpha) * cosb, np.sin(beta), np.cos(alpha) * cosb])
 
 
 def vector_angle(v: np.array) -> (float, float):

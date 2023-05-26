@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from microphone_api.microphone_adapter import UDPSocket
+from microphone_api.microphone_adapter import MicrophoneSocket
 
 
 class MicrophoneAPI:
@@ -11,7 +11,7 @@ class MicrophoneAPI:
     speaking = None
     threshold = None
 
-    def __init__(self, sock: UDPSocket, threshold=-55):
+    def __init__(self, sock: MicrophoneSocket, threshold=-55):
         """ Constructor for the Microphone
 
         Args:
@@ -68,7 +68,7 @@ class MicrophoneAPI:
             print("Unable to get elevation from microphone, response was: " + ret)
         return self.elevation
 
-    def get_direction(self) -> np.array:
+    def get_direction(self) -> np.ndarray | str:
         """ Get direction vector from the microphone.
 
         Returns:
@@ -87,8 +87,10 @@ class MicrophoneAPI:
             if 0 <= azimuth < 360:
                 self.azimuth = np.deg2rad(azimuth)
         except KeyError:
-            print("Unable to get direction from microphone, response was: " + ret)
-
+            obj = json.loads(ret)
+            if "message" in obj:
+                return obj["message"]
+            return "Unable to get direction from microphone, response was: " + ret
         return self.vector()
 
     def vector(self) -> np.array:
@@ -100,9 +102,9 @@ class MicrophoneAPI:
         """
         cose = np.cos(self.elevation)
         return np.array([np.sin(self.azimuth) * cose,
-                         np.sin(self.elevation), np.cos(self.azimuth) * cose])
+                         -np.sin(self.elevation), np.cos(self.azimuth) * cose])
 
-    def is_speaking(self) -> bool:
+    def is_speaking(self) -> bool | str:
         """ Determine whether someone is speaking based on the peak loudness
 
         Returns:
@@ -116,5 +118,8 @@ class MicrophoneAPI:
             if -90 <= res <= 0:
                 self.speaking = res > self.threshold
         except KeyError:
-            print("Unable to get peak loudness, response was: " + ret)
+            obj = json.loads(ret)
+            if "message" in obj:
+                return obj["message"]
+            return "Unable to get peak loudness, response was: " + ret
         return self.speaking
