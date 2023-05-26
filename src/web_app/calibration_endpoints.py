@@ -1,5 +1,6 @@
 from flask import make_response, jsonify
 from web_app.integration import GeneralController
+import numpy as np
 
 def success():
     return make_response(jsonify({}), 200)
@@ -26,6 +27,10 @@ def is_calibrated(integration: GeneralController):
     }), 200)
 
 def get_calibration(integration: GeneralController):
+    cam_coord = np.array([0.0, 0.0, 0.0])
+    if integration.calibration.is_calibrated():
+        cam_coord = integration.calibration.calculate_distance()
+
     return make_response(jsonify({
-        "camera-coords": list(integration.calibration.calculate_distance())
+        "camera-coords": list(cam_coord)
     }), 200)
