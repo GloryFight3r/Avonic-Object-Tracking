@@ -7,13 +7,22 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 
 def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
-          preset_locations: PresetCollection, prev_cam=None):
+          preset_locations: PresetCollection, prev_cam=None) -> [int]:
+    """ Points the camera towards the closest preset location.
+
+        params:
+            cam_api: the camera API instance
+            mic_api: the microphone API instance
+            preset_locations: a collection of presets to be used
+
+        returns:
+            The new position (pan, tilt) of the camera.
+    """
     if prev_cam is None:
         prev_cam = [0.0, 0.0, 0.0]
     preset_names = np.array(preset_locations.get_preset_list())
-    presets_mic = []
-    for i in range(len(preset_names)):
-        presets_mic.append(preset_locations.get_preset_info(preset_names[i])[1])
+    presets_mic = list(map(lambda preset: preset_locations.get_preset_info(preset)[1], preset_names))
+
     mic_direction = mic_api.get_direction()
     preset_id = find_most_similar_preset(mic_direction,presets_mic)
     preset = preset_locations.get_preset_info(preset_names[preset_id])

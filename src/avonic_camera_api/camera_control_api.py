@@ -21,6 +21,12 @@ class CameraAPI:
         self.latest_direction = np.array([0, 0, 1])
 
     def message_counter(self) -> str:
+        """ Keeps count of how many messages were sent and resets at 256.
+
+            returns:
+                count: the count as hexadecimal
+
+        """
         cnt_hex = self.counter.to_bytes(1, 'big').hex()
 
         self.counter = (self.counter + 1) % 256
@@ -77,13 +83,16 @@ class CameraAPI:
         return self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
                                 '81 01 06 04 FF', self.counter)
 
-    def degrees_to_command(self, degree: float, step_size) -> str:
+    def degrees_to_command(self, degree: float, step_size: float) -> str:
         """ Transforms an angle in degree to a command code for visca call
 
-        Args:
-            degree: an angle in degrees, can be a float but precision could be lost
-        Returns:
-            A byte code that will be used for a visca command call
+        params:
+            degree: an angle in degrees, can be a float but precision could be lost.
+            step_size: the smallest change in movement the camera can take. This differs
+                for pan and tilt movement.
+
+        returns:
+            A byte code that will be used for a visca command call.
         """
         degree_divided = int(degree / step_size)
 

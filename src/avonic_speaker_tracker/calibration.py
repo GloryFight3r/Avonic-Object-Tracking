@@ -66,6 +66,8 @@ class Calibration:
         """
         if len(self.speaker_points) == 0:
             return self.mic_to_cam
+
+        # reset the list so no old calculations are used
         self.mic_to_cams = []
         for speaker in self.speaker_points:
             cam_vecw = speaker[0]
@@ -91,4 +93,13 @@ class Calibration:
         return self.mic_to_cam
 
 def angle_between_vectors(p: np.array, q: np.array) -> float:
+    """ Calculates the cosine of the smallest angle between two vectors.
+
+        params:
+            p: the first vector
+            q: the second vector
+
+        returns:
+            angle: the cosine of the angle
+    """
     return p.dot(q) / (np.linalg.norm(p) * np.linalg.norm(q))
