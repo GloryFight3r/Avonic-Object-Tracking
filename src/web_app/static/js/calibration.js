@@ -5,6 +5,8 @@ let isCalibrating = false
 function addCalibrationSpeaker() {
     isCalibrating = false
     const instructionText = document.getElementById("calibration-instruction")
+
+    // after the last point has been calibrated, change the instruction text
     if (calibratingSpeakerCount === totalCalibrations - 1) {
         instructionText.innerHTML =
             "Please point the camera directly to the microphone.";
@@ -39,29 +41,27 @@ function pointCameraCalibration(button) {
     const instructionText = document.getElementById("calibration-instruction");
     button.disabled = true;
     const body = { method: "get" };
-        fetch("/calibration/add_direction_to_mic", body).then(async function (res) {
+    fetch("/calibration/add_direction_to_mic", body).then(async function (res) {
+        button.disabled = false;
+        if (res.status !== 200) {
+            onError(button);
+        } else {
             button.disabled = false;
-            if (res.status !== 200) {
-                onError(button);
-            } else {
-                button.disabled = false;
-                button.innerHTML = "Reset calibration";
-                instructionText.innerHTML =
-                    "Don't forget to set the height too. Press below to reset the calibration.";
-                button.onclick = () => resetCalibration(button);
-                document.getElementsByClassName("calibration-button")[calibratingSpeakerCount].disabled = true
-            }
-        });
+            button.innerHTML = "Reset calibration";
+            instructionText.innerHTML =
+                "Don't forget to set the height too. Press below to reset the calibration.";
+            button.onclick = () => resetCalibration(button);
+            document.getElementsByClassName("calibration-button")[calibratingSpeakerCount].disabled = true
+        }
+    });
 }
 
 async function calibrationIsSet() {
-    console.log("CALIBRATION???")
     const body = { method: "get" };
     fetch("/calibration/is_set", body)
         .then((data) => data.json())
         .then((json) => {
             if (json["is_set"]) {
-                console.log("Calibration is set")
                 const buttons = document.getElementsByClassName("calibration-button");
                 buttons[0].disabled = true
                 for (button in buttons) {
