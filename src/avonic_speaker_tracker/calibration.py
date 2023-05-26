@@ -66,6 +66,7 @@ class Calibration:
         """
         if len(self.speaker_points) == 0:
             return self.mic_to_cam
+        self.mic_to_cams = []
         for speaker in self.speaker_points:
             cam_vecw = speaker[0]
             mic_vecw = speaker[1]
