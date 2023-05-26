@@ -1,12 +1,6 @@
 import json
 import numpy as np
-
-
-class CustomEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, (np.ndarray, np.generic)):
-            return o.tolist()
-        return o.__dict__
+from avonic_speaker_tracker.persistency_utils import CustomEncoder
 
 
 class Preset:
@@ -21,8 +15,7 @@ class PresetCollection:
     def __init__(self, filename=None):
         self.filename = filename
         self.preset_locations = {}
-        if filename is not None:
-            self.load()
+        self.load()
 
     def add_preset(self, to_add: str,
                    cam_info: np.ndarray, microphone_direction: np.ndarray) -> None:

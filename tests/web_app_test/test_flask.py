@@ -38,7 +38,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(Camera(sock, None))
+    cam_api = CameraAPI(Camera(sock, (None, 1259)))
     def mocked_camera_reconnect():
         pass
     def mocked_get_zoom():

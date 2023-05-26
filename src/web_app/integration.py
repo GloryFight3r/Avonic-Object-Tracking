@@ -39,7 +39,7 @@ class GeneralController():
         mic_sock = UDPSocket(mic_addr)
         self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
         self.preset_locations = PresetCollection(filename="sample.json")
-        self.calibration = Calibration()
+        self.calibration = Calibration(filename="sample_calibration.json")
         self.secret = getenv("SECRET_KEY")
 
     def load_mock(self):
