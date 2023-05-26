@@ -31,13 +31,13 @@ class CameraAPI:
 
         return cnt_hex
 
-    def reboot(self) -> None:
+    def reboot(self, new_socket) -> ResponseCode:
         """ Reboots the camera - the camera will do a complete reboot
         """
         self.camera.send_no_response('01 00 00 06 00 00 00' + self.message_counter(),
                                      '81 0A 01 06 01 FF')
 
-        self.camera.reconnect()
+        return self.camera.reconnect(new_socket)
 
     def stop(self) -> ResponseCode:
         """ Stops the camera from rotating

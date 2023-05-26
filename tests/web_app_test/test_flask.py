@@ -15,7 +15,7 @@ sock = mock.Mock()
 
 @pytest.fixture()
 def camera(monkeypatch):
-    def mocked_connect(addr):
+    def mocked_connect(addr, self=None):
         pass
 
     def mocked_close(self):
@@ -27,7 +27,7 @@ def camera(monkeypatch):
     def mocked_recv(size):
         return b'\x01\x00\x00\x00\x00\x00\x00\x01\x90\x41\xff'
 
-    def mocked_timeout(ms):
+    def mocked_timeout(ms: float, self=None):
         pass
 
     sock = socket.socket
@@ -37,15 +37,12 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=sock))
-    def mocked_camera_reconnect():
-        pass
+    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():
         return np.array([0, 0, 0])
 
-    monkeypatch.setattr(cam_api.camera, "reconnect", mocked_camera_reconnect)
     monkeypatch.setattr(cam_api, "get_zoom", mocked_get_zoom)
     monkeypatch.setattr(cam_api, "get_direction", mocked_get_direction)
 
@@ -64,6 +61,7 @@ def client(camera):
     cam_api = camera
 
     test_controller = GeneralController()
+    test_controller.cam_sock = camera.camera.sock
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
@@ -81,14 +79,14 @@ def test_fail(client):
 
 
 def test_turn_on(client):
-    """Test a turn on endpoint."""
+    """Test a turn-on endpoint."""
 
     rv = client.post('/camera/on')
     assert rv.status_code == 200
 
 
 def test_turn_off(client):
-    """Test a turn off endpoint."""
+    """Test a turn-off endpoint."""
 
     rv = client.post('/camera/off')
     assert rv.status_code == 200

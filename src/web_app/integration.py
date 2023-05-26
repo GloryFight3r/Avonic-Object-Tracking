@@ -14,6 +14,7 @@ class GeneralController:
         self.event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
+        self.cam_sock = None  # Only for testing
         self.cam_api = None
         self.mic_api = None
         self.secret = None
@@ -37,8 +38,10 @@ class GeneralController:
         self.secret = getenv("SECRET_KEY")
 
     def load_mock(self):
-        self.cam_api = CameraAPI(CameraSocket())
-        self.mic_api = MicrophoneAPI(MicrophoneSocket(), 55)
+        cam_addr = ('0.0.0.0', 52381)
+        mic_addr = ('0.0.0.0', 45)
+        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
+        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
         self.calibration = Calibration()
 
     def copy(self, new_controller):

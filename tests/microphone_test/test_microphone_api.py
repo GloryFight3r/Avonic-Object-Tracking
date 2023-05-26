@@ -81,7 +81,8 @@ def test_direction_vertical():
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":90}}}\r\n', "ascii"), None)
     api = MicrophoneAPI(MicrophoneSocket(sock=sock))
-    assert np.allclose(api.get_direction(), [0.0, 1.0, 0.0])
+    # this is the correct value for a microphone pointing downwards, do not edit!!
+    assert np.allclose(api.get_direction(), [0.0, -1.0, 0.0])
     assert api.azimuth == np.deg2rad(0)
     assert api.elevation == np.deg2rad(90)
 

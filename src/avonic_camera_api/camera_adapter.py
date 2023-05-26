@@ -1,6 +1,5 @@
 import socket
 import binascii
-import time
 from enum import Enum
 
 
@@ -16,6 +15,7 @@ class ResponseCode(Enum):
     NO_SOCKET = 5
     NOT_EXECUTABLE = 6
     TIMED_OUT = 7
+    NO_ADDRESS = 8
 
 
 class CameraSocket:
@@ -55,23 +55,34 @@ class CameraSocket:
         """
         self.sock.close()
 
-    def reconnect(self, sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)):
+    def reconnect(self, sock, address=None):
         """ Re-connect to camera after a reboot
         """
         self.sock = sock
-        time.sleep(1)
-        if self.address is None:
-            print("WARNING: Camera address not specified!")
-            return
-        self.sock.connect(self.address)
+        if address is None:
+            if self.address is None:
+                print("WARNING: Camera address not specified!")
+                return ResponseCode.NO_ADDRESS
+        else:
+            self.address = address
+        self.sock.settimeout(10.0)
+        try:
+            self.sock.connect(self.address)
+            return ResponseCode.COMPLETION
+        except TimeoutError:
+            print("ERROR: Cannot connect to camera on address " + self.address)
+            return ResponseCode.TIMED_OUT
 
     def send_no_response(self, header: str, command: str) -> None:
-        """ Sends the reboot command to the camera, but does not wait for a response
+        """ Sends the command to the camera, but does not wait for a response
 
         Args:
             header: header for the current command
             command: the command the camera has to execute in accordance to the VISCA protocol
         """
+        if self.address is None:
+            print("WARNING: Camera address not specified!")
+            return
         header = bytes.fromhex(header)
         command = bytes.fromhex(command)
         message = header + command
@@ -89,6 +100,9 @@ class CameraSocket:
         Returns:
             Response code from the camera
         """
+        if self.address is None:
+            print("WARNING: Camera address not specified!")
+            return ResponseCode.NO_ADDRESS
         header = bytes.fromhex(header)
         command = bytes.fromhex(command)
         message = header + command

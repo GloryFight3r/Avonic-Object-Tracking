@@ -1,3 +1,5 @@
+import socket
+
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_adapter import ResponseCode
@@ -21,13 +23,17 @@ def success():
 
 
 def reboot_camera_endpoint(integration: GeneralController):
-    integration.cam_api.reboot()
-    return success()
+    if integration.cam_sock is None:
+        new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    else:
+        new_socket = integration.cam_sock
+    ret = integration.cam_api.reboot(new_socket)
+    return responses()[ret]
 
 
 def turn_on_camera_endpoint(integration: GeneralController):
     ret = integration.cam_api.turn_on()
-    if ret == ResponseCode.COMPLETION:
+    if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "on"})
         return success()
     return responses()[ret]
@@ -35,7 +41,7 @@ def turn_on_camera_endpoint(integration: GeneralController):
 
 def turn_off_camera_endpoint(integration: GeneralController):
     ret = integration.cam_api.turn_off()
-    if ret == ResponseCode.COMPLETION:
+    if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "off"})
         return success()
     return responses()[ret]
