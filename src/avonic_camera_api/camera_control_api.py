@@ -86,13 +86,11 @@ class CameraAPI:
             A byte code that will be used for a visca command call
         """
         degree_divided = int(degree / step_size)
-        print(degree_divided)
 
         if degree_divided < 0:
             degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
 
         in_bytes = hex(degree_divided)[2:]
-        print(in_bytes)
 
         in_bytes = '0' * (4 - len(in_bytes)) + in_bytes
 
