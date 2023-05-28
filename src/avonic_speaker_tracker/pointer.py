@@ -26,7 +26,6 @@ def preset_pointer(cam_api: CameraAPI, mic_api: MicrophoneAPI,
     return dir
 
 def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_dir):
-    print("continuous")
     mic_direction = mic_api.get_direction()
 
     m_height = 0.65
@@ -54,7 +53,6 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
     else :
         dir = continuous_pointer(mic_api, calibration,prev_dir)
     if prev_dir[0] != dir[0] or prev_dir[1] != dir[1]:
-        print (dir[0],dir[1],"boohoo")
         cam_api.move_absolute(24,20, dir[0], dir[1])
         if preset_use == True:
             cam_api.direct_zoom(dir[3])
