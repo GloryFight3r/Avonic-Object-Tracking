@@ -5,17 +5,17 @@ import avonic_speaker_tracker.coordinate_translation
 def generate_good_pairs_of_combinations():
     return [
         (np.array([-1.9, 1.3, -1.5]), np.array([-1.4, -1.7, -0.1]),
-        1.7, np.array([-3.3, -0.4, -1.6])),
+        1.7, np.array([-0.5, 3, -1.4])),
         (np.array([-1.5, 3, 0.3]), np.array([-1.4, -1.9, -0.5]),
-        1.9, np.array([-2.9, 1.1, -0.2])),
+        1.9, np.array([-0.1, 4.9, 0.8])),
         (np.array([-1.5, 3, 0.3]), np.array([-1.4, -1.9, -0.5]) / 5,
-        1.9, np.array([-2.9, 1.1, -0.2])),
+        1.9, np.array([-0.1, 4.9, 0.8])),
         (np.array([-1.5, 3, 0.3]), np.array([2.8, -2.1, 5.2]),
-        2.1, np.array([1.3, 0.9, 5.5])),
+        2.1, np.array([-4.3, 5.1, -4.9])),
         (np.array([-1.5, 3, 0.3]), np.array([2.8, -2.1, 5.2]) / 4,
-        2.1, np.array([1.3, 0.9, 5.5])),
+        2.1, np.array([-4.3, 5.1, -4.9])),
         (np.array([-1.5, 3, 0.3]), np.array([2.8, -2.1, 5.2]) / 10,
-        2.1, np.array([1.3, 0.9, 5.5]))
+        2.1, np.array([-4.3, 5.1, -4.9]))
     ]
 
 def generate_bad_pairs_of_combinations():
