@@ -202,6 +202,15 @@ def test_set_address_microphone(client):
     assert rv.status_code == 200
 
 
+def test_set_address_microphone_invalid(client):
+    data = {
+        "ip": "",
+        "port": 1234
+    }
+    rv = client.post('/microphone/address/set', data=data)
+    assert rv.status_code == 400
+
+
 def test_set_microphone_height(client):
     rv = client.post('/microphone/height/set', data={"microphone-height": 1.7})
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-height\":1.7}\n", "utf-8")

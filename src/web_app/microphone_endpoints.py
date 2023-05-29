@@ -1,6 +1,20 @@
 from time import sleep
 from flask import make_response, jsonify, request
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, verify_address
+
+
+def address_set_microphone_endpoint(integration: GeneralController):
+    try:
+        addr = (request.form["ip"], int(request.form["port"]))
+        verify_address(addr)
+        ret_msg, code = integration.mic_api.set_address(addr)
+        if code:
+            ret_code = 200
+        else:
+            ret_code = 400
+        return make_response(jsonify(ret_msg), ret_code)
+    except (AssertionError, ValueError):
+        return make_response(jsonify({"message": "Invalid address!"}), 400)
 
 
 def height_set_microphone_endpoint(integration: GeneralController):

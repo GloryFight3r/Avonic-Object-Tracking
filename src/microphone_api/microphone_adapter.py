@@ -30,8 +30,9 @@ class MicrophoneSocket:
     def connect(self, address=None):
         if address is None:
             print("WARNING: Microphone address not specified!")
-            return
+            return False
         self.address = address
+        return True
 
     def send(self, command: str, responses: int = 1) -> [str]:
         """ Send a command and wait for a response

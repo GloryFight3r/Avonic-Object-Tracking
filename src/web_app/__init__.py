@@ -103,6 +103,10 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
 
+    @app.post('/microphone/address/set')
+    def set_microphone_address():
+        return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
+
     @app.post('/microphone/height/set')
     def set_height():
         """

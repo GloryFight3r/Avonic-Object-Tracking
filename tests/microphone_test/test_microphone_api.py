@@ -153,3 +153,11 @@ def test_connect():
     expected = ('0.0.0.0', 45)
     api.set_address(expected)
     assert api.sock.address == expected
+
+
+def test_connect_invalid():
+    sock = mock.Mock()
+    expected = ('0.0.0.0', 45)
+    api = MicrophoneAPI(MicrophoneSocket(sock=sock, address=expected))
+    api.set_address(None)
+    assert api.sock.address == expected
