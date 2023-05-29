@@ -1,6 +1,6 @@
 <head>
-  <meta charset="UTF-8" />
-  <title>Main page</title>
+  <meta charset="UTF-8">
+  <title>{{ page_name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <script src="https://cdn.socket.io/4.6.0/socket.io.js"></script>
@@ -14,13 +14,13 @@
           }
       }
   </script>
-  <script src="{{ url_for('static', filename='js/scene.js')}}" type="module" defer></script>
-  <script src="{{ url_for('static', filename='js/socket.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/footage.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/presets.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/thread.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  {%- if 'scene' in to_import -%}<script src="{{ url_for('static', filename='js/scene.js')}}" type="module" defer></script> {% endif %}
+  {%- if 'socket' in to_import -%}<script src="{{ url_for('static', filename='js/socket.js') }}" defer></script> {% endif %}
+  {%- if 'calibration' in to_import -%}<script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script> {% endif %}
+  {%- if 'camera' in to_import -%}<script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script> {% endif %}
+  {%- if 'microphone' in to_import -%}<script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script> {% endif %}
+  {%- if 'footage' in to_import -%}<script src="{{ url_for('static', filename='js/footage.js') }}" defer></script> {% endif %}
+  {%- if 'presets' in to_import -%}<script src="{{ url_for('static', filename='js/presets.js') }}" defer></script> {% endif %}
+  {%- if 'thread' in to_import -%}<script src="{{ url_for('static', filename='js/thread.js') }}" defer></script> {% endif %}
+  {%- if 'main' in to_import -%}<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>{% endif %}
 </head>

@@ -32,31 +32,44 @@ def create_app(test_controller=None):
 
     @app.get('/')
     def view():
-        return render_template('view.html')
+        to_import=["camera", "microphone", "presets", "calibration",
+                   "footage", "thread", "scene", "socket", "main"]
+        return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
     def camera_view():
-        return render_template('single_page.html', name="camera")
-
+        to_import=["camera", "socket", "main"]
+        return render_template('single_page.html', name="camera", to_import=to_import, 
+                               page_name="Camera View")
     @app.get('/microphone_control')
     def microphone_view():
-        return render_template('single_page.html', name="microphone")
+        to_import=["microphone", "socket", "main"]
+        return render_template('single_page.html', name="microphone", to_import=to_import,
+                               page_name="Microphone View")
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        return render_template('single_page.html', name="presets_and_calibration")
+        to_import=["socket", "presets", "calibration", "main"]
+        return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
+                               page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
-        return render_template('single_page.html', name="live_footage")
+        to_import=["footage", "socket", "main"]
+        return render_template('single_page.html', name="live_footage", to_import=to_import,
+                               page_name="Live Footage")
 
     @app.get('/thread')
     def thread_view():
-        return render_template('single_page.html', name="thread")
+        to_import=["thread", "socket", "main"]
+        return render_template('single_page.html', name="thread", to_import=to_import,
+                               page_name="Thread view")
 
     @app.get('/visualisation')
     def visualisation_view():
-        return render_template('single_page.html', name="visualisation")
+        to_import=["scene", "socket"]
+        return render_template('single_page.html', name="visualisation", to_import=to_import,
+                               page_name="Visualisation view")
 
     @app.post('/camera/reboot')
     def post_reboot():
