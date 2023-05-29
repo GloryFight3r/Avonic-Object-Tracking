@@ -45,6 +45,18 @@ def test_azimuth():
     assert api.azimuth == np.deg2rad(46)
 
 
+def test_elevation_recv_error():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), None)
+    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    api.elevation = 0.5
+    assert api.get_elevation() == 0.5
+
+
 def test_azimuth_recv_error():
     """ Invalid command
     """
@@ -133,3 +145,11 @@ def test_elevation_prop(a):
     api = MicrophoneAPI(MicrophoneSocket(sock=sock))
     assert np.isclose(api.get_elevation(), np.deg2rad(a))
     assert np.isclose(api.elevation, np.deg2rad(a))
+
+
+def test_connect():
+    sock = mock.Mock()
+    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    expected = ('0.0.0.0', 45)
+    api.set_address(expected)
+    assert api.sock.address == expected
