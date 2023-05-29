@@ -1,15 +1,12 @@
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.converter import vector_angle
 from avonic_speaker_tracker.preset_control import find_most_similar_preset
-from avonic_speaker_tracker.preset import PresetCollection
-from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
 from avonic_speaker_tracker.coordinate_translation import translate_microphone_to_camera_vector
-from avonic_camera_api.converter import vector_angle
-import numpy as np
-
+from microphone_api.microphone_control_api import MicrophoneAPI
 
 def preset_pointer(mic_api: MicrophoneAPI,
           preset_locations: PresetCollection):
@@ -20,7 +17,6 @@ def preset_pointer(mic_api: MicrophoneAPI,
             preset_locations: Collection containing all current presets 
         Returns: the vector in which direction the camera should point
     """
-          
     preset_names = np.array(preset_locations.get_preset_list())
     presets_mic = []
     for i in range(len(preset_names)):
@@ -28,8 +24,8 @@ def preset_pointer(mic_api: MicrophoneAPI,
     mic_direction = mic_api.get_direction()
     preset_id = find_most_similar_preset(mic_direction,presets_mic)
     preset = preset_locations.get_preset_info(preset_names[preset_id])
-    dir = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),0]
-    return dir
+    direct = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),0]
+    return direct
 
 def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
     """ Calculates the direction of the camera so it point to the speaker.
@@ -45,9 +41,9 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
     cam_vec = [-cam_vec[0], cam_vec[1], cam_vec[2]]
 
 
-    dir = vector_angle(cam_vec)
-    dir = [int(np.rad2deg(dir[0])),int(np.rad2deg(dir[1])),0]
-    return dir
+    direct = vector_angle(cam_vec)
+    direct = [int(np.rad2deg(direct[0])),int(np.rad2deg(direct[1])),0]
+    return direct
 
 
 def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, preset_use: bool, calibration: Calibration, prev_dir=None):
@@ -62,21 +58,18 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
             prev_dir: The previous direction to which the camera was pointing
         Returns: the pitch and yaw of the camera and the zoom value
     """
-    
     if prev_dir is None:
         prev_dir = [0.0, 0.0, 0.0]
-    dir = [0.0, 0.0, 0.0]
+    direct = [0.0, 0.0, 0.0]
 
     if preset_use == True:
-        dir = preset_pointer(mic_api, preset_locations)
+        direct = preset_pointer(mic_api, preset_locations)
     else :
-        dir = continuous_pointer(mic_api, calibration)
-    if prev_dir[0] != dir[0] or prev_dir[1] != dir[1]:
-        cam_api.move_absolute(24,20, dir[0], dir[1])
+        direct = continuous_pointer(mic_api, calibration)
+    if prev_dir[0] != direct[0] or prev_dir[1] != direct[1]:
+        cam_api.move_absolute(24,20, direct[0], direct[1])
         if preset_use == True:
-            cam_api.direct_zoom(dir[2])
-        prev_dir = dir
+            cam_api.direct_zoom(direct[2])
+        prev_dir = direct
 
-    return dir 
-
-    
+    return direct

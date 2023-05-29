@@ -18,3 +18,7 @@ html/
 .hypothesis
 .DS_Store
 src/.DS_Store
+codeclimate.json
+public/
+pylint_test/
+run_pylint.sh
