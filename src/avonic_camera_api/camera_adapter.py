@@ -58,19 +58,20 @@ class CameraSocket:
     def reconnect(self, sock, address=None):
         """ Re-connect to camera after a reboot
         """
-        self.sock = sock
         if address is None:
             if self.address is None:
                 print("WARNING: Camera address not specified!")
                 return ResponseCode.NO_ADDRESS
         else:
             self.address = address
-        self.sock.settimeout(10.0)
+        self.sock = sock
+        self.sock.settimeout(20.0)
         try:
             self.sock.connect(self.address)
             return ResponseCode.COMPLETION
         except TimeoutError:
-            print("ERROR: Cannot connect to camera on address " + self.address)
+            ip, port = self.address
+            print("ERROR: Cannot connect to camera on address " + ip + ":" + str(port))
             return ResponseCode.TIMED_OUT
 
     def send_no_response(self, header: str, command: str) -> None:

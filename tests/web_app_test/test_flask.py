@@ -78,6 +78,15 @@ def test_fail(client):
     assert rv.status_code == 418
 
 
+def test_set_address_camera(client):
+    data = {
+        "ip": "0.0.0.1",
+        "port": 1234
+    }
+    rv = client.post('/camera/address/set', data=data)
+    assert rv.status_code == 200
+
+
 def test_turn_on(client):
     """Test a turn-on endpoint."""
 
@@ -183,6 +192,16 @@ def test_get_zoom(client):
     rv = client.get('/camera/zoom/get')
     assert rv.status_code == 200 and rv.data == bytes("{\"zoom-value\":128}\n", "utf-8")
 
+
+def test_set_address_microphone(client):
+    data = {
+        "ip": "0.0.0.1",
+        "port": 1234
+    }
+    rv = client.post('/microphone/address/set', data=data)
+    assert rv.status_code == 200
+
+
 def test_set_microphone_height(client):
     rv = client.post('/microphone/height/set', data={"microphone-height": 1.7})
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-height\":1.7}\n", "utf-8")
@@ -214,9 +233,12 @@ def test_calibration_is_set(client):
     rv = client.get('/calibration/is_set')
     assert rv.status_code == 200 and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
+
 def test_calibration_get_camera(client):
     rv = client.get('/calibration/camera')
-    assert rv.status_code == 200 and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+    assert rv.status_code == 200 and rv.data \
+           == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+
 
 def test_update_microphone(client):
     rv = client.post('/update/microphone', json=json.dumps({"test": "testington"}))

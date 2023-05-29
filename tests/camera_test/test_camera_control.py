@@ -268,11 +268,70 @@ def test_camera_error(monkeypatch, camera):
     assert camera.get_direction() == ResponseCode.TIMED_OUT
 
 
+def test_camera_error_second(monkeypatch, camera):
+    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
+    camera.camera.counter = 0
+    def mocked_send(message):
+        assert message == expected_msg
+    def mocked_return(bytes_receive):
+        camera.camera.counter += 1
+        if camera.camera.counter == 1:
+            return b'\x01\x00\x00\x05\x00\x00\x00\x01\x51\x51\x00\x00\x00\x00\x00\x00\x00\x00\xFF'
+        raise TimeoutError
+
+    def mocked_timeout(ms):
+        pass
+
+    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
+    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
+    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
+    assert camera.get_direction() == ResponseCode.TIMED_OUT
+
+
 def test_send_no_address(monkeypatch, camera):
     camera.camera.address = None
     assert camera.get_direction() == ResponseCode.NO_ADDRESS
 
 
-def test_reconnect_no_address(monkeypatch, camera):
+def test_reconnect_no_new_address(monkeypatch, camera):
     camera.camera.address = None
     assert camera.reboot(camera.camera.sock) == ResponseCode.NO_ADDRESS
+
+
+@pytest.fixture()
+def camera_no_address(monkeypatch):
+    def mocked_connect(addr):
+        pass
+
+    def mocked_close():
+        pass
+
+    def mocked_timeout(ms):
+        pass
+
+    sock = socket.socket
+    monkeypatch.setattr(sock, "connect", mocked_connect)
+    monkeypatch.setattr(sock, "close", mocked_close)
+    monkeypatch.setattr(sock, "settimeout", mocked_timeout)
+
+    return CameraAPI(CameraSocket(sock=sock))
+
+
+def test_init_no_address(monkeypatch, camera_no_address):
+    assert camera_no_address.camera.address is None
+
+
+def test_reconnect_new_address(monkeypatch, camera_no_address):
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) == ResponseCode.COMPLETION
+
+
+def test_reconnect_new_address_timeout(monkeypatch, camera_no_address):
+    def mocked_return(bytes_receive):
+        raise TimeoutError
+
+    monkeypatch.setattr(camera_no_address.camera.sock, "connect", mocked_return)
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) == ResponseCode.TIMED_OUT
+
+
+def test_new_address_no_address(monkeypatch, camera_no_address):
+    assert camera_no_address.set_address(camera_no_address.camera.sock) == ResponseCode.NO_ADDRESS

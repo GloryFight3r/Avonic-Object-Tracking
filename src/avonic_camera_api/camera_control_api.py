@@ -18,6 +18,12 @@ class CameraAPI:
         self.video = "on"
         self.latest_direction = np.array([0, 0, 1])
 
+    def set_address(self, new_socket, address=None) -> ResponseCode:
+        if address is None:
+            print("WARNING: Camera address not specified!")
+            return ResponseCode.NO_ADDRESS
+        return self.camera.reconnect(new_socket, address=address)
+
     def message_counter(self) -> str:
         """ Get current message count
         Increments the count for next message.
@@ -82,7 +88,8 @@ class CameraAPI:
         return self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
                                 '81 01 06 04 FF', self.counter)
 
-    def move_relative(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> ResponseCode:
+    def move_relative(self, speed_x: int, speed_y: int,
+                      degrees_x: float, degrees_y: float) -> ResponseCode:
         """ Rotates the camera relative to the current rotation degree
 
         Args:
@@ -105,7 +112,8 @@ class CameraAPI:
                                 degrees_to_command(degrees_x) + " " +
                                 degrees_to_command(degrees_y) + " FF", self.counter)
 
-    def move_absolute(self, speed_x: int, speed_y: int, degrees_x: float, degrees_y: float) -> ResponseCode:
+    def move_absolute(self, speed_x: int, speed_y: int,
+                      degrees_x: float, degrees_y: float) -> ResponseCode:
         """ Rotates the camera in absolute position (current position does not matter)
 
         Args:
@@ -150,7 +158,8 @@ class CameraAPI:
         """
         message = "81 09 04 47 FF"
 
-        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
+        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
+                               message, self.counter)
         if isinstance(ret, ResponseCode):
             return ret
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
@@ -165,7 +174,8 @@ class CameraAPI:
         assert 0 <= zoom <= 16384
         message = "81 01 04 47 0p 0q 0r 0s FF"
         final_message = insert_zoom_in_hex(message, zoom)
-        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(), final_message, self.counter)
+        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
+                                final_message, self.counter)
 
     def get_saved_direction(self) -> np.array:
         """ Get the last direction the camera pointed to.
@@ -179,13 +189,15 @@ class CameraAPI:
         """ Get the direction, pan and tilt, from the camera.
 
             Returns:
-                (pan, tilt): The pan and tilt of the camera. Pan ranges between 0xF670 (-2447) and 0x0990 (2448)
-                                                            while pan_adjusted ranges between (-170°) and (+170°)
-                                                            Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
-                                                            while tilt_adjusted ranges between (-30°) and (+90°)
+                (pan, tilt): The pan and tilt of the camera.
+                    Pan ranges between 0xF670 (-2447) and 0x0990 (2448)
+                        while pan_adjusted ranges between (-170°) and (+170°)
+                    Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
+                        while tilt_adjusted ranges between (-30°) and (+90°)
         """
         message = "81 09 06 12 FF"
-        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(), message, self.counter)
+        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
+                               message, self.counter)
         if isinstance(ret, ResponseCode):
             return ret
         ret_msg = str(ret)[2:-1]  # remove b' and '

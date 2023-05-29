@@ -1,7 +1,6 @@
 import socket
-
 from flask import make_response, jsonify, request
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode
 
 
@@ -14,7 +13,8 @@ def responses():
         ResponseCode.CANCELED: make_response(jsonify({"message": "Command canceled"}), 409),
         ResponseCode.NO_SOCKET: make_response(jsonify({"message": "No such socket"}), 400),
         ResponseCode.NOT_EXECUTABLE: make_response(jsonify({"message": "Command cannot be executed"}), 400),
-        ResponseCode.TIMED_OUT: make_response(jsonify({"message": "Camera timed out"}), 504)
+        ResponseCode.TIMED_OUT: make_response(jsonify({"message": "Camera timed out"}), 504),
+        ResponseCode.NO_ADDRESS: make_response(jsonify({"message": "Camera address not specified"}), 400)
     }
 
 
@@ -76,8 +76,10 @@ def move_relative_camera_endpoint(integration: GeneralController):
 def move_vector_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        ret = integration.cam_api.move_vector(int(data["vector-speed-x"]), int(data["vector-speed-y"]),
-                                              [float(data["vector-x"]), float(data["vector-y"]),
+        ret = integration.cam_api.move_vector(int(data["vector-speed-x"]),
+                                              int(data["vector-speed-y"]),
+                                              [float(data["vector-x"]),
+                                               float(data["vector-y"]),
                                                float(data["vector-z"])])
         return responses()[ret]
     except AssertionError as e:
@@ -109,3 +111,17 @@ def position_get_camera_endpoint(integration: GeneralController):
         return responses()[position]
     return make_response(jsonify({"position-alpha-value": position[0],
                                   "position-beta-value": position[1]}), 200)
+
+
+def address_set_camera_endpoint(integration: GeneralController):
+    try:
+        addr = (request.form["ip"], int(request.form["port"]))
+        verify_address(addr)
+        if integration.cam_sock is None:
+            new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        else:
+            new_socket = integration.cam_sock
+        ret = integration.cam_api.set_address(new_socket, address=addr)
+        return responses()[ret]
+    except (AssertionError, ValueError):
+        return make_response(jsonify({"message": "Invalid address!"}), 400)
