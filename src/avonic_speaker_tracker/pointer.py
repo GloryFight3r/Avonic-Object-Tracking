@@ -11,10 +11,16 @@ from avonic_camera_api.converter import vector_angle
 import numpy as np
 
 
-def preset_pointer(cam_api: CameraAPI, mic_api: MicrophoneAPI,
-          preset_locations: PresetCollection, prev_cam=None):
-    if prev_cam is None:
-        prev_cam = [0.0, 0.0, 0.0]
+def preset_pointer(mic_api: MicrophoneAPI,
+          preset_locations: PresetCollection):
+    """ Calculates the direction to which the camera should point so that
+        it is the closest to an existing preset.
+        Args:
+            mic_api: The controller for the microphone 
+            preset_locations: Collection containing all current presets 
+        Returns: the vector in which direction the camera should point
+    """
+          
     preset_names = np.array(preset_locations.get_preset_list())
     presets_mic = []
     for i in range(len(preset_names)):
@@ -25,7 +31,13 @@ def preset_pointer(cam_api: CameraAPI, mic_api: MicrophoneAPI,
     dir = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),int(np.rad2deg(preset[0][2]))]
     return dir
 
-def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_dir):
+def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
+    """ Calculates the direction of the camera so it point to the speaker.
+        Args: 
+            mic_api: The controller for the microphone 
+            calibration: Information on the calibration of the system
+        Returns: the vector in which direction the camera should point
+    """
     mic_direction = mic_api.get_direction()
 
     m_height = 0.65
@@ -44,14 +56,26 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_di
 
 
 def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, preset_use: bool, calibration: Calibration, prev_dir=None):
+    """ Points the camera towards the calculated direction from either: 
+    the presets or the continuous follower.
+        Args: 
+            cam_api: The controller for the camera
+            mic_api: The controller for the microphone
+            preset_locations: Collection containing all current presets 
+            preset_use: True if we are using presets and false otherwise
+            calibration: Information on the calibration of the system
+            prev_dir: The previous direction to which the camera was pointing
+        Returns: the vector in which direction the camera should point
+    """
+    
     if prev_dir is None:
         prev_dir = [0.0, 0.0, 0.0]
     dir = [0.0, 0.0, 0.0]
 
     if preset_use == True:
-        dir = preset_pointer(mic_api, preset_locations, prev_dir)
+        dir = preset_pointer(mic_api, preset_locations)
     else :
-        dir = continuous_pointer(mic_api, calibration,prev_dir)
+        dir = continuous_pointer(mic_api, calibration)
     if prev_dir[0] != dir[0] or prev_dir[1] != dir[1]:
         cam_api.move_absolute(24,20, dir[0], dir[1])
         if preset_use == True:
