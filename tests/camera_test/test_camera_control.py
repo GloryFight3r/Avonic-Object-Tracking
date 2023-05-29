@@ -322,7 +322,8 @@ def test_init_no_address(monkeypatch, camera_no_address):
 
 
 def test_reconnect_new_address(monkeypatch, camera_no_address):
-    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) == ResponseCode.COMPLETION
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381))\
+           == ResponseCode.COMPLETION
 
 
 def test_reconnect_new_address_timeout(monkeypatch, camera_no_address):
@@ -330,7 +331,8 @@ def test_reconnect_new_address_timeout(monkeypatch, camera_no_address):
         raise TimeoutError
 
     monkeypatch.setattr(camera_no_address.camera.sock, "connect", mocked_return)
-    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) == ResponseCode.TIMED_OUT
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) \
+           == ResponseCode.TIMED_OUT
 
 
 def test_new_address_no_address(monkeypatch, camera_no_address):
