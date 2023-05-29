@@ -1,6 +1,7 @@
 import pytest
 
 from avonic_camera_api.camera_control_api import CameraAPI, insert_zoom_in_hex
+from avonic_camera_api.camera_adapter import ResponseCode
 from tests.CameraMock import CameraMock
 
 def test_get_zoom():
@@ -61,3 +62,10 @@ def test_insert_zoom_wrong_size_hex():
         insert_zoom_in_hex(short_message, 100)
     with pytest.raises(AssertionError):
         insert_zoom_in_hex(long_message, 100)
+
+
+def test_timeout():
+    api = CameraAPI(CameraMock(True))
+    ret = api.get_zoom()
+    assert ret == ResponseCode.TIMED_OUT
+    assert api.camera.call_count == 0

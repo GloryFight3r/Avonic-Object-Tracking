@@ -21,7 +21,9 @@ renderer.setSize(width, height)
 canvas.append(renderer.domElement)
 camera.position.set(2, 2, 2)
 camera.lookAt(0, 0, 0)
-scene.add(new THREE.AxesHelper(1000))
+const axes = new THREE.AxesHelper(1000)
+axes.setColors(0x000000, 0x00ff00, 0x0000ff)
+scene.add(axes)
 const light = new THREE.AmbientLight(0xffffff, 10)
 scene.add(light)
 const planeGeometry = new THREE.PlaneGeometry(10, 10, 20, 20)
@@ -53,7 +55,7 @@ async function animate() {
     const micX = document.getElementById("mic-direction-x").value
     const micY = document.getElementById("mic-direction-y").value
     const micZ = document.getElementById("mic-direction-z").value
-    const micDir = new THREE.Vector3(-micX, micY, micZ)
+    const micDir = new THREE.Vector3(micX, micY, micZ)
     micArrow.setDirection(micDir)
     scene.remove(camArrow)
     camArrow.dispose()

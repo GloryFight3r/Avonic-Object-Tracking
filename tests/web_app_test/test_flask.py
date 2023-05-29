@@ -27,7 +27,7 @@ def camera(monkeypatch):
     def mocked_recv(size):
         return b'\x01\x00\x00\x00\x00\x00\x00\x01\x90\x41\xff'
 
-    def mocked_timeout(ms: float, self=None):
+    def mocked_timeout(ms, self=None):
         pass
 
     sock = socket.socket
