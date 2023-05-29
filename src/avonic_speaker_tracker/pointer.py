@@ -28,7 +28,7 @@ def preset_pointer(mic_api: MicrophoneAPI,
     mic_direction = mic_api.get_direction()
     preset_id = find_most_similar_preset(mic_direction,presets_mic)
     preset = preset_locations.get_preset_info(preset_names[preset_id])
-    dir = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),int(np.rad2deg(preset[0][2]))]
+    dir = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),0]
     return dir
 
 def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
@@ -36,22 +36,17 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
         Args: 
             mic_api: The controller for the microphone 
             calibration: Information on the calibration of the system
-        Returns: the vector in which direction the camera should point
+        Returns: the pitch and yaw of the camera and the zoom value
     """
     mic_direction = mic_api.get_direction()
-
-    m_height = 0.65
-    to_m_dir = np.array([0.0,-0.5,1.2])
 
     cam_vec = translate_microphone_to_camera_vector(calibration.to_mic_direction,mic_direction,calibration.mic_height)
 
     cam_vec = [-cam_vec[0], cam_vec[1], cam_vec[2]]
 
-    #return cam_vec
 
     dir = vector_angle(cam_vec)
-    dir = [int(np.rad2deg(dir[0])),int(np.rad2deg(dir[1]))]
-    print(dir,mic_direction)
+    dir = [int(np.rad2deg(dir[0])),int(np.rad2deg(dir[1])),0]
     return dir
 
 
@@ -65,7 +60,7 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
             preset_use: True if we are using presets and false otherwise
             calibration: Information on the calibration of the system
             prev_dir: The previous direction to which the camera was pointing
-        Returns: the vector in which direction the camera should point
+        Returns: the pitch and yaw of the camera and the zoom value
     """
     
     if prev_dir is None:
@@ -79,7 +74,7 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
     if prev_dir[0] != dir[0] or prev_dir[1] != dir[1]:
         cam_api.move_absolute(24,20, dir[0], dir[1])
         if preset_use == True:
-            cam_api.direct_zoom(dir[3])
+            cam_api.direct_zoom(dir[2])
         prev_dir = dir
 
     return dir 
