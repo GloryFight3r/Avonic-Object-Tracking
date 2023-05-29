@@ -17,8 +17,8 @@ def test_preset_pointer_good_weather():
     dir1 = preset_pointer(mic_api,col)
     dir2 = preset_pointer(mic2_api,col)
 
-    assert (dir1 == np.array([int(np.rad2deg(4)), int(np.rad2deg(7)), 0])).all()
-    assert (dir2 == np.array([int(np.rad2deg(1)), int(np.rad2deg(5)), 0])).all()
+    assert (dir1 == np.array([int(np.rad2deg(4)), int(np.rad2deg(7)), 5000])).all()
+    assert (dir2 == np.array([int(np.rad2deg(1)), int(np.rad2deg(5)), 5000])).all()
 
 
 def test_continuous_pointer():
@@ -63,6 +63,6 @@ def test_pointer():
     assert cam2_api.move_absolute.call_count == 0
     assert cam2_api.direct_zoom.call_count == 0
 
-    assert (dir1 == np.array([int(np.rad2deg(5)), int(np.rad2deg(9)), 0])).all()
+    assert (dir1 == np.array([int(np.rad2deg(5)), int(np.rad2deg(9)), 5000])).all()
     assert (dir2 == np.array([-16,4,0])).all()
     assert (dir3 == np.array([-16,4,0])).all()

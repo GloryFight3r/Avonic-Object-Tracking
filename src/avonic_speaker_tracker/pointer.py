@@ -24,7 +24,7 @@ def preset_pointer(mic_api: MicrophoneAPI,
     mic_direction = mic_api.get_direction()
     preset_id = find_most_similar_preset(mic_direction,presets_mic)
     preset = preset_locations.get_preset_info(preset_names[preset_id])
-    direct = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),0]
+    direct = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])),preset[0][2]]
     return direct
 
 def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
