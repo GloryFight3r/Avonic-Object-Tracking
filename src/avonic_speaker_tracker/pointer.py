@@ -62,13 +62,13 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCo
         prev_dir = [0.0, 0.0, 0.0]
     direct = [0.0, 0.0, 0.0]
 
-    if preset_use == True:
+    if preset_use:
         direct = preset_pointer(mic_api, preset_locations)
     else :
         direct = continuous_pointer(mic_api, calibration)
     if prev_dir[0] != direct[0] or prev_dir[1] != direct[1]:
         cam_api.move_absolute(24,20, direct[0], direct[1])
-        if preset_use == True:
+        if preset_use:
             cam_api.direct_zoom(direct[2])
         prev_dir = direct
 
