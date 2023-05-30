@@ -498,7 +498,6 @@ def test_add_preset_location(client):
     )
     assert rv.status_code == 400
 
-
 def test_edit_preset_location(client):
     rv = client.post("preset/add",
         data={
@@ -613,3 +612,20 @@ def test_get_preset_list(client):
     rv = client.get("preset/info/test-preset-name")
     assert rv.status_code == 400
 
+# live footage test
+
+"""def generate_single_page_views():
+    return [
+        "/live_footage",
+        "/thread",
+        "/visualisation",
+        "/camera_control",
+        "/microphone_control",
+        "/presets_and_calibration",
+    ]
+
+@pytest.mark.parametrize("url", generate_single_page_views())
+def test_live_footage(client, url):
+    rv = client.get(url)
+    assert rv.status_code == 200
+"""

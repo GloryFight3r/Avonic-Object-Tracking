@@ -20,6 +20,15 @@ def get_speaker_direction_endpoint(integration: GeneralController):
         list(wait_for_speaker(integration)) }), 200)
 
 def wait_for_speaker(integration: GeneralController):
+    """ Waits for the speaker to speak in order to get the direction 
+    from the microphone towards him
+
+    Args:
+        integration: The controller object
+
+    Returns: Direction towards the speaker
+        
+    """
     while not integration.mic_api.is_speaking():
         sleep(0.1)
     return integration.mic_api.get_direction()

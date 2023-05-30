@@ -12,10 +12,9 @@ class MockedCv:
 
 @pytest.fixture
 def footage_thread():
-    mocked_url = ""
     mocked_cam_footage = MockedCv()
     event = Event()
-    thread = FootageThread(mocked_url, mocked_cam_footage, event)
+    thread = FootageThread(mocked_cam_footage, event)
 
     return thread
 

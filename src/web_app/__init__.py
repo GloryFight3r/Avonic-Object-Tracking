@@ -32,7 +32,7 @@ def create_app(test_controller=None):
 
     @app.get('/')
     def view():
-        to_import=["camera", "microphone", "presets", "calibration",
+        to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
                    "footage", "thread", "scene", "socket", "main"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
@@ -64,12 +64,6 @@ def create_app(test_controller=None):
         to_import=["thread", "socket", "main"]
         return render_template('single_page.html', name="thread", to_import=to_import,
                                page_name="Thread view")
-
-    @app.get('/visualisation')
-    def visualisation_view():
-        to_import=["scene", "socket"]
-        return render_template('single_page.html', name="visualisation", to_import=to_import,
-                               page_name="Visualisation view")
 
     @app.post('/camera/reboot')
     def post_reboot():

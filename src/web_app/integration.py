@@ -14,7 +14,7 @@ from avonic_speaker_tracker.calibration import Calibration
 class GeneralController():
     def __init__(self):
         self.event = Event()
-        self.event2 = Event()
+        self.footage_thread_event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_api = None
@@ -40,11 +40,11 @@ class GeneralController():
         self.calibration = Calibration()
         self.secret = getenv("SECRET_KEY")
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
-        self.footage_thread = FootageThread(self.url, self.video, self.event2)
+        self.footage_thread = FootageThread(self.video, self.footage_thread_event)
         self.footage_thread.start()
 
     def __del__(self):
-        self.event2.set()
+        self.footage_thread_event.set()
         self.video.release()
 
     def load_mock(self):
