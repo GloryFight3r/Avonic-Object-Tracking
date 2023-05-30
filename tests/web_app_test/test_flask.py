@@ -89,6 +89,15 @@ def test_set_address_camera(client):
     assert rv.status_code == 200
 
 
+def test_set_address_camera_invalid(client):
+    data = {
+        "ip": "asdf",
+        "port": 1234
+    }
+    rv = client.post('/camera/address/set', data=data)
+    assert rv.status_code == 400
+
+
 def test_turn_on(client):
     """Test a turn-on endpoint."""
 
