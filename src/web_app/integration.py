@@ -39,8 +39,8 @@ class GeneralController():
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         mic_sock = UDPSocket(mic_addr)
         self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
-        self.preset_locations = PresetCollection()
-        self.calibration = Calibration()
+        self.preset_locations = PresetCollection(filename="presets.json")
+        self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
         self.preset = False
 
@@ -49,6 +49,7 @@ class GeneralController():
         self.mic_api = MicrophoneAPI(None, 55)
         self.calibration = Calibration()
         self.preset = False
+        self.preset_locations = None
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -57,6 +58,8 @@ class GeneralController():
         self.mic_api = new_controller.mic_api
         self.calibration = new_controller.calibration
         self.preset = new_controller.preset
+        self.preset_locations = new_controller.preset_locations
+        self.ws = new_controller.ws
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api
@@ -64,3 +67,6 @@ class GeneralController():
     def set_cam_api(self, new_cam_api):
         self.cam_api = new_cam_api
 
+
+    def set_preset_collection(self, new_preset_collection):
+        self.preset_locations = new_preset_collection

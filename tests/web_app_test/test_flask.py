@@ -8,6 +8,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import Camera
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
+from avonic_speaker_tracker.preset import PresetCollection
 import web_app
 
 
@@ -37,7 +38,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(Camera(sock, None))
+    cam_api = CameraAPI(Camera(sock, (None, 1259)))
     def mocked_camera_reconnect():
         pass
     def mocked_get_zoom():
@@ -67,6 +68,7 @@ def client(camera):
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
+    test_controller.set_preset_collection(PresetCollection(filename=None))
     test_controller.ws = mock.Mock()
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
@@ -214,11 +216,13 @@ def test_calibration_reset(client):
 
 def test_calibration_is_set(client):
     rv = client.get('/calibration/is_set')
-    assert rv.status_code == 200 and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
+    assert rv.status_code == 200 \
+        and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
 def test_calibration_get_camera(client):
     rv = client.get('/calibration/camera')
-    assert rv.status_code == 200 and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+    assert rv.status_code == 200 \
+        and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
 
 def test_update_microphone(client):
     rv = client.post('/update/microphone', json=json.dumps({"test": "testington"}))
@@ -403,6 +407,30 @@ def test_edit_preset_location(client):
 
 
 def test_get_preset_list(client):
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 1,
+            "mic-direction-x" : 0,
+            "mic-direction-y" : 1,
+            "mic-direction-z" : 0,
+            "preset-name": "test-another-preset-name"
+        }
+    )
+    assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200\
         and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","\

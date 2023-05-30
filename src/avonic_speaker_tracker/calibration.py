@@ -1,5 +1,6 @@
+import json
 import numpy as np
-
+from avonic_speaker_tracker.persistency_utils import CustomEncoder
 
 class Calibration:
     # height of the microphone above the speaker
@@ -11,6 +12,11 @@ class Calibration:
     speaker_points: [(np.array, np.array)] = []
     to_mic_direction: np.array = None
 
+    filename = None
+
+    def __init__(self, filename=None):
+        self.filename = filename
+        self.load()
 
     def set_height(self, height: float):
         """ Sets the height of the microphone above the speaker.
@@ -27,6 +33,7 @@ class Calibration:
                 speaker_point: the camera direction and the microphone direction respectively
         """
         self.speaker_points.append(speaker_point)
+        self.record()
 
     def add_direction_to_mic(self, to_mic: np.array):
         """ Add the direction from the camera to the microphone.
@@ -35,6 +42,7 @@ class Calibration:
                 to_mic: the direction as a 3D vector
         """
         self.to_mic_direction = to_mic
+        self.record()
 
     def reset_calibration(self):
         """ Reset the calibration. To be used in case calibration
@@ -43,6 +51,7 @@ class Calibration:
         self.mic_to_cam = np.array([0.0, 0.0, 0.0])
         self.speaker_points = []
         self.to_mic_direction = None
+        self.record()
 
     def is_calibrated(self) -> bool:
         """ Check whether the system has been calibrated by
@@ -89,6 +98,33 @@ class Calibration:
         self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)
         print(self.mic_to_cam)
         return self.mic_to_cam
+
+    def record(self):
+        if self.filename is not None:
+            with open(self.filename, "w", encoding="utf-8") as outfile:
+                outfile.write(json.dumps({"speaker_points" :self.speaker_points,
+                    "to_mic_direction": self.to_mic_direction}, indent=4, cls=CustomEncoder))
+
+    def load(self):
+        if self.filename is not None:
+            try:
+                with open(self.filename, encoding="utf-8") as f:
+                    print("Loading calibration json...")
+            except FileNotFoundError:
+                with open(self.filename, "x", encoding="utf-8") as outfile:
+                    print("Create new preset json...")
+                    outfile.write(json.dumps({"speaker_points": [],
+                    "to_mic_direction": None}, indent=4))
+            with open(self.filename, encoding="utf-8") as f:
+                data = json.load(f)
+                print(data)
+                self.speaker_points = []
+                for key in data["speaker_points"]:
+                    self.speaker_points.append((np.array(key[0]),
+                        np.array(key[1])))
+                self.to_mic_direction = np.array(data["to_mic_direction"])
+                print(self.speaker_points)
+                print(self.to_mic_direction)
 
 def angle_between_vectors(p: np.array, q: np.array) -> float:
     return p.dot(q) / (np.linalg.norm(p) * np.linalg.norm(q))
