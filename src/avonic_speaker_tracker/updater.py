@@ -43,7 +43,6 @@ class UpdateThread(Thread):
                 sleep(5)
                 continue
 
-            calibrate = Calibration()
             if len(self.preset_locations.get_preset_list()) == 0 and self.preset_use :
                 print("No locations preset")
             else :
