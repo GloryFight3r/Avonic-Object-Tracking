@@ -8,6 +8,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
+from avonic_speaker_tracker.preset import PresetCollection
 import web_app
 
 
@@ -65,6 +66,7 @@ def client(camera):
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
+    test_controller.set_preset_collection(PresetCollection(filename=None))
     test_controller.ws = mock.Mock()
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
@@ -240,7 +242,8 @@ def test_calibration_reset(client):
 
 def test_calibration_is_set(client):
     rv = client.get('/calibration/is_set')
-    assert rv.status_code == 200 and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
+    assert rv.status_code == 200 \
+        and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
 
 def test_calibration_get_camera(client):
@@ -432,14 +435,36 @@ def test_edit_preset_location(client):
 
 
 def test_get_preset_list(client):
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 1,
+            "mic-direction-x" : 0,
+            "mic-direction-y" : 1,
+            "mic-direction-z" : 0,
+            "preset-name": "test-another-preset-name"
+        }
+    )
+    assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200\
         and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","\
             + "\"test-another-preset-name\"]}\n", "utf-8")
     sock.recvfrom.return_value = \
         (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
-    rv = client.post("preset/point")
-    assert rv.status_code == 200
     rv = client.get("preset/info/test-non-existent-preset-name")
     assert rv.status_code == 400
     rv = client.get("preset/info/test-preset-name")

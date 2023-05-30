@@ -21,6 +21,7 @@ class GeneralController:
         self.ws = None
         self.preset_locations = None
         self.calibration = None
+        self.preset = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
@@ -33,9 +34,10 @@ class GeneralController:
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         verify_address(mic_addr)
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
-        self.preset_locations = PresetCollection()
-        self.calibration = Calibration()
+        self.preset_locations = PresetCollection(filename="presets.json")
+        self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
+        self.preset = False
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)
@@ -43,6 +45,8 @@ class GeneralController:
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
         self.calibration = Calibration()
+        self.preset = False
+        self.preset_locations = None
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -50,12 +54,19 @@ class GeneralController:
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
         self.calibration = new_controller.calibration
+        self.preset = new_controller.preset
+        self.preset_locations = new_controller.preset_locations
+        self.ws = new_controller.ws
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api
 
     def set_cam_api(self, new_cam_api):
         self.cam_api = new_cam_api
+
+
+    def set_preset_collection(self, new_preset_collection):
+        self.preset_locations = new_preset_collection
 
 
 def verify_address(address):

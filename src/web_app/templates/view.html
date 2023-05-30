@@ -136,6 +136,10 @@
       </article>
       <article id="thread" class="container">
         <h1>Thread 🧵</h1>
+        <form action="/thread/preset" method="post" id="thread-preset">
+          <button type="submit">Use Presets</button>
+        </form>
+        <input id="preset-use" name="preset-use" readonly />
         <div class="grid">
           <form action="/thread/start" method="post" id="thread-start-form">
             <button type="submit">Start</button>

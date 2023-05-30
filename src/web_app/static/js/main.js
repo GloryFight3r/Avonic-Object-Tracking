@@ -14,7 +14,8 @@ onSuccess = {
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
     "preset-get-list-form": refreshPresetList,
-    "camera-coords-get-form": onCameraCoordsGet
+    "camera-coords-get-form": onCameraCoordsGet,
+    "thread-preset" : usePresets,
 };
 
 async function onError(button) {
@@ -60,7 +61,7 @@ const presetform = document.getElementById("preset-form");
 
 presetform.onsubmit = async (e) => {
     e.preventDefault();
-    const b = f.getElementsByTagName("button")[0]
+    const b = presetform.getElementsByTagName("button")[0]
     b.ariaBusy = "true"
     const button_id = e.submitter.id;
     let body = {};
