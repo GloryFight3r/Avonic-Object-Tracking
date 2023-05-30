@@ -173,7 +173,7 @@ class CameraAPI:
         """
         assert 0 <= zoom <= 16384
         message = "81 01 04 47 0p 0q 0r 0s FF"
-        final_message = insert_zoom_in_hex(message, zoom)
+        final_message = insert_zoom_in_hex(message, int(zoom))
         return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
                                 final_message, self.counter)
 
