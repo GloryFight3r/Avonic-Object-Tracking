@@ -1,5 +1,6 @@
+import socket
 from flask import make_response, jsonify, request
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode
 from avonic_camera_api.converter import vector_angle
 
@@ -21,7 +22,9 @@ def responses():
         ResponseCode.NOT_EXECUTABLE:
             make_response(jsonify({"message": "Command cannot be executed"}), 400),
         ResponseCode.TIMED_OUT:
-            make_response(jsonify({"message": "Camera timed out"}), 504)
+            make_response(jsonify({"message": "Camera timed out"}), 504),
+        ResponseCode.NO_ADDRESS:
+            make_response(jsonify({"message": "Camera address not specified"}), 400)
     }
 
 
@@ -30,13 +33,17 @@ def success():
 
 
 def reboot_camera_endpoint(integration: GeneralController):
-    integration.cam_api.reboot()
-    return success()
+    if integration.cam_sock is None:
+        new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    else:
+        new_socket = integration.cam_sock
+    ret = integration.cam_api.reboot(new_socket)
+    return responses()[ret]
 
 
 def turn_on_camera_endpoint(integration: GeneralController):
     ret = integration.cam_api.turn_on()
-    if ret == ResponseCode.COMPLETION:
+    if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "on"})
         return success()
     return responses()[ret]
@@ -44,7 +51,7 @@ def turn_on_camera_endpoint(integration: GeneralController):
 
 def turn_off_camera_endpoint(integration: GeneralController):
     ret = integration.cam_api.turn_off()
-    if ret == ResponseCode.COMPLETION:
+    if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "off"})
         return success()
     return responses()[ret]
@@ -79,9 +86,11 @@ def move_relative_camera_endpoint(integration: GeneralController):
 def move_vector_camera_endpoint(integration: GeneralController):
     data = request.form
     try:
-        ret = integration.cam_api.move_vector(
-            int(data["vector-speed-x"]), int(data["vector-speed-y"]),
-            [float(data["vector-x"]), float(data["vector-y"]), float(data["vector-z"])])
+        ret = integration.cam_api.move_vector(int(data["vector-speed-x"]),
+                                              int(data["vector-speed-y"]),
+                                              [float(data["vector-x"]),
+                                               float(data["vector-y"]),
+                                               float(data["vector-z"])])
         return responses()[ret]
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
@@ -112,4 +121,18 @@ def position_get_camera_endpoint(integration: GeneralController):
         return responses()[position]
     pos = vector_angle(position)
     return make_response(jsonify({"position-alpha-value": pos[0],
-        "position-beta-value": pos[1]}), 200)
+                                  "position-beta-value": pos[1]}), 200)
+
+
+def address_set_camera_endpoint(integration: GeneralController):
+    try:
+        addr = (request.form["ip"], int(request.form["port"]))
+        verify_address(addr)
+        if integration.cam_sock is None:
+            new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        else:
+            new_socket = integration.cam_sock
+        ret = integration.cam_api.set_address(new_socket, address=addr)
+        return responses()[ret]
+    except (AssertionError, ValueError):
+        return make_response(jsonify({"message": "Invalid address!"}), 400)

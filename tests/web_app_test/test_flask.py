@@ -5,9 +5,9 @@ import pytest
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import Camera
+from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import UDPSocket
+from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 import web_app
 
@@ -16,7 +16,7 @@ sock = mock.Mock()
 
 @pytest.fixture()
 def camera(monkeypatch):
-    def mocked_connect(addr):
+    def mocked_connect(addr, self=None):
         pass
 
     def mocked_close(self):
@@ -28,7 +28,7 @@ def camera(monkeypatch):
     def mocked_recv(size):
         return b'\x01\x00\x00\x00\x00\x00\x00\x01\x90\x41\xff'
 
-    def mocked_timeout(ms):
+    def mocked_timeout(ms, self=None):
         pass
 
     sock = socket.socket
@@ -38,15 +38,12 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(Camera(sock, (None, 1259)))
-    def mocked_camera_reconnect():
-        pass
+    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():
         return np.array([0, 0, 0])
 
-    monkeypatch.setattr(cam_api.camera, "reconnect", mocked_camera_reconnect)
     monkeypatch.setattr(cam_api, "get_zoom", mocked_get_zoom)
     monkeypatch.setattr(cam_api, "get_direction", mocked_get_direction)
 
@@ -59,12 +56,13 @@ def client(camera):
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
-    mic_api = MicrophoneAPI(UDPSocket(None, sock))
+    mic_api = MicrophoneAPI(MicrophoneSocket(sock=sock))
     mic_api.height = 1
 
     cam_api = camera
 
     test_controller = GeneralController()
+    test_controller.cam_sock = camera.camera.sock
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
@@ -82,15 +80,33 @@ def test_fail(client):
     assert rv.status_code == 418
 
 
+def test_set_address_camera(client):
+    data = {
+        "ip": "0.0.0.1",
+        "port": 1234
+    }
+    rv = client.post('/camera/address/set', data=data)
+    assert rv.status_code == 200
+
+
+def test_set_address_camera_invalid(client):
+    data = {
+        "ip": "asdf",
+        "port": 1234
+    }
+    rv = client.post('/camera/address/set', data=data)
+    assert rv.status_code == 400
+
+
 def test_turn_on(client):
-    """Test a turn on endpoint."""
+    """Test a turn-on endpoint."""
 
     rv = client.post('/camera/on')
     assert rv.status_code == 200
 
 
 def test_turn_off(client):
-    """Test a turn off endpoint."""
+    """Test a turn-off endpoint."""
 
     rv = client.post('/camera/off')
     assert rv.status_code == 200
@@ -187,6 +203,25 @@ def test_get_zoom(client):
     rv = client.get('/camera/zoom/get')
     assert rv.status_code == 200 and rv.data == bytes("{\"zoom-value\":128}\n", "utf-8")
 
+
+def test_set_address_microphone(client):
+    data = {
+        "ip": "0.0.0.1",
+        "port": 1234
+    }
+    rv = client.post('/microphone/address/set', data=data)
+    assert rv.status_code == 200
+
+
+def test_set_address_microphone_invalid(client):
+    data = {
+        "ip": "",
+        "port": 1234
+    }
+    rv = client.post('/microphone/address/set', data=data)
+    assert rv.status_code == 400
+
+
 def test_set_microphone_height(client):
     rv = client.post('/microphone/height/set', data={"microphone-height": 1.7})
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-height\":1.7}\n", "utf-8")
@@ -219,10 +254,12 @@ def test_calibration_is_set(client):
     assert rv.status_code == 200 \
         and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
+
 def test_calibration_get_camera(client):
     rv = client.get('/calibration/camera')
-    assert rv.status_code == 200 \
-        and rv.data == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+    assert rv.status_code == 200 and rv.data \
+           == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
+
 
 def test_update_microphone(client):
     rv = client.post('/update/microphone', json=json.dumps({"test": "testington"}))

@@ -13,6 +13,7 @@ from web_app.integration import GeneralController
 
 integration = GeneralController()
 
+
 def create_app(test_controller=None):
     # create and configure the app
     app = Flask(__name__)
@@ -32,6 +33,10 @@ def create_app(test_controller=None):
     @app.get('/')
     def view():
         return render_template('view.html')
+
+    @app.post('/camera/address/set')
+    def post_set_address():
+        return web_app.camera_endpoints.address_set_camera_endpoint(integration)
 
     @app.post('/camera/reboot')
     def post_reboot():
@@ -97,6 +102,10 @@ def create_app(test_controller=None):
         Endpoint to get the position value of the camera.
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
+
+    @app.post('/microphone/address/set')
+    def set_microphone_address():
+        return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
 
     @app.post('/microphone/height/set')
     def set_height():

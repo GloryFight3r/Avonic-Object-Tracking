@@ -4,9 +4,9 @@ import pytest
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import Camera
+from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import UDPSocket
+from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 import web_app
 
@@ -15,7 +15,7 @@ sock = mock.Mock()
 @pytest.fixture()
 def camera(monkeypatch):
     cam_sock = socket.socket
-    def mocked_connect(t):
+    def mocked_connect(t, self=None):
         pass
 
     def mocked_close():
@@ -40,7 +40,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "recv", mocked_recv)
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(Camera(cam_sock, (None, 1259)))
+    cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)))
     def mocked_camera_reconnect():
         pass
     def mocked_get_zoom():
@@ -65,12 +65,13 @@ def client(camera):
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
-    mic_api = MicrophoneAPI(UDPSocket(None, sock))
+    mic_api = MicrophoneAPI(MicrophoneSocket(None, sock))
     mic_api.height = 1
 
     cam_api = camera
 
     test_controller = GeneralController()
+    test_controller.cam_sock = sock
     test_controller.load_mock()
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
