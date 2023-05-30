@@ -41,7 +41,7 @@ def get_speaker_direction_endpoint(integration: GeneralController):
     ret = wait_for_speaker(integration)
     if isinstance(ret, str):
         return make_response(jsonify({"message": ret}), 504)
-    return make_response(jsonify({"microphone-direction": ret}), 200)
+    return make_response(jsonify({"microphone-direction": list(ret)}), 200)
 
 
 def wait_for_speaker(integration: GeneralController):

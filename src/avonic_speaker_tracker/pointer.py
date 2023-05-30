@@ -33,8 +33,8 @@ def preset_pointer(mic_api: MicrophoneAPI,
     return direct
 
 
-def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration, prev_dir=None):
-    """ Calculates the direction of the camera so it point to the speaker.
+def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
+    """ Calculates the direction of the camera, so it point to the speaker.
         Args:
             mic_api: The controller for the microphone
             calibration: Information on the calibration of the system

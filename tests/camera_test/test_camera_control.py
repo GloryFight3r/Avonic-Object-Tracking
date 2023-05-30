@@ -101,7 +101,7 @@ def generate_degrees_to_commands():
 
 
 @pytest.mark.parametrize("alpha, expected", generate_degrees_to_commands())
-def test_degrees_to_command(camera:CameraAPI, alpha, expected):
+def test_degrees_to_command(alpha, expected):
     assert degrees_to_command(alpha) == expected
 
 
