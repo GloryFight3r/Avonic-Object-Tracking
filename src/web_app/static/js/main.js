@@ -60,7 +60,7 @@ const presetform = document.getElementById("preset-form");
 
 presetform.onsubmit = async (e) => {
     e.preventDefault();
-    const b = f.getElementsByTagName("button")[0]
+    const b = presetform.getElementsByTagName("button")[0]
     b.ariaBusy = "true"
     const button_id = e.submitter.id;
     let body = {};

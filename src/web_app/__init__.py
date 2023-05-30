@@ -224,5 +224,5 @@ def create_app(test_controller=None):
 
     return app
 
-
-application = create_app()
+if __name__ == "__main__":
+    application = create_app()
