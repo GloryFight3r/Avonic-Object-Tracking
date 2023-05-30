@@ -21,7 +21,8 @@ dependencies = [
     "numpy",
     "python-dotenv",
     "requests",
-    "opencv-python"
+    "opencv-python",
+    "ultralytics"
 ]
 
 [project.optional-dependencies]

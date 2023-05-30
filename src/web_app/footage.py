@@ -1,6 +1,7 @@
 from flask import make_response, jsonify, request
 from flask_socketio import emit
 from web_app.integration import GeneralController
+import base64
 
 def update_footage(integration: GeneralController):
     data = request.get_json()

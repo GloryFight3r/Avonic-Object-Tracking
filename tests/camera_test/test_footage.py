@@ -3,6 +3,7 @@ from threading import Event
 import cv2
 import base64
 from avonic_camera_api.footage import FootageThread
+from object_tracker.yolov2 import YOLOPredict
 
 class MockedCv:
     def __init__(self):
@@ -10,12 +11,31 @@ class MockedCv:
     def read(self):
         return (True, "mocked return")
 
+class MockedBoxTracker:
+    def __init__(self):
+        pass
+    def camera_track(self, bx):
+        pass
+
+class MockedYoloPredict:
+    def __init__(self):
+        pass
+
+    def get_bounding_boxes(self, frame):
+        return [[0, 0, 0, 0]]
+    def get_bounding_boxes_image(self, frame):
+        pass
+    def draw_prediction(self, img, lbl, x, y, x2, y2):
+        pass
+
 @pytest.fixture
 def footage_thread():
     mocked_url = ""
     mocked_cam_footage = MockedCv()
+    mocked_box_tracker = MockedBoxTracker()
+    mocked_yolo = MockedYoloPredict()
     event = Event()
-    thread = FootageThread(mocked_url, mocked_cam_footage, event)
+    thread = FootageThread(mocked_url, mocked_cam_footage, mocked_yolo, event, mocked_box_tracker)
 
     return thread
 

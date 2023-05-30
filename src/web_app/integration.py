@@ -3,13 +3,17 @@ from os import getenv
 import socket
 from dotenv import load_dotenv
 import cv2
+import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
 from avonic_camera_api.footage import FootageThread
+from avonic_speaker_tracker.boxtracking import BoxTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
+from object_tracker.yolo import Yolo
+from object_tracker.yolov2 import YOLOPredict
 
 class GeneralController():
     def __init__(self):
@@ -24,6 +28,7 @@ class GeneralController():
         self.preset_locations = None
         self.calibration = None
         self.camera_footage = None
+        self.box_tracker = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
@@ -40,7 +45,10 @@ class GeneralController():
         self.calibration = Calibration()
         self.secret = getenv("SECRET_KEY")
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
-        self.footage_thread = FootageThread(self.url, self.video, self.event2)
+
+        self.box_tracker = BoxTracker(self.cam_api, np.array([1920.0, 1080.0]))
+
+        self.footage_thread = FootageThread(self.url, self.video, YOLOPredict(), self.event2, self.box_tracker)
         self.footage_thread.start()
 
     def __del__(self):
