@@ -197,6 +197,10 @@ def create_app(test_controller=None):
     def thread_stop():
         return web_app.tracking_endpoints.stop_thread_endpoint(integration)
 
+    @app.post('/thread/preset')
+    def preset_use():
+        return web_app.tracking_endpoints.preset_use(integration)
+
     @app.get('/thread/running')
     def thread_is_running():
         # checks whether thread is running

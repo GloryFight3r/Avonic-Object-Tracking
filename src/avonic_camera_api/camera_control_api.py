@@ -83,7 +83,7 @@ class CameraAPI:
         Returns:
             A byte code that will be used for a visca command call
         """
-        degree_divided = int(degree / 0.0625)
+        degree_divided = int(degree / (5/72))
 
         if degree_divided < 0:
             degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
@@ -210,8 +210,8 @@ class CameraAPI:
             pan_adjusted = -((pan ^ ((1 << 16) - 1)) + 1)
         if ret_msg[13] == "F":
             tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
-        pan_rad = pan_adjusted * 0.0625 / 180 * math.pi
-        tilt_rad = tilt_adjusted * 0.0625 / 180 * math.pi
+        pan_rad = pan_adjusted * (5/72) / 180 * math.pi
+        tilt_rad = tilt_adjusted * (5/72) / 180 * math.pi
         direction = converter.angle_vector(pan_rad, tilt_rad)
         self.latest_direction = direction
         return direction
