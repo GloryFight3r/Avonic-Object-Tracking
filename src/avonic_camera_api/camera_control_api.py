@@ -213,7 +213,6 @@ class CameraAPI:
         pan_rad = pan_adjusted * (5/72) / 180 * math.pi
         tilt_rad = tilt_adjusted * (5/72) / 180 * math.pi
         direction = converter.angle_vector(pan_rad, tilt_rad)
-        pos = converter.vector_angle(direction)
         self.latest_direction = direction
         return direction
 

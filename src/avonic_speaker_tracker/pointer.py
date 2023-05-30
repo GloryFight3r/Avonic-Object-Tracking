@@ -36,7 +36,9 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
     """
     mic_direction = mic_api.get_direction()
 
-    cam_vec = translate_microphone_to_camera_vector(calibration.to_mic_direction,mic_direction,calibration.mic_height)
+    cam_vec = translate_microphone_to_camera_vector(calibration.to_mic_direction,
+                                                    mic_direction,
+                                                    calibration.mic_height)
 
     cam_vec = [-cam_vec[0], cam_vec[1], cam_vec[2]]
 
@@ -46,7 +48,9 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
     return direct
 
 
-def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, preset_use: bool, calibration: Calibration, prev_dir=None):
+def point(cam_api: CameraAPI, mic_api: MicrophoneAPI, 
+            preset_locations: PresetCollection, preset_use: bool, 
+            calibration: Calibration, prev_dir=None):
     """ Points the camera towards the calculated direction from either: 
     the presets or the continuous follower.
         Args: 
