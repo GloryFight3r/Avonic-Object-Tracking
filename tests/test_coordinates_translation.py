@@ -3,19 +3,16 @@ import numpy as np
 import avonic_speaker_tracker.coordinate_translation
 
 def generate_good_pairs_of_combinations():
+    # Check values at:
+    # https://www.geogebra.org/calculator/wwejbfhe
+    # Format:
+    #   camera-to-microphone vector
+    #   microphone-to-speaker vector
+    #   height from the speaker plane to microphone
+    #   expected vector of correct distance camera-to-speaker
     return [
-        (np.array([-1.9, 1.3, -1.5]), np.array([-1.4, -1.7, -0.1]),
-        1.7, np.array([-0.5, 3, -1.4])),
-        (np.array([-1.5, 3, 0.3]), np.array([-1.4, -1.9, -0.5]),
-        1.9, np.array([-0.1, 4.9, 0.8])),
-        (np.array([-1.5, 3, 0.3]), np.array([-1.4, -1.9, -0.5]) / 5,
-        1.9, np.array([-0.1, 4.9, 0.8])),
-        (np.array([-1.5, 3, 0.3]), np.array([2.8, -2.1, 5.2]),
-        2.1, np.array([-4.3, 5.1, -4.9])),
-        (np.array([-1.5, 3, 0.3]), np.array([2.8, -2.1, 5.2]) / 4,
-        2.1, np.array([-4.3, 5.1, -4.9])),
-        (np.array([-1.5, 3, 0.3]), np.array([2.8, -2.1, 5.2]) / 10,
-        2.1, np.array([-4.3, 5.1, -4.9]))
+        (np.array([1.8, 1.8, 6]), np.array([1.9, -1.2, 2.7]),
+        1.2, np.array([3.7, 0.6, 8.7])),
     ]
 
 def generate_bad_pairs_of_combinations():

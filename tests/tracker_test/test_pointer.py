@@ -32,10 +32,10 @@ def test_continuous_pointer():
 
     calibration = mock.Mock()
     calibration.to_mic_direction = np.array([0.0,-0.5,1.2])
-    calibration.mic_height = 0.65
+    calibration.mic_height = -0.65
 
-    dir1 = continuous_pointer(mic_api,calibration)
-    dir2 = continuous_pointer(mic2_api,calibration)
+    dir1 = continuous_pointer(mic_api, calibration)
+    dir2 = continuous_pointer(mic2_api, calibration)
     assert(dir1 == np.array([-8,3,0])).all()
     assert(dir2 == np.array([-1,6,0])).all()
 
@@ -50,7 +50,7 @@ def test_pointer():
     col.add_preset("preset3", np.array([1, 5, 5000]), np.array([6, 8, 9]))
     calibration = mock.Mock()
     calibration.to_mic_direction = np.array([0.0,-0.5,1.2])
-    calibration.mic_height = 0.65
+    calibration.mic_height = -0.65
 
     dir1 = point(cam_api, mic_api, col, True, calibration)
     assert cam_api.move_absolute.call_count == 1
