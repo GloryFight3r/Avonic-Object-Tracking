@@ -1,17 +1,22 @@
 from threading import Event
 from os import getenv
 from dotenv import load_dotenv
-from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.calibration import Calibration
+from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+import requests
+from threading import Thread
+from time import sleep
 
 
 class GeneralController:
     def __init__(self):
         self.event = Event()
+        self.info_threads_event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
@@ -20,8 +25,9 @@ class GeneralController:
         self.secret = None
         self.ws = None
         self.preset_locations = None
-        self.calibration = None
-        self.preset = None
+        self.audio_model = None
+        self.preset_model = None
+        self.model = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
@@ -34,10 +40,19 @@ class GeneralController:
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         verify_address(mic_addr)
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
-        self.preset_locations = PresetCollection(filename="presets.json")
-        self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
+
+        # Initialize models
+        self.audio_model = AudioModel()
+        self.preset_model = PresetModel()
         self.preset = False
+
+        # Initialize camera and microphone info threads
+        self.info_threads_event.set()
+        self.thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
+        self.thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
+        self.thread_mic.start()
+        self.thread_cam.start()
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)
@@ -64,9 +79,56 @@ class GeneralController:
     def set_cam_api(self, new_cam_api):
         self.cam_api = new_cam_api
 
+    def get_model_based_on_choice(self):
+        if self.preset:
+            return self.preset_model
+        return self.audio_model
 
     def set_preset_collection(self, new_preset_collection):
         self.preset_locations = new_preset_collection
+
+    def get_mic_info(self):
+        """ Get information about the microphone.
+        """
+        return {
+            "microphone-direction": list(self.mic_api.get_direction()),
+            "microphone-speaking": self.mic_api.is_speaking()
+        }
+
+    def get_cam_info(self):
+        """ Get the direction of the camera.
+        """
+        direction = self.cam_api.get_direction()
+        zoom = self.cam_api.get_zoom()
+        if isinstance(direction, ResponseCode):
+            direction = [0, 0, 1]
+        angles = converter.vector_angle(direction)
+        if not isinstance(zoom, int):
+            zoom = 0
+        return {
+            "camera-direction": {
+                "position-alpha-value": angles[0],
+                "position-beta-value": angles[1]
+            },
+            "zoom-value": zoom,
+            "camera-video": self.cam_api.video
+        }
+
+    def send_update(self, data, path: str):
+        """ Send an HTTP request to the flask server to update the webpages.
+
+        Args:
+            data: The data in dictionary format
+            path: The path to send to
+        """
+        print("Info-thread start and will send updates to " + path)
+        while True:
+            if not self.info_threads_event.is_set():
+                d = data()
+                response = requests.post('http://' + self.url + path, json=d)
+                if response.status_code != 200:
+                    print("Could not update flask at path " + path)
+                sleep(0.3)
 
 
 def verify_address(address):

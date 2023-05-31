@@ -10,6 +10,7 @@ class MicrophoneAPI:
     azimuth = None
     speaking = None
     threshold = None
+    latest_direction = np.array([0, 1.0, 0])
 
     def __init__(self, sock: MicrophoneSocket, threshold=-55):
         """ Constructor for the Microphone
@@ -22,6 +23,7 @@ class MicrophoneAPI:
         self.elevation = 0.0
         self.azimuth = 0.0
         self.speaking = False
+        self.latest_direction = np.array([0, 1.0, 0])
         self.threshold = threshold
 
     def set_address(self, address):
@@ -103,7 +105,8 @@ class MicrophoneAPI:
             if "message" in obj:
                 return obj["message"]
             return "Unable to get direction from microphone, response was: " + ret
-        return self.vector()
+        self.latest_direction = self.vector()
+        return self.latest_direction
 
     def vector(self) -> np.array:
         """ Get direction vector from local variables

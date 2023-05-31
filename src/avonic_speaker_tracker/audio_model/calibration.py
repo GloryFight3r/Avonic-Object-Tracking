@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from avonic_speaker_tracker.persistency_utils import CustomEncoder
+from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 class Calibration:
     # height of the microphone above the speaker

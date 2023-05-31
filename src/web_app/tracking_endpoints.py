@@ -5,23 +5,17 @@ from web_app.integration import GeneralController
 
 def start_thread_endpoint(integration: GeneralController, allow_movement):
     # start (unpause) the thread
-    if integration.thread is None:
-        # FIXME: UGLY code repetition please fix
+    if (integration.thread is None) or (integration.event.is_set()):
+        if integration.thread is None:
+            old_calibration = 0
+        else:
+            old_calibration = integration.thread.value
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
-                                          integration.preset_locations, integration.calibration,
-                                          integration.preset, allow_movement)
-        integration.thread.set_calibration(2)
-        integration.event.clear()
-        integration.thread.start()
-    elif integration.event.is_set():
-        old_calibration = integration.thread.value
-        integration.thread = UpdateThread(integration.event, integration.url,
-                                          integration.cam_api, integration.mic_api,
-                                          integration.preset_locations, integration.calibration,
-                                          integration.preset, allow_movement)
+                                          integration.get_model_based_on_choice(), allow_movement)
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
+        integration.info_threads_event.clear()
         integration.thread.start()
     else:
         print("Thread already running!")
@@ -32,6 +26,7 @@ def start_thread_endpoint(integration: GeneralController, allow_movement):
 def stop_thread_endpoint(integration: GeneralController):
     # stop (pause) the thread
     integration.event.set()
+    integration.info_threads_event.set()
     integration.thread.join()
     return make_response(jsonify({}), 200)
 

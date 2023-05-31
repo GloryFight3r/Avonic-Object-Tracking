@@ -235,6 +235,19 @@ def create_app(test_controller=None):
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
 
+    # Info-thread section
+
+    @app.post('/info-thread/start')
+    def info_thread_start():
+        integration.info_threads_event.clear()
+        return make_response(jsonify({}), 200)
+
+    @app.post('/info-thread/stop')
+    def info_thread_stop():
+        integration.info_threads_event.set()
+        print(integration.info_threads_event)
+        return make_response(jsonify({}), 200)
+
     return app
 
 if __name__ == "__main__":

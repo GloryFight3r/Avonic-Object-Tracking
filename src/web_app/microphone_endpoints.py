@@ -18,9 +18,9 @@ def address_set_microphone_endpoint(integration: GeneralController):
 
 
 def height_set_microphone_endpoint(integration: GeneralController):
-    integration.calibration.set_height(float(request.form["microphone-height"]))
+    integration.audio_model.calibration.set_height(float(request.form["microphone-height"]))
     return make_response(jsonify(
-        {"microphone-height": integration.calibration.mic_height}), 200)
+        {"microphone-height": integration.audio_model.calibration.mic_height}), 200)
 
 
 def direction_get_microphone_endpoint(integration: GeneralController):
