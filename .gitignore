@@ -20,8 +20,6 @@ html/
 .DS_Store
 .erb-lint.yml
 .hypothesis
-.DS_Store
-src/.DS_Store
 codeclimate.json
 public/
 pylint_test/
