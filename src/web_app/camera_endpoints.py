@@ -117,14 +117,12 @@ def position_get_camera_endpoint(integration: GeneralController):
     position = integration.cam_api.get_direction()
     if isinstance(position, ResponseCode):
         return responses()[position]
-
     pos = vector_angle(position)
     return make_response(jsonify({"position-alpha-value": pos[0],
                                   "position-beta-value": pos[1]}), 200)
 
 def get_camera_footage(integration: GeneralController):
     return integration.footage_thread.get_frame()
-
 
 def address_set_camera_endpoint(integration: GeneralController):
     try:

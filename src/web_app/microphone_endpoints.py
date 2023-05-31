@@ -2,7 +2,6 @@ from time import sleep
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 
-
 def address_set_microphone_endpoint(integration: GeneralController):
     try:
         addr = (request.form["ip"], int(request.form["port"]))
