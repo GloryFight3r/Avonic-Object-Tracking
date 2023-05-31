@@ -14,7 +14,8 @@ onSuccess = {
     "microphone-speaking-form": onSpeaking,
     "thread-value-form": onValueGet,
     "preset-get-list-form": refreshPresetList,
-    "camera-coords-get-form": onCameraCoordsGet
+    "camera-coords-get-form": onCameraCoordsGet,
+    "thread-preset" : usePresets,
 };
 
 async function onError(button) {
@@ -81,7 +82,7 @@ presetform.onsubmit = async (e) => {
             body = { method: presetform.method, body: new FormData(presetform) };
             break;
         case "point-to-closest":
-            presetform.setAttribute("method", "GET");
+            presetform.setAttribute("method", "POST");
             presetform.action = "/preset/point";
             body = { method: presetform.method };
             break;
