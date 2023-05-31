@@ -45,14 +45,17 @@ def continuous_pointer(mic_api: MicrophoneAPI, calibration: Calibration):
         print(mic_direction)
         return None
 
+    cam_vec = translate_microphone_to_camera_vector(np.array([1.8, 1.35, 6]),
+                                                    mic_direction,
+                                                    1.15)
     cam_vec = translate_microphone_to_camera_vector(calibration.to_mic_direction,
                                                     mic_direction,
                                                     calibration.mic_height)
 
-    cam_vec = [-cam_vec[0], cam_vec[1], cam_vec[2]]
+    #cam_vec = [-cam_vec[0], cam_vec[1], cam_vec[2]]
 
     direct = vector_angle(cam_vec)
-    direct = [int(np.rad2deg(direct[0])),int(np.rad2deg(direct[1])),0]
+    direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), 0]
     return direct
 
 

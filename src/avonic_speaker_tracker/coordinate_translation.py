@@ -16,6 +16,6 @@ def translate_microphone_to_camera_vector(cam_to_mic: np.array,
         raise TypeError("Not a 3D vector")
     cam_to_mic = cam_to_mic.flatten()
     mic_to_speaker = mic_to_speaker.flatten()
-    intersection_point = mic_to_speaker * mic_height / (mic_to_speaker[1])
+    intersection_point = -mic_to_speaker * mic_height / (mic_to_speaker[1])
 
     return intersection_point + cam_to_mic

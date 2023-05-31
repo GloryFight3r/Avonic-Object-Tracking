@@ -1,7 +1,7 @@
 from time import sleep
 from threading import Thread
 import requests
-from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.pointer import point
@@ -67,12 +67,18 @@ class UpdateThread(Thread):
         """ Get the direction of the camera.
         """
         direction = self.cam_api.get_direction()
+        zoom = self.cam_api.get_zoom()
+        if isinstance(direction, ResponseCode):
+            direction = [0, 0, 1]
+        angles = converter.vector_angle(direction)
+        if not isinstance(zoom, int):
+            zoom = 0
         return {
             "camera-direction": {
-                "position-alpha-value": direction[0],
-                "position-beta-value": direction[1]
+                "position-alpha-value": angles[0],
+                "position-beta-value": angles[1]
             },
-            "zoom-value": self.cam_api.get_zoom(),
+            "zoom-value": zoom,
             "camera-video": self.cam_api.video
         }
 
