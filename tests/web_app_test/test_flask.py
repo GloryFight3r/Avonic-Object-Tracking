@@ -282,7 +282,7 @@ def test_update_calibration(client):
     assert rv.status_code == 200
 
 def test_thread(client):
-    rv = client.post('/thread/start')
+    rv = client.post('/thread/start/false')
     assert rv.status_code == 200
     rv = client.get('/thread/running')
     assert rv.status_code == 200 and rv.data == bytes("{\"is-running\":true}\n", "utf-8")
@@ -290,11 +290,11 @@ def test_thread(client):
     assert rv.status_code == 200
     rv = client.get('/thread/running')
     assert rv.status_code == 200 and rv.data == bytes("{\"is-running\":false}\n", "utf-8")
-    rv = client.post('/thread/start')
+    rv = client.post('/thread/start/false')
     assert rv.status_code == 200
     rv = client.get('/thread/running')
     assert rv.status_code == 200 and rv.data == bytes("{\"is-running\":true}\n", "utf-8")
-    rv = client.post('/thread/start')
+    rv = client.post('/thread/start/false')
     assert rv.status_code == 403
     rv = client.post('/thread/stop')
     assert rv.status_code == 200

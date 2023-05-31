@@ -3,13 +3,14 @@ from avonic_speaker_tracker.updater import UpdateThread
 from web_app.integration import GeneralController
 
 
-def start_thread_endpoint(integration: GeneralController):
+def start_thread_endpoint(integration: GeneralController, allow_movement):
     # start (unpause) the thread
     if integration.thread is None:
+        # FIXME: UGLY code repetition please fix
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
                                           integration.preset_locations, integration.calibration,
-                                            integration.preset)
+                                          integration.preset, bool(allow_movement))
         integration.thread.set_calibration(2)
         integration.event.clear()
         integration.thread.start()
@@ -18,7 +19,7 @@ def start_thread_endpoint(integration: GeneralController):
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
                                           integration.preset_locations, integration.calibration,
-                                           integration.preset)
+                                          integration.preset, bool(allow_movement))
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
         integration.thread.start()

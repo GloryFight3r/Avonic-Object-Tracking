@@ -81,7 +81,7 @@ class Calibration:
             assert mic_vecw[1] != 0.0 and self.mic_height != 0.0
 
             # calculate the length of the mic_vec
-            mic_vec = mic_vecw / mic_vecw[1] * -self.mic_height
+            mic_vec = mic_vecw / mic_vecw[1] * self.mic_height
 
             # calculate the two angles needed
             alpha_cos = angle_between_vectors(cam_vecw, mic_vecw)
@@ -97,6 +97,7 @@ class Calibration:
 
         self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)
         print(self.mic_to_cam)
+        print(self.mic_height)
         return self.mic_to_cam
 
     def record(self):
