@@ -38,7 +38,7 @@ def vector_angle(v: np.array) -> (float, float):
     new_vec = np.array([vec[0], 0, vec[2]])
     new_vec /= np.linalg.norm(new_vec)
     alpha = np.arccos(home_vec.dot(new_vec))
-    if vec[0] < 0:
+    if vec[0] >= 0:
         alpha = -alpha
 
     beta = np.arcsin(vec[1])
