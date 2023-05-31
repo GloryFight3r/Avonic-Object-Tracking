@@ -12,7 +12,7 @@ def test_constructor():
     cam_api = mock.Mock()
     presets = mock.Mock()
     calibration = mock.Mock()
-    ct = UpdateThread(e, '', cam_api, mic_api, presets,calibration,False)
+    ct = UpdateThread(e, '', cam_api, mic_api, presets,calibration,False, False)
     assert ct.event == e
     assert ct.mic_api == mic_api
     assert ct.cam_api == cam_api
@@ -29,7 +29,7 @@ def test_setter():
     cam_api = mock.Mock()
     presets = mock.Mock()
     calibration = mock.Mock()
-    ct = UpdateThread(e, '', mic_api, cam_api, presets,calibration,False)
+    ct = UpdateThread(e, '', mic_api, cam_api, presets,calibration,False, False)
     assert ct.event == e
     assert ct.value is None
     ct.set_calibration(2)

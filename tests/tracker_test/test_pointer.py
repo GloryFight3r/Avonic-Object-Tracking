@@ -31,7 +31,7 @@ def test_continuous_pointer():
     mic2_api.is_speaking.return_value = True
 
     calibration = mock.Mock()
-    calibration.to_mic_direction = np.array([0.0,-0.5,1.2])
+    calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
 
     dir1 = continuous_pointer(mic_api, calibration)
@@ -49,7 +49,7 @@ def test_pointer():
     col.add_preset("preset2", np.array([5, 9, 5000]), np.array([7, 8, 10]))
     col.add_preset("preset3", np.array([1, 5, 5000]), np.array([6, 8, 9]))
     calibration = mock.Mock()
-    calibration.to_mic_direction = np.array([0.0,-0.5,1.2])
+    calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
 
     dir1 = point(cam_api, mic_api, col, True, calibration)
