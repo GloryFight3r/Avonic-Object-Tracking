@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from ultralytics import YOLO
+import torch
 
 class YOLOPredict:
     model = None
@@ -23,14 +24,15 @@ class YOLOPredict:
         return frame
 
     def get_bounding_boxes(self, frame):
-        results = self.model(frame, device="mps", classes=0)
+        results = self.model.predict(frame, device="mps")
         result = results[0]
+        person_indices = torch.nonzero(result.boxes.cls.cpu() == 0)
+        #persons = [result.boxes.cls.cpu()[i] for i in person_indices]
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
-
-        return bboxes
+        print(len(bboxes[person_indices]))
+        return bboxes[person_indices]
 
     def draw_prediction(self, img, label, left, top, right, bottom):
         cv2.rectangle(img, (left, top), (right, bottom), [0, 0, 0], 2)
         cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0, 0, 0], 2)
-

@@ -6,8 +6,8 @@ import cv2
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import Camera
-from avonic_camera_api.footage import FootageThread
-from avonic_speaker_tracker.boxtracking import BoxTracker
+from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
+from avonic_speaker_tracker.boxtracking import ThresholdBoxTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import UDPSocket
 from avonic_speaker_tracker.preset import PresetCollection
@@ -15,10 +15,13 @@ from avonic_speaker_tracker.calibration import Calibration
 from object_tracker.yolo import Yolo
 from object_tracker.yolov2 import YOLOPredict
 
+import rtsp
+
 class GeneralController():
     def __init__(self):
         self.event = Event()
         self.event2 = Event()
+        self.object_tracking_event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_api = None
@@ -29,6 +32,10 @@ class GeneralController():
         self.calibration = None
         self.camera_footage = None
         self.box_tracker = None
+        self.video = cv2.VideoCapture(
+                'rtsp://' + getenv("CAM_IP") + ':554/live/av0'
+        )
+        self.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
@@ -44,16 +51,17 @@ class GeneralController():
         self.preset_locations = PresetCollection()
         self.calibration = Calibration()
         self.secret = getenv("SECRET_KEY")
-        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
 
-        self.box_tracker = BoxTracker(self.cam_api, np.array([1920.0, 1080.0]))
-
-        self.footage_thread = FootageThread(self.url, self.video, YOLOPredict(), self.event2, self.box_tracker)
+        self.box_tracker = ThresholdBoxTracker(self.cam_api, np.array([1920.0, 1080.0]), 5)
+        self.footage_thread = FootageThread(self.video, self.event2)
         self.footage_thread.start()
+        self.object_tracking_thread = ObjectTrackingThread(YOLOPredict(), self.box_tracker, self.footage_thread,
+                                                        self.object_tracking_event)
+        self.object_tracking_event.set()
 
     def __del__(self):
-        self.event2.set()
         self.video.release()
+        self.object_tracking_event.set()
 
     def load_mock(self):
         self.cam_api = CameraAPI(None)

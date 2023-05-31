@@ -7,9 +7,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 
 def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
-          preset_locations: PresetCollection, prev_cam=None):
-    if prev_cam is None:
-        prev_cam = [0.0, 0.0, 0.0]
+          preset_locations: PresetCollection, prev_cam=[0.0, 0.0, 0.0]):
     preset_names = np.array(preset_locations.get_preset_list())
     presets_mic = []
     for i in range(len(preset_names)):
@@ -23,3 +21,6 @@ def point(cam_api: CameraAPI, mic_api: MicrophoneAPI,
         cam_api.direct_zoom(int(preset[0][2]))
         prev_cam = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1]))]
     return prev_cam
+
+def angle_between_vectors(p: np.array, q: np.array) -> float:
+    return np.arccos(p.dot(q) / (np.linalg.norm(p) * np.linalg.norm(q)))

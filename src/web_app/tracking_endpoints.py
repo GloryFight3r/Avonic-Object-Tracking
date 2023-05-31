@@ -2,6 +2,32 @@ from flask import make_response, jsonify, request
 from avonic_speaker_tracker.updater import UpdateThread
 from web_app.integration import GeneralController
 
+def start_object_tracking_endpoint(integration: GeneralController):
+    print("YEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    if integration.object_tracking_thread is None:
+        url = 'rtsp://' + getenv("CAM_IP") + ':554/live/av0'
+        integration.video = cv2.VideoCapture(url)
+        integration.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        integration.box_tracker = ThresholdBoxTracker(integration.cam_api, np.array([1920.0, 1080.0]), 5)
+        integration.object_tracking_thread = ObjectTrackingThread(YOLOPredict(), integration.box_tracker, integration.footage_thread)
+        integration.object_tracking_event.clear()
+        integration.object_tracking_thread.start()
+    elif integration.object_tracking_event.is_set():
+        integration.object_tracking_event.clear()
+        integration.object_tracking_thread.start()
+    else:
+        return make_response(jsonify({}), 403)
+    integration.footage_thread.show_bounding_boxes = True
+    return make_response(jsonify({}), 200)
+
+def stop_object_tracking_endpoint(integration: GeneralController):
+    # stop (pause) the object tracking thread
+    integration.object_tracking_event.set()
+    integration.object_tracking_thread.join()
+    integration.footage_thread.show_bounding_boxes = False
+    return make_response(jsonify({}), 200)
+
+
 
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread

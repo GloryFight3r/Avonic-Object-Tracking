@@ -40,7 +40,7 @@ def create_app(test_controller=None):
     @app.get('/camera_control')
     def camera_view():
         to_import=["camera", "socket", "main"]
-        return render_template('single_page.html', name="camera", to_import=to_import, 
+        return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
     @app.get('/microphone_control')
     def microphone_view():
@@ -227,6 +227,14 @@ def create_app(test_controller=None):
     # python's "global" identifier and because threads can't be paused
 
     # create the event and start the thread
+
+    @app.post('/object_tracking/start')
+    def object_tracking_start():
+        return web_app.tracking_endpoints.start_object_tracking_endpoint(integration)
+
+    @app.post('/object_tracking/stop')
+    def object_tracking_stop():
+        return web_app.tracking_endpoints.stop_object_tracking_endpoint(integration)
 
     @app.post('/thread/start')
     def thread_start():
