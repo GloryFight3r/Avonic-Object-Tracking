@@ -11,7 +11,9 @@ from avonic_speaker_tracker.calibration import Calibration
 class UpdateThread(Thread):
     loop = None
 
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_locations: PresetCollection, calibration: Calibration, preset_use: bool, allow_movement: bool = False):
+    def __init__(self, event, url: str, cam_api: CameraAPI,
+                 mic_api: MicrophoneAPI, preset_locations: PresetCollection,
+                 calibration: Calibration, preset_use: bool, allow_movement: bool = False):
         """ Class constructor
 
         Args:

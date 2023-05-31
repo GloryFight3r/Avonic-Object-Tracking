@@ -1,17 +1,19 @@
 from threading import Event
 from os import getenv
 from dotenv import load_dotenv
+import cv2
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
 
-
 class GeneralController:
     def __init__(self):
         self.event = Event()
+        self.footage_thread_event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
@@ -21,6 +23,7 @@ class GeneralController:
         self.ws = None
         self.preset_locations = None
         self.calibration = None
+        self.camera_footage = None
         self.preset = None
 
     def load_env(self):
@@ -37,6 +40,13 @@ class GeneralController:
         self.preset_locations = PresetCollection(filename="presets.json")
         self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
+        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
+        self.footage_thread = FootageThread(self.video, self.footage_thread_event)
+        self.footage_thread.start()
+
+    def __del__(self):
+        self.footage_thread_event.set()
+        self.video.release()
         self.preset = False
 
     def load_mock(self):
