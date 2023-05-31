@@ -136,3 +136,13 @@ def address_set_camera_endpoint(integration: GeneralController):
         return responses()[ret]
     except (AssertionError, ValueError):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
+
+def navigate_camera(integration: GeneralController):
+    x = float(request.get_json()["x-pos"])
+    y = float(request.get_json()["y-pos"])
+    #print(x, y)
+    x = x * 1920
+    y = y * 1080
+    #print(x, y)
+    integration.box_tracker.camera_track([x, y, x, y])
+    return success()

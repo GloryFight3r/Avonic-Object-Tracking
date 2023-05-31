@@ -51,7 +51,13 @@ class UpdateThread(Thread):
                 prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, self.preset_use, self.calibration, prev_dir)
 
             self.value += 1
-            sleep(0.3)
+            asyncio.run(
+                self.send_update(self.get_mic_info(), '/update/microphone'))
+            # to not time out the camera, only update it once in 1.5 seconds
+            if self.value % 15 == 0:
+                asyncio.run(
+                    self.send_update(self.get_cam_info(), '/update/camera'))
+            sleep(0.1)
         print("Exiting thread")
 
     def set_calibration(self, value):

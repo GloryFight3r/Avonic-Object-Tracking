@@ -6,6 +6,9 @@ from avonic_camera_api import converter
 
 class CameraAPI:
     latest_direction = None
+    MIN_FOV = np.array([3.72, 2.14])
+    MAX_FOV = np.array([60.38, 35.80])
+    MAX_ZOOM_VALUE = 16384
 
     def __init__(self, camera: CameraSocket):
         """ Constructor for cameraAPI
@@ -218,6 +221,13 @@ class CameraAPI:
         self.latest_direction = direction
         return direction
 
+    def calculate_fov(self):
+        current_zoom = self.get_zoom()
+        
+        current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
+            * current_zoom / self.MAX_ZOOM_VALUE)
+            
+        return current_fov
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.

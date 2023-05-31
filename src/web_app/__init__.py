@@ -6,6 +6,7 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
+import web_app.footage
 from web_app.integration import GeneralController
 
 # While testing to keep the log clean
@@ -205,6 +206,10 @@ def create_app(test_controller=None):
     def calibration_get_cam_coords():
         return web_app.calibration_endpoints.get_calibration(integration)
 
+    @app.post('/navigate/camera')
+    def navigate_camera():
+        return web_app.camera_endpoints.navigate_camera(integration)
+
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
 
@@ -256,7 +261,7 @@ def create_app(test_controller=None):
     @app.post('/update/camera')
     def thread_camera():
         return web_app.tracking_endpoints.update_camera(integration)
-    
+
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)
@@ -264,6 +269,10 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
+#    # Camera footage
+#    @app.route('/video_feed')
+#    def video_feed():
+#        return Response(web_app.camera_endpoints.get_camera_footage(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     return app
 
