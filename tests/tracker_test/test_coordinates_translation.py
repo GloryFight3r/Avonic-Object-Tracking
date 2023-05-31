@@ -4,6 +4,7 @@ import avonic_speaker_tracker.coordinate_translation
 
 def generate_good_pairs_of_combinations():
     # Check values at:
+    # Point C - camera, S - speaker, M - microphone
     # https://www.geogebra.org/calculator/wwejbfhe
     # Format:
     #   camera-to-microphone vector
@@ -13,6 +14,15 @@ def generate_good_pairs_of_combinations():
     return [
         (np.array([1.8, 1.8, 6]), np.array([1.9, -1.2, 2.7]),
         1.2, np.array([3.7, 0.6, 8.7])),
+        (np.array([1.8, 1.8, 6]), np.array([-3.6, -1.2, 2.7]),
+        1.2, np.array([-1.8, 0.6, 8.7])),
+        (np.array([1.8, 1.8, 6]), np.array([-3.6, -1.2, -2.1]),
+        1.2, np.array([-1.8, 0.6, 3.9])),
+        (np.array([1.8, 1.8, 6]), np.array([2.5, -1.2, -2.1]),
+        1.2, np.array([4.3, 0.6, 3.9])),
+        (np.array([-2.8, 1.8, -3.5]), np.array([2.5, -1.2, -2.1]),
+        1.2, np.array([-0.3, 0.6, -5.6]))
+
     ]
 
 def generate_bad_pairs_of_combinations():
