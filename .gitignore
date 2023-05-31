@@ -17,7 +17,6 @@ calibration.json
 presets.json
 html/
 .mutmut-cache
-.DS_Store
 .erb-lint.yml
 .hypothesis
 codeclimate.json
