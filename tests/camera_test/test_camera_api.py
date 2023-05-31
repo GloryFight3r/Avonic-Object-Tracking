@@ -12,7 +12,11 @@ def test_angle_vector_basic():
 def test_angle_vector_complex():
     alpha = -30
     beta = 60
-    result = np.array([-0.25, np.sqrt(3) / 2, np.sqrt(3) / 4])
+    # x is +0.25 because the pan angle goes clockwise,
+    # therefore this negative one goes counterclockwise,
+    # so towards the x-axis
+    # This is the correct value, do not edit!!
+    result = np.array([0.25, np.sqrt(3) / 2, np.sqrt(3) / 4])
     assert np.allclose(angle_vector(np.deg2rad(alpha), np.deg2rad(beta)), result)
 
 

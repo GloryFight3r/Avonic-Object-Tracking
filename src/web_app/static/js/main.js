@@ -2,21 +2,6 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-onSuccess = {
-    "camera-off-form": hideOff,
-    "camera-on-form": hideOn,
-    "camera-zoom-get-form": onZoomGet,
-    "camera-position-get-form": onPositionGet,
-    "presets-camera-position-set-form": onPositionSet,
-    "presets-camera-zoom-set-form": onZoomSet,
-    "microphone-get-direction-form": onDirectionGet,
-    "microphone-set-direction-form": onMicrophoneDirectionSet,
-    "microphone-speaking-form": onSpeaking,
-    "thread-value-form": onValueGet,
-    "preset-get-list-form": refreshPresetList,
-    "camera-coords-get-form": onCameraCoordsGet
-};
-
 async function onError(button) {
     button.classList.add("contrast");
     await sleep(350);
@@ -55,4 +40,3 @@ async function onError(button) {
             }
         })
 );
-

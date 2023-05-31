@@ -1,3 +1,18 @@
+if (typeof onSuccess !== 'undefined') {
+  onSuccess = Object.assign({}, onSuccess, {
+    "microphone-get-direction-form": onDirectionGet,
+    "microphone-set-direction-form": onMicrophoneDirectionSet,
+    "microphone-speaking-form": onSpeaking,
+  });
+}
+else {
+  onSuccess = {
+    "microphone-get-direction-form": onDirectionGet,
+    "microphone-set-direction-form": onMicrophoneDirectionSet,
+    "microphone-speaking-form": onSpeaking,
+  }
+}
+
 async function onMicrophoneDirectionSet(data) {
     const d = (await data)["microphone-direction"];
 

@@ -1,3 +1,16 @@
+if (typeof onSuccess !== 'undefined') {
+  onSuccess = Object.assign({}, onSuccess, {
+    "preset-get-list-form": refreshPresetList,
+    "camera-position-get-form": onPositionGet
+  });
+}
+else {
+  onSuccess = {
+    "preset-get-list-form": refreshPresetList,
+    "camera-position-get-form": onPositionGet
+  }
+} 
+
 async function refreshPresetList(data) {
   const d = (await data)["preset-list"];
   const presetList = document.getElementById("preset-select");
@@ -108,7 +121,6 @@ presetform.onsubmit = async (e) => {
   const response = await fetch(presetform.action, body);
   if (response.status === 200) {
     requestPresetList();
-    document.getElementById("reload-preset-button").click();
   }
   if (response.status !== 200) {
     const b = e.submitter;
@@ -120,4 +132,6 @@ function loadPresets() {
   requestPresetList();
 }
 
-loadPresets();
+if (presetform !== null) {
+  loadPresets();
+}

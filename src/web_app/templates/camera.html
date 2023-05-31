@@ -39,8 +39,8 @@
   <div class="grid">
     <form action="/camera/position/get" method="get" id="camera-position-get-form" class="grid">
       <label for="position-alpha-value">Pan and Tilt [rad]</label>
-      <input type="number" name="position-alpha-value" id="position-alpha-value" readonly />
-      <input type="number" name="position-beta-value" id="position-beta-value" readonly />
+      <input type="number" name="position-alpha-value" id="position-alpha-value" value="0" step="0.001" readonly>
+      <input type="number" name="position-beta-value" id="position-beta-value" value="0" step="0.001" readonly>
       <button type="submit">Get position</button>
     </form>
   </div>

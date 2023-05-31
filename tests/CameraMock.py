@@ -1,4 +1,5 @@
 from avonic_camera_api.camera_control_api import insert_zoom_in_hex
+from avonic_camera_api.camera_adapter import ResponseCode
 
 class CameraMock:
     """
@@ -7,11 +8,14 @@ class CameraMock:
     call_count = None
     zoom = None
 
-    def __init__(self):
+    def __init__(self, timeout=False):
         self.call_count = 0
         self.zoom = 16384
+        self.timeout = timeout
 
     def send(self, header, command, data):
+        if self.timeout:
+            return ResponseCode.TIMED_OUT
         if len(command) == 26:
             # to set the zoom of the camera
             hex_res = command[13] + command[16] + command[19] + command[22]

@@ -1,4 +1,5 @@
 import math
+import os
 import pytest
 import numpy as np
 
@@ -134,3 +135,12 @@ def test_angle_between_vectors(v1, v2, exp_angle):
     angle = angle_between_vectors(np.array(v1), np.array(v2))
     # floats are not exactly the same in this case
     assert abs(angle - exp_angle) <= 1E-4
+
+def test_with_file():
+    cal = Calibration("TEST_WITH_FILE_CALIBRATION.json")
+    d = np.array([1, 1])
+    p = (np.array([1, 1]), np.array([0, 0, 0]))
+
+    cal.add_speaker_point(p)
+    cal.add_direction_to_mic(d)
+    os.remove("TEST_WITH_FILE_CALIBRATION.json")

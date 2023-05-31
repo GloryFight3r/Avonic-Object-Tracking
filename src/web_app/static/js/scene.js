@@ -21,7 +21,9 @@ renderer.setSize(width, height)
 canvas.append(renderer.domElement)
 camera.position.set(2, 2, 2)
 camera.lookAt(0, 0, 0)
-scene.add(new THREE.AxesHelper(1000))
+const axes = new THREE.AxesHelper(1000)
+axes.setColors(0x000000, 0x00ff00, 0x0000ff)
+scene.add(axes)
 const light = new THREE.AmbientLight(0xffffff, 10)
 scene.add(light)
 const planeGeometry = new THREE.PlaneGeometry(10, 10, 20, 20)
@@ -60,7 +62,7 @@ async function animate() {
     const camA = document.getElementById("position-alpha-value").value
     const camB = document.getElementById("position-beta-value").value
     const cosb = Math.cos(camB)
-    const camX = -Math.sin(camA) * cosb
+    const camX = Math.sin(camA) * cosb
     const camY = Math.sin(camB)
     const camZ = Math.cos(camA) * cosb
     const camDir = new THREE.Vector3(camX, camY, camZ)
@@ -71,7 +73,7 @@ async function animate() {
     camArrow = new THREE.ArrowHelper(camDir, cam, 1, 0xff00ff)
     scene.add(camArrow)
 
-    plane.position.set(0, h, 0)
+    plane.position.set(0, -h, 0)
     requestAnimationFrame(animate)
     controls.update()
     render().then()

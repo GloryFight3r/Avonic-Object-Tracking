@@ -78,7 +78,6 @@ async function startCalibration(button) {
     isCalibrating = true
 }
 
-
 function resetCalibration(button) {
     const body = { method: "get" };
     fetch("/calibration/reset", body).then(async function (res) {
@@ -97,35 +96,6 @@ function resetCalibration(button) {
     });
 }
 
-async function startCalibration(button) {
-    await startThread();
-    const instructionText = document.getElementById("calibration-instruction");
-    instructionText.innerHTML =
-        "Please stand somewhere in the room, point the camera at your face and speak up.";
-    button.innerHTML = "Listening...";
-    button.disabled = true;
-    const body = { method: "get" };
-    fetch("/calibration/add_directions_to_speaker", body).then(async function (
-        res
-    ) {
-        button.disabled = false;
-        if (res.status !== 200) {
-            onError(button);
-        } else {
-            button.disabled = true;
-            setTimeout(() => {
-                pointCameraCalibration(button);
-            }, 500);
-        }
-    });
-}
-
-function onWaitCalibration() {
-    const submitCalButton = document.getElementById("submit-calibration");
-    submitCalButton.innerHTML = "Please speak up...";
-    submitCalButton.disabled = true;
-}
-
 function selectCaliTab() {
     document.getElementById("presets").style.display = "none"
     document.getElementById("cal").style.display = "none"
@@ -140,6 +110,8 @@ function selectCaliTab() {
             header.innerText = "Calibration 🧰"
             break
         default:
+            header.innerText = "Presets 🔖"
+
     }
 }
 
@@ -150,5 +122,9 @@ async function onCameraCoordsGet(data) {
     document.getElementById("camera-coords-z").value = d[2].toFixed(5)
 }
 
-selectCaliTab()
-calibrationIsSet().then()
+if (document.getElementById("presets") !== null) {
+  selectCaliTab()
+}
+if (document.getElementById("calibration-button") !== null) {
+  calibrationIsSet().then()
+}

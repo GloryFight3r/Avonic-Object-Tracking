@@ -18,4 +18,6 @@ function selectFootageTab() {
         default:
     }
 }
-selectFootageTab()
+if (document.getElementById("footage-tab") !== null) {
+  selectFootageTab()
+}

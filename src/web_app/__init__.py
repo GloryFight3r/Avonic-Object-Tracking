@@ -14,6 +14,7 @@ from web_app.integration import GeneralController
 
 integration = GeneralController()
 
+
 def create_app(test_controller=None):
     # create and configure the app
     app = Flask(__name__)
@@ -49,7 +50,7 @@ def create_app(test_controller=None):
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        to_import=["socket", "presets", "calibration", "main"]
+        to_import=["socket", "camera", "microphone", "presets", "calibration", "main"]
         return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
                                page_name="Presets & Calibration View")
 
@@ -59,11 +60,9 @@ def create_app(test_controller=None):
         return render_template('single_page.html', name="live_footage", to_import=to_import,
                                page_name="Live Footage")
 
-    @app.get('/thread')
-    def thread_view():
-        to_import=["thread", "socket", "main"]
-        return render_template('single_page.html', name="thread", to_import=to_import,
-                               page_name="Thread view")
+    @app.post('/camera/address/set')
+    def post_set_address():
+        return web_app.camera_endpoints.address_set_camera_endpoint(integration)
 
     @app.post('/camera/reboot')
     def post_reboot():
@@ -129,6 +128,10 @@ def create_app(test_controller=None):
         Endpoint to get the position value of the camera.
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
+
+    @app.post('/microphone/address/set')
+    def set_microphone_address():
+        return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
 
     @app.post('/microphone/height/set')
     def set_height():
@@ -228,6 +231,10 @@ def create_app(test_controller=None):
     @app.post('/thread/stop')
     def thread_stop():
         return web_app.tracking_endpoints.stop_thread_endpoint(integration)
+
+    @app.post('/thread/preset')
+    def preset_use():
+        return web_app.tracking_endpoints.preset_use(integration)
 
     @app.get('/thread/running')
     def thread_is_running():
