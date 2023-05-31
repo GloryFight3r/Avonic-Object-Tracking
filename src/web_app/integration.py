@@ -1,15 +1,15 @@
 from threading import Event
 from os import getenv
-import socket
 from dotenv import load_dotenv
 import cv2
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera
+from avonic_camera_api.camera_adapter import CameraSocket
 from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
 from avonic_speaker_tracker.boxtracking import ThresholdBoxTracker
+from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import UDPSocket
+from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
 from object_tracker.yolo import Yolo
@@ -17,13 +17,14 @@ from object_tracker.yolov2 import YOLOPredict
 
 import rtsp
 
-class GeneralController():
+class GeneralController:
     def __init__(self):
         self.event = Event()
         self.event2 = Event()
         self.object_tracking_event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
+        self.cam_sock = None  # Only for testing
         self.cam_api = None
         self.mic_api = None
         self.secret = None
@@ -36,21 +37,23 @@ class GeneralController():
                 'rtsp://' + getenv("CAM_IP") + ':554/live/av0'
         )
         self.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        self.preset = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
         load_dotenv()
-        cam_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
-        self.cam_api = CameraAPI(Camera(cam_sock, cam_addr))
+        verify_address(cam_addr)
+        self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
-        mic_sock = UDPSocket(mic_addr)
-        self.mic_api = MicrophoneAPI(mic_sock, int(getenv("MIC_THRESH")))
-        self.preset_locations = PresetCollection()
-        self.calibration = Calibration()
+        verify_address(mic_addr)
+        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
+        self.preset_locations = PresetCollection(filename="presets.json")
+        self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
+        self.preset = False
 
         self.box_tracker = ThresholdBoxTracker(self.cam_api, np.array([1920.0, 1080.0]), 5)
         self.footage_thread = FootageThread(self.video, self.event2)
@@ -64,10 +67,13 @@ class GeneralController():
         self.object_tracking_event.set()
 
     def load_mock(self):
-        self.cam_api = CameraAPI(None)
-        self.mic_api = MicrophoneAPI(None, 55)
+        cam_addr = ('0.0.0.0', 52381)
+        mic_addr = ('0.0.0.0', 45)
+        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
+        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
         self.calibration = Calibration()
-        self.preset_locations = PresetCollection()
+        self.preset = False
+        self.preset_locations = None
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -75,6 +81,7 @@ class GeneralController():
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
         self.calibration = new_controller.calibration
+        self.preset = new_controller.preset
         self.preset_locations = new_controller.preset_locations
         self.ws = new_controller.ws
 
@@ -83,3 +90,18 @@ class GeneralController():
 
     def set_cam_api(self, new_cam_api):
         self.cam_api = new_cam_api
+
+
+    def set_preset_collection(self, new_preset_collection):
+        self.preset_locations = new_preset_collection
+
+
+def verify_address(address):
+    try:
+        assert 0 <= address[1] <= 65535
+        assert 0 <= int(address[0].split(".")[0]) <= 255 and \
+               0 <= int(address[0].split(".")[1]) <= 255 and \
+               0 <= int(address[0].split(".")[2]) <= 255 and \
+               0 <= int(address[0].split(".")[3]) <= 255
+    except AssertionError:
+        print("ERROR: Address " + address + " is invalid!")

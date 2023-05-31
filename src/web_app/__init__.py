@@ -15,6 +15,7 @@ from web_app.integration import GeneralController
 
 integration = GeneralController()
 
+
 def create_app(test_controller=None):
     # create and configure the app
     app = Flask(__name__)
@@ -71,6 +72,10 @@ def create_app(test_controller=None):
         to_import=["scene", "socket"]
         return render_template('single_page.html', name="visualisation", to_import=to_import,
                                page_name="Visualisation view")
+
+    @app.post('/camera/address/set')
+    def post_set_address():
+        return web_app.camera_endpoints.address_set_camera_endpoint(integration)
 
     @app.post('/camera/reboot')
     def post_reboot():
@@ -136,6 +141,10 @@ def create_app(test_controller=None):
         Endpoint to get the position value of the camera.
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
+
+    @app.post('/microphone/address/set')
+    def set_microphone_address():
+        return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
 
     @app.post('/microphone/height/set')
     def set_height():
@@ -236,13 +245,17 @@ def create_app(test_controller=None):
     def object_tracking_stop():
         return web_app.tracking_endpoints.stop_object_tracking_endpoint(integration)
 
-    @app.post('/thread/start')
-    def thread_start():
-        return web_app.tracking_endpoints.start_thread_endpoint(integration)
+    @app.post('/thread/start/<allow_movement>')
+    def thread_start(allow_movement):
+        return web_app.tracking_endpoints.start_thread_endpoint(integration, allow_movement)
 
     @app.post('/thread/stop')
     def thread_stop():
         return web_app.tracking_endpoints.stop_thread_endpoint(integration)
+
+    @app.post('/thread/preset')
+    def preset_use():
+        return web_app.tracking_endpoints.preset_use(integration)
 
     @app.get('/thread/running')
     def thread_is_running():

@@ -29,12 +29,14 @@ def stop_object_tracking_endpoint(integration: GeneralController):
 
 
 
-def start_thread_endpoint(integration: GeneralController):
+def start_thread_endpoint(integration: GeneralController, allow_movement):
     # start (unpause) the thread
     if integration.thread is None:
+        # FIXME: UGLY code repetition please fix
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
-                                          integration.preset_locations)
+                                          integration.preset_locations, integration.calibration,
+                                          integration.preset, allow_movement)
         integration.thread.set_calibration(2)
         integration.event.clear()
         integration.thread.start()
@@ -42,7 +44,8 @@ def start_thread_endpoint(integration: GeneralController):
         old_calibration = integration.thread.value
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
-                                          integration.preset_locations)
+                                          integration.preset_locations, integration.calibration,
+                                          integration.preset, allow_movement)
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
         integration.thread.start()
@@ -80,3 +83,9 @@ def update_calibration(integration: GeneralController):
 def is_running_endpoint(integration: GeneralController):
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
+
+
+def preset_use(integration: GeneralController):
+    integration.preset = not integration.preset
+    print(integration.preset)
+    return make_response(jsonify({"preset":integration.preset}), 200)

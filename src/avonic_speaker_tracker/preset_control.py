@@ -7,9 +7,11 @@ def cos_similarity(a: np.array, b: np.array) -> float:
     -1 - most different, 1 - most similar
     https://en.wikipedia.org/wiki/Cosine_similarity
 
-    :param a: first vector [x, y, z]
-    :param b: second vector [x, y, z]
-    :returns: cosine similarity of a and b
+    Args:
+        a: first vector [x, y, z]
+        b: second vector [x, y, z]
+    Returns:
+        cosine similarity of a and b
     """
     if len(a.shape) > 2 or (a.shape[0] != 3) or (len(a.shape) == 2 and a.shape[1] != 1):
         raise TypeError("Not a 3D vector")
@@ -24,9 +26,12 @@ def find_most_similar_preset(current: np.array, presets: list[np.array]) -> int:
     """Finds index of the most similar preset in relation
     to the given vector in the list of presets.
 
-    :param current: current vector of microphone direction, to which try to find the most similar.
-    :param presets: list of vectors pointing to the presets;
-    :returns: index in the list of the most similar preset to the current vector
+    Args:
+        current: current vector of microphone direction, to which try to find the most similar.
+        presets: list of vectors pointing to the presets;
+
+    Returns:
+        index in the list of the most similar preset to the current vector
     """
     if len(presets) == 0:
         raise ValueError("Empty list of presets given")
