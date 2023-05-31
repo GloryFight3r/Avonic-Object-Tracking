@@ -17,7 +17,7 @@ class FootageThread(Thread):
         self.frame = None
         self.event = event
         self.ret = None
-        self.buffer = None
+        self.buffer = bytes(0)
 
     def run(self):
         """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
