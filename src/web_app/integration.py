@@ -15,8 +15,6 @@ from avonic_speaker_tracker.calibration import Calibration
 from object_tracker.yolo import Yolo
 from object_tracker.yolov2 import YOLOPredict
 
-import rtsp
-
 class GeneralController:
     def __init__(self):
         self.event = Event()
@@ -38,6 +36,8 @@ class GeneralController:
         )
         self.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         self.preset = None
+        self.nn = YOLOPredict()
+        self.object_tracking_thread = None
 
     def load_env(self):
         url = getenv("SERVER_ADDRESS")
@@ -55,12 +55,9 @@ class GeneralController:
         self.secret = getenv("SECRET_KEY")
         self.preset = False
 
-        self.box_tracker = ThresholdBoxTracker(self.cam_api, np.array([1920.0, 1080.0]), 5)
         self.footage_thread = FootageThread(self.video, self.event2)
         self.footage_thread.start()
-        self.object_tracking_thread = ObjectTrackingThread(YOLOPredict(), self.box_tracker, self.footage_thread,
-                                                        self.object_tracking_event)
-        self.object_tracking_event.set()
+        self.box_tracker = ThresholdBoxTracker(self.cam_api, np.array([1920.0, 1080.0]), 5)
 
     def __del__(self):
         self.video.release()

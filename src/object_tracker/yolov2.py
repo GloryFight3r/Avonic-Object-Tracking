@@ -1,14 +1,14 @@
 import cv2
 import numpy as np
-from ultralytics import RTDETR
+from ultralytics import YOLO
 import torch
 
 class YOLOPredict:
     model = None
 
     def __init__(self, path = "./src/object_tracker/"):
-        #self.model = YOLO("yolov8m.pt")
-        self.model = RTDETR("rtdetr-l.pt")
+        self.model = YOLO("yolov8m.pt")
+        #self.model = RTDETR("rtdetr-l.pt")
 
     def get_bounding_boxes_image(self, frame):
         results = self.model(frame, device="mps", classes=0)
