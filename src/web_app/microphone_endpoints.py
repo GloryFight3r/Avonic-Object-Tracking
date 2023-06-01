@@ -2,7 +2,6 @@ from time import sleep
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 
-
 def address_set_microphone_endpoint(integration: GeneralController):
     try:
         addr = (request.form["ip"], int(request.form["port"]))
@@ -15,7 +14,6 @@ def address_set_microphone_endpoint(integration: GeneralController):
         return make_response(jsonify(ret_msg), ret_code)
     except (AssertionError, ValueError):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
-
 
 def height_set_microphone_endpoint(integration: GeneralController):
     integration.calibration.set_height(float(request.form["microphone-height"]))
@@ -45,6 +43,15 @@ def get_speaker_direction_endpoint(integration: GeneralController):
 
 
 def wait_for_speaker(integration: GeneralController):
+    """ Waits for the speaker to speak in order to get the direction 
+    from the microphone towards him
+
+    Args:
+        integration: The controller object
+
+    Returns: Direction towards the speaker
+        
+    """
     while not integration.mic_api.is_speaking():
         sleep(0.1)
     return integration.mic_api.get_direction()
