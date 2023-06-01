@@ -34,7 +34,7 @@ class AudioModel(TrackingModel):
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
         if vec_len > 10.0:
             vec_len = 10.0
-        zoom_val = (vec_len/10.0)*16000
+        zoom_val = (int)((vec_len/10.0)*16000)
 
         direct = vector_angle(cam_vec)
         direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
@@ -45,8 +45,8 @@ class AudioModel(TrackingModel):
         speedX = diffX/360*24
         speedY = diffY/120*20
 
-        speedX = math.min(speedX,24)
-        speedY = math.min(speedY,20) 
+        speedX = min(speedX,24)
+        speedY = min(speedY,20) 
 
         if direct is None:
             return self.prev_dir

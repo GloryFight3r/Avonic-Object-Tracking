@@ -47,8 +47,8 @@ def test_continuous_pointer():
 
     dir1 = am.point(cam_api, mic_api)
     dir2 = am.point(cam_api, mic2_api)
-    assert(dir1 == np.array([-8,3,0])).all()
-    assert(dir2 == np.array([-1,6,0])).all()
+    assert(dir1 == np.array([-8,3,3526])).all()
+    assert(dir2 == np.array([-1,6,2065])).all()
 """
 def test_pointer():
     cam_api = mock.Mock()

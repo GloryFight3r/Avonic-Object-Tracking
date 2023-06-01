@@ -44,8 +44,8 @@ class PresetModel(TrackingModel):
         speedX = diffX/360*24
         speedY = diffY/120*20
 
-        speedX = math.min(speedX,24)
-        speedY = math.min(speedY,20) 
+        speedX = min(speedX,24)
+        speedY = min(speedY,20) 
 
         if direct is None:
             return self.self.prev_dir
