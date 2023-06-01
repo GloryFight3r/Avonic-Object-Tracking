@@ -39,6 +39,8 @@ test:
     MIC_THRESH: 55
   cache:
     policy: pull
+  before_script:
+    - apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
   script:
     - python --version  # For debugging
     - pip install virtualenv

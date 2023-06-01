@@ -1,4 +1,5 @@
 from flask import make_response, jsonify
+from time import sleep
 from web_app.integration import GeneralController
 
 def success():
@@ -28,6 +29,10 @@ def is_calibrated(integration: GeneralController):
         "is_set": integration.audio_model.calibration.is_calibrated()
     }), 200)
 
+def wait_for_speaker(integration: GeneralController):
+    while not integration.mic_api.is_speaking():
+        sleep(0.1)
+    return integration.mic_api.get_direction()
 def get_calibration(integration: GeneralController):
     return make_response(jsonify({
         "camera-coords": list(integration.audio_model.calibration.mic_to_cam)

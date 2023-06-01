@@ -4,7 +4,6 @@ from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode
 from avonic_camera_api.converter import vector_angle
 
-
 def responses():
     return {
         ResponseCode.ACK:
@@ -26,7 +25,6 @@ def responses():
         ResponseCode.NO_ADDRESS:
             make_response(jsonify({"message": "Camera address not specified"}), 400)
     }
-
 
 def success():
     return make_response(jsonify({}), 200)
@@ -123,6 +121,8 @@ def position_get_camera_endpoint(integration: GeneralController):
     return make_response(jsonify({"position-alpha-value": pos[0],
                                   "position-beta-value": pos[1]}), 200)
 
+def get_camera_footage(integration: GeneralController):
+    return integration.footage_thread.get_frame()
 
 def address_set_camera_endpoint(integration: GeneralController):
     try:

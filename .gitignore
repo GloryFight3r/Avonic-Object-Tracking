@@ -17,9 +17,8 @@ calibration.json
 presets.json
 html/
 .mutmut-cache
+.erb-lint.yml
 .hypothesis
-.DS_Store
-src/.DS_Store
 codeclimate.json
 public/
 pylint_test/

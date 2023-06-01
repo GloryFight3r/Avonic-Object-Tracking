@@ -10,7 +10,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 import web_app
-
+from flask_socketio import SocketIO
 
 sock = mock.Mock()
 
@@ -51,7 +51,7 @@ def camera(monkeypatch):
 
 
 @pytest.fixture
-def client(camera):
+def client(camera, monkeypatch):
     """A test client for the app."""
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
@@ -68,8 +68,14 @@ def client(camera):
     test_controller.set_mic_api(mic_api)
     test_controller.set_preset_collection(PresetCollection(filename=None))
     test_controller.ws = mock.Mock()
+
+    #def mocked_on(adr):
+    #   pass
+    #monkeypatch.setattr(test_controller.ws, "on", mocked_on)
+
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
+
     return app.test_client()
 
 
@@ -232,6 +238,8 @@ def test_get_microphone_direction(client):
     res_vec = json.loads(rv.data)["microphone-direction"]
     assert rv.status_code == 200 and np.allclose(res_vec, [0.0, 0.0, 1.0])
 
+def test_add_direction_to_speaker(client):
+    rv = client.get('/calibration/add_directions_to_speaker')
 
 def test_add_direction_to_mic(client):
     client.get('/calibration/reset')
@@ -243,11 +251,9 @@ def test_add_direction_to_speaker(client):
     rv = client.get('/calibration/add_directions_to_speaker')
     assert rv.status_code == 200
 
-
 def test_calibration_reset(client):
     rv = client.get('/calibration/reset')
     assert rv.status_code == 200
-
 
 def test_calibration_is_set(client):
     rv = client.get('/calibration/is_set')
@@ -274,7 +280,6 @@ def test_update_camera(client):
 def test_update_calibration(client):
     rv = client.post('/update/calibration', json=json.dumps({"test": "testington"}))
     assert rv.status_code == 200
-
 
 def test_thread(client):
     rv = client.post('/thread/start/false')
@@ -442,6 +447,136 @@ def test_edit_preset_location(client):
     )
     assert rv.status_code == 200
 
+def test_add_preset_location(client):
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name-y-missing"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name-x-missing"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name-z-missing"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name-alpha-missing"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0
+        }
+    )
+    assert rv.status_code == 400
+
+def test_edit_preset_location(client):
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0.25,
+            "camera-direction-beta" : 0.25,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : -1,
+            "preset-name": "test-another-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+    rv = client.post("preset/edit",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-wrong-preset-name"
+        }
+    )
+    assert rv.status_code == 400
+    rv = client.post("preset/edit",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 0,
+            "mic-direction-y" : 1,
+            "mic-direction-z" : 0,
+            "preset-name": "test-another-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+
 
 def test_get_preset_list(client):
     rv = client.post("preset/add",
@@ -515,3 +650,21 @@ def test_get_preset_list(client):
     assert rv.status_code == 200 and rv.data == bytes("{\"preset-list\":[]}\n", "utf-8")
     rv = client.get("preset/info/test-preset-name")
     assert rv.status_code == 400
+
+# live footage test
+
+"""def generate_single_page_views():
+    return [
+        "/live_footage",
+        "/thread",
+        "/visualisation",
+        "/camera_control",
+        "/microphone_control",
+        "/presets_and_calibration",
+    ]
+
+@pytest.mark.parametrize("url", generate_single_page_views())
+def test_live_footage(client, url):
+    rv = client.get(url)
+    assert rv.status_code == 200
+"""
