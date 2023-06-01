@@ -24,21 +24,13 @@
         <label for="preset-name">Type preset name:</label>
         <input id="preset-name" name="preset-name">
       </div>
-      <div class="grid">
-        <label for="mic-direction-x2">Microphone direction x</label>
-        <label for="mic-direction-y2">Microphone direction y</label>
-        <label for="mic-direction-z2">Microphone direction z</label>
-      </div>
+      <h6>Microphone direction vector</h6>
       <div class="grid">
         <input id="mic-direction-x2" name="mic-direction-x" readonly />
         <input id="mic-direction-y2" name="mic-direction-y" readonly />
         <input id="mic-direction-z2" name="mic-direction-z" readonly />
       </div>
-      <div class="grid">
-        <label for="camera-direction-alpha">Camera degrees pan</label>
-        <label for="camera-direction-beta">Camera degrees tilt</label>
-        <label for="camera-zoom-value">Camera zoom value</label>
-      </div>
+      <h6>Camera info[pan,tilt,zoom]</h6>
       <div class="grid">
         <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
         <input id="camera-direction-beta" name="camera-direction-beta" readonly />
@@ -49,30 +41,37 @@
         <button id="edit-preset-button" type="submit">Edit current preset</button>
         <button id="remove-preset-button" type="submit">Remove current preset</button>
       </div>
-      <button id="point-to-closest" type="submit">Point to closest preset</button>
     </form>
 
     <div class="grid">
       <form action="/camera/position/get" method="get" id="presets-camera-position-set-form">
-        <button type="submit">Set camera position</button>
+        <button type="submit">Get camera position</button>
       </form>
       <form action="/camera/zoom/get" method="get" id="presets-camera-zoom-set-form">
-        <button type="submit">Set camera zoom</button>
+        <button type="submit">Get camera zoom</button>
       </form>
       <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
         <button id="set-mic-button" type="submit">Set microphone position</button>
       </form>
     </div>
+    <form action="/preset/track" method="get" id="preset-track">
+      <button type="submit">Enable preset tracking</button>
+    </form>
   </div>
   <div id="cal">
     <h5 id="calibration-instruction">Set the height, then click below to calibrate point 1</h5>
     <button id="calibration-button" onclick="startCalibration(this)">Start calibration</button>
-    <form action="/calibration/camera" method="get" id="camera-coords-get-form" class="grid">
-      <label for="camera-coords-x">Calculated camera coordinates [x, y, z]:</label>
+    <form action="/calibration/camera" method="get" id="camera-coords-get-form">
+      <button type="submit">Get calculated camera coordinates</button>
+    </form>
+    <h6>Calculated camera coordinates [x, y, z]:</h6>
+    <div class="grid">
       <input id="camera-coords-x" />
       <input id="camera-coords-y" />
       <input id="camera-coords-z" />
-      <button type="submit">Get calculated camera coordinates</button>
+    </div>
+    <form action="/calibration/track" method="get" id="calibration-track">
+      <button type="submit">Enable continuous tracking</button>
     </form>
   </div>
 </article>
