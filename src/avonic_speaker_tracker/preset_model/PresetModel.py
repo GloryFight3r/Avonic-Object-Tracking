@@ -8,9 +8,9 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 class PresetModel(TrackingModel):
     preset_locations: PresetCollection = None
     prev_dir: np.array = None
-    def __init__(self):
+    def __init__(self, filename=None):
         self.prev_dir = np.array([0, 0, -1.0])
-        self.preset_locations = PresetCollection(filename="presets.json")
+        self.preset_locations = PresetCollection(filename=filename)
 
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         """ Calculates the direction to which the camera should point so that

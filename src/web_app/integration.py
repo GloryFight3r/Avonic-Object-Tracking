@@ -19,6 +19,8 @@ class GeneralController:
         self.event = Event()
         self.info_threads_event = Event()
         self.footage_thread_event = Event()
+        self.info_threads_break = Event() # THIS IS ONLY FOR DESTROYING THREADS
+        self.info_threads_break.clear()
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
@@ -31,8 +33,13 @@ class GeneralController:
         self.preset_model = None
         self.model = None
         self.camera_footage = None
+        self.video = None
+        self.thread_mic = None
+        self.thread_cam = None
+        self.preset = True
 
     def load_env(self):
+        self.preset = True
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
@@ -46,44 +53,65 @@ class GeneralController:
         self.secret = getenv("SECRET_KEY")
 
         # Initialize models
-        self.audio_model = AudioModel()
-        self.preset_model = PresetModel()
+        self.audio_model = AudioModel(filename="calibration.json")
+        self.preset_model = PresetModel(filename="presets.json")
 
         # Initialize footage thread
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
         self.footage_thread = FootageThread(self.video, self.footage_thread_event)
         self.footage_thread.start()
 
-    def __del__(self):
-        self.footage_thread_event.set()
-        self.video.release()
-        self.preset = False
-
         # Initialize camera and microphone info threads
         self.info_threads_event.set()
+        self.info_threads_break.clear() # THIS IS ONLY FOR DESTROYING THREADS
         self.thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
         self.thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
         self.thread_mic.start()
         self.thread_cam.start()
+
+    def __del__(self):
+        self.preset = False
+        self.footage_thread_event.set()
+        self.info_threads_break.set()
+
+        try:
+            self.thread_mic.join()
+        except:
+            print("Trying to destruct None thread")
+        try:
+            self.thread_cam.join()
+        except:
+            print("Trying to destruct None thread")
+        try:
+            self.footage_thread.join()
+        except:
+            print("Trying to destruct None thread")
+        try:
+            cv2.destroyAllWindows()
+        except:
+            print("Trying to destruct None thread")
+        try:
+            self.video.release()
+        except:
+            print("Trying to destruct None thread")
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
-        self.calibration = Calibration()
-        self.preset = False
-        self.preset_locations = None
+        self.audio_model = AudioModel()
+        self.preset_model = PresetModel()
 
     def copy(self, new_controller):
         self.event = new_controller.event
         self.thread = new_controller.thread
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
-        self.calibration = new_controller.calibration
-        self.preset = new_controller.preset
         self.preset_locations = new_controller.preset_locations
         self.ws = new_controller.ws
+        self.audio_model = AudioModel()
+        self.preset_model = PresetModel()
 
     def set_mic_api(self, new_mic_api):
         self.mic_api = new_mic_api
@@ -134,13 +162,18 @@ class GeneralController:
             path: The path to send to
         """
         print("Info-thread start and will send updates to " + path)
-        while True:
+        flag = True
+        while flag:
+            print("something")
+            if self.info_threads_break.is_set():
+                flag = False
             if not self.info_threads_event.is_set():
                 d = data()
                 response = requests.post('http://' + self.url + path, json=d)
                 if response.status_code != 200:
                     print("Could not update flask at path " + path)
-                sleep(0.3)
+            sleep(0.3)
+        print("closing")
 
 
 def verify_address(address):
@@ -152,3 +185,15 @@ def verify_address(address):
                0 <= int(address[0].split(".")[3]) <= 255
     except AssertionError:
         print("ERROR: Address " + address + " is invalid!")
+
+
+def close_running_threads(integration_passed):
+    integration_passed.footage_thread_event.set()
+    integration_passed.info_threads_break.set()
+
+    integration_passed.thread_mic.join()
+    integration_passed.thread_cam.join()
+    integration_passed.footage_thread.join()
+    cv2.destroyAllWindows()
+    integration_passed.video.release()
+    raise SystemExit

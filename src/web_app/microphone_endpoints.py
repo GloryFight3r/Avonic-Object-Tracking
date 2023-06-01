@@ -50,7 +50,7 @@ def wait_for_speaker(integration: GeneralController):
         integration: The controller object
 
     Returns: Direction towards the speaker
-        
+
     """
     while not integration.mic_api.is_speaking():
         sleep(0.1)

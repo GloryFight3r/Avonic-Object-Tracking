@@ -6,7 +6,9 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, close_running_threads
+
+import signal
 
 # While testing to keep the log clean
 #log = logging.getLogger('werkzeug')
@@ -277,6 +279,12 @@ def create_app(test_controller=None):
         integration.info_threads_event.set()
         print(integration.info_threads_event)
         return make_response(jsonify({}), 200)
+
+    def sigterm_handler(_signo, _stack_frame):
+        close_running_threads(integration)
+
+    signal.signal(signal.SIGINT, sigterm_handler)
+    signal.signal(signal.SIGTERM, sigterm_handler)
 
     return app
 

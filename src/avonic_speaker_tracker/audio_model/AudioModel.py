@@ -10,9 +10,9 @@ class AudioModel(TrackingModel):
     calibration: Calibration = None
     prev_dir: np.array = None
     
-    def __init__(self):
+    def __init__(self, filename=None):
         self.prev_dir = np.array([0, 0, -1.0])
-        self.calibration = Calibration(filename="calibration.json")
+        self.calibration = Calibration(filename=filename)
     
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         """ Points the camera towards the calculated direction from either:

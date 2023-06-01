@@ -12,12 +12,10 @@ def test_constructor():
     cam_api = mock.Mock()
     presets = mock.Mock()
     calibration = mock.Mock()
-    ct = UpdateThread(e, '', cam_api, mic_api, presets,calibration,False, False)
+    ct = UpdateThread(e, '', cam_api, mic_api, False)
     assert ct.event == e
     assert ct.mic_api == mic_api
     assert ct.cam_api == cam_api
-    assert ct.preset_locations == presets
-    assert ct.url == 'http://'
     assert ct.value is None
 
 
@@ -29,7 +27,7 @@ def test_setter():
     cam_api = mock.Mock()
     presets = mock.Mock()
     calibration = mock.Mock()
-    ct = UpdateThread(e, '', mic_api, cam_api, presets,calibration,False, False)
+    ct = UpdateThread(e, '', mic_api, cam_api, False)
     assert ct.event == e
     assert ct.value is None
     ct.set_calibration(2)

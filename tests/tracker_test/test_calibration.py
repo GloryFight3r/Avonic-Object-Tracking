@@ -3,7 +3,7 @@ import os
 import pytest
 import numpy as np
 
-from avonic_speaker_tracker.calibration import Calibration, angle_between_vectors
+from avonic_speaker_tracker.audio_model.calibration import Calibration, angle_between_vectors
 
 def test_set_height():
     cal = Calibration()
