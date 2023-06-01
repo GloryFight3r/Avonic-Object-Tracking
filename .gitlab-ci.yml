@@ -94,7 +94,7 @@ run:
     - source venv/bin/activate
     - pip install build
     - python -m build
-    - pip install
+    - pip install .
   cache:
     policy: push
   artifacts:
