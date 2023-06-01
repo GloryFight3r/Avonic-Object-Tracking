@@ -27,6 +27,7 @@ class UpdateThread(Thread):
         start of the thread with false flag, body of the while-loop is not executed.
         """
         prev_dir = [0.0, 0.0]
+        speak_delay = 0
         while not self.event.is_set():
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -34,6 +35,13 @@ class UpdateThread(Thread):
                 continue
 
             if self.allow_movement:
+                if self.mic_api.is_speaking():
+                    speak_delay = 0 
+                else:
+                    speak_delay = speak_delay + 1 
+
+                if speak_delay > 5: 
+                    self.cam_api.direct_zoom(0)
                 direct = self.model_in_use.point(self.cam_api, self.mic_api)
 
             self.value += 1
