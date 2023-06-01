@@ -89,6 +89,7 @@ pylint:
 
 run:
   stage: build
+  image: python:3.10-slim
   script:
     - python --version  # For debugging
     - pip install virtualenv
