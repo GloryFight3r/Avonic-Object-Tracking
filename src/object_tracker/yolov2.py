@@ -1,16 +1,14 @@
 import cv2
 import numpy as np
-from ultralytics import YOLO
+from ultralytics import RTDETR
 import torch
 
 class YOLOPredict:
     model = None
-    labels = None
 
     def __init__(self, path = "./src/object_tracker/"):
-        self.model = YOLO("yolov8m.pt")
-        with open(path+"yolo.txt", 'r') as f:
-            self.labels = [line.strip() for line in f.readlines()]
+        #self.model = YOLO("yolov8m.pt")
+        self.model = RTDETR("rtdetr-l.pt")
 
     def get_bounding_boxes_image(self, frame):
         results = self.model(frame, device="mps", classes=0)
@@ -19,13 +17,14 @@ class YOLOPredict:
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
         for x in bboxes:
             (x, y, x2, y2) = x
-            self.draw_prediction(frame, self.labels[0], x, y, x2, y2)
+            self.draw_prediction(frame, "Person", x, y, x2, y2)
 
         return frame
 
     def get_bounding_boxes(self, frame):
-        results = self.model.predict(frame, device="mps")
+        results = self.model.predict(frame, classes=0)
         result = results[0]
+        print(result)
         person_indices = torch.nonzero(result.boxes.cls.cpu() == 0)
         #persons = [result.boxes.cls.cpu()[i] for i in person_indices]
 
