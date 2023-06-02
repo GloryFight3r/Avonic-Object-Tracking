@@ -20,8 +20,8 @@ class ObjectTrackingThread(Thread):
         self.event = event
 
     def run(self):
+        """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
         while not self.event.is_set():
-            print("HUH")
             frame = self.stream.frame  # read the camera frame
             if frame is not None:
                 boxes = self.nn.get_bounding_boxes(frame)
@@ -55,7 +55,11 @@ class FootageThread(Thread):
             ret, self.frame = self.camera.read()
 
     def get_frame(self):
-        print(self.show_bounding_boxes, self.buffer is not None)
+        """ Returns the camera footage image decoded into ascii
+
+        Returns:
+
+        """
         if self.show_bounding_boxes and self.buffer is not None:
             ret, jpg = cv2.imencode('.jpg', self.buffer)
             data = base64.b64encode(jpg).decode('ascii')
@@ -63,5 +67,4 @@ class FootageThread(Thread):
         else:
             ret, jpg = cv2.imencode('.jpg', self.frame)
             data = base64.b64encode(jpg).decode('ascii')
-
         return data

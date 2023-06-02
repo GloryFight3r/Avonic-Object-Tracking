@@ -51,7 +51,7 @@ class CalibrationTracker:
     def calculate_speed(self, rotate_angle:np.ndarray):
         return [20, 20]
 
-    def continuous_pointer(calibration: Calibration):
+    def continuous_pointer(self, calibration: Calibration):
         """ Calculates the direction of the camera, so it point to the speaker.
             Args:
                 mic_api: The controller for the microphone
@@ -68,7 +68,7 @@ class CalibrationTracker:
                                                         calibration.mic_height)
 
         direct = vector_angle(cam_vec)
-        direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), 0]
+        direct = (int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])))
         return direct
 
 
@@ -95,7 +95,7 @@ class ThresholdCalibrationTracker(CalibrationTracker):
         else:
             print("Not moving!!!", str(avg_angle))
 
-    def track_audio(direct, prev_dir=[0.0, 0.0, 0.0]):
+    def track_audio(self, direct, prev_dir=(0.0, 0.0)):
         """ Points the camera towards the calculated direction from either:
         the presets or the continuous follower.
             Args:
@@ -107,14 +107,14 @@ class ThresholdCalibrationTracker(CalibrationTracker):
                 prev_dir: The previous direction to which the camera was pointing
             Returns: the pitch and yaw of the camera and the zoom value
         """
-        direct = continuous_pointer(self.mic_api, calibration)
         if direct is None:
             return prev_dir
         if prev_dir[0] != direct[0] or prev_dir[1] != direct[1]:
-            if (prev_dir[0] + prev_dir[1])/2 >= self.threshold:
+            avg = (abs(direct[0] - prev_dir[0]) + abs(direct[1] - prev_dir[1])) / 2
+            if avg >= 0:
+                print("DIRECTION")
+                print(direct)
                 self.cam_api.move_absolute(24,20, direct[0], direct[1])
-            if preset_use:
-                self.cam_api.direct_zoom(direct[2])
             prev_dir = direct
 
         return prev_dir

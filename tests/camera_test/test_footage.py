@@ -30,12 +30,11 @@ class MockedYoloPredict:
 
 @pytest.fixture
 def footage_thread():
-    mocked_url = ""
     mocked_cam_footage = MockedCv()
     mocked_box_tracker = MockedBoxTracker()
     mocked_yolo = MockedYoloPredict()
     event = Event()
-    thread = FootageThread(mocked_url, mocked_cam_footage, mocked_yolo, event, mocked_box_tracker)
+    thread = FootageThread(mocked_cam_footage, event)
 
     return thread
 

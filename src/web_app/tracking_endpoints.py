@@ -30,7 +30,7 @@ def start_thread_endpoint(integration: GeneralController, allow_movement):
                                           integration.cam_api, integration.mic_api,
                                           integration.preset_locations, integration.calibration,
                                           integration.preset, integration.calibration_tracker,
-                                          allow_movement)
+                                          allow_movement == "true")
         integration.thread.set_calibration(2)
         integration.event.clear()
         integration.thread.start()
@@ -40,7 +40,7 @@ def start_thread_endpoint(integration: GeneralController, allow_movement):
                                           integration.cam_api, integration.mic_api,
                                           integration.preset_locations, integration.calibration,
                                           integration.preset, integration.calibration_tracker,
-                                          allow_movement)
+                                          allow_movement == "true")
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
         integration.thread.start()

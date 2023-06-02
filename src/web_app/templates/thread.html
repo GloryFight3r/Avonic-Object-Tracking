@@ -1,5 +1,9 @@
 <article id="thread">
   <h1>Thread 🧵</h1>
+  <form action="/thread/preset" method="post" id="thread-preset">
+    <button type="submit">Use Presets</button>
+  </form>
+  <input id="preset-use" name="preset-use" readonly>
   <div class="grid">
     <form action="/object_tracking/start" method="post" id="object-tracking-start-form">
       <button type="submit">Start object tracking</button>
@@ -9,7 +13,7 @@
     </form>
   </div>
   <div class="grid">
-    <form action="/thread/start" method="post" id="thread-start-form">
+    <form action="/thread/start/true" method="post" id="thread-start-form">
       <button type="submit">Start</button>
     </form>
     <form action="/thread/stop" method="post" id="thread-stop-form">

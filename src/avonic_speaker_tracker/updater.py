@@ -37,7 +37,7 @@ class UpdateThread(Thread):
         Method should start with self.event.wait() to make sure that on
         start of the thread with false flag, body of the while-loop is not executed.
         """
-        prev_dir = [0.0, 0.0]
+        prev_dir = (0.0, 0.0)
         thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
         thread_mic.start()
         thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
@@ -53,16 +53,18 @@ class UpdateThread(Thread):
             elif self.allow_movement:
                 if self.preset_use:
                     direction = preset_pointer(self.preset_locations, self.mic_api)
-                    prev_dir = calibration_tracker.track_audio(direction, prev_dir)
+                    prev_dir = point(self.cam_api.direction, prev_dir)
                 else:
-                    direction = continuous_pointer()
-                    prev_dir = point(self.cam_api, direction, prev_dir)
+                    direction = self.calibration_tracker.continuous_pointer(self.calibration)
+                    prev_dir = self.calibration_tracker.track_audio(direction, prev_dir)
 
             self.value += 1
             sleep(0.3)
         print("Exiting thread")
 
     def set_calibration(self, value):
+        """ Sets the calibration value.
+        """
         self.value = value
 
     def get_mic_info(self):

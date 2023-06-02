@@ -34,7 +34,7 @@ def create_app(test_controller=None):
 
     @app.get('/')
     def view():
-        to_import=["camera", "microphone", "presets", "calibration",
+        to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
                    "footage", "thread", "scene", "socket", "main"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
@@ -51,7 +51,7 @@ def create_app(test_controller=None):
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        to_import=["socket", "presets", "calibration", "main"]
+        to_import=["socket", "camera", "microphone", "presets", "calibration", "main"]
         return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
                                page_name="Presets & Calibration View")
 
@@ -60,18 +60,6 @@ def create_app(test_controller=None):
         to_import=["footage", "socket", "main"]
         return render_template('single_page.html', name="live_footage", to_import=to_import,
                                page_name="Live Footage")
-
-    @app.get('/thread')
-    def thread_view():
-        to_import=["thread", "socket", "main"]
-        return render_template('single_page.html', name="thread", to_import=to_import,
-                               page_name="Thread view")
-
-    @app.get('/visualisation')
-    def visualisation_view():
-        to_import=["scene", "socket"]
-        return render_template('single_page.html', name="visualisation", to_import=to_import,
-                               page_name="Visualisation view")
 
     @app.post('/camera/address/set')
     def post_set_address():

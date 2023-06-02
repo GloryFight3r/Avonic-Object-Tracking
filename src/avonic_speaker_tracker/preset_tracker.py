@@ -11,9 +11,8 @@ def preset_pointer(preset_locations: PresetCollection, mic_api: MicrophoneAPI):
         Returns: the vector in which direction the camera should point
     """
     preset_names = np.array(preset_locations.get_preset_list())
-    presets_mic = []
-    for i in range(len(preset_names)):
-        presets_mic.append(preset_locations.get_preset_info(preset_names[i])[1])
+    presets_mic = list(map(lambda preset: preset_locations.get_preset_info(preset)[1], preset_names))
+
     mic_direction = mic_api.get_direction()
     if isinstance(mic_direction, str):
         print(mic_direction)

@@ -18,8 +18,8 @@ from object_tracker.yolov2 import YOLOPredict
 class GeneralController:
     def __init__(self):
         self.event = Event()
-        self.event2 = Event()
         self.object_tracking_event = Event()
+        self.footage_thread_event = Event()
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
@@ -31,10 +31,6 @@ class GeneralController:
         self.calibration = None
         self.camera_footage = None
         self.calibration_tracker = None
-        self.video = cv2.VideoCapture(
-                'rtsp://' + getenv("CAM_IP") + ':554/live/av0'
-        )
-        self.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         self.preset = None
         self.nn = YOLOPredict()
         self.object_tracking_thread = None
@@ -53,15 +49,17 @@ class GeneralController:
         self.preset_locations = PresetCollection(filename="presets.json")
         self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
-        self.preset = False
-
-        self.footage_thread = FootageThread(self.video, self.event2)
+        #self.preset = False
+        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
+        self.footage_thread = FootageThread(self.video, self.footage_thread_event)
         self.footage_thread.start()
         self.calibration_tracker = ThresholdCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 10)
 
     def __del__(self):
         self.video.release()
         self.object_tracking_event.set()
+        self.footage_thread_event.set()
+        self.preset = False
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)
