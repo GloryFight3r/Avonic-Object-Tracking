@@ -11,7 +11,7 @@ class AudioModel(TrackingModel):
     prev_dir: np.array = None
     
     def __init__(self, filename=None):
-        self.prev_dir = np.array([0, 0, -1.0])
+        self.prev_dir = np.array([0, 0, 0])
         self.calibration = Calibration(filename=filename)
     
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
@@ -33,9 +33,6 @@ class AudioModel(TrackingModel):
             Returns: the pitch and yaw of the camera and the zoom value
         """
         mic_direction = mic_api.latest_direction
-        if isinstance(mic_direction, str):
-            print(mic_direction)
-            return None
 
         cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
@@ -44,8 +41,6 @@ class AudioModel(TrackingModel):
         direct = vector_angle(cam_vec)
         direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), 0]
 
-        if direct is None:
-            return self.prev_dir
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
             cam_api.move_absolute(24, 20, direct[0], direct[1])
             cam_api.direct_zoom(direct[2])

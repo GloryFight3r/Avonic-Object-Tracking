@@ -28,7 +28,6 @@ class GeneralController:
         self.mic_api = None
         self.secret = None
         self.ws = None
-        self.preset_locations = None
         self.audio_model = None
         self.preset_model = None
         self.model = None
@@ -92,13 +91,14 @@ class GeneralController:
         except:
             print("Trying to destruct None thread")
         try:
-            cv2.destroyAllWindows()
-        except:
-            print("Trying to destruct None thread")
-        try:
             self.video.release()
         except:
             print("Trying to destruct None thread")
+        try:
+            cv2.destroyAllWindows()
+        except:
+            print("Trying to destruct None thread")
+        
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)
@@ -114,7 +114,6 @@ class GeneralController:
         self.thread = new_controller.thread
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
-        self.preset_locations = new_controller.preset_locations
         self.ws = new_controller.ws
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
@@ -129,9 +128,6 @@ class GeneralController:
         if self.preset:
             return self.preset_model
         return self.audio_model
-
-    def set_preset_collection(self, new_preset_collection):
-        self.preset_locations = new_preset_collection
 
     def get_mic_info(self):
         """ Get information about the microphone.

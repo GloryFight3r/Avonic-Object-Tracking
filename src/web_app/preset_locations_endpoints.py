@@ -108,5 +108,5 @@ def get_preset_info(integration: GeneralController, preset_name: str):
 
 
 def point_to_closest_preset(integration: GeneralController):
-    #point(integration.cam_api, integration.mic_api, integration.preset_model.preset_locations, integration.calibration, integration.preset)
+    integration.preset_model.point(integration.cam_api, integration.mic_api)
     return make_response(jsonify({}), 200)
