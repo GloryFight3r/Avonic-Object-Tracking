@@ -32,7 +32,7 @@ class FootageThread(Thread):
                 self.ret, buffer = cv2.imencode('.jpg', self.frame)
                 string = base64.b64encode(buffer)
                 length = len(string)
-                self.buffer.raw = string + b'\0' * (1000000-length)
+                self.buffer.raw = string
                 self.buflen.value = length
             else:
                 break
