@@ -48,11 +48,6 @@ class AudioModel(TrackingModel):
 
         speedX = min(speedX,24)
         speedY = min(speedY,20) 
-        """
-        print("ZOOM: ", zoom_val )
-        print("SPEEDX: ",speedX)
-        print("SPEEDY: ",speedY)
-        print(diffX,diffY)"""
 
         if direct is None:
             return self.prev_dir

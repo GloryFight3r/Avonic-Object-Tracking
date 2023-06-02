@@ -37,7 +37,7 @@ class UpdateThread(Thread):
             else:
                 speak_delay = speak_delay + 1 
             print(speak_delay)
-            if speak_delay > 100: 
+            if speak_delay == 100: 
                 self.cam_api.direct_zoom(0)
             direct = self.model_in_use.point(self.cam_api, self.mic_api)
 

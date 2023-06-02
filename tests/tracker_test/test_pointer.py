@@ -49,6 +49,26 @@ def test_continuous_pointer():
     dir2 = am.point(cam_api, mic2_api)
     assert(dir1 == np.array([-8,3,3526])).all()
     assert(dir2 == np.array([-1,6,2065])).all()
+
+def test_zoom():
+    cam_api = mock.Mock()
+    mic_api = mock.Mock()
+    mic2_api = mock.Mock()
+    calibration = mock.Mock()
+    calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
+    calibration.mic_height = -0.65
+    am = AudioModel()
+    am.calibration = calibration
+    mic_api.latest_direction = np.array([0.0,1.0,14.0])
+    mic2_api.latest_direction = np.array([1.0,0.7,-2.0])
+
+    dir1 = am.point(cam_api,mic_api)
+    assert(dir1 == np.array([0,0,16000])).all()
+
+    dir2 = am.point(cam_api,mic2_api)
+    assert(dir2 == np.array([-125,7,1835])).all()
+
+    
 """
 def test_pointer():
     cam_api = mock.Mock()
