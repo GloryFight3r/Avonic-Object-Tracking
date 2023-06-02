@@ -41,4 +41,6 @@ class UpdateThread(Thread):
         print("Exiting thread")
 
     def set_calibration(self, value):
+        """ Sets the calibration value.
+        """
         self.value = value

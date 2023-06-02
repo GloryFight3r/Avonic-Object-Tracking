@@ -3,6 +3,8 @@ import numpy as np
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api import converter
 
+PAN_STEP = 341/(2448+2448)
+TILT_STEP = 121/(1296+443)
 
 class CameraAPI:
     latest_direction = None
@@ -109,8 +111,8 @@ class CameraAPI:
         return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) + " " +
-                                degrees_to_command(degrees_x) + " " +
-                                degrees_to_command(degrees_y) + " FF", self.counter)
+                                degrees_to_command(degrees_x, PAN_STEP) + " " +
+                                degrees_to_command(degrees_y, TILT_STEP) + " FF", self.counter)
 
     def move_absolute(self, speed_x: int, speed_y: int,
                       degrees_x: float, degrees_y: float) -> ResponseCode:
@@ -133,8 +135,8 @@ class CameraAPI:
         return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
                                 '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) +
-                                " " + degrees_to_command(degrees_x) + " " +
-                                degrees_to_command(degrees_y) + " FF", self.counter)
+                                " " + degrees_to_command(degrees_x, PAN_STEP) + " " +
+                                degrees_to_command(degrees_y, TILT_STEP) + " FF", self.counter)
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> ResponseCode:
         """ Rotates the camera in the direction of a vector (with home position being [0, 0, 1]
@@ -212,11 +214,36 @@ class CameraAPI:
             pan_adjusted = -((pan ^ ((1 << 16) - 1)) + 1)
         if ret_msg[13] == "F":
             tilt_adjusted = -((tilt ^ ((1 << 16) - 1)) + 1)
-        pan_rad = pan_adjusted * (5/72) / 180 * math.pi
-        tilt_rad = tilt_adjusted * (5/72) / 180 * math.pi
+
+        pan_rad = pan_adjusted * PAN_STEP / 180 * math.pi
+        tilt_rad = tilt_adjusted * TILT_STEP / 180 * math.pi
         direction = converter.angle_vector(pan_rad, tilt_rad)
         self.latest_direction = direction
         return direction
+
+def degrees_to_command(degree: float, step_size: float) -> str:
+    """ Transforms an angle in degree to a command code for VISCA call
+
+    Args:
+        degree: an angle in degrees, can be a float but precision could be lost
+    Returns:
+        A byte code that will be used for a VISCA command call
+    """
+    degree_divided = int(degree / step_size)
+
+    if degree_divided < 0:
+        degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
+
+    in_bytes = hex(degree_divided)[2:]
+
+    in_bytes = '0' * (4 - len(in_bytes)) + in_bytes
+
+    answer_string = ''
+
+    for t in in_bytes:
+        answer_string += '0' + t
+
+    return answer_string
 
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
@@ -239,28 +266,3 @@ def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     s = padded_insert[3]
     res = msg[:13] + p + msg[14:16] + q + msg[17:19] + r + msg[20:22] + s + msg[23:]
     return res
-
-
-def degrees_to_command(degree: float) -> str:
-    """ Transforms an angle in degree to a command code for VISCA call
-
-    Args:
-        degree: an angle in degrees, can be a float but precision could be lost
-    Returns:
-        A byte code that will be used for a VISCA command call
-    """
-    degree_divided = int(degree / (5/72))
-
-    if degree_divided < 0:
-        degree_divided = (abs(degree_divided) - 1) ^ ((1 << 16) - 1)
-
-    in_bytes = hex(degree_divided)[2:]
-
-    in_bytes = '0' * (4 - len(in_bytes)) + in_bytes
-
-    answer_string = ''
-
-    for t in in_bytes:
-        answer_string += '0' + t
-
-    return answer_string
