@@ -6,12 +6,12 @@ import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import CameraSocket
 from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
-from avonic_speaker_tracker.boxtracking import ThresholdBoxTracker
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
+from avonic_speaker_tracker.calibration_tracker import ThresholdCalibrationTracker
 from object_tracker.yolo import Yolo
 from object_tracker.yolov2 import YOLOPredict
 
@@ -30,7 +30,7 @@ class GeneralController:
         self.preset_locations = None
         self.calibration = None
         self.camera_footage = None
-        self.box_tracker = None
+        self.calibration_tracker = None
         self.video = cv2.VideoCapture(
                 'rtsp://' + getenv("CAM_IP") + ':554/live/av0'
         )
@@ -57,7 +57,7 @@ class GeneralController:
 
         self.footage_thread = FootageThread(self.video, self.event2)
         self.footage_thread.start()
-        self.box_tracker = ThresholdBoxTracker(self.cam_api, np.array([1920.0, 1080.0]), 5)
+        self.calibration_tracker = ThresholdCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 10)
 
     def __del__(self):
         self.video.release()

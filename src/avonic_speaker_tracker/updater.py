@@ -4,8 +4,9 @@ import requests
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.pointer import point
+from avonic_speaker_tracker.preset_tracker import point, preset_pointer
 from avonic_speaker_tracker.calibration import Calibration
+from avonic_speaker_tracker.calibration_tracker import CalibrationTracker
 
 
 class UpdateThread(Thread):
@@ -13,7 +14,7 @@ class UpdateThread(Thread):
 
     def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI,
                  preset_locations: PresetCollection, calibration: Calibration,
-                 preset_use: bool, allow_movement: bool = False):
+                 preset_use: bool, calibration_tracker: CalibrationTracker, allow_movement: bool = False):
         """ Class constructor
 
         Args:
@@ -29,6 +30,7 @@ class UpdateThread(Thread):
         self.calibration = calibration
         self.preset_use = preset_use
         self.allow_movement = allow_movement
+        self.calibration_tracker = calibration_tracker
 
     def run(self):
         """ Actual body of the thread.
@@ -49,7 +51,12 @@ class UpdateThread(Thread):
             if len(self.preset_locations.get_preset_list()) == 0 and self.preset_use:
                 print("No locations preset")
             elif self.allow_movement:
-                prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, self.preset_use, self.calibration, prev_dir)
+                if self.preset_use:
+                    direction = preset_pointer(self.preset_locations, self.mic_api)
+                    prev_dir = calibration_tracker.track_audio(direction, prev_dir)
+                else:
+                    direction = continuous_pointer()
+                    prev_dir = point(self.cam_api, direction, prev_dir)
 
             self.value += 1
             sleep(0.3)

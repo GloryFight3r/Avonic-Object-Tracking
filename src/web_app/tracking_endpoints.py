@@ -5,7 +5,7 @@ from avonic_camera_api.footage import ObjectTrackingThread
 
 def start_object_tracking_endpoint(integration: GeneralController):
     if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():
-        integration.object_tracking_thread = ObjectTrackingThread(integration.nn, integration.box_tracker,
+        integration.object_tracking_thread = ObjectTrackingThread(integration.nn, integration.calibration_tracker,
                                                                   integration.footage_thread, integration.object_tracking_event)
         integration.object_tracking_event.clear()
         integration.object_tracking_thread.start()
@@ -29,7 +29,8 @@ def start_thread_endpoint(integration: GeneralController, allow_movement):
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
                                           integration.preset_locations, integration.calibration,
-                                          integration.preset, allow_movement)
+                                          integration.preset, integration.calibration_tracker,
+                                          allow_movement)
         integration.thread.set_calibration(2)
         integration.event.clear()
         integration.thread.start()
@@ -38,7 +39,8 @@ def start_thread_endpoint(integration: GeneralController, allow_movement):
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
                                           integration.preset_locations, integration.calibration,
-                                          integration.preset, allow_movement)
+                                          integration.preset, integration.calibration_tracker,
+                                          allow_movement)
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
         integration.thread.start()

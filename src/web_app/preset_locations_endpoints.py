@@ -1,7 +1,7 @@
 import numpy as np
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
-from avonic_speaker_tracker.pointer import point
+from avonic_speaker_tracker.preset_tracker import point
 
 
 def success():
@@ -15,7 +15,7 @@ def add_preset_location(integration: GeneralController):
         integration: The controller containing all the dependencies
 
     Returns: A http response which indicates success(200) or failure(400)
-        
+
     """
     data = request.form
     try:
