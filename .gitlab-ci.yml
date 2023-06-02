@@ -37,16 +37,23 @@ test:
     # PORT of Microphone
     MIC_PORT: 45
     MIC_THRESH: 55
+  before_script:
+    - apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
   script:
     - python --version  # For debugging
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
     - pip install build
+    - pip install 'genbadge[coverage]'
     - pip install -e '.[test]'
-    - pytest --cov --cov-report xml:cov.xml
+    - pytest --cov --cov-report term --cov-report xml:cov.xml --cov-report html:pytest-html
+    - genbadge coverage -i cov.xml
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
+    paths:
+      - pytest-html
+      - coverage-badge.svg
     reports:
       coverage_report:
         coverage_format: cobertura

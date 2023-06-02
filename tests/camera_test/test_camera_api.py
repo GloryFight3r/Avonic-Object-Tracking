@@ -12,7 +12,11 @@ def test_angle_vector_basic():
 def test_angle_vector_complex():
     alpha = -30
     beta = 60
-    result = np.array([-0.25, np.sqrt(3) / 2, np.sqrt(3) / 4])
+    # x is +0.25 because the pan angle goes clockwise,
+    # therefore this negative one goes counterclockwise,
+    # so towards the x-axis
+    # This is the correct value, do not edit!!
+    result = np.array([0.25, np.sqrt(3) / 2, np.sqrt(3) / 4])
     assert np.allclose(angle_vector(np.deg2rad(alpha), np.deg2rad(beta)), result)
 
 
@@ -23,25 +27,27 @@ def test_vector_angle_basic():
 def test_vector_angle_complex_normalised():
     alpha = -30
     beta = 60
-    (a, b) = vector_angle([-0.25, np.sqrt(3)/2, np.sqrt(3)/4])
+    (a, b) = vector_angle([0.25, np.sqrt(3)/2, np.sqrt(3)/4])
     assert pytest.approx(a) == np.deg2rad(alpha)
     assert pytest.approx(b) == np.deg2rad(beta)
 
 
 def test_vector_angle_complex():
-    """ not normalised, length of vector is 2 """
+    """ not normalized, length of vector is 2 """
     alpha = -30
     beta = 60
-    (a, b) = vector_angle([-0.5, np.sqrt(3), np.sqrt(3)/2])
+    (a, b) = vector_angle([0.5, np.sqrt(3), np.sqrt(3)/2])
     assert pytest.approx(a) == np.deg2rad(alpha)
     assert pytest.approx(b) == np.deg2rad(beta)
 
 
 def test_vector_angle_invalid():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError) as excinfo:
         vector_angle([0.0, 0.0, 0.0])
+    assert "Vector not normalizable" == str(excinfo.value)
 
 
 def test_vector_angle_invalid_type():
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError) as excinfo:
         vector_angle([1, 2])
+    assert "Vector must contain three floats" == str(excinfo.value)

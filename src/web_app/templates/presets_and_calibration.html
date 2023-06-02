@@ -1,0 +1,85 @@
+<article>
+  <div class="grid">
+    <h1 id="presets-cali-title">Presets 🔖</h1>
+    <select id="presets-cali-select" onchange="selectCaliTab()">
+      <option value="presets">Presets</option>
+      <option value="cal">Calibration</option>
+    </select>
+  </div>
+  <div id="presets">
+    <h5>
+      Click add preset which will add a new preset to the list. After that click record sound direction and the
+      system will wait for the first audible noise and record its direction. After that point the camera to the
+      speaker
+      and click record camera direction
+    </h5>
+
+    <form id="preset-form" method="post">
+      <div class="grid">
+        <label for="preset-select">Select an existing preset:</label>
+        <select id="preset-select" name="preset-select" onchange="changePreset()">
+        </select>
+      </div>
+      <div class="grid">
+        <label for="preset-name">Type preset name:</label>
+        <input id="preset-name" name="preset-name">
+      </div>
+      <div class="grid">
+        <label for="mic-direction-x2">Microphone direction x</label>
+        <label for="mic-direction-y2">Microphone direction y</label>
+        <label for="mic-direction-z2">Microphone direction z</label>
+      </div>
+      <div class="grid">
+        <input id="mic-direction-x2" name="mic-direction-x" readonly />
+        <input id="mic-direction-y2" name="mic-direction-y" readonly />
+        <input id="mic-direction-z2" name="mic-direction-z" readonly />
+      </div>
+      <div class="grid">
+        <label for="camera-direction-alpha">Camera degrees pan</label>
+        <label for="camera-direction-beta">Camera degrees tilt</label>
+        <label for="camera-zoom-value">Camera zoom value</label>
+      </div>
+      <div class="grid">
+        <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
+        <input id="camera-direction-beta" name="camera-direction-beta" readonly />
+        <input id="camera-zoom-value" name="camera-zoom-value" readonly />
+      </div>
+      <div class="grid">
+        <button id="add-preset-button" type="submit">Add new preset</button>
+        <button id="edit-preset-button" type="submit">Edit current preset</button>
+        <button id="remove-preset-button" type="submit">Remove current preset</button>
+      </div>
+      <button id="point-to-closest" type="submit">Point to closest preset</button>
+    </form>
+
+    <div class="grid">
+      <form action="/camera/position/get" method="get" id="presets-camera-position-set-form">
+        <button type="submit">Set camera position</button>
+      </form>
+      <form action="/camera/zoom/get" method="get" id="presets-camera-zoom-set-form">
+        <button type="submit">Set camera zoom</button>
+      </form>
+      <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
+        <button id="set-mic-button" type="submit">Set microphone position</button>
+      </form>
+    </div>
+  </div>
+  <div id="cal">
+    <h5 id="calibration-instruction">Set the height, then click below to calibrate point 1</h5>
+    <div class="grid">
+      <button class="calibration-button" onclick="startCalibration(this)">Start 1</button>
+      <button class="calibration-button" onclick="startCalibration(this)" disabled="disabled">Start 2</button>
+      <button class="calibration-button" onclick="startCalibration(this)" disabled="disabled">Start 3</button>
+    </div>
+    <button id="camera-direction-button" onclick="pointCameraCalibration(this)" disabled="disabled">
+      Submit current camera direction.
+    </button>
+    <form action="/calibration/camera" method="get" id="camera-coords-get-form" class="grid">
+      <label for="camera-coords-x">Calculated camera coordinates [x, y, z]:</label>
+      <input id="camera-coords-x" />
+      <input id="camera-coords-y" />
+      <input id="camera-coords-z" />
+      <button type="submit">Get calculated camera coordinates</button>
+    </form>
+  </div>
+</article>

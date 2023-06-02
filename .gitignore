@@ -13,6 +13,13 @@ html_cov/
 .coverage
 src/avonic_speaker_tracker.egg-info/
 .env
+calibration.json
+presets.json
 html/
 .mutmut-cache
+.erb-lint.yml
 .hypothesis
+codeclimate.json
+public/
+pylint_test/
+run_pylint.sh

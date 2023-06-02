@@ -27,3 +27,11 @@ socket.on("camera-update", async (args) => {
 socket.on("new-camera-zoom", async (args) => {
     await onZoomGet(args)
 });
+
+socket.on("footage-update", async (args) => {
+  onFootageGet(args).then()
+})
+
+socket.on("calibration-update", async (args) => {
+    await onCameraCoordsGet(args)
+})

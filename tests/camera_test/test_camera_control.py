@@ -1,19 +1,31 @@
-import pytest
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import Camera
-from avonic_camera_api import converter
 import socket
 import math
+import pytest
 import numpy as np
+from avonic_camera_api.camera_control_api import CameraAPI, PAN_STEP, TILT_STEP, degrees_to_command
+from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
+from avonic_camera_api import converter
+
 
 def generate_relative_commands():
     return [
-        (1, 1, 30, 0, b'\x01\x00\x00\x0f\x00\x00\x00\x01\x81\x01\x06\x03\x01\x01\x00\x01\x0E\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x05\x01\x00\x01\x0E\x00\x00\x03\x0C\x00\xFF', "b'9041FF'"),
-        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x14\x0F\x0D\x03\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x18\x0C\x00\x00\x00\x00\x0F\x0E\x02\x00\xFF', "b'9041FF'"),
-        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', "b'9041FF'"),
+        (1, 1, 30, 0,
+         b'\x01\x00\x00\x0f\x00\x00\x00\x01\x81\x01\x06\x03\x01\x01\x00\x01\x0A\x0E\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (5, 1, 30, 60,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x05\x01\x00\x01\x0A\x0E\x00\x03\x05\x0E\xFF',
+         ResponseCode.ACK),
+        (1, 20, -45, 0,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x14\x0F\x0D\x07\x0A\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (24, 12, 0, -30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x18\x0C\x00\x00\x00\x00\x0F\x0E\x05\x01\xFF',
+         ResponseCode.ACK),
+        (10, 10, 30, 30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x0A\x0A\x00\x01\x0A\x0E\x00\x01\x0A\x0F\xFF',
+         ResponseCode.ACK),
     ]
+
 
 @pytest.fixture()
 def camera(monkeypatch):
@@ -31,11 +43,13 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "close", mocked_close)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    return CameraAPI(Camera(sock, None))
+    return CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52382)))
+
 
 @pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_relative_commands())
-def test_move_relative(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, alpha, beta, expected, expected2):
+def test_move_relative(monkeypatch, camera: CameraAPI, speed_alpha, speed_beta, alpha, beta, expected, expected2):
     def mocked_send(message):
+        print(message, expected)
         assert message == expected
     def mocked_return(bytes_receive):
         return b'\x01\x00\x00\x00\x00\x00\x00\x01\x90\x41\xff'
@@ -48,6 +62,7 @@ def test_move_relative(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, a
 
     assert camera.move_relative(speed_alpha, speed_beta, alpha, beta) == expected2
 
+
 def generate_relative_commands_bad_parameters():
     return [
         (11, 10, 150, 91),
@@ -59,50 +74,71 @@ def generate_relative_commands_bad_parameters():
         (3, 3, 5, -31)
     ]
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta", generate_relative_commands_bad_parameters())
-def test_move_relative_bad_parameters(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, alpha, beta):
+
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",
+    generate_relative_commands_bad_parameters())
+def test_move_relative_bad_parameters(camera:CameraAPI,
+    speed_alpha, speed_beta, alpha, beta):
     with pytest.raises (AssertionError):
         camera.move_relative(speed_alpha, speed_beta, alpha, beta)
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta", generate_relative_commands_bad_parameters())
-def test_move_absolute_bad_parameters(monkeypatch, camera:CameraAPI, speed_alpha, speed_beta, alpha, beta):
+
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta",
+    generate_relative_commands_bad_parameters())
+def test_move_absolute_bad_parameters(camera:CameraAPI,
+    speed_alpha, speed_beta, alpha, beta):
     with pytest.raises (AssertionError):
         camera.move_absolute(speed_alpha, speed_beta, alpha, beta)
 
-def generate_degrees_to_commands():
+
+def generate_degrees_to_commands_pan():
     return [
         # positive degrees tests
-        (45, "00020d00"),
-        (60, "00030c00"),
-        (90, "00050a00"),
-        (170, "000a0a00"),
+        (45, "00020806"),
+        (60, "0003050d"),
+        (90, "0005000c"),
+        (170, "00090808"),
         # negative degrees tests
-        (-45, "0f0d0300"),
-        (-60, "0f0c0400"),
-        (-90, "0f0a0600"),
-        (-170, "0f050600"),
+        (-45, "0f0d070a"),
+        (-60, "0f0c0a03"),
+        (-90, "0f0a0f04"),
+        (-170, "0f060708"),
         # decimal degrees tests
-        (13.5, "00000d08"),
-        (13.9, "00000d0e"),
-        (-22.6, "0f0e0907"),
-        (-10.12, "0f0f050f"),
+        (13.5, "00000c01"),
+        (13.9, "00000c07"),
+        (-22.6, "0f0e0b0c"),
+        (-10.12, "0f0f060f"),
     ]
 
-@pytest.mark.parametrize("alpha, expected", generate_degrees_to_commands())
-def test_degrees_to_command(camera:CameraAPI, alpha, expected):
-    assert camera.degrees_to_command(alpha) == expected
+
+@pytest.mark.parametrize("alpha, expected", generate_degrees_to_commands_pan())
+def test_degrees_to_command(alpha, expected):
+    assert degrees_to_command(alpha, PAN_STEP) == expected
+
 
 def generate_absolute_commands():
     return [
-        (1, 1, 30, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x01\x00\x01\x0E\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x05\x01\x00\x01\x0E\x00\x00\x03\x0C\x00\xFF', "b'9041FF'"),
-        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x14\x0F\x0D\x03\x00\x00\x00\x00\x00\xFF', "b'9041FF'"),
-        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x18\x0C\x00\x00\x00\x00\x0F\x0E\x02\x00\xFF', "b'9041FF'"),
-        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0E\x00\x00\x01\x0E\x00\xFF', "b'9041FF'"),
+        (1, 1, 30, 0,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x01\x00\x01\x0A\x0E\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (5, 1, 30, 60,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x05\x01\x00\x01\x0A\x0E\x00\x03\x05\x0E\xFF',
+         ResponseCode.ACK),
+        (1, 20, -45, 0,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x14\x0F\x0D\x07\x0A\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (24, 12, 0, -30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x18\x0C\x00\x00\x00\x00\x0F\x0E\x05\x01\xFF',
+         ResponseCode.ACK),
+        (10, 10, 30, 30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0A\x0E\x00\x01\x0A\x0F\xFF',
+         ResponseCode.ACK),
     ]
 
-@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_absolute_commands())
-def test_move_absolute(monkeypatch, camera, speed_alpha, speed_beta, alpha, beta, expected, expected2):
+@pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2",
+     generate_absolute_commands())
+def test_move_absolute(monkeypatch, camera,
+    speed_alpha, speed_beta, alpha, beta, expected, expected2):
     def mocked_send(message):
         print(message, expected)
         assert message == expected
@@ -117,8 +153,9 @@ def test_move_absolute(monkeypatch, camera, speed_alpha, speed_beta, alpha, beta
 
     assert camera.move_absolute(speed_alpha, speed_beta, alpha, beta) == expected2
 
+
 def test_home_commands(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x01\x06\x04\xff'
 
     def mocked_send(message):
@@ -134,28 +171,30 @@ def test_home_commands(monkeypatch, camera):
 
     assert camera.home() == expected2
 
+
 def test_reboot_command(monkeypatch, camera):
-    expected2 = None
+    expected2 = ResponseCode.COMPLETION
     expected = b'\x01\x00\x00\x06\x00\x00\x00\x01\x81\x0A\x01\x06\x01\xff'
 
     def mocked_send(message):
         assert message == expected
     def mocked_return(bytes_receive):
         return None
-    def mocked_connect():
+    def mocked_connect(address):
         pass
-    def mocked_timeout(ms):
+    def mocked_timeout(ms: float):
         pass
 
     monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
     monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
-    monkeypatch.setattr(camera.camera, "reconnect", mocked_connect)
+    monkeypatch.setattr(camera.camera.sock, "connect", mocked_connect)
     monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
 
-    assert camera.reboot() == expected2
+    assert camera.reboot(camera.camera.sock) == expected2
+
 
 def test_stop_command(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x09\x00\x00\x00\x01\x81\x01\x06\x01\x05\x05\x03\x03\xff'
 
     def mocked_send(message):
@@ -171,8 +210,9 @@ def test_stop_command(monkeypatch, camera):
 
     assert camera.stop() == expected2
 
+
 def test_turn_on_command(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x06\x00\x00\x00\x01\x81\x01\x04\x00\x02\xff'
 
     def mocked_send(message):
@@ -188,8 +228,9 @@ def test_turn_on_command(monkeypatch, camera):
 
     assert camera.turn_on() == expected2
 
+
 def test_turn_off_command(monkeypatch, camera):
-    expected2 = "b'9041FF'"
+    expected2 = ResponseCode.ACK
     expected = b'\x01\x00\x00\x06\x00\x00\x00\x01\x81\x01\x04\x00\x03\xff'
 
     def mocked_send(message):
@@ -202,14 +243,15 @@ def test_turn_off_command(monkeypatch, camera):
 
     assert camera.turn_off() == expected2
 
+
 def generate_get_direction_commands():
     return [
         ([0, 0], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x00\x00\x00\x00\x00\xFF'),
         ([1, 1], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x01\x00\x00\x00\x01\xFF'),
-        ([700, 1], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x02\x0B\x0C\x00\x00\x00\x01\xFF'),
         ([1, 700], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x00\x00\x00\x01\x00\x02\x0B\x0C\xFF'),
         ([-2448, -443], b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x0F\x06\x07\x00\x0F\x0E\x04\x05\xFF'),
     ]
+
 
 @pytest.mark.parametrize("direction, ret_msg", generate_get_direction_commands())
 def test_get_direction(monkeypatch, camera, direction, ret_msg):
@@ -225,5 +267,92 @@ def test_get_direction(monkeypatch, camera, direction, ret_msg):
     monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
     monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
     monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
-    direction =  np.array(direction) * 0.0625 / 180 * math.pi
+    direction = np.array([direction[0] * PAN_STEP, direction[1] * TILT_STEP]) / 180 * math.pi
     assert (camera.get_direction() == converter.angle_vector(direction[0], direction[1])).all()
+
+
+def test_camera_error(monkeypatch, camera):
+    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
+
+    def mocked_send(message):
+        assert message == expected_msg
+    def mocked_return(bytes_receive):
+        raise TimeoutError
+    def mocked_timeout(ms):
+        pass
+
+    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
+    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
+    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
+    assert camera.get_direction() == ResponseCode.TIMED_OUT
+
+
+def test_camera_error_second(monkeypatch, camera):
+    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
+    camera.camera.counter = 0
+    def mocked_send(message):
+        assert message == expected_msg
+    def mocked_return(bytes_receive):
+        camera.camera.counter += 1
+        if camera.camera.counter == 1:
+            return b'\x01\x00\x00\x05\x00\x00\x00\x01\x51\x51\x00\x00\x00\x00\x00\x00\x00\x00\xFF'
+        raise TimeoutError
+
+    def mocked_timeout(ms):
+        pass
+
+    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
+    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
+    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
+    assert camera.get_direction() == ResponseCode.TIMED_OUT
+
+
+def test_send_no_address(monkeypatch, camera):
+    camera.camera.address = None
+    assert camera.get_direction() == ResponseCode.NO_ADDRESS
+
+
+def test_reconnect_no_new_address(monkeypatch, camera):
+    camera.camera.address = None
+    assert camera.reboot(camera.camera.sock) == ResponseCode.NO_ADDRESS
+
+
+@pytest.fixture()
+def camera_no_address(monkeypatch):
+    def mocked_connect(addr):
+        pass
+
+    def mocked_close():
+        pass
+
+    def mocked_timeout(ms):
+        pass
+
+    sock = socket.socket
+    monkeypatch.setattr(sock, "connect", mocked_connect)
+    monkeypatch.setattr(sock, "close", mocked_close)
+    monkeypatch.setattr(sock, "settimeout", mocked_timeout)
+
+    return CameraAPI(CameraSocket(sock=sock))
+
+
+def test_init_no_address(monkeypatch, camera_no_address):
+    assert camera_no_address.camera.address is None
+
+
+def test_reconnect_new_address(monkeypatch, camera_no_address):
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381))\
+           == ResponseCode.COMPLETION
+
+
+def test_reconnect_new_address_timeout(monkeypatch, camera_no_address):
+    def mocked_return(bytes_receive):
+        raise TimeoutError
+
+    monkeypatch.setattr(camera_no_address.camera.sock, "connect", mocked_return)
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) \
+           == ResponseCode.TIMED_OUT
+
+
+def test_new_address_no_address(monkeypatch, camera_no_address):
+    assert camera_no_address.set_address(camera_no_address.camera.sock) == ResponseCode.NO_ADDRESS
