@@ -52,7 +52,7 @@ class UpdateThread(Thread):
                 prev_dir = point(self.cam_api, self.mic_api, self.preset_locations, self.preset_use, self.calibration, prev_dir)
 
             self.value += 1
-            sleep(0.3)
+            sleep(0.05)
         print("Exiting thread")
 
     def set_calibration(self, value):
