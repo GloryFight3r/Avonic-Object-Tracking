@@ -3,7 +3,7 @@ from avonic_speaker_tracker.updater import UpdateThread
 from web_app.integration import GeneralController
 
 
-def start_thread_endpoint(integration: GeneralController, allow_movement):
+def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     if (integration.thread is None) or (integration.event.is_set()):
         if integration.thread is None:
@@ -12,7 +12,7 @@ def start_thread_endpoint(integration: GeneralController, allow_movement):
             old_calibration = integration.thread.value
         integration.thread = UpdateThread(integration.event, integration.url,
                                           integration.cam_api, integration.mic_api,
-                                          integration.get_model_based_on_choice(), allow_movement)
+                                          integration.get_model_based_on_choice())
         integration.thread.set_calibration(old_calibration)
         integration.event.clear()
         integration.info_threads_event.clear()
@@ -50,6 +50,8 @@ def update_calibration(integration: GeneralController):
 
 
 def is_running_endpoint(integration: GeneralController):
+    print(integration.thread)
+    print(integration.thread.is_alive())
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 

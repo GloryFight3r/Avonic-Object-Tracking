@@ -226,9 +226,9 @@ def create_app(test_controller=None):
 
     # create the event and start the thread
 
-    @app.post('/thread/start/<allow_movement>')
-    def thread_start(allow_movement):
-        return web_app.tracking_endpoints.start_thread_endpoint(integration, allow_movement)
+    @app.post('/thread/start')
+    def thread_start():
+        return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():

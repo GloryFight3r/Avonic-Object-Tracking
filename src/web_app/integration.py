@@ -44,12 +44,17 @@ class GeneralController:
         if url is not None:
             self.url = url
         load_dotenv()
+        # Setup camera API
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
         verify_address(cam_addr)
         self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
+
+        # Setup microphone API
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
         verify_address(mic_addr)
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
+
+        # Setup secret
         self.secret = getenv("SECRET_KEY")
 
         # Initialize models
@@ -102,6 +107,7 @@ class GeneralController:
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
+        self.thread = None
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -164,7 +170,6 @@ class GeneralController:
         print("Info-thread start and will send updates to " + path)
         flag = True
         while flag:
-            print("something")
             if self.info_threads_break.is_set():
                 flag = False
             if not self.info_threads_event.is_set():
@@ -173,7 +178,7 @@ class GeneralController:
                 if response.status_code != 200:
                     print("Could not update flask at path " + path)
             sleep(0.3)
-        print("closing")
+        print("Closing " + path + " updater thread")
 
 
 def verify_address(address):

@@ -7,7 +7,7 @@ from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 class UpdateThread(Thread):
     loop = None
 
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel, allow_movement: bool = False):
+    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel):
         """ Class constructor
 
         Args:
@@ -18,7 +18,6 @@ class UpdateThread(Thread):
         self.value = None
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.allow_movement = allow_movement
         self.model_in_use = model
 
     def run(self):
@@ -32,9 +31,7 @@ class UpdateThread(Thread):
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
-
-            if self.allow_movement:
-                direct = self.model_in_use.point(self.cam_api, self.mic_api)
+            direct = self.model_in_use.point(self.cam_api, self.mic_api)
 
             self.value += 1
             sleep(0.3)
