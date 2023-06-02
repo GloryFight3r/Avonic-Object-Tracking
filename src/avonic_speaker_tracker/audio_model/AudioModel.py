@@ -10,10 +10,14 @@ from avonic_camera_api.converter import vector_angle
 class AudioModel(TrackingModel):
     calibration: Calibration = None
     prev_dir: np.array = None
+    speak_delay: int = 0
     
     def __init__(self, filename=None):
         self.prev_dir = np.array([0, 0, -1.0])
         self.calibration = Calibration(filename=filename)
+
+    def set_speak_delay(self, speak_delay = 0):
+        self.speak_delay = speak_delay
     
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         """ Calculates the direction and points the camera towards the speaker.
@@ -22,6 +26,10 @@ class AudioModel(TrackingModel):
                 mic_api: The controller for the microphone
             Returns: the pitch and yaw of the camera and the zoom value
         """
+        if self.speak_delay == 100:
+            cam_api.direct_zoom(0)
+            self.prev_dir[2]=0
+            return self.prev_dir
         mic_direction = mic_api.latest_direction
         if isinstance(mic_direction, str):
             print(mic_direction)
