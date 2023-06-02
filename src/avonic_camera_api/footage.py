@@ -1,14 +1,13 @@
 from threading import Thread
-from multiprocessing import Array, Value
+from multiprocessing import Value, Array
 import base64
-import numpy as np
 import time
 import cv2
 
 
 class FootageThread(Thread):
-    buffer = Array('b', range(320000), lock=False)
-    buflen = Value('i', 320000)
+    buffer = Array('c', b'\0' * 1000000, lock=False)
+    buflen = Value('i', 320000, lock=False)
 
     def __init__(self, camera_footage: cv2.VideoCapture, event):
         """ Constructor for the footage thread
@@ -27,13 +26,14 @@ class FootageThread(Thread):
     def run(self):
         """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
         while not self.event.is_set():
-            time.sleep(0.1)
+            time.sleep(0.01)
             self.success, self.frame = self.camera_footage.read()  # read the camera frame
             if self.success:
                 self.ret, buffer = cv2.imencode('.jpg', self.frame)
-                self.buflen.value = len(buffer)
-                self.buffer[:self.buflen.value] = np.frombuffer(buffer)
-                print(self.buffer[5000], self.buflen.value)
+                string = base64.b64encode(buffer)
+                length = len(string)
+                self.buffer.raw = string + b'\0' * (1000000-length)
+                self.buflen.value = length
             else:
                 break
 
@@ -43,8 +43,4 @@ class FootageThread(Thread):
         Returns:
             
         """
-        print("gugug", self.buffer[5000], self.buflen.value)
-        buffer = np.array(self.buffer[:self.buflen.value]).tobytes()
-        data = base64.b64encode(buffer).decode('ascii')
-        print(data[5])
-        return data
+        return str(self.buffer.raw[:self.buflen.value], 'ascii')
