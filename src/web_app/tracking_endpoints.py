@@ -13,7 +13,7 @@ def start_thread_endpoint(integration: GeneralController):
         integration.event.value = 1
         integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
-                                          integration.get_model_based_on_choice())
+                                          integration.preset)
         integration.thread.set_calibration(old_calibration)
         
         integration.info_threads_event.value = 1
@@ -58,6 +58,9 @@ def is_running_endpoint(integration: GeneralController):
 
 
 def preset_use(integration: GeneralController):
-    integration.preset = not integration.preset
-    print(integration.preset)
-    return make_response(jsonify({"preset":integration.preset}), 200)
+    if integration.preset.value == 1:
+        integration.preset.value = 0
+    else:
+        integration.preset.value = 1
+    print(integration.preset.value)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)

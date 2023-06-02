@@ -33,10 +33,10 @@ class GeneralController:
         self.video = None
         self.thread_mic = None
         self.thread_cam = None
-        self.preset = True
+        self.preset = Value("i", 0, lock=False)
 
     def load_env(self):
-        self.preset = True
+        self.preset = Value("i", 0, lock=False)
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
@@ -74,7 +74,7 @@ class GeneralController:
         self.thread_cam.start()
 
     def __del__(self):
-        self.preset = False # pragma: no mutate
+        self.preset.value = 0 # pragma: no mutate
         self.footage_thread_event.set() # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
 
@@ -124,7 +124,7 @@ class GeneralController:
         self.cam_api = new_cam_api
 
     def get_model_based_on_choice(self):
-        if self.preset:
+        if self.preset.value == 0:
             return self.preset_model
         return self.audio_model
 
@@ -165,11 +165,9 @@ class GeneralController:
         print("Info-thread start and will send updates to " + path)
         flag = True
         while flag:
-            print(self.info_threads_event.value)
             if self.info_threads_break.value == 1:
                 flag = False
             if self.info_threads_event.value != 0:
-                print("something")
                 d = data()
                 response = requests.post('http://' + self.url + path, json=d)
                 if response.status_code != 200:

@@ -9,7 +9,7 @@ class PresetModel(TrackingModel):
     preset_locations: PresetCollection = None
     prev_dir: np.array = None
     def __init__(self, filename=None):
-        self.prev_dir = np.array([0, 0, 0])
+        self.prev_dir = np.array([0, 0, 1])
         self.preset_locations = PresetCollection(filename=filename)
 
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.array:
@@ -21,7 +21,10 @@ class PresetModel(TrackingModel):
             Returns: the vector in which direction the camera should point and zoom value
         """
         preset_names = np.array(self.preset_locations.get_preset_list())
-        mic_direction = mic_api.latest_direction
+        mic_direction = mic_api.get_direction()
+        if isinstance(mic_direction, str):
+            print(mic_direction)
+            return self.prev_dir
 
         if len(self.preset_locations.get_preset_list()) == 0:
             print("No locations preset")

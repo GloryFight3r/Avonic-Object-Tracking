@@ -12,10 +12,13 @@ class AudioModel(TrackingModel):
     prev_dir: np.array = None
 
     def __init__(self, filename=None):
-        self.prev_dir = np.array([0, 0, 0])
+        self.prev_dir = np.array([0, 0, 1])
         self.calibration = Calibration(filename=filename)
+        self.calibration.load()
+        print("CALIBRATION !!!!", self.calibration.mic_to_cam)
 
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
+        print("CALIBRATION !!!!", self.calibration.mic_to_cam)
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone
             information for pointing.
@@ -24,7 +27,10 @@ class AudioModel(TrackingModel):
                 mic_api: The controller for the microphone
             Returns: the vector in which direction the camera should point and zoom value.
         """
-        mic_direction = mic_api.latest_direction
+        mic_direction = mic_api.get_direction()
+        if isinstance(mic_direction, str):
+            print(mic_direction)
+            return None
 
         cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
@@ -32,9 +38,6 @@ class AudioModel(TrackingModel):
 
         direct = vector_angle(cam_vec)
         direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), 0]
-
-        if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            cam_api.move_absolute(24, 20, direct[0], direct[1])
-            cam_api.direct_zoom(direct[2])
-            self.prev_dir = direct
         return direct
+
+
