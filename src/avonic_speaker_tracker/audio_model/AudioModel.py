@@ -36,17 +36,23 @@ class AudioModel(TrackingModel):
             vec_len = 10.0
         zoom_val = (int)((vec_len/10.0)*16000)
 
+
         direct = vector_angle(cam_vec)
         direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct[1])*2
 
-        speedX = diffX/360*24
-        speedY = diffY/120*20
+        speedX = (int)(13 + diffX/360*11)
+        speedY = (int)(11 + diffY/120*9)
 
         speedX = min(speedX,24)
         speedY = min(speedY,20) 
+        """
+        print("ZOOM: ", zoom_val )
+        print("SPEEDX: ",speedX)
+        print("SPEEDY: ",speedY)
+        print(diffX,diffY)"""
 
         if direct is None:
             return self.prev_dir

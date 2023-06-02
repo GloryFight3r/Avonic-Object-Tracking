@@ -32,17 +32,17 @@ class UpdateThread(Thread):
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
-                if self.mic_api.is_speaking():
-                    speak_delay = 0 
-                else:
-                    speak_delay = speak_delay + 1 
-
-                if speak_delay > 5: 
-                    self.cam_api.direct_zoom(0)
+            if self.mic_api.is_speaking():
+                speak_delay = 0 
+            else:
+                speak_delay = speak_delay + 1 
+            print(speak_delay)
+            if speak_delay > 100: 
+                self.cam_api.direct_zoom(0)
             direct = self.model_in_use.point(self.cam_api, self.mic_api)
 
             self.value += 1
-            sleep(0.3)
+            sleep(0.05)
         print("Exiting thread")
 
     def set_calibration(self, value):
