@@ -15,6 +15,7 @@ class GeneralController:
         self.event = Event()
         self.footage_thread_event = Event()
         self.thread = None
+        self.footage_thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
         self.cam_api = None
@@ -24,6 +25,7 @@ class GeneralController:
         self.preset_locations = None
         self.calibration = None
         self.camera_footage = None
+        self.video = None
         self.preset = None
 
     def load_env(self):
@@ -73,7 +75,6 @@ class GeneralController:
 
     def set_cam_api(self, new_cam_api):
         self.cam_api = new_cam_api
-
 
     def set_preset_collection(self, new_preset_collection):
         self.preset_locations = new_preset_collection
