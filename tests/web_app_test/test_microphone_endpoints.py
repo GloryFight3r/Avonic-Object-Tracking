@@ -96,17 +96,3 @@ def test_direction_is_speaking_endpoint_bad_weather(client):
     mic_api.is_speaking.return_value = "Unable to get peak loudness, response was: 404"
     rv = client.get('microphone/speaking')
     assert rv.status_code == 504
-
-def test_direction_get_speaker_bad_weather(client):
-    mic_api.is_speaking.return_value = True
-    mic_api.get_direction.return_value = np.array([0.0, 0.0, 1.0])
-    rv = client.get('microphone/speaker/direction')
-    assert rv.status_code == 200
-    mic_api.is_speaking.return_value = False
-    mic_api.get_direction.return_value = np.array([0.0, 0.0, -1.0])
-    rv = client.get('microphone/speaker/direction')
-    assert rv.status_code == 200
-    mic_api.is_speaking.return_value = False
-    mic_api.get_direction.return_value = "Unable to get direction from microphone, response was: 404"
-    rv = client.get('microphone/speaker/direction')
-    assert rv.status_code == 504

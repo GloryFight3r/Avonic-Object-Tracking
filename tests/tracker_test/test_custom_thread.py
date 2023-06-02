@@ -1,11 +1,12 @@
 from threading import Event
 from unittest import mock
 import numpy as np
+from multiprocessing import Value
 from avonic_speaker_tracker.updater import UpdateThread
 
 
 def test_constructor():
-    e = Event()
+    e = Value("i", 0, lock=False)
     mic_api = mock.Mock()
     mic_api.get_direction.return_value = np.array([0, 0, 1])
     mic_api.is_speaking.return_value = True
@@ -19,7 +20,7 @@ def test_constructor():
 
 
 def test_setter():
-    e = Event()
+    e = Value("i", 0, lock=False)
     mic_api = mock.Mock()
     mic_api.get_direction.return_value = np.array([0, 0, 1])
     mic_api.is_speaking.return_value = True
@@ -28,8 +29,9 @@ def test_setter():
     ct = UpdateThread(e, mic_api, cam_api, model)
     assert ct.event == e
     assert ct.value is None
+    e.value = 1
     ct.start()
-    e.set()
+    e.value = 0
     ct.join()
     ct.set_calibration(2)
     assert ct.value == 2

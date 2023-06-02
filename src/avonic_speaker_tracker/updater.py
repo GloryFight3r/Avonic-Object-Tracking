@@ -25,7 +25,7 @@ class UpdateThread(Thread):
         """ Actual body of the thread.
         Continuously calls point method of the supplied model, to point the camera.
         """
-        while not self.event.is_set():
+        while self.event.value != 0:
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)

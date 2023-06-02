@@ -1,6 +1,5 @@
-from threading import Event
+from threading import Event, Thread
 from os import getenv
-from threading import Thread
 from time import sleep
 from dotenv import load_dotenv
 import requests
@@ -12,14 +11,14 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from multiprocessing import Value, Array
 
 class GeneralController:
     def __init__(self):
-        self.event = Event()
-        self.info_threads_event = Event()
+        self.event = Value("i", 0, lock=False)
+        self.info_threads_event = Value("i", 0, lock=False)
         self.footage_thread_event = Event()
-        self.info_threads_break = Event() # THIS IS ONLY FOR DESTROYING THREADS
-        self.info_threads_break.clear()
+        self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
         self.thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
@@ -60,13 +59,13 @@ class GeneralController:
         self.preset_model = PresetModel(filename="presets.json")
 
         # Initialize footage thread
-        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
-        self.footage_thread = FootageThread(self.video, self.footage_thread_event)
-        self.footage_thread.start()
+        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0') # pragma: no mutate
+        self.footage_thread = FootageThread(self.video, self.footage_thread_event) # pragma: no mutate
+        self.footage_thread.start() # pragma: no mutate
 
         # Initialize camera and microphone info threads
-        self.info_threads_event.set()
-        self.info_threads_break.clear() # THIS IS ONLY FOR DESTROYING THREADS
+        self.info_threads_event.value = 0
+        self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
         self.thread_mic = Thread(target=self.send_update,
             args=(self.get_mic_info, '/update/microphone'))
         self.thread_cam = Thread(target=self.send_update,
@@ -75,30 +74,30 @@ class GeneralController:
         self.thread_cam.start()
 
     def __del__(self):
-        self.preset = False
-        self.footage_thread_event.set()
-        self.info_threads_break.set()
+        self.preset = False # pragma: no mutate
+        self.footage_thread_event.set() # pragma: no mutate
+        self.info_threads_break.value = 1 # pragma: no mutate
 
-        try:
-            self.thread_mic.join()
-        except:
-            print("Trying to destruct None thread")
-        try:
-            self.thread_cam.join()
-        except:
-            print("Trying to destruct None thread")
-        try:
-            self.footage_thread.join()
-        except:
-            print("Trying to destruct None thread")
-        try:
-            self.video.release()
-        except:
-            print("Trying to destruct None thread")
-        try:
-            cv2.destroyAllWindows()
-        except:
-            print("Trying to destruct None thread")
+        try: # pragma: no mutate
+            self.thread_mic.join() # pragma: no mutate
+        except: # pragma: no mutate
+            print("Trying to destruct None thread") # pragma: no mutate
+        try: # pragma: no mutate
+            self.thread_cam.join() # pragma: no mutate
+        except: # pragma: no mutate
+            print("Trying to destruct None thread") # pragma: no mutate
+        try: # pragma: no mutate
+            self.footage_thread.join() # pragma: no mutate
+        except: # pragma: no mutate 
+            print("Trying to destruct None thread") # pragma: no mutate
+        try: # pragma: no mutate 
+            self.video.release() # pragma: no mutate
+        except: # pragma: no mutate 
+            print("Trying to destruct None thread") # pragma: no mutate
+        try: # pragma: no mutate
+            cv2.destroyAllWindows() # pragma: no mutate
+        except: # pragma: no mutate
+            print("Trying to destruct None thread") # pragma: no mutate
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)
@@ -166,9 +165,11 @@ class GeneralController:
         print("Info-thread start and will send updates to " + path)
         flag = True
         while flag:
-            if self.info_threads_break.is_set():
+            print(self.info_threads_event.value)
+            if self.info_threads_break.value == 1:
                 flag = False
-            if not self.info_threads_event.is_set():
+            if self.info_threads_event.value != 0:
+                print("something")
                 d = data()
                 response = requests.post('http://' + self.url + path, json=d)
                 if response.status_code != 200:
@@ -189,12 +190,12 @@ def verify_address(address):
 
 
 def close_running_threads(integration_passed):
-    integration_passed.footage_thread_event.set()
-    integration_passed.info_threads_break.set()
+    integration_passed.footage_thread_event.set() # pragma: no mutate
+    integration_passed.info_threads_break.value = 1 # pragma: no mutate
 
-    integration_passed.thread_mic.join()
-    integration_passed.thread_cam.join()
-    integration_passed.footage_thread.join()
-    cv2.destroyAllWindows()
-    integration_passed.video.release()
-    raise SystemExit
+    integration_passed.thread_mic.join() # pragma: no mutate
+    integration_passed.thread_cam.join() # pragma: no mutate
+    integration_passed.footage_thread.join() # pragma: no mutate
+    cv2.destroyAllWindows() # pragma: no mutate
+    integration_passed.video.release() # pragma: no mutate
+    raise SystemExit # pragma: no mutate

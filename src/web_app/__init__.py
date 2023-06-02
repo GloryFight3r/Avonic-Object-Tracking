@@ -270,13 +270,13 @@ def create_app(test_controller=None):
 
     @app.post('/info-thread/start')
     def info_thread_start():
-        integration.info_threads_event.clear()
+        integration.info_threads_event.value = 1
         return make_response(jsonify({}), 200)
 
     @app.post('/info-thread/stop')
     def info_thread_stop():
-        integration.info_threads_event.set()
-        print(integration.info_threads_event)
+        integration.info_threads_event.value = 0
+        print(integration.info_threads_event.value)
         return make_response(jsonify({}), 200)
 
     def sigterm_handler(_signo, _stack_frame):
