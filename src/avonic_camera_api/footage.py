@@ -3,6 +3,7 @@ import base64
 import time
 import cv2
 
+
 class FootageThread(Thread):
     def __init__(self, camera_footage: cv2.VideoCapture, event):
         """ Constructor for the footage thread
@@ -26,6 +27,7 @@ class FootageThread(Thread):
             self.success, self.frame = self.camera_footage.read()  # read the camera frame
             if self.success:
                 self.ret, self.buffer = cv2.imencode('.jpg', self.frame)
+                print(self.buffer)
             else:
                 break
 
@@ -35,5 +37,6 @@ class FootageThread(Thread):
         Returns:
             
         """
+        print(self.buffer)
         data = base64.b64encode(self.buffer).decode('ascii')
         return data
