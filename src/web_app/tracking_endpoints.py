@@ -10,7 +10,7 @@ def start_thread_endpoint(integration: GeneralController):
             old_calibration = 0
         else:
             old_calibration = integration.thread.value
-        integration.thread = UpdateThread(integration.event, integration.url,
+        integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
                                           integration.get_model_based_on_choice())
         integration.thread.set_calibration(old_calibration)

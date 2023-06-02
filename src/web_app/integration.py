@@ -1,18 +1,17 @@
 from threading import Event
 from os import getenv
+from threading import Thread
+from time import sleep
 from dotenv import load_dotenv
-from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
+import requests
 import cv2
+from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.audio_model.calibration import Calibration
-import requests
-from threading import Thread
-from time import sleep
 
 class GeneralController:
     def __init__(self):
@@ -68,8 +67,10 @@ class GeneralController:
         # Initialize camera and microphone info threads
         self.info_threads_event.set()
         self.info_threads_break.clear() # THIS IS ONLY FOR DESTROYING THREADS
-        self.thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
-        self.thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
+        self.thread_mic = Thread(target=self.send_update,
+            args=(self.get_mic_info, '/update/microphone'))
+        self.thread_cam = Thread(target=self.send_update,
+            args=(self.get_cam_info, '/update/camera'))
         self.thread_mic.start()
         self.thread_cam.start()
 
@@ -98,7 +99,6 @@ class GeneralController:
             cv2.destroyAllWindows()
         except:
             print("Trying to destruct None thread")
-        
 
     def load_mock(self):
         cam_addr = ('0.0.0.0', 52381)

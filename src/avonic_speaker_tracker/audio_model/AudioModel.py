@@ -1,36 +1,28 @@
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
-from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_speaker_tracker.utils.coordinate_translation import translate_microphone_to_camera_vector
-from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_camera_api.converter import vector_angle
+from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
+from avonic_speaker_tracker.utils.coordinate_translation\
+    import translate_microphone_to_camera_vector
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
     calibration: Calibration = None
     prev_dir: np.array = None
-    
+
     def __init__(self, filename=None):
         self.prev_dir = np.array([0, 0, 0])
         self.calibration = Calibration(filename=filename)
-    
+
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
-        """ Points the camera towards the calculated direction from either:
-        the presets or the continuous follower.
+        """ Calculates the direction of the camera, so it point to the speaker.
+            Based on so-called audio model that relies ONLY on microphone
+            information for pointing.
             Args:
                 cam_api: The controller for the camera
                 mic_api: The controller for the microphone
-                preset_locations: Collection containing all current presets
-                preset_use: True if we are using presets and false otherwise
-                calibration: Information on the calibration of the system
-                prev_dir: The previous direction to which the camera was pointing
-            Returns: the pitch and yaw of the camera and the zoom value
-        """
-        """ Calculates the direction of the camera, so it point to the speaker.
-            Args:
-                mic_api: The controller for the microphone
-                calibration: Information on the calibration of the system
-            Returns: the pitch and yaw of the camera and the zoom value
+            Returns: the vector in which direction the camera should point and zoom value.
         """
         mic_direction = mic_api.latest_direction
 

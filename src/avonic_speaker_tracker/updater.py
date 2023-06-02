@@ -7,7 +7,8 @@ from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 class UpdateThread(Thread):
     loop = None
 
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel):
+    def __init__(self, event,
+        cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel):
         """ Class constructor
 
         Args:
@@ -22,16 +23,14 @@ class UpdateThread(Thread):
 
     def run(self):
         """ Actual body of the thread.
-        Method should start with self.event.wait() to make sure that on
-        start of the thread with false flag, body of the while-loop is not executed.
+        Continuously calls point method of the supplied model, to point the camera.
         """
-        prev_dir = [0.0, 0.0]
         while not self.event.is_set():
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
-            direct = self.model_in_use.point(self.cam_api, self.mic_api)
+            self.model_in_use.point(self.cam_api, self.mic_api)
 
             self.value += 1
             sleep(0.3)

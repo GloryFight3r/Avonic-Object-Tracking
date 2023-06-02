@@ -1,8 +1,8 @@
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 import numpy as np
+from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.preset_model.preset import PresetCollection
 from avonic_speaker_tracker.preset_model.preset_control import find_most_similar_preset
-from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
@@ -18,7 +18,7 @@ class PresetModel(TrackingModel):
             Args:
                 cam_api: The controller for the camera
                 mic_api: The controller for the microphone
-            Returns: the vector in which direction the camera should point
+            Returns: the vector in which direction the camera should point and zoom value
         """
         preset_names = np.array(self.preset_locations.get_preset_list())
         mic_direction = mic_api.latest_direction
