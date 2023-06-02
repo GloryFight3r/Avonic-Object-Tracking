@@ -138,4 +138,8 @@ def angle_between_vectors(p: np.array, q: np.array) -> float:
         returns:
             angle: the cosine of the angle
     """
+    print("TEST")
+    print(p)
+    print(q)
+    print("TEST")
     return p.dot(q) / (np.linalg.norm(p) * np.linalg.norm(q))

@@ -69,8 +69,8 @@ def get_calibration(integration: GeneralController):
                 relative to the microphone.
     """
     cam_coord = np.array([0.0, 0.0, 0.0])
-    if integration.calibration.is_calibrated():
-        cam_coord = integration.calibration.calculate_distance()
+    if integration.audio_model.calibration.is_calibrated():
+        cam_coord = integration.audio_model.calibration.calculate_distance()
     return make_response(jsonify({
         "camera-coords": list(integration.audio_model.calibration.mic_to_cam)
     }), 200)
