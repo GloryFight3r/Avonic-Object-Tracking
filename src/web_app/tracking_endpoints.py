@@ -21,7 +21,6 @@ def stop_object_tracking_endpoint(integration: GeneralController):
     integration.footage_thread.show_bounding_boxes = False
     return make_response(jsonify({}), 200)
 
-
 def start_thread_endpoint(integration: GeneralController, allow_movement):
     # start (unpause) the thread
     if integration.thread is None:

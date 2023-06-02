@@ -11,8 +11,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset import PresetCollection
 from avonic_speaker_tracker.calibration import Calibration
-from avonic_speaker_tracker.calibration_tracker import ThresholdCalibrationTracker
-from object_tracker.yolo import Yolo
+from avonic_speaker_tracker.calibration_tracker import WaitCalibrationTracker
 from object_tracker.yolov2 import YOLOPredict
 
 class GeneralController:
@@ -32,7 +31,6 @@ class GeneralController:
         self.camera_footage = None
         self.calibration_tracker = None
         self.preset = None
-        self.nn = YOLOPredict()
         self.object_tracking_thread = None
 
     def load_env(self):
@@ -49,11 +47,11 @@ class GeneralController:
         self.preset_locations = PresetCollection(filename="presets.json")
         self.calibration = Calibration(filename="calibration.json")
         self.secret = getenv("SECRET_KEY")
-        #self.preset = False
+        self.nn = YOLOPredict()
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
         self.footage_thread = FootageThread(self.video, self.footage_thread_event)
         self.footage_thread.start()
-        self.calibration_tracker = ThresholdCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 10)
+        self.calibration_tracker = WaitCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
 
     def __del__(self):
         self.video.release()
