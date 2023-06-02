@@ -60,7 +60,7 @@ class Calibration:
             returns:
                 is_calibrated: a boolean indicating whether the system is calibrated
         """
-        return self.speaker_points and self.to_mic_direction is not None
+        return bool(self.speaker_points) and self.to_mic_direction is not None
 
     def calculate_distance(self) -> np.array:
         """ Calculate the vectors from the microphone to the camera
@@ -75,6 +75,9 @@ class Calibration:
         """
         if len(self.speaker_points) == 0:
             return self.mic_to_cam
+
+        # reset the list so no old calculations are used
+        self.mic_to_cams = []
         for speaker in self.speaker_points:
             cam_vecw = speaker[0]
             mic_vecw = speaker[1]
@@ -96,8 +99,6 @@ class Calibration:
             self.mic_to_cams.append(mic_to_cam)
 
         self.mic_to_cam = np.mean(self.mic_to_cams, axis=0)
-        print(self.mic_to_cam)
-        print(self.mic_height)
         return self.mic_to_cam
 
     def record(self):
@@ -128,4 +129,13 @@ class Calibration:
                 print(self.to_mic_direction)
 
 def angle_between_vectors(p: np.array, q: np.array) -> float:
+    """ Calculates the cosine of the smallest angle between two vectors.
+
+        params:
+            p: the first vector
+            q: the second vector
+
+        returns:
+            angle: the cosine of the angle
+    """
     return p.dot(q) / (np.linalg.norm(p) * np.linalg.norm(q))
