@@ -7,56 +7,48 @@
     </select>
   </div>
   <div id="presets">
-    <h5>
-      Click add preset which will add a new preset to the list. After that click record sound direction and the
-      system will wait for the first audible noise and record its direction. After that point the camera to the
-      speaker
-      and click record camera direction
-    </h5>
 
     <form id="preset-form" method="post">
       <div class="grid">
-        <label for="preset-select">Select an existing preset:</label>
+        <label for="preset-select">Select an existing preset to edit:</label>
         <select id="preset-select" name="preset-select" onchange="changePreset()">
         </select>
       </div>
       <div class="grid">
-        <label for="preset-name">Type preset name:</label>
+        <label for="preset-name">Type the new preset name:</label>
         <input id="preset-name" name="preset-name">
       </div>
-      <h6>Microphone direction vector</h6>
+      <h6>Microphone direction vector:</h6>
       <div class="grid">
         <input id="mic-direction-x2" name="mic-direction-x" readonly />
         <input id="mic-direction-y2" name="mic-direction-y" readonly />
         <input id="mic-direction-z2" name="mic-direction-z" readonly />
       </div>
-      <h6>Camera info[pan,tilt,zoom]</h6>
+      <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
+        <button id="set-mic-button" type="submit">Get the microphone direction towards the speaker</button>
+      </form>
+      <h6>Camera info[pan,tilt,zoom]:</h6>
       <div class="grid">
         <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
         <input id="camera-direction-beta" name="camera-direction-beta" readonly />
         <input id="camera-zoom-value" name="camera-zoom-value" readonly />
       </div>
       <div class="grid">
-        <button id="add-preset-button" type="submit">Add new preset</button>
+        <form action="/camera/position/get" method="get" id="presets-camera-position-set-form">
+          <button type="submit">Get the camera direction</button>
+        </form>
+        <form action="/camera/zoom/get" method="get" id="presets-camera-zoom-set-form">
+          <button type="submit">Get the camera zoom</button>
+        </form>
+      </div>
+      <h6>Preset Controls</h6>
+      <div class="grid">
+        <button id="add-preset-button" type="submit">Add the new preset</button>
         <button id="edit-preset-button" type="submit">Edit current preset</button>
         <button id="remove-preset-button" type="submit">Remove current preset</button>
       </div>
     </form>
 
-    <div class="grid">
-      <form action="/camera/position/get" method="get" id="presets-camera-position-set-form">
-        <button type="submit">Get camera position</button>
-      </form>
-      <form action="/camera/zoom/get" method="get" id="presets-camera-zoom-set-form">
-        <button type="submit">Get camera zoom</button>
-      </form>
-      <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
-        <button id="set-mic-button" type="submit">Set microphone position</button>
-      </form>
-    </div>
-    <form action="/preset/track" method="get" id="preset-track">
-      <button type="submit">Enable preset tracking</button>
-    </form>
   </div>
   <div id="cal">
     <h5 id="calibration-instruction">Set the height, then click below to calibrate point 1</h5>
@@ -70,8 +62,5 @@
       <input id="camera-coords-y" />
       <input id="camera-coords-z" />
     </div>
-    <form action="/calibration/track" method="get" id="calibration-track">
-      <button type="submit">Enable continuous tracking</button>
-    </form>
   </div>
 </article>
