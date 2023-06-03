@@ -125,9 +125,9 @@ class Calibration:
                     self.speaker_points.append((np.array(key[0]),
                         np.array(key[1])))
                 self.to_mic_direction = np.array(data["to_mic_direction"])
+                self.calculate_distance()
                 print(self.speaker_points)
                 print(self.to_mic_direction)
-            print('AFTER WITH', self.to_mic_direction)
 
 def angle_between_vectors(p: np.array, q: np.array) -> float:
     """ Calculates the cosine of the smallest angle between two vectors.

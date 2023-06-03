@@ -22,10 +22,8 @@ class UpdateThread(Thread):
         self.value = None
         self.cam_api = cam_api
         self.mic_api = mic_api
-        print("ARRIVEED ", preset_or_tracking.value)
         self.preset_or_tracking = preset_or_tracking.value
         self.model_in_use = None
-        
 
     def run(self):
         """ Actual body of the thread.
@@ -33,11 +31,6 @@ class UpdateThread(Thread):
         """
         if self.preset_or_tracking == 0:
             self.model_in_use = AudioModel(filename="calibration.json")
-            dummy = Calibration(filename="calibration.json")
-            dummy.load()
-            print("something", dummy.mic_to_cam)
-            self.model_in_use.calibration.mic_to_cam = dummy.mic_to_cam
-            print("something", self.model_in_use.calibration.mic_to_cam)
         else:
             self.model_in_use = PresetModel(filename="presets.json")
 
