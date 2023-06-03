@@ -4,6 +4,7 @@ from time import sleep
 from dotenv import load_dotenv
 import requests
 import cv2
+import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
@@ -142,7 +143,7 @@ class GeneralController:
         direction = self.cam_api.get_direction()
         zoom = self.cam_api.get_zoom()
         if isinstance(direction, ResponseCode):
-            direction = [0, 0, 1]
+            direction = np.array([0, 0, 1])
         angles = converter.vector_angle(direction)
         if not isinstance(zoom, int):
             zoom = 0
