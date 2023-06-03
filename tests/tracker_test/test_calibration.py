@@ -139,8 +139,8 @@ def test_angle_between_vectors(v1, v2, exp_angle):
 def test_with_file():
     try:
         cal = Calibration("TEST_WITH_FILE_CALIBRATION.json")
-        d = np.array([1, 1])
-        p = (np.array([1, 0, 0]), np.array([0, 0, 0]))
+        d = np.array([1, 1, 1])
+        p = (np.array([1, 0.2, 0]), np.array([0, 0.2, 1]))
 
         cal.add_speaker_point(p)
         cal.add_direction_to_mic(d)

@@ -20,6 +20,7 @@ class PresetModel(TrackingModel):
                 mic_api: The controller for the microphone
             Returns: the vector in which direction the camera should point and zoom value
         """
+        print("Using presets")
         preset_names = np.array(self.preset_locations.get_preset_list())
         mic_direction = mic_api.get_direction()
         if isinstance(mic_direction, str):

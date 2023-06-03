@@ -16,8 +16,12 @@ def test_preset_pointer_good_weather():
     mic2_api.get_direction.return_value = np.array([7, 8, 10])
     mic2_api.is_speaking.return_value = True
     pm = PresetModel()
+    mic_api.get_direction.return_value = "some error"
     dir0 = pm.point(cam_api, mic_api)
-    assert (dir0 == np.array([0, 0, 0])).all()
+    assert (dir0 == pm.prev_dir).all()
+    mic_api.get_direction.return_value = np.array([1, 2, 3])
+    dir0 = pm.point(cam_api, mic_api)
+    assert (dir0 == pm.prev_dir).all()
     pm.preset_locations.add_preset("preset", np.array([4, 7, 5000]), np.array([1, 2, 3]))
     pm.preset_locations.add_preset("preset1", np.array([1, 5, 5000]), np.array([6, 8, 9]))
 
@@ -46,6 +50,11 @@ def test_continuous_pointer():
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
     am.calibration = calibration
+
+    mic_api.get_direction.return_value = "some error"
+    dir0 = am.point(cam_api, mic_api)
+    assert (dir0 == am.prev_dir).all()
+    mic_api.get_direction.return_value = np.array([1, 2, 3])
 
     dir1 = am.point(cam_api, mic_api)
     dir2 = am.point(cam_api, mic2_api)

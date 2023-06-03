@@ -29,7 +29,7 @@ class AudioModel(TrackingModel):
         print("LOL", self.calibration.mic_to_cam)
         if isinstance(mic_direction, str):
             print(mic_direction)
-            return None
+            return self.prev_dir
 
         cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
