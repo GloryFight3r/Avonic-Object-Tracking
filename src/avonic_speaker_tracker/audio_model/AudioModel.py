@@ -37,6 +37,10 @@ class AudioModel(TrackingModel):
 
         direct = vector_angle(cam_vec)
         direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), 0]
+        if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
+            cam_api.move_absolute(24, 20, direct[0], direct[1])
+            cam_api.direct_zoom(direct[2])
+            self.prev_dir = direct
         return direct
 
 
