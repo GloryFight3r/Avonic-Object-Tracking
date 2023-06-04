@@ -43,7 +43,7 @@ class UpdateThread(Thread):
             print(self.model_in_use.point(self.cam_api, self.mic_api))
 
             self.value += 1
-            sleep(0.3)
+            sleep(0.05)
         print("Exiting thread")
 
     def set_calibration(self, value):
