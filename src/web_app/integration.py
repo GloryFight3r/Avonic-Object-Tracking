@@ -21,6 +21,7 @@ class GeneralController:
         self.footage_thread_event = Event()
         self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
         self.thread = None
+        self.footage_thread = None
         self.url = '127.0.0.1:5000'
         self.cam_sock = None  # Only for testing
         self.cam_api = None
