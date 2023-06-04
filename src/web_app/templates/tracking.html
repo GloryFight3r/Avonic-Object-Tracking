@@ -1,10 +1,10 @@
 <article id="tracking">
-    <h1>Tracking 🔭</h1>
-    <form action="/preset/track" method="get" id="preset-track">
-        <button type="submit">Use preset tracking</button>
-      </form>
-    <form action="/calibration/track" method="get" id="calibration-track">
-        <button type="submit">Use continuous tracking</button>
-      </form>
-  </article>
+    <h1 id="tracking-title">Tracking 🔭</h1>
+    <h2> You need to start the thread for tracking to work</h2>
+    <select id="tracking-select" onchange="selectTracking()">
+      <option value="untrack">No tracking</option>
+      <option value="preset">Presets</option>
+      <option value="calib">Continuous following</option>
+    </select>
+</article>
   

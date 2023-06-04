@@ -36,7 +36,7 @@ def create_app(test_controller=None):
     @app.get('/')
     def view():
         to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
-                   "footage", "thread", "scene", "socket", "main"]
+                   "footage", "thread", "scene", "socket", "main", "tracking"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
@@ -215,6 +215,10 @@ def create_app(test_controller=None):
     def continuous_tracker():
         print("CONTINUOUS TRACKER")
         return web_app.tracking_endpoints.track_continuously(integration)
+
+    @app.get('/untrack')
+    def stop_tracking():
+        return web_app.tracking_endpoints.stop_tracking(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
