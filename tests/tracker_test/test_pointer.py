@@ -73,7 +73,9 @@ def test_zoom():
     am = AudioModel()
     am.calibration = calibration
     mic_api.latest_direction = np.array([0.0,1.0,14.0])
+    mic_api.get_direction.return_value = np.array([0.0,1.0,14.0])
     mic2_api.latest_direction = np.array([1.0,0.7,-2.0])
+    mic2_api.get_direction.return_value = np.array([1.0,0.7,-2.0])
 
     dir1 = am.point(cam_api,mic_api)
     assert(dir1 == np.array([0,0,16000])).all()
@@ -92,7 +94,7 @@ def test_zoom_out():
     am.prev_dir = np.array([0,0,16000])
     am.set_speak_delay(100)
     am.calibration = calibration
-    mic_api.latest_direction = np.array([0.0,1.0,14.0])
+    mic_api.get_direction.return_value = np.array([0.0,1.0,14.0])
     dir1 = am.point(cam_api,mic_api)
     assert cam_api.direct_zoom.call_count == 1
     assert cam_api.move_absolute.call_count == 0
