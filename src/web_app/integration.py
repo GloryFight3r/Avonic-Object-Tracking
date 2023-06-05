@@ -19,29 +19,50 @@ class GeneralController:
     def __init__(self):
         # self.event is part of the while loop in UpdateThread. When 0 - stops the while loop.
         self.event = Value("i", 0, lock=False)
-        # self.info_threads_event is part of the info-threads, and indicates whether or not, update should be performed
+
+        # self.info_threads_event is part of the info-threads
+        # and indicates whether or not update should be performed.
         # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
+
         self.footage_thread_event = Event()
+
         # self.info_threads_break used to completely destroy info-thread, and not just pause
-        # Used for safe finish of the program, for safe destruction. When 1 - finishes the thread ASAP.
+        # Used for safe finish of the program, for safe destruction.
+        # When 1 - finishes the thread ASAP.
         self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
+
+        # Update thread field
         self.thread = None
+        # Footage thread field
         self.footage_thread = None
+
+        # URL of the server
         self.url = '127.0.0.1:5000'
+
+        # Camera and microphone APIs
         self.cam_sock = None  # Only for testing
         self.cam_api = None
         self.mic_api = None
+
+        # Secret for cookies and websocket
         self.secret = None
         self.ws = None
+
+        # Models, to record all updates onto a disk
         self.audio_model = None
         self.preset_model = None
-        self.model = None
+
+        # Video related fields
         self.camera_footage = None
         self.video = None
+
+        # Info-threads
         self.thread_mic = None
         self.thread_cam = None
-        self.preset = Value("i", 0, lock=False) # indicates which model should be used, check UpdateThread
+
+        # Indicates which model should be used, check UpdateThread
+        self.preset = Value("i", 0, lock=False)
 
     def load_env(self) -> None:
         """Performs load procedure of all of the specified parameters.
