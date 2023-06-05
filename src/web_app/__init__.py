@@ -216,9 +216,6 @@ def create_app(test_controller=None):
         print("CONTINUOUS TRACKER")
         return web_app.tracking_endpoints.track_continuously(integration)
 
-    @app.get('/untrack')
-    def stop_tracking():
-        return web_app.tracking_endpoints.stop_tracking(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED

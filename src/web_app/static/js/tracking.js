@@ -14,13 +14,6 @@ function selectTracking() {
     console.log(selected)
     const header = document.getElementById("tracking-title")
     switch(selected) {
-        case "untrack":
-            header.innerText = "Tracking 🔭"
-            fetch("/untrack", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
-            break 
         case "preset":
             header.innerText = "Tracking using presets 🔭"
             fetch("/preset/track", {

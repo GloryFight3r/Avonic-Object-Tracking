@@ -36,10 +36,10 @@ class GeneralController:
         self.video = None
         self.thread_mic = None
         self.thread_cam = None
-        self.preset = "preset"
+        self.preset = True
 
     def load_env(self):
-        self.preset = "untrack"
+        self.preset = True
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
@@ -70,7 +70,7 @@ class GeneralController:
         self.thread_cam.start()
 
     def __del__(self):
-        self.preset = "untrack"
+        self.preset = True
         self.footage_thread_event.set()
         self.info_threads_break.set()
 
@@ -120,9 +120,9 @@ class GeneralController:
         self.cam_api = new_cam_api
 
     def get_model_based_on_choice(self):
-        if self.preset == "preset":
+        if self.preset == True:
             return self.preset_model
-        elif self.preset == "continuous":
+        elif self.preset == False:
             return self.audio_model
         else:
             return None
