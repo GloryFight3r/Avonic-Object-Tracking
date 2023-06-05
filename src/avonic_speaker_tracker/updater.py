@@ -59,7 +59,7 @@ class UpdateThread(Thread):
                     prev_dir = self.calibration_tracker.track_audio(direction, prev_dir)
 
             self.value += 1
-            sleep(0.3)
+            sleep(0.05)
         print("Exiting thread")
 
     def set_calibration(self, value):

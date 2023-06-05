@@ -1,4 +1,5 @@
 from threading import Thread
+from multiprocessing import Value, Array
 import base64
 import time
 import cv2
@@ -12,6 +13,12 @@ from avonic_speaker_tracker.calibration_tracker import CalibrationTracker
 
 class ObjectTrackingThread(Thread):
     def __init__(self, nn: YOLOPredict, trck: CalibrationTracker, stream, event):
+        """ Constructor for the footage thread
+
+        Args:
+            event (): event that stops the thread
+            camera_footage: object to read from camera footage
+        """
         super().__init__()
         self.stream = stream
         # the neural network
@@ -32,21 +39,31 @@ class ObjectTrackingThread(Thread):
                     last_box = []
                 (x, y, x2, y2) = last_box
                 self.nn.draw_prediction(frame, "person", x, y, x2, y2)
-                self.stream.buffer = frame
+                #self.stream.buffer = frame
 
 
 class FootageThread(Thread):
+    buffer = Array('c', b'\0' * 1000000, lock=False)
+    buflen = Value('i', 320000, lock=False)
+
     def __init__(self, camera, event):
         super().__init__()
         self.camera = camera
         self.frame = None
-        self.buffer = None
         self.event = event
         self.show_bounding_boxes = False
 
     def run(self):
         while not self.event.is_set():
             ret, self.frame = self.camera.read()
+            if ret:
+                ret, buffer = cv2.imencode('.jpg', self.frame)
+                string = base64.b64encode(buffer)
+                length = len(string)
+                self.buffer.raw = string
+                self.buflen.value = length
+            else:
+                break
 
     def get_frame(self):
         """ Returns the camera footage image decoded into ascii
@@ -54,11 +71,4 @@ class FootageThread(Thread):
         Returns:
 
         """
-        if self.show_bounding_boxes and self.buffer is not None:
-            ret, jpg = cv2.imencode('.jpg', self.buffer)
-            data = base64.b64encode(jpg).decode('ascii')
-
-        else:
-            ret, jpg = cv2.imencode('.jpg', self.frame)
-            data = base64.b64encode(jpg).decode('ascii')
-        return data
+        return str(self.buffer.raw[:self.buflen.value], 'ascii')
