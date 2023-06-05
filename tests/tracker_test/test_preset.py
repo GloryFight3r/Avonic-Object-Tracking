@@ -1,8 +1,7 @@
 import os
 import pytest
 import numpy as np
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.preset import Preset
+from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
 
 
 @pytest.fixture()

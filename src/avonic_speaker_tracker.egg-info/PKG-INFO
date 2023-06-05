@@ -1,9 +1,17 @@
+Metadata-Version: 2.1
+Name: avonic-speaker-tracker
+Version: 0.1.0
+Summary: A program for tracking the speaker using an Avonic camera using data from a Sennheiser TeamConnect Ceiling 2 microphone.
+Author-email: Izzy van der Giessen <i.vandergiessen@student.tudelft.nl>, Petr Khartskhaev <p.khartskhaev@student.tudelft.nl>, Yehor Kozyr <y.kozyr@student.tudelft.nl>, Borislav Semerdzhiev <b.n.semerdzhiev@student.tudelft.nl>, Ivan Smilenov <i.y.smilenov@student.tudelft.nl>
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Provides-Extra: test
+Provides-Extra: prod
+
 # 11C - Avonic
 
 ## Badges
 `dev branch:` ![dev pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/public/badges/pylint.svg?job=pylint) ![dev coverage](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/dev/raw/coverage-badge.svg?job=test)
-`main branch:` ![main pylint](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/main/raw/public/badges/pylint.svg?job=pylint) ![main coverage](https://gitlab.ewi.tudelft.nl/cse2000-software-project/2022-2023-q4/ta-cluster/cluster-11/11c-avonic/11c-avonic/-/jobs/artifacts/main/raw/coverage-badge.svg?job=test)
-
 
 ## Rules
 
