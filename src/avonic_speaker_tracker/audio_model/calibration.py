@@ -5,12 +5,12 @@ from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 class Calibration:
     # height of the microphone above the speaker
     mic_height: float = 1.0
-    mic_to_cams: [np.array] = []
-    mic_to_cam: np.array = np.array([0.0, 0.0, 0.0])
+    mic_to_cams: [np.ndarray] = []
+    mic_to_cam: np.ndarray = np.array([0.0, 0.0, 0.0])
 
     # variables of calibration
-    speaker_points: [(np.array, np.array)] = []
-    to_mic_direction: np.array = None
+    speaker_points: [(np.ndarray, np.ndarray)] = []
+    to_mic_direction: np.ndarray = None
 
     filename = None
 
@@ -27,7 +27,7 @@ class Calibration:
         self.mic_height = height
         self.record()
 
-    def add_speaker_point(self, speaker_point: (np.array, np.array)):
+    def add_speaker_point(self, speaker_point: (np.ndarray, np.ndarray)):
         """ Add the point at which the calibrator is speaking.
 
             params:
@@ -36,7 +36,7 @@ class Calibration:
         self.speaker_points.append(speaker_point)
         self.record()
 
-    def add_direction_to_mic(self, to_mic: np.array):
+    def add_direction_to_mic(self, to_mic: np.ndarray):
         """ Add the direction from the camera to the microphone.
 
             params:
@@ -63,7 +63,7 @@ class Calibration:
         """
         return bool(self.speaker_points) and self.to_mic_direction is not None
 
-    def calculate_distance(self) -> np.array:
+    def calculate_distance(self) -> np.ndarray:
         """ Calculate the vectors from the microphone to the camera
             using the vectors acquired during calibration.
             This vector has a norm equal to the distance from the
@@ -105,8 +105,11 @@ class Calibration:
     def record(self):
         if self.filename is not None:
             with open(self.filename, "w", encoding="utf-8") as outfile:
-                outfile.write(json.dumps({"speaker_points" :self.speaker_points,
-                    "to_mic_direction": self.to_mic_direction, "mic_height": self.mic_height}, indent=4, cls=CustomEncoder))
+                outfile.write(json.dumps({
+                    "speaker_points" :self.speaker_points,
+                    "to_mic_direction": self.to_mic_direction,
+                    "mic_height": self.mic_height
+                    }, indent=4, cls=CustomEncoder))
 
     def load(self):
         if self.filename is not None:
@@ -128,9 +131,9 @@ class Calibration:
                 self.to_mic_direction = np.array(data["to_mic_direction"])
                 self.mic_height = float(data["mic_height"])
                 self.calculate_distance()
-                print(self.speaker_points)
-                print(self.to_mic_direction)
-                print(self.mic_height)
+                print("Loaded speaker points: ", self.speaker_points)
+                print("Loaded camera to microphone vector: ", self.to_mic_direction)
+                print("Loaded microphone height: ", self.mic_height)
 
 def angle_between_vectors(p: np.array, q: np.array) -> float:
     """ Calculates the cosine of the smallest angle between two vectors.

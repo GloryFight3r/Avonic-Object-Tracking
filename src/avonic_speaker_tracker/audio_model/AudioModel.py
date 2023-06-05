@@ -10,7 +10,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
     calibration: Calibration = None
-    prev_dir: np.array = None
+    prev_dir: np.ndarray = None
     speak_delay: int = 0
 
     def __init__(self, filename=None):
@@ -21,10 +21,11 @@ class AudioModel(TrackingModel):
     def set_speak_delay(self, speak_delay = 0):
         self.speak_delay = speak_delay
 
-    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
+    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.ndarray:
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone
             information for pointing.
+            In addition to calculating the direction, performs movement of the camera.
             Args:
                 cam_api: The controller for the camera
                 mic_api: The controller for the microphone
@@ -61,7 +62,7 @@ class AudioModel(TrackingModel):
         speedY = (int)(11 + diffY/120*9)
 
         speedX = min(speedX,24)
-        speedY = min(speedY,20) 
+        speedY = min(speedY,20)
 
         if direct is None:
             return self.prev_dir
@@ -74,5 +75,3 @@ class AudioModel(TrackingModel):
 
         self.prev_dir = direct
         return direct
-
-

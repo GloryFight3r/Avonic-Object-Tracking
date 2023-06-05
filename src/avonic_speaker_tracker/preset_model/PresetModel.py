@@ -16,6 +16,7 @@ class PresetModel(TrackingModel):
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.array:
         """ Calculates the direction to which the camera should point so that
             it is the closest to an existing preset.
+            In addition to calculating the direction, performs movement of the camera.
             Args:
                 cam_api: The controller for the camera
                 mic_api: The controller for the microphone
@@ -47,7 +48,7 @@ class PresetModel(TrackingModel):
         speedY = diffY/120*20
 
         speedX = min(speedX,24)
-        speedY = min(speedY,20) 
+        speedY = min(speedY,20)
 
         if direct is None:
             return self.prev_dir

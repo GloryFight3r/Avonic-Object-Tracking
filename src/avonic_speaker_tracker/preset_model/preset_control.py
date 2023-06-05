@@ -22,7 +22,7 @@ def cos_similarity(a: np.array, b: np.array) -> float:
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
-def find_most_similar_preset(current: np.array, presets: list[np.array]) -> int:
+def find_most_similar_preset(current: np.ndarray, presets: list[np.ndarray]) -> int:
     """Finds index of the most similar preset in relation
     to the given vector in the list of presets.
 
