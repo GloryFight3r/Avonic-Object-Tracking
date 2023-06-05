@@ -46,8 +46,7 @@ class AudioModel(TrackingModel):
                                                         self.calibration.mic_height)
 
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
-        if vec_len > 10.0:
-            vec_len = 10.0
+        vec_len = min(vec_len,10.0)
         zoom_val = (int)((vec_len/10.0)*16000)
 
 

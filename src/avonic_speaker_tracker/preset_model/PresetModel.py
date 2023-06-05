@@ -50,7 +50,7 @@ class PresetModel(TrackingModel):
         speedY = min(speedY,20) 
 
         if direct is None:
-            return self.self.prev_dir
+            return self.prev_dir
 
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
             cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
