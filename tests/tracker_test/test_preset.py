@@ -17,7 +17,7 @@ def preset_collection_with_file():
 
 
 def test_edit_preset(preset_collection: PresetCollection):
-    name:str = "preset"
+    name : str = "preset"
     camera_angle: np.ndarray = np.array([1, 2, 5000])
     microphone_direction: np.ndarray = np.array([1, 2, 3])
     preset_collection.add_preset(name, camera_angle, microphone_direction)
