@@ -128,10 +128,7 @@ class GeneralController:
     def get_model_based_on_choice(self):
         if self.preset.value == 0:
             return self.preset_model
-        elif self.preset == False:
-            return self.audio_model
-        else:
-            return None
+        return self.audio_model
 
     def get_mic_info(self):
         """ Get information about the microphone.
