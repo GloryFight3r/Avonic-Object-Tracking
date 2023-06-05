@@ -36,7 +36,7 @@ class AudioModel(TrackingModel):
             self.prev_dir[2]=0
             return self.prev_dir
         mic_direction = mic_api.get_direction()
-        print("LOL", self.calibration.mic_to_cam)
+        print("Current calibration mic -> cam vector: ", self.calibration.mic_to_cam)
 
         if isinstance(mic_direction, str):
             print(mic_direction)
