@@ -3,11 +3,15 @@ from threading import Thread
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
     loop = None
 
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel, allow_movement: bool = False):
+    def __init__(self, event,
+        cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking):
         """ Class constructor
 
         Args:
@@ -18,35 +22,42 @@ class UpdateThread(Thread):
         self.value = None
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.allow_movement = allow_movement
-        self.model_in_use = model
+        self.preset_or_tracking = preset_or_tracking.value
+        self.model_in_use = None
 
     def run(self):
         """ Actual body of the thread.
-        Method should start with self.event.wait() to make sure that on
-        start of the thread with false flag, body of the while-loop is not executed.
+        Continuously calls point method of the supplied model, to point the camera.
         """
         prev_dir = [0.0, 0.0]
         speak_delay = 0
-        while not self.event.is_set():
+        if self.preset_or_tracking == 0:
+            self.model_in_use = AudioModel(filename="calibration.json")
+        else:
+            self.model_in_use = PresetModel(filename="presets.json")
+
+        while self.event.value != 0:
+            print("RUNNING")
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
 
-            if self.allow_movement:
-                if self.mic_api.is_speaking():
-                    speak_delay = 0 
-                else:
-                    speak_delay = speak_delay + 1 
+            if self.mic_api.is_speaking():
+                speak_delay = 0 
+            else:
+                speak_delay = speak_delay + 1 
+            self.model_in_use.set_speak_delay(speak_delay)
+            direct = self.model_in_use.point(self.cam_api, self.mic_api)
 
-                if speak_delay > 5: 
-                    self.cam_api.direct_zoom(0)
-                direct = self.model_in_use.point(self.cam_api, self.mic_api)
+            print(direct)
+
 
             self.value += 1
-            sleep(0.3)
+            sleep(0.05)
         print("Exiting thread")
 
     def set_calibration(self, value):
+        """ Sets the calibration value.
+        """
         self.value = value

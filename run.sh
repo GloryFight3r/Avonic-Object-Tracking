@@ -6,16 +6,21 @@ python3 -m venv venv
 
 if [ "$1" = "test" ]
   then
-    pip install -e '.[test]'
+    pip3 install -e '.[test]'
     echo "Running tests with coverage"
     pytest --cov --cov-report term --cov-report=html:pytest-html
     flask --app src/web_app run --debug
 elif [ "$1" = "prod" ]
   then
     export SERVER_ADDRESS=0.0.0.0:8000
-    pip install -e '.[prod]'
+    pip3 install -e '.[prod]'
+    python3 -c "\
+from gevent import monkey
+monkey.patch_all()
+    "
+    # it is recommended that you apply the monkey patching at the top of your main script, even above your imports.
     uwsgi --http :8000 --gevent 1000 --http-websockets --master --module web_app.wsgi:app
 else
-    pip install .
+    pip3 install .
     flask --app src/web_app run
 fi

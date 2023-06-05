@@ -2,6 +2,7 @@ from unittest import mock
 import socket
 import json
 import pytest
+import time
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
@@ -276,26 +277,48 @@ def test_update_calibration(client):
     rv = client.post('/update/calibration', json=json.dumps({"test": "testington"}))
     assert rv.status_code == 200
 
-#FIXME - revert /thread/start endpoint to not have </false, /true> options
-"""
+
 def test_thread(client):
-    rv = client.post('/thread/start/false')
+    rv = client.post("preset/add",
+    data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 0,
+            "mic-direction-x" : 1,
+            "mic-direction-y" : 0,
+            "mic-direction-z" : 0,
+            "preset-name": "test-preset-name"
+        }
+    )
     assert rv.status_code == 200
-    rv = client.get('/thread/running')
-    assert rv.status_code == 200 and rv.data == bytes("{\"is-running\":true}\n", "utf-8")
+    rv = client.post("preset/add",
+        data={
+            "camera-direction-alpha" : 0,
+            "camera-direction-beta" : 0,
+            "camera-zoom-value": 1,
+            "mic-direction-x" : 0,
+            "mic-direction-y" : 1,
+            "mic-direction-z" : 0,
+            "preset-name": "test-another-preset-name"
+        }
+    )
+    assert rv.status_code == 200
+    rv = client.post('/thread/start')
+    assert rv.status_code == 200
+    rv_running = client.get('/thread/running')
+    assert rv_running.data == bytes("{\"is-running\":true}\n", "utf-8")
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
     rv = client.get('/thread/running')
     assert rv.status_code == 200 and rv.data == bytes("{\"is-running\":false}\n", "utf-8")
-    rv = client.post('/thread/start/false')
+    rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.get('/thread/running')
     assert rv.status_code == 200 and rv.data == bytes("{\"is-running\":true}\n", "utf-8")
-    rv = client.post('/thread/start/false')
+    rv = client.post('/thread/start')
     assert rv.status_code == 403
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
-"""
 
 def test_is_speaking(client):
     sock.sendto.return_value = 48
@@ -468,6 +491,8 @@ def test_get_preset_list(client):
             "preset-name": "test-another-preset-name"
         }
     )
+    assert rv.status_code == 200
+    rv = client.post("preset/point", data={})
     assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200\

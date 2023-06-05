@@ -2,18 +2,28 @@ import socket
 import math
 import pytest
 import numpy as np
-from avonic_camera_api.camera_control_api import CameraAPI, degrees_to_command
+from avonic_camera_api.camera_control_api import CameraAPI, PAN_STEP, TILT_STEP, degrees_to_command
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api import converter
 
 
 def generate_relative_commands():
     return [
-        (1, 1, 30, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x01\x00\x01\x0B\x00\x00\x00\x00\x00\xFF', ResponseCode.ACK),
-        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x05\x01\x00\x01\x0B\x00\x00\x03\x06\x00\xFF', ResponseCode.ACK),
-        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x14\x0F\x0D\x07\x08\x00\x00\x00\x00\xFF', ResponseCode.ACK),
-        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x18\x0C\x00\x00\x00\x00\x0F\x0E\x05\x00\xFF', ResponseCode.ACK),
-        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x0A\x0A\x00\x01\x0B\x00\x00\x01\x0B\x00\xFF', ResponseCode.ACK),
+        (1, 1, 30, 0,
+         b'\x01\x00\x00\x0f\x00\x00\x00\x01\x81\x01\x06\x03\x01\x01\x00\x01\x0A\x0E\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (5, 1, 30, 60,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x05\x01\x00\x01\x0A\x0E\x00\x03\x05\x0E\xFF',
+         ResponseCode.ACK),
+        (1, 20, -45, 0,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x01\x14\x0F\x0D\x07\x0A\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (24, 12, 0, -30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x18\x0C\x00\x00\x00\x00\x0F\x0E\x05\x01\xFF',
+         ResponseCode.ACK),
+        (10, 10, 30, 30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x03\x0A\x0A\x00\x01\x0A\x0E\x00\x01\x0A\x0F\xFF',
+         ResponseCode.ACK),
     ]
 
 
@@ -39,6 +49,7 @@ def camera(monkeypatch):
 @pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_relative_commands())
 def test_move_relative(monkeypatch, camera: CameraAPI, speed_alpha, speed_beta, alpha, beta, expected, expected2):
     def mocked_send(message):
+        print(message, expected)
         assert message == expected
     def mocked_return(bytes_receive):
         return b'\x01\x00\x00\x00\x00\x00\x00\x01\x90\x41\xff'
@@ -80,40 +91,49 @@ def test_move_absolute_bad_parameters(camera:CameraAPI,
         camera.move_absolute(speed_alpha, speed_beta, alpha, beta)
 
 
-def generate_degrees_to_commands():
+def generate_degrees_to_commands_pan():
     return [
         # positive degrees tests
-        (45, "00020808"),
-        (60, "00030600"),
-        (90, "00050100"),
-        (170, "00090900"),
+        (45, "00020806"),
+        (60, "0003050d"),
+        (90, "0005000c"),
+        (170, "00090808"),
         # negative degrees tests
-        (-45, "0f0d0708"),
-        (-60, "0f0c0a00"),
-        (-90, "0f0a0f00"),
-        (-170, "0f060700"),
+        (-45, "0f0d070a"),
+        (-60, "0f0c0a03"),
+        (-90, "0f0a0f04"),
+        (-170, "0f060708"),
         # decimal degrees tests
-        (13.5, "00000c02"),
-        (13.9, "00000c08"),
-        (-22.6, "0f0e0b0b"),
+        (13.5, "00000c01"),
+        (13.9, "00000c07"),
+        (-22.6, "0f0e0b0c"),
         (-10.12, "0f0f060f"),
     ]
 
 
-@pytest.mark.parametrize("alpha, expected", generate_degrees_to_commands())
+@pytest.mark.parametrize("alpha, expected", generate_degrees_to_commands_pan())
 def test_degrees_to_command(alpha, expected):
-    assert degrees_to_command(alpha) == expected
+    assert degrees_to_command(alpha, PAN_STEP) == expected
 
 
 def generate_absolute_commands():
     return [
-        (1, 1, 30, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x01\x00\x01\x0B\x00\x00\x00\x00\x00\xFF', ResponseCode.ACK),
-        (5, 1, 30, 60, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x05\x01\x00\x01\x0B\x00\x00\x03\x06\x00\xFF', ResponseCode.ACK),
-        (1, 20, -45, 0, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x14\x0F\x0D\x07\x08\x00\x00\x00\x00\xFF', ResponseCode.ACK),
-        (24, 12, 0, -30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x18\x0C\x00\x00\x00\x00\x0F\x0E\x05\x00\xFF', ResponseCode.ACK),
-        (10, 10, 30, 30, b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0B\x00\x00\x01\x0B\x00\xFF', ResponseCode.ACK),
+        (1, 1, 30, 0,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x01\x00\x01\x0A\x0E\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (5, 1, 30, 60,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x05\x01\x00\x01\x0A\x0E\x00\x03\x05\x0E\xFF',
+         ResponseCode.ACK),
+        (1, 20, -45, 0,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x01\x14\x0F\x0D\x07\x0A\x00\x00\x00\x00\xFF',
+         ResponseCode.ACK),
+        (24, 12, 0, -30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x18\x0C\x00\x00\x00\x00\x0F\x0E\x05\x01\xFF',
+         ResponseCode.ACK),
+        (10, 10, 30, 30,
+         b'\x01\x00\x00\x0F\x00\x00\x00\x01\x81\x01\x06\x02\x0A\x0A\x00\x01\x0A\x0E\x00\x01\x0A\x0F\xFF',
+         ResponseCode.ACK),
     ]
-
 
 @pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2",
      generate_absolute_commands())
@@ -247,7 +267,7 @@ def test_get_direction(monkeypatch, camera, direction, ret_msg):
     monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
     monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
     monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
-    direction = np.array(direction) * (5/72) / 180 * math.pi
+    direction = np.array([direction[0] * PAN_STEP, direction[1] * TILT_STEP]) / 180 * math.pi
     assert (camera.get_direction() == converter.angle_vector(direction[0], direction[1])).all()
 
 
