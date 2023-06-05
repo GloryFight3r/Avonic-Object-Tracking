@@ -57,13 +57,13 @@ def is_running_endpoint(integration: GeneralController):
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
 def track_presets(integration: GeneralController):
-    integration.preset = "preset"
-    print(integration.preset)
+    integration.preset.value = 1
+    print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset}), 200)
 
 def track_continuously(integration: GeneralController):
-    integration.preset = "continuous"
-    print(integration.preset)
+    integration.preset.value = 0
+    print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset}), 200)
 
 def preset_use(integration: GeneralController):
