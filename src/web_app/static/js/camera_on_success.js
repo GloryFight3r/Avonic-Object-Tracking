@@ -4,7 +4,6 @@ if (typeof onSuccess !== 'undefined') {
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "camera-position-get-form": onPositionGet,
-    "camera-coords-get-form": onCameraCoordsGet,
     "presets-camera-position-set-form": onPositionSet,
     "presets-camera-zoom-set-form": onZoomSet,
     "camera-coords-get-form": onCameraCoordsGet
