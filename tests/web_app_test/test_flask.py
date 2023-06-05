@@ -305,11 +305,7 @@ def test_thread(client):
     assert rv.status_code == 200
     rv = client.post('/thread/start')
     assert rv.status_code == 200
-    for i in range(5):
-        rv_running = client.get('/thread/running')
-        print(rv_running.data)
-        rv = client.get('/thread/value')
-        print(rv.data)
+    rv_running = client.get('/thread/running')
     assert rv_running.data == bytes("{\"is-running\":true}\n", "utf-8")
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
@@ -495,6 +491,8 @@ def test_get_preset_list(client):
             "preset-name": "test-another-preset-name"
         }
     )
+    assert rv.status_code == 200
+    rv = client.post("preset/point", data={})
     assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200\

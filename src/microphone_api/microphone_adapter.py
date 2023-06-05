@@ -5,8 +5,8 @@ class MicrophoneSocket:
     """
     This class contains methods to send and receive raw UDP packets to the microphone.
     """
-    sock = None
-    address = None
+    sock = None # pragma: no mutate
+    address = None # pragma: no mutate
 
     def __init__(self, sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM), address=None):
         """ Constructor for Microphone Socket

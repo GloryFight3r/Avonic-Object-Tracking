@@ -1,9 +1,14 @@
 from threading import Thread
+from multiprocessing import Value, Array
 import base64
 import time
 import cv2
 
+
 class FootageThread(Thread):
+    buffer = Array('c', b'\0' * 1000000, lock=False)
+    buflen = Value('i', 320000, lock=False)
+
     def __init__(self, camera_footage: cv2.VideoCapture, event):
         """ Constructor for the footage thread
 
@@ -17,7 +22,6 @@ class FootageThread(Thread):
         self.frame = None
         self.event = event
         self.ret = None
-        self.buffer = bytes(0)
 
     def run(self):
         """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
@@ -25,7 +29,11 @@ class FootageThread(Thread):
             time.sleep(0.01)
             self.success, self.frame = self.camera_footage.read()  # read the camera frame
             if self.success:
-                self.ret, self.buffer = cv2.imencode('.jpg', self.frame)
+                self.ret, buffer = cv2.imencode('.jpg', self.frame)
+                string = base64.b64encode(buffer)
+                length = len(string)
+                self.buffer.raw = string
+                self.buflen.value = length
             else:
                 break
 
@@ -35,5 +43,4 @@ class FootageThread(Thread):
         Returns:
             
         """
-        data = base64.b64encode(self.buffer).decode('ascii')
-        return data
+        return str(self.buffer.raw[:self.buflen.value], 'ascii')

@@ -52,6 +52,8 @@ def wait_for_speaker(integration: GeneralController):
     Returns: Direction towards the speaker
 
     """
-    while not integration.mic_api.is_speaking():
+    approaching_limit: int = 0
+    while not integration.mic_api.is_speaking() and approaching_limit < 10:
+        approaching_limit += 1
         sleep(0.1)
     return integration.mic_api.get_direction()

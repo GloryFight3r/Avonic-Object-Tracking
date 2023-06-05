@@ -2,7 +2,8 @@ from unittest import mock
 import socket
 import pytest
 import numpy as np
-from web_app.integration import GeneralController
+import time
+from web_app.integration import GeneralController, close_running_threads
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -10,7 +11,7 @@ from microphone_api.microphone_adapter import MicrophoneSocket
 import web_app
 
 sock = mock.Mock()
-"""
+
 @pytest.fixture()
 def camera(monkeypatch):
     cam_sock = socket.socket
@@ -57,10 +58,11 @@ def camera(monkeypatch):
 
     return cam_api
 
+test_controller = GeneralController()
 
 @pytest.fixture
 def client(camera):
-    A test client for the app.
+    """A test client for the app."""
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
@@ -69,15 +71,13 @@ def client(camera):
 
     cam_api = camera
 
-    test_controller = GeneralController()
-    test_controller.cam_sock = sock
-    test_controller.load_mock()
-    test_controller.set_cam_api(cam_api)
-    test_controller.set_mic_api(mic_api)
+    test_controller.load_env()
     test_controller.ws = mock.Mock()
-    app = web_app.create_app(test_controller=None)
+    app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
     return app.test_client()
 
 def test_load_env(client):
-    pass"""
+    time.sleep(0.5)
+    test_controller.footage_thread_event.set()
+    test_controller.info_threads_break.value = 1

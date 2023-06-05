@@ -1,3 +1,4 @@
+import signal
 from flask import Flask, jsonify, abort, render_template, make_response, Response, request
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -7,8 +8,6 @@ import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
 from web_app.integration import GeneralController, close_running_threads
-
-import signal
 
 # While testing to keep the log clean
 #log = logging.getLogger('werkzeug')
@@ -53,8 +52,8 @@ def create_app(test_controller=None):
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
         to_import=["socket", "camera", "microphone", "presets", "calibration", "main"]
-        return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
-                               page_name="Presets & Calibration View")
+        return render_template('single_page.html', name="presets_and_calibration",
+            to_import=to_import, page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
@@ -271,13 +270,13 @@ def create_app(test_controller=None):
 
     @app.post('/info-thread/start')
     def info_thread_start():
-        integration.info_threads_event.clear()
+        integration.info_threads_event.value = 1
         return make_response(jsonify({}), 200)
 
     @app.post('/info-thread/stop')
     def info_thread_stop():
-        integration.info_threads_event.set()
-        print(integration.info_threads_event)
+        integration.info_threads_event.value = 0
+        print(integration.info_threads_event.value)
         return make_response(jsonify({}), 200)
 
     def sigterm_handler(_signo, _stack_frame):
