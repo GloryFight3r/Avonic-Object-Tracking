@@ -51,6 +51,8 @@ class GeneralController:
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0')
         self.footage_thread = FootageThread(self.video, self.footage_thread_event)
         self.footage_thread.start()
+
+        # choose a strategy for tracking
         self.calibration_tracker = WaitCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
 
     def __del__(self):

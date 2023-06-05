@@ -27,7 +27,11 @@ class YOLOPredict:
         #persons = [result.boxes.cls.cpu()[i] for i in person_indices]
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
-        return bboxes[person_indices]
+        persons = []
+        for index in person_indices:
+            persons.append(bboxes[index])
+
+        return persons
 
     def draw_prediction(self, img, label, left, top, right, bottom):
         cv2.rectangle(img, (left, top), (right, bottom), [0, 0, 0], 2)

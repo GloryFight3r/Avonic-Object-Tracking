@@ -26,18 +26,12 @@ class ObjectTrackingThread(Thread):
             if frame is not None:
                 boxes = self.nn.get_bounding_boxes(frame)
                 if len(boxes) > 0:
-                    last_box = copy.deepcopy(boxes)
-                    try:
-                        self.trck.track_object(boxes[0][0])
-                    except:
-                        last_box = [[last_box]]
-                        self.trck.track_object(boxes)
+                    last_box = self.trck.get_center_box(boxes)
+                    self.trck.track_object(last_box)
                 else:
                     last_box = []
-
-                for bb in last_box:
-                    (x, y, x2, y2) = bb[0]
-                    self.nn.draw_prediction(frame, "person", x, y, x2, y2)
+                (x, y, x2, y2) = last_box
+                self.nn.draw_prediction(frame, "person", x, y, x2, y2)
                 self.stream.buffer = frame
 
 

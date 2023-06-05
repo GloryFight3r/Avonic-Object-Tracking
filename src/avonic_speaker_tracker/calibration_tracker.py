@@ -22,6 +22,20 @@ class CalibrationTracker:
         self.mic_api = mic_api
         self.resolution = resolution
 
+    def get_center_box(self, boxes: [np.array]):
+        """ Gets the box closest to the center of the screen.
+
+            params:
+                boxes: an array of boxes represented as numpy arrays
+
+            returns:
+                box (np.array): the box closest to the center
+        """
+        get_center = lambda box: np.array([(box[0] + box[2])/2, (box[1] + box[3])/2])
+        center = sorted(boxes,
+                        key=lambda box: np.linalg.norm(get_center(box) - self.resolution))[0]
+        return center
+
     def get_movement_to_box(self, current_box: list):
         current_box[2] = current_box[2] - current_box[0]
         tmp = current_box[3]
@@ -104,11 +118,7 @@ class WaitCalibrationTracker(CalibrationTracker):
         """ Points the camera towards the calculated direction from either:
         the presets or the continuous follower.
             Args:
-                cam_api: The controller for the camera
-                mic_api: The controller for the microphone
-                preset_locations: Collection containing all current presets
-                preset_use: True if we are using presets and false otherwise
-                calibration: Information on the calibration of the system
+                direct: the direction in which to point the camera
                 prev_dir: The previous direction to which the camera was pointing
             Returns: the pitch and yaw of the camera and the zoom value
         """
@@ -149,14 +159,9 @@ class ThresholdCalibrationTracker(CalibrationTracker):
             print("Not moving!!!", str(avg_angle))
 
     def track_audio(self, direct, prev_dir=(0.0, 0.0)):
-        """ Points the camera towards the calculated direction from either:
-        the presets or the continuous follower.
+        """ Points the camera towards the calculated direction.
             Args:
-                cam_api: The controller for the camera
-                mic_api: The controller for the microphone
-                preset_locations: Collection containing all current presets
-                preset_use: True if we are using presets and false otherwise
-                calibration: Information on the calibration of the system
+                direct: the direction in which to point the camera
                 prev_dir: The previous direction to which the camera was pointing
             Returns: the pitch and yaw of the camera and the zoom value
         """
