@@ -59,12 +59,12 @@ def is_running_endpoint(integration: GeneralController):
 def track_presets(integration: GeneralController):
     integration.preset.value = 1
     print(integration.preset.value)
-    return make_response(jsonify({"preset":integration.preset}), 200)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_continuously(integration: GeneralController):
     integration.preset.value = 0
     print(integration.preset.value)
-    return make_response(jsonify({"preset":integration.preset}), 200)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def preset_use(integration: GeneralController):
     if integration.preset.value == 1:
