@@ -12,7 +12,7 @@ from microphone_api.microphone_adapter import MicrophoneSocket
 import web_app
 from flask_socketio import SocketIO
 
-sock = mock.Mock()
+mic_sock = mock.Mock()
 
 @pytest.fixture()
 def camera(monkeypatch):
@@ -31,14 +31,14 @@ def camera(monkeypatch):
     def mocked_timeout(ms, self=None):
         pass
 
-    sock = socket.socket
-    monkeypatch.setattr(sock, "connect", mocked_connect)
-    monkeypatch.setattr(sock, "close", mocked_close)
-    monkeypatch.setattr(sock, "sendall", mocked_send_all)
-    monkeypatch.setattr(sock, "recv", mocked_recv)
-    monkeypatch.setattr(sock, "settimeout", mocked_timeout)
+    cam_sock = socket.socket
+    monkeypatch.setattr(cam_sock, "connect", mocked_connect)
+    monkeypatch.setattr(cam_sock, "close", mocked_close)
+    monkeypatch.setattr(cam_sock, "sendall", mocked_send_all)
+    monkeypatch.setattr(cam_sock, "recv", mocked_recv)
+    monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=cam_sock, address=('0.0.0.0', 52381)))
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():
@@ -53,10 +53,11 @@ def camera(monkeypatch):
 @pytest.fixture
 def client(camera, monkeypatch):
     """A test client for the app."""
-    sock.sendto.return_value = 48
-    sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
-    mic_api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    mic_sock.sendto.return_value = 48
+    mic_sock.recvfrom.return_value = \
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), "0.0.0.0")
+    mic_adapt = MicrophoneSocket(sock=mic_sock, address="0.0.0.0")
+    mic_api = MicrophoneAPI(mic_adapt)
     mic_api.height = 1
 
     cam_api = camera
@@ -122,6 +123,7 @@ def test_reboot(client):
 
     rv = client.post('/camera/reboot')
     assert rv.status_code == 200
+    del client
 
 
 def test_home(client):
@@ -236,6 +238,7 @@ def test_get_microphone_direction(client):
     rv = client.get('microphone/direction')
     res_vec = json.loads(rv.data)["microphone-direction"]
     assert rv.status_code == 200 and np.allclose(res_vec, [0.0, 0.0, 1.0])
+    del client
 
 def test_add_direction_to_mic(client):
     client.get('/calibration/reset')
@@ -321,17 +324,17 @@ def test_thread(client):
     assert rv.status_code == 200
 
 def test_is_speaking(client):
-    sock.sendto.return_value = 48
-    sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-55}}}\r\n', "ascii"), None)
+    mic_sock.sendto.return_value = 48
+    mic_sock.recvfrom.return_value = \
+        (bytes('{"m":{"in1":{"peak":-55}}}\r\n', "ascii"), "0.0.0.0")
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":false}\n", "utf-8")
-    sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
+    mic_sock.recvfrom.return_value = \
+        (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), "0.0.0.0")
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":true}\n", "utf-8")
-    sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-100}}}\r\n', "ascii"), None)
+    mic_sock.recvfrom.return_value = \
+        (bytes('{"m":{"in1":{"peak":-100}}}\r\n', "ascii"), "0.0.0.0")
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":true}\n", "utf-8")
 
@@ -498,7 +501,7 @@ def test_get_preset_list(client):
     assert rv.status_code == 200\
         and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","\
             + "\"test-another-preset-name\"]}\n", "utf-8")
-    sock.recvfrom.return_value = \
+    mic_sock.recvfrom.return_value = \
         (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
     rv = client.get("preset/info/test-non-existent-preset-name")
     assert rv.status_code == 400

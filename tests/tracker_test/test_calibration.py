@@ -37,7 +37,7 @@ def test_reset_calibration():
     assert cal.mic_to_cam[1] == 0.0
     assert cal.mic_to_cam[2] == 0.0
     assert not cal.speaker_points
-    assert cal.to_mic_direction is None
+    assert np.allclose(cal.to_mic_direction, np.array([0, 0, 0]))
 
 def test_is_calibrated():
     cal = Calibration()

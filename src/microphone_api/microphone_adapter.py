@@ -5,9 +5,6 @@ class MicrophoneSocket:
     """
     This class contains methods to send and receive raw UDP packets to the microphone.
     """
-    sock = None # pragma: no mutate
-    address = None # pragma: no mutate
-
     def __init__(self, sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM), address=None):
         """ Constructor for Microphone Socket
 
@@ -27,14 +24,14 @@ class MicrophoneSocket:
         """
         self.sock.close()
 
-    def connect(self, address=None):
+    def connect(self, address=None) -> bool:
         if address is None:
             print("WARNING: Microphone address not specified!")
             return False
         self.address = address
         return True
 
-    def send(self, command: str, responses: int = 1) -> [str]:
+    def send(self, command: str, responses: int = 1) -> list[str]:
         """ Send a command and wait for a response
 
         Args:
@@ -50,7 +47,7 @@ class MicrophoneSocket:
             try:
                 data, addr = self.sock.recvfrom(1024)
             except TimeoutError:
-                return '{"message":"Microphone timed out"}'
+                return ['{"message":"Microphone timed out"}']
             if addr == self.address:
                 # all the microphone's responses end in CRLF
                 res.append(data.decode("ascii").split("\r\n")[0])

@@ -7,7 +7,7 @@ from avonic_speaker_tracker.preset_model.preset_control import find_most_similar
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
-    def __init__(self, filename=None):
+    def __init__(self, filename: str = ""):
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.preset_locations: PresetCollection = PresetCollection(filename=filename)
 
@@ -37,22 +37,22 @@ class PresetModel(TrackingModel):
 
         preset_id = find_most_similar_preset(mic_direction, presets_mic)
         preset = self.preset_locations.get_preset_info(preset_names[preset_id])
-        direct = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])), preset[0][2]]
+        direct = np.array([np.rad2deg(preset[0][0]), np.rad2deg(preset[0][1]), preset[0][2]])
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct[1])*2
 
-        speedX = diffX/360*24
-        speedY = diffY/120*20
+        speedX : float = diffX/360*24
+        speedY : float = diffY/120*20
 
-        speedX = min(speedX,24)
-        speedY = min(speedY,20)
+        speedX_picked : int = int(min(speedX,24))
+        speedY_picked : int = int(min(speedY,20))
 
         if direct is None:
             return self.prev_dir
 
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
+            cam_api.move_absolute(speedX_picked, speedY_picked, direct[0], direct[1])
 
         if self.prev_dir[2] != direct[2]:
             cam_api.direct_zoom(direct[2])

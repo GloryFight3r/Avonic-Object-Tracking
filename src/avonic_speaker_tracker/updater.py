@@ -1,6 +1,7 @@
 from time import sleep
 from threading import Thread
 from multiprocessing import Value
+from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
@@ -8,20 +9,20 @@ from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
-    def __init__(self, event: Value,
-        cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: Value):
+    def __init__(self, event: c_int,
+        cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: c_int):
         """ Class constructor
 
         Args:
             event - event from threading module, that acts as a flag/lock of the thread
         """
         super().__init__()
-        self.event: Value = event
-        self.value: int = None
+        self.event: c_int = event
+        self.value: int = 0
         self.cam_api: CameraAPI = cam_api
         self.mic_api: MicrophoneAPI = mic_api
         self.preset_or_tracking: int = preset_or_tracking.value
-        self.model_in_use: TrackingModel = None
+        self.model_in_use: TrackingModel
 
     def run(self) -> None:
         """ Actual body of the thread.

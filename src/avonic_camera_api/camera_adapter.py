@@ -24,7 +24,7 @@ class CameraSocket:
     """
     sock = None
     address = None
-    message_dict = {}
+    message_dict: dict[int, str] = {}
     response_codes = {
         "b'9041FF'": ResponseCode.ACK,
         "b'9051FF'": ResponseCode.COMPLETION,

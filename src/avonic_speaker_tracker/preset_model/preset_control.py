@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def cos_similarity(a: np.array, b: np.array) -> float:
+def cos_similarity(a: np.ndarray, b: np.ndarray) -> float:
     """Calculates cosine similarity between two vectors.
     Holds symmetric property, value is in [-1, 1]
     -1 - most different, 1 - most similar
@@ -36,4 +36,4 @@ def find_most_similar_preset(current: np.ndarray, presets: list[np.ndarray]) -> 
     if len(presets) == 0:
         raise ValueError("Empty list of presets given")
     similartity = np.apply_along_axis(lambda x: cos_similarity(current, x), 1, np.array(presets))
-    return np.argmax(similartity)
+    return int(np.argmax(similartity))

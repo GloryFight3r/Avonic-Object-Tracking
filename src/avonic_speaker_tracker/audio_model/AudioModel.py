@@ -9,7 +9,7 @@ from avonic_speaker_tracker.audio_model.calibration import Calibration
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
-    def __init__(self, filename: str = None):
+    def __init__(self, filename: str = ""):
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.calibration: Calibration = Calibration(filename=filename)
         self.speak_delay: int = 0
@@ -30,7 +30,7 @@ class AudioModel(TrackingModel):
         """
         if self.speak_delay == 100:
             cam_api.direct_zoom(0)
-            self.prev_dir[2]=0
+            self.prev_dir[2] = 0
             return self.prev_dir
         mic_direction = mic_api.get_direction()
         print("Current calibration mic -> cam vector: ", self.calibration.mic_to_cam)
@@ -50,13 +50,13 @@ class AudioModel(TrackingModel):
 
         direct = vector_angle(cam_vec)
 
-        direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
+        direct_np = np.array([int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val])
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct[1])*2
 
-        speedX = (int)(13 + diffX/360*11)
-        speedY = (int)(11 + diffY/120*9)
+        speedX : int = int(13 + diffX/360*11)
+        speedY : int = int(11 + diffY/120*9)
 
         speedX = min(speedX,24)
         speedY = min(speedY,20)
@@ -64,11 +64,11 @@ class AudioModel(TrackingModel):
         if direct is None:
             return self.prev_dir
 
-        if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
+        if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
+            cam_api.move_absolute(speedX, speedY, direct_np[0], direct_np[1])
 
-        if self.prev_dir[2] != direct[2]:
-            cam_api.direct_zoom(direct[2])
+        if self.prev_dir[2] != direct_np[2]:
+            cam_api.direct_zoom(direct_np[2])
 
-        self.prev_dir = direct
-        return direct
+        self.prev_dir = direct_np
+        return direct_np

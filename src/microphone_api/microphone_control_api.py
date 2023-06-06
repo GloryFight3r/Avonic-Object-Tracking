@@ -5,28 +5,18 @@ from multiprocessing import Array
 
 
 class MicrophoneAPI:
-    sock = None
-    height = None
-    elevation = None
-    azimuth = None
-    speaking = None
-    threshold = None
-    latest_direction = Array('f', [0.0, 1.0, 0.0], lock=False)
-
-
-    def __init__(self, sock: MicrophoneSocket, threshold=-55):
+    def __init__(self, sock: MicrophoneSocket, threshold: int =-55):
         """ Constructor for the Microphone
 
         Args:
             sock: wrapper for the socket
         """
-        self.sock = sock
-        self.height = 0.0
-        self.elevation = 0.0
-        self.azimuth = 0.0
-        self.speaking = False
-        self.latest_direction.raw = [0.0, 1.0, 0.0]
-        self.threshold = threshold
+        self.sock: MicrophoneSocket = sock
+        self.height: float = 0.0
+        self.elevation: float = 0.0
+        self.azimuth: float = 0.0
+        self.speaking: bool = False
+        self.threshold: int = threshold
 
     def set_address(self, address):
         """
@@ -107,10 +97,9 @@ class MicrophoneAPI:
             if "message" in obj:
                 return obj["message"]
             return "Unable to get direction from microphone, response was: " + ret
-        self.latest_direction.raw = self.vector().tolist()
         return self.vector()
 
-    def vector(self) -> np.array:
+    def vector(self) -> np.ndarray:
         """ Get direction vector from local variables
 
         Returns:

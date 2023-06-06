@@ -12,7 +12,7 @@ class Preset:
         return f"Preset({self.camera_info}, {self.microphone_direction})"
 
 class PresetCollection:
-    def __init__(self, filename: str = None):
+    def __init__(self, filename: str = ""):
         self.filename: str = filename
         self.preset_locations: dict[str, Preset] = {}
         self.load()
@@ -53,7 +53,7 @@ class PresetCollection:
         self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
-    def get_preset_list(self) -> list[Preset]:
+    def get_preset_list(self) -> list[str]:
         """ Returns a list with the names of the presets
 
         Returns: List with presets names
@@ -75,12 +75,12 @@ class PresetCollection:
                 self.preset_locations[to_get].microphone_direction)
 
     def record(self) -> None:
-        if self.filename is not None:
+        if self.filename != "":
             with open(self.filename, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps(self.preset_locations, indent=4, cls=CustomEncoder))
 
     def load(self) -> None:
-        if self.filename is not None:
+        if self.filename != "":
             try:
                 with open(self.filename, encoding="utf-8") as f:
                     print("Loading json...")

@@ -29,8 +29,8 @@ def test_preset_pointer_good_weather():
     dir1 = pm.point(cam_api, mic_api)
     dir2 = pm.point(cam_api, mic2_api)
 
-    assert (dir1 == np.array([int(np.rad2deg(4)), int(np.rad2deg(7)), 5000])).all()
-    assert (dir2 == np.array([int(np.rad2deg(1)), int(np.rad2deg(5)), 5000])).all()
+    assert np.allclose(dir1, np.array([np.rad2deg(4), np.rad2deg(7), 5000]))
+    assert np.allclose(dir2, np.array([np.rad2deg(1), np.rad2deg(5), 5000]))
 
 
 def test_continuous_pointer():

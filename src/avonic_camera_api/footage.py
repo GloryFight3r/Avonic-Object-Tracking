@@ -2,7 +2,7 @@ from threading import Thread
 from multiprocessing import Value, Array
 import base64
 import time
-import cv2
+import cv2 # type: ignore
 
 
 class FootageThread(Thread):
