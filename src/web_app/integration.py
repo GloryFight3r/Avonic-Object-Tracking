@@ -180,7 +180,9 @@ class GeneralController:
         direction = self.cam_api.get_direction()
         zoom = self.cam_api.get_zoom()
         if isinstance(direction, ResponseCode):
-            direction = np.array([0, 0, 1])
+            direction = np.array([0.0, 0.0, 1.0])
+        if isinstance(zoom, ResponseCode):
+            zoom = np.array(0)
         angles = converter.vector_angle(direction)
         if not isinstance(zoom, int):
             zoom = 0
