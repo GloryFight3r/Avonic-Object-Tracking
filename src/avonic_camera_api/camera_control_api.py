@@ -190,7 +190,7 @@ class CameraAPI:
         """
         return self.latest_direction
 
-    def get_direction(self):
+    def get_direction(self) -> np.ndarray | ResponseCode:
         """ Get the direction, pan and tilt, from the camera.
 
             Returns:
@@ -224,7 +224,7 @@ class CameraAPI:
         self.latest_direction = direction
         return direction
 
-    def calculate_fov(self):
+    def calculate_fov(self)->np.ndarray:
         current_zoom = self.get_zoom()
 
         current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \

@@ -5,10 +5,12 @@ from dotenv import load_dotenv
 import requests
 import cv2
 import numpy as np
+
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import CameraSocket
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
+from avonic_speaker_tracker.object_tracker_model.ObjectTrackingModel import HybridTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.calibration_tracker import WaitCalibrationTracker
@@ -55,6 +57,7 @@ class GeneralController:
 
         self.thread_mic = None
         self.thread_cam = None
+        self.hybrid_model = None
 
         self.preset = Value("i", 0, lock=False)
 
@@ -77,15 +80,18 @@ class GeneralController:
         # Setup secret
         self.secret = getenv("SECRET_KEY")
        
-        self.nn = YOLOPredict()
+        # Initialize footage thread
+        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0') # pragma: no mutate
+        self.footage_thread:FootageThread= FootageThread(self.video, self.footage_thread_event) # pragma: no mutate
+        self.footage_thread.start() # pragma: no mutate
+
+        self.nn:YOLOPredict = YOLOPredict()
         # Initialize models
         self.audio_model = AudioModel(filename="calibration.json")
         self.preset_model = PresetModel(filename="presets.json")
+        self.hybrid_model = HybridTracker(\
+        filename="calibration.json", bbox=self.nn, cam_footage=self.footage_thread)
 
-        # Initialize footage thread
-        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0') # pragma: no mutate
-        self.footage_thread = FootageThread(self.video, self.footage_thread_event) # pragma: no mutate
-        self.footage_thread.start() # pragma: no mutate
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
@@ -98,7 +104,8 @@ class GeneralController:
         self.thread_cam.start()
 
         # choose a strategy for tracking
-        self.calibration_tracker = WaitCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
+        self.calibration_tracker:WaitCalibrationTracker = \
+        WaitCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
 
     def __del__(self):
         self.preset.value = 0 # pragma: no mutate

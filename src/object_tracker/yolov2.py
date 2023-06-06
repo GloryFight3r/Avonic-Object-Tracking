@@ -20,7 +20,7 @@ class YOLOPredict:
 
         return frame
 
-    def get_bounding_boxes(self, frame):
+    def get_bounding_boxes(self, frame)->list[np.ndarray]:
         results = self.model.predict(frame, classes=0, device="cpu")
         result = results[0]
         person_indices = torch.nonzero(result.boxes.cls.cpu() == 0)

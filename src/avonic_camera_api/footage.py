@@ -1,12 +1,9 @@
-from threading import Thread
 import base64
-import time
 import cv2
 from threading import Thread
-import cv2
-import base64
-import copy
-import time
+import numpy as np
+from avonic_camera_api.camera_control_api import CameraAPI
+
 from object_tracker.yolov2 import YOLOPredict
 from avonic_speaker_tracker.calibration_tracker import CalibrationTracker
 
@@ -16,7 +13,9 @@ class ObjectTrackingThread(Thread):
         self.stream = stream
         # the neural network
         self.nn = nn
+
         self.trck = trck
+
         self.event = event
 
     def run(self):
@@ -36,6 +35,13 @@ class ObjectTrackingThread(Thread):
 
 
 class FootageThread(Thread):
+    resolution:np.ndarray = np.array([])
+    camera:CameraAPI | None = None
+    frame = None
+    buffer = None
+    event = None
+    show_bounding_boxes:bool | None = None
+
     def __init__(self, camera, event):
         super().__init__()
         self.camera = camera
@@ -43,6 +49,9 @@ class FootageThread(Thread):
         self.buffer = None
         self.event = event
         self.show_bounding_boxes = False
+
+        # resolution of 
+        self.resolution = np.array([1920.0, 1080.0])
 
     def run(self):
         while not self.event.is_set():
