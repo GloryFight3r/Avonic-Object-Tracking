@@ -11,7 +11,6 @@ from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
-from object_tracker.yolov2 import YOLOPredict
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
@@ -54,6 +53,9 @@ class GeneralController:
         self.thread_cam = None
         self.preset = Value("i", ModelCode.PRESET, lock=False)
 
+        # the neural network to use
+        self.nn = None
+
     def load_env(self):
         self.preset = Value("i", ModelCode.PRESET, lock=False)
         url = getenv("SERVER_ADDRESS")
@@ -72,9 +74,6 @@ class GeneralController:
 
         # Setup secret
         self.secret = getenv("SECRET_KEY")
-
-        # Setup object tracking
-        self.nn = YOLOPredict()
 
         # Initialize models
         self.audio_model = AudioModel(self.cam_api, self.mic_api, filename="calibration.json")

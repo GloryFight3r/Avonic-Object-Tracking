@@ -35,14 +35,18 @@ class ObjectTrackingThread(Thread):
                 if len(boxes) > 0:
                     last_box = self.trck.get_center_box(boxes)
                     self.trck.track_object(last_box)
-                    #(x, y, x2, y2) = last_box
-                    #self.nn.draw_prediction(frame, "person", x, y, x2, y2)
-                    #self.stream.buffer = frame
+
+                    # this won't work in production. It is purely for debugging purposes
+                    if True:
+                        (x, y, x2, y2) = last_box
+                        self.nn.draw_prediction(frame, "person", x, y, x2, y2)
+                        self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
 
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
+    box_frame = None
 
     def __init__(self, camera, event):
         super().__init__()
@@ -56,10 +60,12 @@ class FootageThread(Thread):
             ret, self.frame = self.camera.read()
             if ret:
                 ret, buffer = cv2.imencode('.jpg', self.frame)
-                string = base64.b64encode(buffer)
-                length = len(string)
-                self.buffer.raw = string
-                self.buflen.value = length
+                self.buffer.raw = buffer
+                self.buflen.value = len(buffer)
+                #string = base64.b64encode(buffer)
+                #length = len(string)
+                #self.buffer.raw = string
+                #self.buflen.value = length
             else:
                 break
 
@@ -69,4 +75,7 @@ class FootageThread(Thread):
         Returns:
 
         """
-        return str(self.buffer.raw[:self.buflen.value], 'ascii')
+        if self.box_frame is not None:
+            return str(base64.b64encode(self.box_frame), 'ascii')
+        return str(base64.b64encode(self.buffer.raw[:self.buflen.value])
+            , 'ascii')

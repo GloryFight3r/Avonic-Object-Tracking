@@ -1,10 +1,15 @@
 from flask import make_response, jsonify, request
 from avonic_speaker_tracker.updater import UpdateThread
+from web_app.integration import GeneralController
+
 from web_app.integration import GeneralController, ModelCode
 from avonic_camera_api.footage import ObjectTrackingThread
+from object_tracker.yolov2 import YOLOPredict
 
 def start_object_tracking_endpoint(integration: GeneralController):
     integration.preset = ModelCode.OBJECT_AUDIO
+    if integration.nn is None:
+        integration.nn = YOLOPredict()
     if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():
         integration.object_tracking_thread = ObjectTrackingThread(integration.nn, integration.object_audio_model,
                                                                   integration.footage_thread, integration.object_tracking_event)
