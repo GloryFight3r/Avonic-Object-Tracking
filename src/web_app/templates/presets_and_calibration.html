@@ -24,9 +24,7 @@
         <input id="mic-direction-y2" name="mic-direction-y" readonly />
         <input id="mic-direction-z2" name="mic-direction-z" readonly />
       </div>
-      <form action="/microphone/speaker/direction" method="get" id="microphone-set-direction-form">
-        <button id="set-mic-button" type="submit">Get the microphone direction towards the speaker</button>
-      </form>
+      <button id="set-mic-button" type="submit">Get the microphone direction towards the speaker</button>
       <h6>Camera info[pan,tilt,zoom]:</h6>
       <div class="grid">
         <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
@@ -34,12 +32,8 @@
         <input id="camera-zoom-value" name="camera-zoom-value" readonly />
       </div>
       <div class="grid">
-        <form action="/camera/position/get" method="get" id="presets-camera-position-set-form">
-          <button type="submit">Get the camera direction</button>
-        </form>
-        <form action="/camera/zoom/get" method="get" id="presets-camera-zoom-set-form">
-          <button type="submit">Get the camera zoom</button>
-        </form>
+          <button id="cam-dir-button" type="submit">Get the camera direction</button>
+          <button id="cam-zoom-button" type="submit">Get the camera zoom</button>
       </div>
       <h6>Preset Controls</h6>
       <div class="grid">
