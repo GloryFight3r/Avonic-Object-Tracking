@@ -8,13 +8,6 @@ from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
-    event: Value = None
-    value: int = None
-    cam_api: CameraAPI = None
-    mic_api: MicrophoneAPI = None
-    preset_or_tracking: int = None
-    model_in_use: TrackingModel = None
-
     def __init__(self, event: Value,
         cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: Value):
         """ Class constructor
@@ -23,12 +16,12 @@ class UpdateThread(Thread):
             event - event from threading module, that acts as a flag/lock of the thread
         """
         super().__init__()
-        self.event = event
-        self.value = None
-        self.cam_api = cam_api
-        self.mic_api = mic_api
-        self.preset_or_tracking = preset_or_tracking.value
-        self.model_in_use = None
+        self.event: Value = event
+        self.value: int = None
+        self.cam_api: CameraAPI = cam_api
+        self.mic_api: MicrophoneAPI = mic_api
+        self.preset_or_tracking: int = preset_or_tracking.value
+        self.model_in_use: TrackingModel = None
 
     def run(self) -> None:
         """ Actual body of the thread.
@@ -41,7 +34,7 @@ class UpdateThread(Thread):
         1 - PresetModel aka presets, which selects the camera direction 
         from the limited pool of options, based on cosine similarity.
         """
-        speak_delay = 0
+        speak_delay: int = 0
         if self.preset_or_tracking == 0:
             self.model_in_use = AudioModel(filename="calibration.json")
         else:

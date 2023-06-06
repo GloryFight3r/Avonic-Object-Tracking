@@ -7,13 +7,11 @@ from avonic_speaker_tracker.preset_model.preset_control import find_most_similar
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
-    preset_locations: PresetCollection = None
-    prev_dir: np.array = None
     def __init__(self, filename=None):
-        self.prev_dir = np.array([0, 0, 1])
-        self.preset_locations = PresetCollection(filename=filename)
+        self.prev_dir: np.ndarray = np.array([0, 0, 1])
+        self.preset_locations: PresetCollection = PresetCollection(filename=filename)
 
-    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.array:
+    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.ndarray:
         """ Calculates the direction to which the camera should point so that
             it is the closest to an existing preset.
             In addition to calculating the direction, performs movement of the camera.
@@ -23,7 +21,7 @@ class PresetModel(TrackingModel):
             Returns: the vector in which direction the camera should point and zoom value
         """
         print("Using presets point method")
-        preset_names = np.array(self.preset_locations.get_preset_list())
+        preset_names: np.ndarray = np.array(self.preset_locations.get_preset_list())
         mic_direction = mic_api.get_direction()
         if isinstance(mic_direction, str):
             print(mic_direction)

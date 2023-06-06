@@ -9,16 +9,13 @@ from avonic_speaker_tracker.audio_model.calibration import Calibration
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
-    calibration: Calibration = None
-    prev_dir: np.ndarray = None
-    speak_delay: int = 0
-
-    def __init__(self, filename=None):
-        self.prev_dir = np.array([0, 0, 1])
-        self.calibration = Calibration(filename=filename)
+    def __init__(self, filename: str = None):
+        self.prev_dir: np.ndarray = np.array([0, 0, 1])
+        self.calibration: Calibration = Calibration(filename=filename)
+        self.speak_delay: int = 0
         self.calibration.load()
 
-    def set_speak_delay(self, speak_delay = 0):
+    def set_speak_delay(self, speak_delay: int = 0):
         self.speak_delay = speak_delay
 
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.ndarray:

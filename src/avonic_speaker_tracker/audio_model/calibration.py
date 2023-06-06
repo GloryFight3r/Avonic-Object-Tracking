@@ -3,19 +3,18 @@ import numpy as np
 from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 class Calibration:
-    # height of the microphone above the speaker
-    mic_height: float = 1.0
-    mic_to_cams: [np.ndarray] = []
-    mic_to_cam: np.ndarray = np.array([0.0, 0.0, 0.0])
-
-    # variables of calibration
-    speaker_points: [(np.ndarray, np.ndarray)] = []
-    to_mic_direction: np.ndarray = None
-
-    filename = None
-
     def __init__(self, filename=None):
         self.filename = filename
+
+        # height of the microphone above the speaker
+        self.mic_height: float = 1.0
+        self.mic_to_cams: [np.ndarray] = []
+        self.mic_to_cam: np.ndarray = np.array([0.0, 0.0, 0.0])
+
+        # variables of calibration
+        self.speaker_points: [(np.ndarray, np.ndarray)] = []
+        self.to_mic_direction: np.ndarray = None
+
         self.load()
 
     def set_height(self, height: float):
@@ -115,15 +114,14 @@ class Calibration:
         if self.filename is not None:
             try:
                 with open(self.filename, encoding="utf-8") as f:
-                    print("Loading calibration json...")
+                    print(f"Loading calibration json from {self.filename}...")
             except FileNotFoundError:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
-                    print("Create new preset json...")
+                    print(f"No file {self.filename} was found. Create new preset json...")
                     outfile.write(json.dumps({"speaker_points": [],
                     "to_mic_direction": None, "mic_height": 1.0}, indent=4))
             with open(self.filename, encoding="utf-8") as f:
                 data = json.load(f)
-                print(data)
                 self.speaker_points = []
                 for key in data["speaker_points"]:
                     self.speaker_points.append((np.array(key[0]),
