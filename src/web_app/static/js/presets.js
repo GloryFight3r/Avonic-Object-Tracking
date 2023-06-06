@@ -1,13 +1,20 @@
 if (typeof onSuccess !== 'undefined') {
     onSuccess = Object.assign({}, onSuccess, {
         "preset-get-list-form": refreshPresetList,
-        "camera-position-get-form": onPositionGet
+        "camera-position-get-form": onPositionGet,
+        "add-preset-button": loadPresets,
+        "edit-preset-button": loadPresets,
+        "remove-preset-button": loadPresets,
+
     });
 }
 else {
     onSuccess = {
         "preset-get-list-form": refreshPresetList,
-        "camera-position-get-form": onPositionGet
+        "camera-position-get-form": onPositionGet,
+        "add-preset-button": loadPresets,
+        "edit-preset-button": loadPresets,
+        "remove-preset-button": loadPresets,
     }
 }
 
@@ -100,13 +107,11 @@ presetform.onsubmit = async (e) => {
             presetform.action = "/microphone/speaker/direction";
             body = { method: presetform.method };
             break;
-
         case "cam-zoom-button":
             presetform.setAttribute("method", "GET");
             presetform.action = "/camera/zoom/get";
             body = { method: presetform.method };
             break;
-
         case "cam-dir-button":
             presetform.setAttribute("method", "GET");
             presetform.action = "/camera/position/get";
@@ -119,8 +124,7 @@ presetform.onsubmit = async (e) => {
     const fun = onSuccess[button_id];
     if (response.status === 200) {
         fun(response.json());
-        if(button_id !=="set-mic-button" && button_id !=="cam-dir-button" && button_id !=="cam-zoom-button")
-            requestPresetList();
+        
     }
     e.submitter.ariaBusy = "false"
     if (response.status !== 200) {

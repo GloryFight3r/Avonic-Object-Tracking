@@ -14,7 +14,6 @@ else {
 }
 
 async function onMicrophoneDirectionSet(data) {
-  console.log("DFHKGH:DHKGDH:DKH:")
   const d = (await data)["microphone-direction"];
 
   document.getElementById("mic-direction-x2").value = d[0];
