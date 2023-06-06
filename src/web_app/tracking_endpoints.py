@@ -35,12 +35,14 @@ def start_thread_endpoint(integration: GeneralController):
         else:
             old_calibration = integration.thread.value
         integration.event.value = 1
-        if integration.preset == ModelCode.PRESET:
+        if integration.preset.value == ModelCode.PRESET:
             model = integration.preset_model
-        elif integration.preset == ModelCode.AUDIO:
+        elif integration.preset.value == ModelCode.AUDIO:
             model = integration.audio_model
         else:
             model = integration.object_audio_model
+        print("MODEL")
+        print(model)
         integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
                                           model)
@@ -81,8 +83,6 @@ def update_calibration(integration: GeneralController):
 
 
 def is_running_endpoint(integration: GeneralController):
-    print(integration.thread)
-    print(integration.thread.is_alive())
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 

@@ -46,22 +46,24 @@ def test_continuous_pointer():
     mic2_api.latest_direction = np.array([5, 80, 10])
     mic2_api.is_speaking.return_value = True
 
-    am = AudioModel()
+    am = AudioModel(cam_api, mic_api)
+    am2 = AudioModel(cam_api, mic2_api)
     calibration = mock.Mock()
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
     am.calibration = calibration
+    am2.calibration = calibration
 
     mic_api.get_direction.return_value = "some error"
-    dir0 = am.point(cam_api, mic_api)
+    dir0 = am.point()
     assert (dir0 == am.prev_dir).all()
-    assert (dir0 == np.array([0, 0, 1])).all()
+    assert (dir0 == [0, 0, 1]).all()
     mic_api.get_direction.return_value = np.array([1, 2, 3])
 
-    dir1 = am.point(cam_api, mic_api)
-    dir2 = am.point(cam_api, mic2_api)
-    assert(dir1 == np.array([-8,3,3526])).all()
-    assert(dir2 == np.array([-1,6,2065])).all()
+    dir1 = am.point()
+    dir2 = am2.point()
+    assert (dir1 == np.array([-8,3,3526])).all()
+    assert (dir2 == np.array([-1,6,2065])).all()
 
 def test_zoom():
     cam_api = mock.Mock()
@@ -70,18 +72,20 @@ def test_zoom():
     calibration = mock.Mock()
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
-    am = AudioModel()
+    am = AudioModel(cam_api, mic_api)
+    am2 = AudioModel(cam_api, mic2_api)
     am.calibration = calibration
+    am2.calibration = calibration
     mic_api.latest_direction = np.array([0.0,1.0,14.0])
     mic_api.get_direction.return_value = np.array([0.0,1.0,14.0])
     mic2_api.latest_direction = np.array([1.0,0.7,-2.0])
     mic2_api.get_direction.return_value = np.array([1.0,0.7,-2.0])
 
-    dir1 = am.point(cam_api,mic_api)
-    assert(dir1 == np.array([0,0,16000])).all()
+    dir1 = am.point()
+    assert (dir1 == np.array([0,0,16000])).all()
 
-    dir2 = am.point(cam_api,mic2_api)
-    assert(dir2 == np.array([-125,7,1835])).all()
+    dir2 = am2.point()
+    assert (dir2 == np.array([-125,7,1835])).all()
 
 def test_zoom_out():
     cam_api = mock.Mock()
@@ -90,11 +94,11 @@ def test_zoom_out():
     mic_api.is_speaking = False
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
-    am = AudioModel()
+    am = AudioModel(cam_api, mic_api)
     am.prev_dir = np.array([0,0,16000])
     am.set_speak_delay(100)
     am.calibration = calibration
     mic_api.get_direction.return_value = np.array([0.0,1.0,14.0])
-    dir1 = am.point(cam_api,mic_api)
+    dir1 = am.point()
     assert cam_api.direct_zoom.call_count == 1
     assert cam_api.move_absolute.call_count == 0

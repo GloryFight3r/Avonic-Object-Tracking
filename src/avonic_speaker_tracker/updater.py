@@ -6,7 +6,6 @@ from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
-from web_app.integration import ModelCode
 
 class UpdateThread(Thread):
     loop = None
@@ -37,6 +36,8 @@ class UpdateThread(Thread):
         #else:
         #    self.model_in_use = PresetModel(filename="presets.json")
 
+        print("THREAD EVENT")
+        print(self.event.value)
         while self.event.value != 0:
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")

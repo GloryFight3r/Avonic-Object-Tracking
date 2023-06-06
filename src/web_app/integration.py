@@ -132,8 +132,9 @@ class GeneralController:
         mic_addr = ('0.0.0.0', 45)
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
-        self.audio_model = AudioModel()
+        self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel()
+        #self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
         self.thread = None
 
     def copy(self, new_controller):
@@ -142,7 +143,7 @@ class GeneralController:
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
         self.ws = new_controller.ws
-        self.audio_model = AudioModel()
+        self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel()
 
     def set_mic_api(self, new_mic_api):

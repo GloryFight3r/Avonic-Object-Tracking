@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
@@ -8,7 +7,7 @@ from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.utils.coordinate_translation import translate_microphone_to_camera_vector
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 
-class ObjectModel(ABC):
+class ObjectModel():
     """ Class with helper methods for calibration tracking. This class has to be extended
         so that point_object and point_audio can be implemented. This facilitates using
         different strategies of dealing with both the object detection and the audio detection.
@@ -19,7 +18,6 @@ class ObjectModel(ABC):
         self.mic_api = mic_api
         self.resolution = resolution
 
-    @abstractmethod
     def track_object(self, current_box: list):
         pass
 
@@ -34,7 +32,7 @@ class ObjectModel(ABC):
         """
         get_center = lambda box: np.array([(box[0] + box[2])/2, (box[1] + box[3])/2])
         center = sorted(boxes,
-                        key=lambda box: np.linalg.norm(get_center(box) - self.resolution))[0]
+                        key=lambda box: np.linalg.norm(get_center(box) - self.resolution/2))[0]
         return center
 
     def get_movement_to_box(self, current_box: list):
