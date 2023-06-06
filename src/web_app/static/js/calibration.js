@@ -82,7 +82,7 @@ async function calibrationIsSet() {
 
 async function startCalibration(button) {
     const post_body = { method: "post", data: {} };
-    fetch("thread/start/false", post_body);
+    fetch("/info-thread/start", post_body);
     const instructionText = document.getElementById("calibration-instruction")
     instructionText.innerHTML =
         "Please stand somewhere in the room, point the camera at your face and speak up."

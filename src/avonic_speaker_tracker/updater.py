@@ -1,20 +1,18 @@
 from time import sleep
 from threading import Thread
-import requests
-from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
+from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.preset_tracker import point, preset_pointer
-from avonic_speaker_tracker.calibration import Calibration
-from avonic_speaker_tracker.calibration_tracker import CalibrationTracker
-
+from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
+from web_app.integration import ModelCode
 
 class UpdateThread(Thread):
     loop = None
 
-    def __init__(self, event, url: str, cam_api: CameraAPI, mic_api: MicrophoneAPI,
-                 preset_locations: PresetCollection, calibration: Calibration,
-                 preset_use: bool, calibration_tracker: CalibrationTracker, allow_movement: bool = False):
+    def __init__(self, event,
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model):
         """ Class constructor
 
         Args:
@@ -23,41 +21,41 @@ class UpdateThread(Thread):
         super().__init__()
         self.event = event
         self.value = None
-        self.url = 'http://' + url
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.preset_locations = preset_locations
-        self.calibration = calibration
-        self.preset_use = preset_use
-        self.allow_movement = allow_movement
-        self.calibration_tracker = calibration_tracker
+        self.model = model
+        #self.model_in_use = None
 
     def run(self):
         """ Actual body of the thread.
-        Method should start with self.event.wait() to make sure that on
-        start of the thread with false flag, body of the while-loop is not executed.
+        Continuously calls point method of the supplied model, to point the camera.
         """
-        prev_dir = (0.0, 0.0)
-        thread_mic = Thread(target=self.send_update, args=(self.get_mic_info, '/update/microphone'))
-        thread_mic.start()
-        thread_cam = Thread(target=self.send_update, args=(self.get_cam_info, '/update/camera'))
-        thread_cam.start()
-        while not self.event.is_set():
+        prev_dir = [0.0, 0.0]
+        speak_delay = 0
+        #if self.preset_or_tracking == ModelCode.PRESET:
+        #    self.model_in_use = AudioModel(filename="calibration.json")
+        #else:
+        #    self.model_in_use = PresetModel(filename="presets.json")
+
+        while self.event.value != 0:
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
 
-            if len(self.preset_locations.get_preset_list()) == 0 and self.preset_use:
+            if isinstance(self.model, PresetModel) and len(self.model.preset_locations.get_preset_list()) == 0:
                 print("No locations preset")
-            elif self.allow_movement:
-                if self.preset_use:
-                    direction = preset_pointer(self.preset_locations, self.mic_api)
-                    prev_dir = point(self.cam_api.direction, prev_dir)
+            if self.mic_api.is_speaking():
+                speak_delay = 0
+                if isinstance(self.model, PresetModel):
+                    prev_dir = self.model.point(self.cam_api, self.mic_api)
                 else:
-                    direction = self.calibration_tracker.continuous_pointer(self.calibration)
-                    prev_dir = self.calibration_tracker.track_audio(direction, prev_dir)
+                    prev_dir = self.model.point()
+            else:
+                speak_delay = speak_delay + 1
+            self.model.set_speak_delay(speak_delay)
 
+            #print(direct)
             self.value += 1
             sleep(0.05)
         print("Exiting thread")
@@ -66,44 +64,3 @@ class UpdateThread(Thread):
         """ Sets the calibration value.
         """
         self.value = value
-
-    def get_mic_info(self):
-        """ Get information about the microphone.
-        """
-        return {
-            "microphone-direction": list(self.mic_api.get_direction()),
-            "microphone-speaking": self.mic_api.is_speaking()
-        }
-
-    def get_cam_info(self):
-        """ Get the direction of the camera.
-        """
-        direction = self.cam_api.get_direction()
-        zoom = self.cam_api.get_zoom()
-        if isinstance(direction, ResponseCode):
-            direction = [0, 0, 1]
-        angles = converter.vector_angle(direction)
-        if not isinstance(zoom, int):
-            zoom = 0
-        return {
-            "camera-direction": {
-                "position-alpha-value": angles[0],
-                "position-beta-value": angles[1]
-            },
-            "zoom-value": zoom,
-            "camera-video": self.cam_api.video
-        }
-
-    def send_update(self, data, path: str):
-        """ Send an HTTP request to the flask server to update the webpages.
-
-        Args:
-            data: The data in dictionary format
-            path: The path to send to
-        """
-        while not self.event.is_set():
-            d = data()
-            response = requests.post(self.url + path, json=d)
-            if response.status_code != 200:
-                print("Could not update flask at path " + path)
-            sleep(0.3)

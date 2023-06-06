@@ -2,10 +2,8 @@ import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.converter import vector_angle
-from avonic_speaker_tracker.preset_control import find_most_similar_preset
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.calibration import Calibration
-from avonic_speaker_tracker.coordinate_translation import translate_microphone_to_camera_vector
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+from avonic_speaker_tracker.utils.coordinate_translation import translate_microphone_to_camera_vector
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 from avonic_camera_api.camera_control_api import CameraAPI

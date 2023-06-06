@@ -9,10 +9,10 @@ import base64
 import copy
 import time
 from object_tracker.yolov2 import YOLOPredict
-from avonic_speaker_tracker.calibration_tracker import CalibrationTracker
+from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 class ObjectTrackingThread(Thread):
-    def __init__(self, nn: YOLOPredict, trck: CalibrationTracker, stream, event):
+    def __init__(self, nn: YOLOPredict, trck: ObjectModel, stream, event):
         """ Constructor for the footage thread
 
         Args:
@@ -35,11 +35,9 @@ class ObjectTrackingThread(Thread):
                 if len(boxes) > 0:
                     last_box = self.trck.get_center_box(boxes)
                     self.trck.track_object(last_box)
-                else:
-                    last_box = []
-                (x, y, x2, y2) = last_box
-                self.nn.draw_prediction(frame, "person", x, y, x2, y2)
-                #self.stream.buffer = frame
+                    #(x, y, x2, y2) = last_box
+                    #self.nn.draw_prediction(frame, "person", x, y, x2, y2)
+                    #self.stream.buffer = frame
 
 
 class FootageThread(Thread):

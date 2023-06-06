@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-import avonic_speaker_tracker.coordinate_translation
+import avonic_speaker_tracker.utils.coordinate_translation
 
 def generate_good_pairs_of_combinations():
     # Check values at:
@@ -56,7 +56,7 @@ def generate_bad_pairs_of_combinations():
 def test_translate_good_weather(camera_to_microphone,
     from_microphone_to_speaker, from_speaker_ceiling_distance, expected):
     assert np.allclose(
-        avonic_speaker_tracker.coordinate_translation.translate_microphone_to_camera_vector(
+        avonic_speaker_tracker.utils.coordinate_translation.translate_microphone_to_camera_vector(
             camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance)
             , expected)
 
@@ -65,6 +65,6 @@ def test_translate_good_weather(camera_to_microphone,
 def test_translate_bad_weather(camera_to_microphone,
     from_microphone_to_speaker, from_speaker_ceiling_distance):
     with pytest.raises (TypeError) as excinfo:
-        avonic_speaker_tracker.coordinate_translation.translate_microphone_to_camera_vector(
+        avonic_speaker_tracker.utils.coordinate_translation.translate_microphone_to_camera_vector(
             camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance)
     assert "Not a 3D vector" == str(excinfo.value)

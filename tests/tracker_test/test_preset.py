@@ -1,8 +1,7 @@
 import os
 import pytest
 import numpy as np
-from avonic_speaker_tracker.preset import PresetCollection
-from avonic_speaker_tracker.preset import Preset
+from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
 
 
 @pytest.fixture()
@@ -18,7 +17,7 @@ def preset_collection_with_file():
 
 
 def test_edit_preset(preset_collection: PresetCollection):
-    name:str = "preset"
+    name : str = "preset"
     camera_angle: np.ndarray = np.array([1, 2, 5000])
     microphone_direction: np.ndarray = np.array([1, 2, 3])
     preset_collection.add_preset(name, camera_angle, microphone_direction)

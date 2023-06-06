@@ -1,3 +1,4 @@
+import signal
 from flask import Flask, jsonify, abort, render_template, make_response, Response, request
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -7,7 +8,7 @@ import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
 import web_app.footage
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
 #log = logging.getLogger('werkzeug')
@@ -52,8 +53,8 @@ def create_app(test_controller=None):
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
         to_import=["socket", "camera", "microphone", "presets", "calibration", "main"]
-        return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
-                               page_name="Presets & Calibration View")
+        return render_template('single_page.html', name="presets_and_calibration",
+            to_import=to_import, page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
@@ -233,9 +234,13 @@ def create_app(test_controller=None):
     def object_tracking_stop():
         return web_app.tracking_endpoints.stop_object_tracking_endpoint(integration)
 
-    @app.post('/thread/start/<allow_movement>')
-    def thread_start(allow_movement):
-        return web_app.tracking_endpoints.start_thread_endpoint(integration, allow_movement)
+    #@app.post('/thread/start/<allow_movement>')
+    #def thread_start(allow_movement):
+    #    return web_app.tracking_endpoints.start_thread_endpoint(integration, allow_movement)
+
+    @app.post('/thread/start')
+    def thread_start():
+        return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():
@@ -277,6 +282,25 @@ def create_app(test_controller=None):
 #    @app.route('/video_feed')
 #    def video_feed():
 #        return Response(web_app.camera_endpoints.get_camera_footage(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    # Info-thread section
+
+    @app.post('/info-thread/start')
+    def info_thread_start():
+        integration.info_threads_event.value = 1
+        return make_response(jsonify({}), 200)
+
+    @app.post('/info-thread/stop')
+    def info_thread_stop():
+        integration.info_threads_event.value = 0
+        print(integration.info_threads_event.value)
+        return make_response(jsonify({}), 200)
+
+    def sigterm_handler(_signo, _stack_frame):
+        close_running_threads(integration)
+
+    signal.signal(signal.SIGINT, sigterm_handler)
+    signal.signal(signal.SIGTERM, sigterm_handler)
 
     return app
 

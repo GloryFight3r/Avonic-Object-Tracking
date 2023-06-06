@@ -1,6 +1,7 @@
 import json
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
+from multiprocessing import Array
 
 
 class MicrophoneAPI:
@@ -10,6 +11,8 @@ class MicrophoneAPI:
     azimuth = None
     speaking = None
     threshold = None
+    latest_direction = Array('f', [0.0, 1.0, 0.0], lock=False)
+
 
     def __init__(self, sock: MicrophoneSocket, threshold=-55):
         """ Constructor for the Microphone
@@ -22,6 +25,7 @@ class MicrophoneAPI:
         self.elevation = 0.0
         self.azimuth = 0.0
         self.speaking = False
+        self.latest_direction.raw = [0.0, 1.0, 0.0]
         self.threshold = threshold
 
     def set_address(self, address):
@@ -103,6 +107,7 @@ class MicrophoneAPI:
             if "message" in obj:
                 return obj["message"]
             return "Unable to get direction from microphone, response was: " + ret
+        self.latest_direction.raw = self.vector().tolist()
         return self.vector()
 
     def vector(self) -> np.array:
