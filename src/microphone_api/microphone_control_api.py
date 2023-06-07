@@ -1,7 +1,6 @@
 import json
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
-from multiprocessing import Array
 
 
 class MicrophoneAPI:

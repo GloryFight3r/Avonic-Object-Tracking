@@ -1,7 +1,6 @@
-from threading import Event
 from unittest import mock
-import numpy as np
 from multiprocessing import Value
+import numpy as np
 from avonic_speaker_tracker.updater import UpdateThread
 
 

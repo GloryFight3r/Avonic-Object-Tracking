@@ -23,7 +23,8 @@ def generate_bad_pairs_of_vectors():
 
 @pytest.mark.parametrize("a, b, expected", generate_good_pairs_of_vectors())
 def test_good_cos_similarity(a, b, expected):
-    assert pytest.approx(avonic_speaker_tracker.preset_model.preset_control.cos_similarity(a, b)) == expected
+    assert pytest.approx(
+        avonic_speaker_tracker.preset_model.preset_control.cos_similarity(a, b)) == expected
 
 @pytest.mark.parametrize("a, b", generate_bad_pairs_of_vectors())
 def test_bad_weather_cos_similarity(a, b):

@@ -1,16 +1,11 @@
 from unittest import mock
 import socket
-import json
 import pytest
-import time
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
 import web_app
-from flask_socketio import SocketIO
 
 sock = mock.Mock()
 
@@ -57,7 +52,7 @@ def client(camera, monkeypatch):
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
-    
+
     mic_api.height = 1
 
     cam_api = camera
@@ -88,7 +83,8 @@ def test_address_set_microphone_endpoint_bad_weather(client):
     assert rv.status_code == 400
 
 def test_direction_get_microphone_endpoint_bad_weather(client):
-    mic_api.get_direction.return_value = "Unable to get direction from microphone, response was: 404"
+    mic_api.get_direction.return_value = \
+        "Unable to get direction from microphone, response was: 404"
     rv = client.get('microphone/direction')
     assert rv.status_code == 504
 

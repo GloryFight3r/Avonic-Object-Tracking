@@ -119,11 +119,11 @@ class GeneralController:
             print("Trying to destruct None thread") # pragma: no mutate
         try: # pragma: no mutate
             self.footage_thread.join() # pragma: no mutate
-        except: # pragma: no mutate 
+        except: # pragma: no mutate
             print("Trying to destruct None thread") # pragma: no mutate
-        try: # pragma: no mutate 
+        try: # pragma: no mutate
             self.video.release() # pragma: no mutate
-        except: # pragma: no mutate 
+        except: # pragma: no mutate
             print("Trying to destruct None thread") # pragma: no mutate
         try: # pragma: no mutate
             cv2.destroyAllWindows() # pragma: no mutate

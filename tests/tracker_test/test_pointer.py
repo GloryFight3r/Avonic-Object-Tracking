@@ -1,6 +1,5 @@
-import numpy as np
 from unittest import mock
-from avonic_speaker_tracker.preset_model.preset import PresetCollection
+import numpy as np
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 
@@ -95,6 +94,6 @@ def test_zoom_out():
     am.set_speak_delay(100)
     am.calibration = calibration
     mic_api.get_direction.return_value = np.array([0.0,1.0,14.0])
-    dir1 = am.point(cam_api,mic_api)
+    am.point(cam_api,mic_api)
     assert cam_api.direct_zoom.call_count == 1
     assert cam_api.move_absolute.call_count == 0

@@ -41,7 +41,7 @@ def create_app(test_controller=None):
     @app.get('/camera_control')
     def camera_view():
         to_import=["camera", "socket", "main"]
-        return render_template('single_page.html', name="camera", to_import=to_import, 
+        return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
     @app.get('/microphone_control')
     def microphone_view():
@@ -257,7 +257,7 @@ def create_app(test_controller=None):
     @app.post('/update/camera')
     def thread_camera():
         return web_app.tracking_endpoints.update_camera(integration)
-    
+
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)

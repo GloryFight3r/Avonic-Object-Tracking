@@ -60,7 +60,9 @@ class Calibration:
             returns:
                 is_calibrated: a boolean indicating whether the system is calibrated
         """
-        return bool(self.speaker_points) and self.to_mic_direction is not None and not np.allclose(self.to_mic_direction, np.array([0.0, 0.0, 0.0]))
+        return bool(self.speaker_points) \
+            and self.to_mic_direction is not None \
+            and not np.allclose(self.to_mic_direction, np.array([0.0, 0.0, 0.0]))
 
     def calculate_distance(self) -> np.ndarray:
         """ Calculate the vectors from the microphone to the camera
