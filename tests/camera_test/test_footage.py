@@ -1,7 +1,7 @@
-import pytest
-from threading import Event
-import cv2
 import base64
+from threading import Event
+import pytest
+import cv2
 from avonic_camera_api.footage import FootageThread
 from object_tracker.yolov2 import YOLOPredict
 

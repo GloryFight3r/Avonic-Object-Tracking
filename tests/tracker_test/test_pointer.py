@@ -1,6 +1,5 @@
-import numpy as np
 from unittest import mock
-from avonic_speaker_tracker.preset_model.preset import PresetCollection
+import numpy as np
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 
@@ -29,8 +28,8 @@ def test_preset_pointer_good_weather():
     dir1 = pm.point(cam_api, mic_api)
     dir2 = pm.point(cam_api, mic2_api)
 
-    assert (dir1 == np.array([int(np.rad2deg(4)), int(np.rad2deg(7)), 5000])).all()
-    assert (dir2 == np.array([int(np.rad2deg(1)), int(np.rad2deg(5)), 5000])).all()
+    assert np.allclose(dir1, np.array([np.rad2deg(4), np.rad2deg(7), 5000]))
+    assert np.allclose(dir2, np.array([np.rad2deg(1), np.rad2deg(5), 5000]))
 
 
 def test_continuous_pointer():
@@ -99,6 +98,6 @@ def test_zoom_out():
     am.set_speak_delay(100)
     am.calibration = calibration
     mic_api.get_direction.return_value = np.array([0.0,1.0,14.0])
-    dir1 = am.point()
+    am.point()
     assert cam_api.direct_zoom.call_count == 1
     assert cam_api.move_absolute.call_count == 0

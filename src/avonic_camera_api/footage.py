@@ -3,11 +3,11 @@ from multiprocessing import Value, Array
 import base64
 import time
 from threading import Thread
-import cv2
 import base64
 import copy
 import time
 import numpy as np
+import cv2 # type: ignore
 
 from object_tracker.yolov2 import YOLOPredict
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
@@ -86,5 +86,6 @@ class FootageThread(Thread):
         """
         #if self.box_frame is not None:
         #    return str(base64.b64encode(self.box_frame), 'ascii')
-        return str(base64.b64encode(self.buffer.raw[:self.buflen.value])
+        ret = str(base64.b64encode(self.buffer.raw[:self.buflen.value])
             , 'ascii')
+        return ret

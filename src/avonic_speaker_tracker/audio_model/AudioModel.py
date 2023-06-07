@@ -1,5 +1,6 @@
 import numpy as np
 import math
+
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.converter import vector_angle
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
@@ -9,45 +10,23 @@ from avonic_speaker_tracker.audio_model.calibration import Calibration
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
-    calibration: Calibration = None
-    prev_dir: np.array = None
-    speak_delay: int = 0
 
-    def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename=None):
-        self.prev_dir = np.array([0, 0, 1])
+    def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename=""):
+        self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.calibration = Calibration(filename=filename)
+        self.calibration: Calibration = Calibration(filename=filename)
         self.calibration.load()
+        self.speak_delay: int = 0
 
-    def set_speak_delay(self, speak_delay = 0):
+    def set_speak_delay(self, speak_delay: int = 0):
         self.speak_delay = speak_delay
-
-    #def get_direction(self):
-    #    mic_direction = self.mic_api.get_direction()
-    #    return mic_direction
-    #    print("LOL", self.calibration.mic_to_cam)
-
-    #    if isinstance(mic_direction, str):
-    #        print(mic_direction)
-    #        return self.prev_dir
-
-    #    cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
-    #                                                    mic_direction,
-    #                                                    self.calibration.mic_height)
-
-    #    direct = vector_angle(cam_vec)
-    #    direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
-
-
 
     def point(self):
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone
             information for pointing.
-            Args:
-                cam_api: The controller for the camera
-                mic_api: The controller for the microphone
+
             Returns: the vector in which direction the camera should point and zoom value.
         """
         if self.speak_delay == 100:
@@ -56,6 +35,7 @@ class AudioModel(TrackingModel):
             return self.prev_dir
 
         mic_direction = self.mic_api.get_direction()
+        print("Current calibration mic -> cam vector: ", self.calibration.mic_to_cam)
 
         if isinstance(mic_direction, str):
             print(mic_direction)
@@ -64,19 +44,19 @@ class AudioModel(TrackingModel):
         cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
                                                         self.calibration.mic_height)
-
+        print(cam_vec)
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
         vec_len = min(vec_len,10.0)
         zoom_val = (int)((vec_len/10.0)*16000)
 
         direct = vector_angle(cam_vec)
-        direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
+        direct_np = np.array([int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val])
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct[1])*2
 
-        speedX = (int)(13 + diffX/360*11)
-        speedY = (int)(11 + diffY/120*9)
+        speedX : int = int(13 + diffX/360*11)
+        speedY : int = int(11 + diffY/120*9)
 
         speedX = min(speedX,24)
         speedY = min(speedY,20)
@@ -84,11 +64,11 @@ class AudioModel(TrackingModel):
         if direct is None:
             return self.prev_dir
 
-        if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
+        if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
+            self.cam_api.move_absolute(speedX, speedY, direct_np[0], direct_np[1])
 
-        if self.prev_dir[2] != direct[2]:
-            self.cam_api.direct_zoom(direct[2])
+        if self.prev_dir[2] != direct_np[2]:
+            self.cam_api.direct_zoom(direct_np[2])
 
-        self.prev_dir = direct
-        return direct
+        self.prev_dir = direct_np
+        return direct_np

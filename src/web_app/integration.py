@@ -1,62 +1,91 @@
 from threading import Event, Thread
 from os import getenv
 from time import sleep
+from multiprocessing import Value
 from dotenv import load_dotenv
 import requests
 import cv2
 import numpy as np
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import CameraSocket
 from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
-from avonic_camera_api.camera_adapter import CameraSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
-from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
-from multiprocessing import Value, Array
 from enum import Enum
 
 class ModelCode():
-    PRESET = 0
-    AUDIO = 1
+    AUDIO = 0
+    PRESET = 1
     OBJECT_AUDIO = 2
 
 class GeneralController:
     def __init__(self):
+        # self.event is part of the while loop in UpdateThread. When 0 - stops the while loop.
         self.event = Value("i", 0, lock=False)
+
+        # self.info_threads_event is part of the info-threads
+        # and indicates whether or not update should be performed.
+        # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
+
         self.footage_thread_event = Event()
+
+        # self.info_threads_break used to completely destroy info-thread, and not just pause
+        # Used for safe finish of the program, for safe destruction.
+        # When 1 - finishes the thread ASAP.
         self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
+
         self.object_tracking_event = Event()
+
+        # Update thread field
         self.thread = None
+        # Footage thread field
         self.footage_thread = None
+
+        # URL of the server
         self.url = '127.0.0.1:5000'
+
+        # Camera and microphone APIs
         self.cam_sock = None  # Only for testing
         self.cam_api = None
         self.mic_api = None
+
+        # Secret for cookies and websocket
         self.secret = None
         self.ws = None
+
+        # Clean this up
         self.audio_model = None
         self.preset_model = None
         self.object_audio_model = None
         self.model = None
-        self.camera_footage = None
-        self.video = None
         self.object_tracking_thread = None
-        self.thread_mic = None
-        self.thread_cam = None
-        self.preset = Value("i", ModelCode.AUDIO, lock=False)
 
         # the neural network to use
         self.nn = None
 
-    def load_env(self):
+        # Models, to record all updates onto a disk
+        self.audio_model = None
+        self.preset_model = None
+
+        # Video related fields
+        self.camera_footage = None
+        self.video = None
+
+        # Info-threads
+        self.thread_mic = None
+        self.thread_cam = None
+
+        # Indicates which model should be used, check UpdateThread
+        self.preset = Value("i", ModelCode.AUDIO, lock=False)
+
+    def load_env(self) -> None:
+        """Performs load procedure of all of the specified parameters.
+        """
         self.preset = Value("i", ModelCode.AUDIO, lock=False)
         url = getenv("SERVER_ADDRESS")
         if url is not None:
@@ -76,15 +105,14 @@ class GeneralController:
         self.secret = getenv("SECRET_KEY")
 
         # Initialize models
+        self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]),
+                                                       5, filename="calibration.json")
         self.audio_model = AudioModel(self.cam_api, self.mic_api, filename="calibration.json")
         self.preset_model = PresetModel(filename="presets.json")
-        self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]),
-                                                       3, filename="calibration.json")
 
         # Initialize footage thread
-        self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0') # pragma: no mutate
-        #self.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-        self.footage_thread = FootageThread(self.video, self.footage_thread_event) # pragma: no mutate
+        self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')# pragma: no mutate
+        self.footage_thread = FootageThread(self.video,self.footage_thread_event)# pragma: no mutate
         self.footage_thread.start() # pragma: no mutate
 
         # Initialize camera and microphone info threads
@@ -100,9 +128,7 @@ class GeneralController:
 
     def __del__(self):
         self.video.release()
-        self.object_tracking_event.set()
-        self.footage_thread_event.set()
-
+        self.object_tracking_event.set() # pragma: no mutate
         self.preset.value = 0 # pragma: no mutate
         self.footage_thread_event.set() # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
@@ -129,6 +155,7 @@ class GeneralController:
             print("Trying to destruct None thread") # pragma: no mutate
 
     def load_mock(self):
+        # This function is used to initialize integration in testing.
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
@@ -136,6 +163,7 @@ class GeneralController:
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel()
         #self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
+        self.preset.value = 1
         self.thread = None
 
     def copy(self, new_controller):
@@ -146,33 +174,42 @@ class GeneralController:
         self.ws = new_controller.ws
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel()
+        self.preset.value = new_controller.preset.value
 
-    def set_mic_api(self, new_mic_api):
+    def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api
 
-    def set_cam_api(self, new_cam_api):
+    def set_cam_api(self, new_cam_api) -> None:
         self.cam_api = new_cam_api
 
-    def get_model_based_on_choice(self):
+    def get_model_based_on_choice(self) -> TrackingModel:
         if self.preset.value == 0:
             return self.preset_model
         return self.audio_model
 
-    def get_mic_info(self):
+    def get_mic_info(self) -> dict:
         """ Get information about the microphone.
+        This function is used by microphone info-thread.
+
+        Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
         return {
             "microphone-direction": list(self.mic_api.get_direction()),
             "microphone-speaking": self.mic_api.is_speaking()
         }
 
-    def get_cam_info(self):
+    def get_cam_info(self) -> dict:
         """ Get the direction of the camera.
+        This function is used by camera info-thread.
+
+        Returns: dictionary with "camera-direction", "camera-video", and "zoom-value" entries
         """
         direction = self.cam_api.get_direction()
         zoom = self.cam_api.get_zoom()
         if isinstance(direction, ResponseCode):
-            direction = np.array([0, 0, 1])
+            direction = np.array([0.0, 0.0, 1.0])
+        if isinstance(zoom, ResponseCode):
+            zoom = np.array(0)
         angles = converter.vector_angle(direction)
         if not isinstance(zoom, int):
             zoom = 0
@@ -185,14 +222,28 @@ class GeneralController:
             "camera-video": self.cam_api.video
         }
 
-    def send_update(self, data, path: str):
-        """ Send an HTTP request to the flask server to update the webpages.
+    def send_update(self, data, path: str) -> None:
+        """ This method is used as a body of the info-thread. Function that performs
+        GET requests to microphone or camera for information retrieval is passed as an arguments.
+        After the information is obtained, send an HTTP request to the Flask server
+        to update the webpages, by emitting WebSocket message.
+
+        self.info_threads_break - responsible for finishing the thread.
+        While 0 - will continue iterating. If 1 - last iteration will be performed.
+
+        self.info_threads_event.value - responsible for whether the request
+        for new information should be performed.
+
+        0 - shouldn't, 1 - should.
+
+        By this, we achieve the fact that info-threads are always running in the background,
+        so the information retrieval can be paused, but not the thread itself.
 
         Args:
             data: The data in dictionary format
             path: The path to send to
         """
-        print("Info-thread start and will send updates to " + path)
+        print("Info-thread is started and will send updates to " + path)
         flag = True
         while flag:
             if self.info_threads_break.value == 1:
@@ -206,7 +257,7 @@ class GeneralController:
         print("Closing " + path + " updater thread")
 
 
-def verify_address(address):
+def verify_address(address) -> None:
     try:
         assert 0 <= address[1] <= 65535
         assert 0 <= int(address[0].split(".")[0]) <= 255 and \
@@ -217,7 +268,8 @@ def verify_address(address):
         print("ERROR: Address " + address + " is invalid!")
 
 
-def close_running_threads(integration_passed):
+def close_running_threads(integration_passed) -> None:
+    """This method is used for safe finish of the Flask and all of our threads."""
     integration_passed.footage_thread_event.set() # pragma: no mutate
     integration_passed.info_threads_break.value = 1 # pragma: no mutate
 

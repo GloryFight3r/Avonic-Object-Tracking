@@ -6,19 +6,6 @@ from web_app.integration import GeneralController, ModelCode
 from avonic_camera_api.footage import ObjectTrackingThread
 from object_tracker.yolov2 import YOLOPredict
 
-def start_object_tracking_endpoint(integration: GeneralController):
-    integration.preset.value = ModelCode.OBJECT_AUDIO
-    if integration.nn is None:
-        integration.nn = YOLOPredict()
-    if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():
-        integration.object_tracking_thread = ObjectTrackingThread(integration.nn, integration.object_audio_model,
-                                                                  integration.footage_thread, integration.object_tracking_event)
-        integration.object_tracking_event.clear()
-        integration.object_tracking_thread.start()
-    else:
-        return make_response(jsonify({}), 403)
-    #integration.footage_thread.show_bounding_boxes = True
-    return make_response(jsonify({}), 200)
 
 def stop_object_tracking_endpoint(integration: GeneralController):
     # stop (pause) the object tracking thread
@@ -35,14 +22,25 @@ def start_thread_endpoint(integration: GeneralController):
         else:
             old_calibration = integration.thread.value
         integration.event.value = 1
+        print("VALUE")
+        print(integration.preset.value)
         if integration.preset.value == ModelCode.PRESET:
             model = integration.preset_model
         elif integration.preset.value == ModelCode.AUDIO:
             model = integration.audio_model
         else:
+            if integration.nn is None:
+                integration.nn = YOLOPredict()
+            if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():
+                integration.object_tracking_thread = \
+                    ObjectTrackingThread(integration.nn, integration.object_audio_model,
+                        integration.footage_thread, integration.object_tracking_event)
+            integration.object_tracking_event.clear()
+            integration.object_tracking_thread.start()
             model = integration.object_audio_model
-        print("MODEL")
+
         print(model)
+
         integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
                                           model)
@@ -50,10 +48,10 @@ def start_thread_endpoint(integration: GeneralController):
 
         integration.info_threads_event.value = 1
         integration.thread.start()
+        return make_response(jsonify({}), 200)
     else:
         print("Thread already running!")
         return make_response(jsonify({}), 403)
-    return make_response(jsonify({}), 200)
 
 
 def stop_thread_endpoint(integration: GeneralController):
@@ -83,15 +81,32 @@ def update_calibration(integration: GeneralController):
 
 
 def is_running_endpoint(integration: GeneralController):
+    print(integration.thread)
+    print(integration.thread.is_alive())
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
+def track_presets(integration: GeneralController):
+    integration.preset.value = ModelCode.PRESET
+    print(integration.preset.value)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
+
+def track_continuously(integration: GeneralController):
+    integration.preset.value = ModelCode.AUDIO
+    print(integration.preset.value)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
+
+def track_object_continuously(integration: GeneralController):
+    integration.preset.value = ModelCode.OBJECT_AUDIO
+    print(integration.preset.value)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 #TO-DO: Change to enums for models
 def preset_use(integration: GeneralController):
-    if integration.preset.value == ModelCode.AUDIO:
-        integration.preset.value = 0
-    else:
-        integration.preset.value = 1
-    print(integration.preset.value)
-    return make_response(jsonify({"preset":integration.preset.value}), 200)
+    pass
+#    if integration.preset.value == ModelCode.AUDIO:
+#        integration.preset.value = ModelCode.PRESET
+#    else:
+#        integration.preset.value = ModelCode.AUDIO
+#    print(integration.preset.value)
+#    return make_response(jsonify({"preset":integration.preset.value}), 200)

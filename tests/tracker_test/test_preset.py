@@ -6,7 +6,7 @@ from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
 
 @pytest.fixture()
 def preset_collection():
-    col = PresetCollection(filename=None)
+    col = PresetCollection(filename="")
     return col
 
 @pytest.fixture()
