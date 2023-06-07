@@ -88,10 +88,18 @@ class PresetCollection:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print("Create new preset json...")
                     outfile.write(json.dumps({}, indent=4, cls=CustomEncoder))
-            with open(self.filename, encoding="utf-8") as f:
-                data = json.load(f)
-                self.preset_locations = {}
-                for key in data:
-                    self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
-                        np.array(data[key]["microphone_direction"]))
-                print("Loaded presets: ", self.preset_locations)
+            try:
+                with open(self.filename, encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.preset_locations = {}
+                    for key in data:
+                        self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
+                            np.array(data[key]["microphone_direction"]))
+                        assert len(data[key]["camera_info"]) == 3
+                        assert len(data[key]["microphone_direction"]) == 3
+                    print("Loaded presets: ", self.preset_locations)
+            except:
+                print("The application couldn't load preset data from specified files. "
+                    + "Please check your config files. Exiting...")
+                raise SystemExit
+            
