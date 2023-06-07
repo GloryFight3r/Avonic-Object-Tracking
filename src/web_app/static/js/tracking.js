@@ -30,6 +30,11 @@ function selectTracking() {
             break
         default:
             header.innerText = "Tracking 🔭"
-
+            break
     }
+}
+
+const track_type_form = document.getElementById("tracking-select");
+if (track_type_form !== null) {
+    selectTracking();
 }
