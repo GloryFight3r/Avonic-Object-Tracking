@@ -21,9 +21,14 @@ class HybridTracker(TrackingModel):
         self.calibration = Calibration(filename=filename)
         self.calibration.load()
 
+
         self.bbox = bbox # the neural network which finds the bounding boxes from a frame
 
         self.cam_footage = cam_footage # camera footage that returns frames
+
+    @override
+    def reload(self):
+        self.calibration.load()
 
     @override
     def point(self, mic_api: MicrophoneAPI, cam_api: CameraAPI):

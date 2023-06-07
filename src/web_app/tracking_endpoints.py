@@ -30,8 +30,8 @@ def start_thread_endpoint(integration: GeneralController):
         integration.event.value = 1
         integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
-                                          integration.preset)
-        integration.thread.set_calibration(old_calibration)
+                                          integration.preset, integration.all_models)
+        #integration.thread.set_calibration(old_calibration)
 
         integration.info_threads_event.value = 1
         integration.thread.start()

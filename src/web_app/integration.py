@@ -61,6 +61,8 @@ class GeneralController:
 
         self.preset = Value("i", 0, lock=False)
 
+        self.all_models = None
+
     def load_env(self):
         self.preset = Value("i", 0, lock=False)
         url = getenv("SERVER_ADDRESS")
@@ -91,6 +93,8 @@ class GeneralController:
         self.preset_model = PresetModel(filename="presets.json")
         self.hybrid_model = HybridTracker(\
         filename="calibration.json", bbox=self.nn, cam_footage=self.footage_thread)
+
+        self.all_models = [self.audio_model, self.preset_model, self.hybrid_model]
 
 
         # Initialize camera and microphone info threads

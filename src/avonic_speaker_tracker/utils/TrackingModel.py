@@ -9,5 +9,9 @@ class TrackingModel(ABC):
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         pass
 
-    def set_speak_delay(self, speak_delay ):
+    @abstractmethod
+    def reload(self):
+        pass
+
+    def set_speak_delay(self, speak_delay):
         pass

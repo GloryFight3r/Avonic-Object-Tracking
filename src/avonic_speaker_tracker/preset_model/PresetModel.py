@@ -1,5 +1,7 @@
 import numpy as np
 import math
+from typing_extensions import override
+
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.preset_model.preset import PresetCollection
@@ -8,11 +10,18 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
     preset_locations: PresetCollection = None
-    prev_dir: np.array = None
+    prev_dir: np.ndarray = None
+
     def __init__(self, filename=None):
         self.prev_dir = np.array([0, 0, 1])
         self.preset_locations = PresetCollection(filename=filename)
+        self.preset_locations.load()
 
+    @override
+    def reload(self):
+        self.preset_locations.load()
+
+    @override
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.array:
         """ Calculates the direction to which the camera should point so that
             it is the closest to an existing preset.

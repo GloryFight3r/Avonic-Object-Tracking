@@ -15,7 +15,6 @@ class PresetCollection:
     def __init__(self, filename=None):
         self.filename = filename
         self.preset_locations = {}
-        self.load()
 
     def add_preset(self, to_add: str,
                    cam_info: np.ndarray, microphone_direction: np.ndarray) -> None:

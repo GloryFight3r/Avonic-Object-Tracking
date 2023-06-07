@@ -1,5 +1,7 @@
 import numpy as np
 import math
+from typing_extensions import override
+
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.converter import vector_angle
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
@@ -10,7 +12,7 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
     calibration: Calibration = None
-    prev_dir: np.array = None
+    prev_dir: np.ndarray = None
     speak_delay: int = 0
 
     def __init__(self, filename=None):
@@ -18,9 +20,14 @@ class AudioModel(TrackingModel):
         self.calibration = Calibration(filename=filename)
         self.calibration.load()
 
+    @override
+    def reload(self):
+        self.calibration.load()
+
     def set_speak_delay(self, speak_delay = 0):
         self.speak_delay = speak_delay
 
+    @override
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone

@@ -2,6 +2,7 @@ from time import sleep
 from threading import Thread
 from multiprocessing import Value
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_speaker_tracker.object_tracker_model.ObjectTrackingModel import HybridTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
@@ -12,11 +13,12 @@ class UpdateThread(Thread):
     value: int = None  
     cam_api: CameraAPI = None    
     mic_api: MicrophoneAPI = None    
-    preset_or_tracking: int = None    
+    model_index: int = None    
     model_in_use: TrackingModel = None
+    all_models: list[TrackingModel] = None
 
     def __init__(self, event: Value,
-                 cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: Value):
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model_index: Value, all_models: list[TrackingModel]):
         """ Class constructor
 
         Args:
@@ -24,10 +26,10 @@ class UpdateThread(Thread):
         """
         super().__init__()
         self.event = event
-        self.value = None
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.preset_or_tracking = preset_or_tracking.value
+        self.model_index = model_index.value
+        self.all_models = all_models
         self.model_in_use = None
 
     def run(self):
@@ -43,17 +45,14 @@ class UpdateThread(Thread):
         """
         prev_dir = [0.0, 0.0]
         speak_delay = 0
-        if self.preset_or_tracking == 0:
-            self.model_in_use = AudioModel(filename="calibration.json")
-        else:
-            self.model_in_use = PresetModel(filename="presets.json")
+
+        self.model_in_use = self.all_models[self.model_index]
+        self.model_in_use.reload()
+
+        print(self.model_index)
 
         while self.event.value != 0:
             print("RUNNING")
-            if self.value is None:
-                print("STOPPED BECAUSE CALIBRATION IS NOT SET")
-                sleep(5)
-                continue
 
             if self.mic_api.is_speaking():
                 speak_delay = 0 
@@ -64,11 +63,5 @@ class UpdateThread(Thread):
 
             print(direct)
 
-            self.value += 1
             sleep(0.05)
         print("Exiting thread")
-
-    def set_calibration(self, value):
-        """ Sets the calibration value.
-        """
-        self.value = value
