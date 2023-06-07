@@ -39,20 +39,12 @@ class PresetModel(TrackingModel):
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
         direct = np.array([np.rad2deg(preset[0][0]), np.rad2deg(preset[0][1]), preset[0][2]])
 
-        diffX = math.fabs(self.prev_dir[0] - direct[0]) * 2
-        diffY = math.fabs(self.prev_dir[1] - direct[1]) * 2
-
-        speedX : float = diffX / 360 * 24
-        speedY : float = diffY / 120 * 20
-
-        speedX_picked : int = int(min(speedX, 24))
-        speedY_picked : int = int(min(speedY, 20))
-
         if direct is None:
+            print("Something wrong with direct here")
             return self.prev_dir
 
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            cam_api.move_absolute(speedX_picked, speedY_picked, direct[0], direct[1])
+            cam_api.move_absolute(24, 20, direct[0], direct[1])
 
         if self.prev_dir[2] != direct[2]:
             cam_api.direct_zoom(direct[2])
