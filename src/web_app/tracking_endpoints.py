@@ -27,7 +27,6 @@ def start_thread_endpoint(integration: GeneralController):
 def stop_thread_endpoint(integration: GeneralController):
     # stop (pause) the thread
     integration.event.value = 0
-    integration.info_threads_event.value = 0
     integration.thread.join()
     return make_response(jsonify({}), 200)
 
