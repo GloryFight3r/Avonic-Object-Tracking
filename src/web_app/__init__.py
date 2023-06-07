@@ -36,7 +36,7 @@ def create_app(test_controller=None):
     @app.get('/')
     def view():
         to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
-                   "footage", "thread", "scene", "socket", "main"]
+                   "footage", "thread", "scene", "socket", "main", "tracking"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
@@ -187,6 +187,16 @@ def create_app(test_controller=None):
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
 
+    @app.get('/preset/track')
+    def preset_tracker():
+        print("PRESET TRACKER")
+        return web_app.tracking_endpoints.track_presets(integration)
+
+    @app.get('/hybrid/track')
+    def hybrid_tracker():
+        print("HYBRID TRACKER")
+        return web_app.tracking_endpoints.track_presets(integration)
+
     @app.get('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
@@ -206,6 +216,11 @@ def create_app(test_controller=None):
     @app.get('/calibration/camera')
     def calibration_get_cam_coords():
         return web_app.calibration_endpoints.get_calibration(integration)
+    @app.get('/calibration/track')
+    def continuous_tracker():
+        print("CONTINUOUS TRACKER")
+        return web_app.tracking_endpoints.track_continuously(integration)
+
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED

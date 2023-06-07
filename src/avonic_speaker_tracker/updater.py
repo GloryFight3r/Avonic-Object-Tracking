@@ -41,6 +41,7 @@ class UpdateThread(Thread):
         1 - PresetModel aka presets, which selects the camera direction 
         from the limited pool of options, based on cosine similarity.
         """
+        prev_dir = [0.0, 0.0]
         speak_delay = 0
         if self.preset_or_tracking == 0:
             self.model_in_use = AudioModel(filename="calibration.json")
@@ -55,9 +56,9 @@ class UpdateThread(Thread):
                 continue
 
             if self.mic_api.is_speaking():
-                speak_delay = 0
+                speak_delay = 0 
             else:
-                speak_delay = speak_delay + 1
+                speak_delay = speak_delay + 1 
             self.model_in_use.set_speak_delay(speak_delay)
             direct = self.model_in_use.point(self.cam_api, self.mic_api)
 

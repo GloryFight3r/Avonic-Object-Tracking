@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.preset_model.preset import PresetCollection
@@ -39,9 +40,23 @@ class PresetModel(TrackingModel):
         preset = self.preset_locations.get_preset_info(preset_names[preset_id])
         direct = [int(np.rad2deg(preset[0][0])), int(np.rad2deg(preset[0][1])), preset[0][2]]
 
+        diffX = math.fabs(self.prev_dir[0]-direct[0])*2
+        diffY = math.fabs(self.prev_dir[1]-direct[1])*2
+
+        speedX = diffX/360*24
+        speedY = diffY/120*20
+
+        speedX = min(speedX,24)
+        speedY = min(speedY,20) 
+
+        if direct is None:
+            return self.prev_dir
+
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            cam_api.move_absolute(24, 20, direct[0], direct[1])
+            cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
+
+        if self.prev_dir[2] != direct[2]:
             cam_api.direct_zoom(direct[2])
-            self.prev_dir = direct
+        self.prev_dir = direct
 
         return direct

@@ -1,9 +1,8 @@
 from flask import make_response, jsonify, request
 from avonic_speaker_tracker.updater import UpdateThread
 from web_app.integration import GeneralController
-from avonic_camera_api.footage import ObjectTrackingThread
 
-def start_object_tracking_endpoint(integration: GeneralController):
+"""def start_object_tracking_endpoint(integration: GeneralController):
     if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():
         integration.object_tracking_thread = ObjectTrackingThread(integration.nn, integration.calibration_tracker,
                                                                   integration.footage_thread, integration.object_tracking_event)
@@ -20,7 +19,7 @@ def stop_object_tracking_endpoint(integration: GeneralController):
     integration.object_tracking_thread.join()
     integration.footage_thread.show_bounding_boxes = False
     return make_response(jsonify({}), 200)
-
+"""
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     if (integration.thread is None) or (integration.event.value == 0):
@@ -74,6 +73,21 @@ def is_running_endpoint(integration: GeneralController):
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
+def track_presets(integration: GeneralController):
+    integration.preset.value = 1
+    print(integration.preset.value)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
+
+def track_hybrid(integration: GeneralController):
+    integration.preset.value = 2
+    print(integration.preset.value)
+    return make_response(jsonify({"hybrid":integration.preset.value}), 200)
+
+def track_continuously(integration: GeneralController):
+    integration.preset.value = 0
+    print(integration.preset.value)
+    #                        TODO preset?
+    return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def preset_use(integration: GeneralController):
     if integration.preset.value == 1:

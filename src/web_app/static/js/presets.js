@@ -1,13 +1,20 @@
 if (typeof onSuccess !== 'undefined') {
     onSuccess = Object.assign({}, onSuccess, {
         "preset-get-list-form": refreshPresetList,
-        "camera-position-get-form": onPositionGet
+        "camera-position-get-form": onPositionGet,
+        "add-preset-button": loadPresets,
+        "edit-preset-button": loadPresets,
+        "remove-preset-button": loadPresets,
+
     });
 }
 else {
     onSuccess = {
         "preset-get-list-form": refreshPresetList,
-        "camera-position-get-form": onPositionGet
+        "camera-position-get-form": onPositionGet,
+        "add-preset-button": loadPresets,
+        "edit-preset-button": loadPresets,
+        "remove-preset-button": loadPresets,
     }
 }
 
@@ -22,7 +29,6 @@ async function refreshPresetList(data) {
     }
 }
 
-const set_mic_button = document.getElementById("set-mic-button")
 
 async function setNewPreset(data) {
     const d = (await data)["microphone-direction"];
@@ -43,15 +49,7 @@ async function setNewPreset(data) {
         d2["zoom-value"];
 }
 
-async function onMicrophoneDirectionSet(data) {
-    const d = (await data)["microphone-direction"];
-
-    document.getElementById("mic-direction-x2").value = d[0];
-    document.getElementById("mic-direction-y2").value = d[1];
-    document.getElementById("mic-direction-z2").value = d[2];
-
-    set_mic_button.ariaBusy = "false"
-}
+const set_mic_button = document.getElementById("set-mic-button")
 
 async function requestPresetList() {
     const response = await fetch("/preset/get_list", {
@@ -104,10 +102,29 @@ presetform.onsubmit = async (e) => {
             presetform.action = "/preset/point";
             body = { method: presetform.method };
             break;
+        case "set-mic-button":
+            presetform.setAttribute("method", "GET");
+            presetform.action = "/microphone/speaker/direction";
+            body = { method: presetform.method };
+            break;
+        case "cam-zoom-button":
+            presetform.setAttribute("method", "GET");
+            presetform.action = "/camera/zoom/get";
+            body = { method: presetform.method };
+            break;
+        case "cam-dir-button":
+            presetform.setAttribute("method", "GET");
+            presetform.action = "/camera/position/get";
+            body = { method: presetform.method };
+            break;
+
+
     }
     const response = await fetch(presetform.action, body);
+    const fun = onSuccess[button_id];
     if (response.status === 200) {
-        requestPresetList();
+        fun(response.json());
+        
     }
     e.submitter.ariaBusy = "false"
     if (response.status !== 200) {
