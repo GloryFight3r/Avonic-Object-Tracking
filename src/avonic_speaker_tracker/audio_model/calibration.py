@@ -121,27 +121,19 @@ class Calibration:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print(f"No file {self.filename} was found. Create new preset json...")
                     outfile.write(json.dumps({"speaker_points": [],
-                    "to_mic_direction": [0.0, 0.0, 0.0], "mic_height": 1.0}, indent=4))
-            try:
-                with open(self.filename, encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.speaker_points = []
-                    for key in data["speaker_points"]:
-                        self.speaker_points.append((np.array(key[0]),
-                            np.array(key[1])))
-                        assert len(key[0]) == 3
-                        assert len(key[1]) == 3
-                    self.to_mic_direction = np.array(data["to_mic_direction"])
-                    assert len(data["to_mic_direction"]) == 3
-                    self.mic_height = float(data["mic_height"])
-                    self.calculate_distance()
-                    print("Loaded speaker points: ", self.speaker_points)
-                    print("Loaded camera to microphone vector: ", self.to_mic_direction)
-                    print("Loaded microphone height: ", self.mic_height)
-            except:
-                print("The appplication couldn't load calibration data from specified files. "
-                    + "Please check your config files. Exiting...")
-                raise SystemExit
+                    "to_mic_direction": None, "mic_height": 1.0}, indent=4))
+            with open(self.filename, encoding="utf-8") as f:
+                data = json.load(f)
+                self.speaker_points = []
+                for key in data["speaker_points"]:
+                    self.speaker_points.append((np.array(key[0]),
+                        np.array(key[1])))
+                self.to_mic_direction = np.array(data["to_mic_direction"])
+                self.mic_height = float(data["mic_height"])
+                self.calculate_distance()
+                print("Loaded speaker points: ", self.speaker_points)
+                print("Loaded camera to microphone vector: ", self.to_mic_direction)
+                print("Loaded microphone height: ", self.mic_height)
 
 def angle_between_vectors(p: np.ndarray, q: np.ndarray) -> float:
     """ Calculates the cosine of the smallest angle between two vectors.
