@@ -4,9 +4,8 @@ if (typeof onSuccess !== 'undefined') {
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "camera-position-get-form": onPositionGet,
-    "camera-coords-get-form": onCameraCoordsGet,
-    "presets-camera-position-set-form": onPositionSet,
-    "presets-camera-zoom-set-form": onZoomSet,
+    "cam-dir-button": onPositionSet,
+    "cam-zoom-button": onZoomSet,
     "camera-coords-get-form": onCameraCoordsGet
   });
 }
@@ -16,8 +15,8 @@ else {
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "camera-position-get-form": onPositionGet,
-    "presets-camera-position-set-form": onPositionSet,
-    "presets-camera-zoom-set-form": onZoomSet,
+    "cam-dir-button": onPositionSet,
+    "cam-zoom-button": onZoomSet,
     "camera-coords-get-form": onCameraCoordsGet
   }
 }
