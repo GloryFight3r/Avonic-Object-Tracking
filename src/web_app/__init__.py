@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort, render_template, make_response, Response, request
+from flask import Flask, jsonify, abort, render_template, make_response
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
@@ -34,29 +34,29 @@ def create_app(test_controller=None):
     @app.get('/')
     def view():
         to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
-                   "footage", "thread", "scene", "socket", "main"]
+                   "footage", "thread", "scene", "socket", "settings", "main"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
     def camera_view():
-        to_import=["camera", "socket", "main"]
+        to_import=["camera", "socket", "settings", "main"]
         return render_template('single_page.html', name="camera", to_import=to_import, 
                                page_name="Camera View")
     @app.get('/microphone_control')
     def microphone_view():
-        to_import=["microphone", "socket", "main"]
+        to_import=["microphone", "socket", "settings", "main"]
         return render_template('single_page.html', name="microphone", to_import=to_import,
                                page_name="Microphone View")
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        to_import=["socket", "camera", "microphone", "presets", "calibration", "main"]
+        to_import=["socket", "camera", "microphone", "presets", "calibration", "settings", "main"]
         return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
                                page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
-        to_import=["footage", "socket", "main"]
+        to_import=["footage", "socket", "settings", "main"]
         return render_template('single_page.html', name="live_footage", to_import=to_import,
                                page_name="Live Footage")
 

@@ -1,0 +1,38 @@
+<dialog id="settings">
+    <article>
+        <a href="#" aria-label="Close"
+           class="close" data-target="settings"
+           onclick="toggleSettings()"></a>
+        <h1>Settings 🔧</h1>
+        <p>
+            Welcome to the settings menu!
+            Here you can set the addresses of both the camera and microphone,
+            and a few more things.
+            If you are seeing this menu unprompted, that means that there is an error in your current settings.
+        </p>
+        <br />
+        <form id="settings-form">
+            <div class="grid">
+                <label for="settings-camera-ip">Camera address (IP:port)</label>
+                <input id="settings-camera-ip" name="camera-ip" />
+                <input id="settings-camera-port" name="camera-port" type="number" min="0" max="65535" />
+            </div>
+            <div class="grid">
+                <label for="settings-microphone-ip">Camera address (IP:port)</label>
+                <input id="settings-microphone-ip" name="microphone-ip" />
+                <input id="settings-microphone-port" name="microphone-port" type="number" min="0" max="65535" />
+            </div>
+            <div class="grid">
+                <label for="settings-microphone-thresh">Microphone loudness threshold (-90 - 0 dB)</label>
+                <input id="settings-microphone-thresh" name="microphone-thresh" type="number" min="-90" max="0" />
+            </div>
+            <div class="grid">
+                <label for="settings-files-path">Path to presets and calibration storage files (app root by default)</label>
+                <input id="settings-files-path" name="filepath" />
+            </div>
+            <footer>
+                <button type="submit">Save</button>
+            </footer>
+        </form>
+    </article>
+</dialog>

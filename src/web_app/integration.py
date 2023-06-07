@@ -55,7 +55,7 @@ class GeneralController:
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
-        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
+        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
         self.calibration = Calibration()
         self.preset = False
         self.preset_locations = None
