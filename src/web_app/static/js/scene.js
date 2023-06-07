@@ -62,7 +62,7 @@ async function animate() {
     const camA = document.getElementById("position-alpha-value").value
     const camB = document.getElementById("position-beta-value").value
     const cosb = Math.cos(camB)
-    const camX = Math.sin(camA) * cosb
+    const camX = -Math.sin(camA) * cosb
     const camY = Math.sin(camB)
     const camZ = Math.cos(camA) * cosb
     const camDir = new THREE.Vector3(camX, camY, camZ)
