@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def angle_vector(alpha: float, beta: float) -> np.array:
+def angle_vector(alpha: float, beta: float) -> np.ndarray:
     """ Convert pitch and yaw angles (radians) to a unit vector
 
     Args:
@@ -16,7 +16,7 @@ def angle_vector(alpha: float, beta: float) -> np.array:
     return np.array([-np.sin(alpha) * cosb, np.sin(beta), np.cos(alpha) * cosb])
 
 
-def vector_angle(v: np.array) -> (float, float):
+def vector_angle(v: np.ndarray) -> tuple[float, float]:
     """ Convert directional vector to pitch and yaw angles (radians)
 
     Args:
