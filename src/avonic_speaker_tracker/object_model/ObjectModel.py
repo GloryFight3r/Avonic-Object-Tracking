@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -9,7 +10,7 @@ from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 
 class ObjectModel():
     """ Class with helper methods for calibration tracking. This class has to be extended
-        so that point_object and point_audio can be implemented. This facilitates using
+        so that track_object can be implemented. This facilitates using
         different strategies of dealing with both the object detection and the audio detection.
     """
 
@@ -17,9 +18,6 @@ class ObjectModel():
         self.cam_api = cam_api
         self.mic_api = mic_api
         self.resolution = resolution
-
-    def track_object(self, current_box: list):
-        pass
 
     def get_center_box(self, boxes: [np.array]):
         """ Gets the box closest to the center of the screen.
@@ -61,7 +59,7 @@ class ObjectModel():
 
         return (rotate_speed, rotate_angle)
 
-    def calculate_speed(self, rotate_angle:np.ndarray):
+    def calculate_speed(self, rotate_angle: np.ndarray):
         return [20, 20]
 
 
@@ -106,21 +104,56 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
                 direct: the direction in which to point the camera
             Returns: the pitch and yaw of the camera and the zoom value
         """
-        # TO-DO: Update this method by copying AudioModel.poin()
-        direct = self.get_direction()
-        print("POOOOOOOOOIIIIIINNNNNNNNNTTTIIIIIINNNNNNGGGG")
+        if self.speak_delay == 100:
+            self.cam_api.direct_zoom(0)
+            self.prev_dir[2]=0
+            return self.prev_dir
+
+        mic_direction = self.mic_api.get_direction()
+
+        if isinstance(mic_direction, str):
+            print(mic_direction)
+            return self.prev_dir
+
+        cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
+                                                        mic_direction,
+                                                        self.calibration.mic_height)
+
+        vec_len = np.sqrt(cam_vec.dot(cam_vec))
+        vec_len = min(vec_len,10.0)
+        zoom_val = (int)((vec_len/10.0)*16000)
+
+        direct = vector_angle(cam_vec)
+        direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
+
+        avg = abs(direct[0] - self.prev_dir[0])
+        if avg >= self.threshold:
+            self.time_without_movement = 0
+        print("Time without movement")
+        print(self.time_without_movement)
+
+        diffX = math.fabs(self.prev_dir[0]-direct[0])*2
+        diffY = math.fabs(self.prev_dir[1]-direct[1])*2
+
+        speedX = (int)(13 + diffX/360*11)
+        speedY = (int)(11 + diffY/120*9)
+
+        speedX = min(speedX,24)
+        speedY = min(speedY,20)
+
         if direct is None:
             return self.prev_dir
-        if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-            avg = abs(direct[0] - self.prev_dir[0])
-            if avg >= self.threshold:
-                self.time_without_movement = 0
-            if self.time_without_movement < 5:
-                self.cam_api.move_absolute(24,20, direct[0], direct[1])
-                self.time_without_movement += 1
-            self.prev_dir = direct
-        print(self.time_without_movement)
-        return self.prev_dir
+
+        if self.time_without_movement < 5:
+            if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
+                self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
+            self.time_without_movement += 1
+
+        if self.prev_dir[2] != direct[2]:
+            self.cam_api.direct_zoom(direct[2])
+
+        self.prev_dir = direct
+        return direct
 
 #class ThresholdCalibrationTracker(CalibrationTracker):
 #    """ This class extends CalibrationTracker. It uses the strategy of using audio

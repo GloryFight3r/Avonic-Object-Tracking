@@ -11,8 +11,9 @@ import web_app.footage
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
-#log = logging.getLogger('werkzeug')
-#log.setLevel(logging.ERROR)
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 integration = GeneralController()
 

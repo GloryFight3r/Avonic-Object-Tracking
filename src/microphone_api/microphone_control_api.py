@@ -102,7 +102,8 @@ class MicrophoneAPI:
                 self.elevation = np.deg2rad(elevation)
             if 0 <= azimuth < 360:
                 self.azimuth = np.deg2rad(azimuth)
-        except KeyError:
+        #except KeyError:
+        except:
             obj = json.loads(ret)
             if "message" in obj:
                 return obj["message"]

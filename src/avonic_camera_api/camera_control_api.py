@@ -227,8 +227,11 @@ class CameraAPI:
     def calculate_fov(self):
         current_zoom = self.get_zoom()
 
-        current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
-            * current_zoom / self.MAX_ZOOM_VALUE)
+        try:
+            current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
+                * current_zoom / self.MAX_ZOOM_VALUE)
+        except:
+            current_fov = self.MAX_FOV
 
         return current_fov
 

@@ -2,12 +2,13 @@ from threading import Thread
 from multiprocessing import Value, Array
 import base64
 import time
-import cv2
 from threading import Thread
 import cv2
 import base64
 import copy
 import time
+import numpy as np
+
 from object_tracker.yolov2 import YOLOPredict
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
@@ -25,11 +26,14 @@ class ObjectTrackingThread(Thread):
         self.nn = nn
         self.trck = trck
         self.event = event
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        self.out = cv2.VideoWriter('output.avi', fourcc, 2.0, (1920, 1080))
 
     def run(self):
         """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
         while not self.event.is_set():
-            frame = self.stream.frame  # read the camera frame
+            im_arr = np.frombuffer(self.stream.buffer.raw[:self.stream.buflen.value], np.byte)
+            frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)  # read the camera frame
             if frame is not None:
                 boxes = self.nn.get_bounding_boxes(frame)
                 if len(boxes) > 0:
@@ -41,6 +45,12 @@ class ObjectTrackingThread(Thread):
                         (x, y, x2, y2) = last_box
                         self.nn.draw_prediction(frame, "person", x, y, x2, y2)
                         self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
+                self.out.write(frame)
+            time.sleep(2)
+
+    def __del__():
+        self.out.release()
+        cv2.destroyAllWindows()
 
 
 class FootageThread(Thread):
@@ -57,17 +67,16 @@ class FootageThread(Thread):
 
     def run(self):
         while not self.event.is_set():
-            ret, self.frame = self.camera.read()
-            if ret:
+            success, self.frame = self.camera.read()
+
+            if success:
                 ret, buffer = cv2.imencode('.jpg', self.frame)
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
-                #string = base64.b64encode(buffer)
-                #length = len(string)
-                #self.buffer.raw = string
-                #self.buflen.value = length
-            else:
-                break
+            #string = base64.b64encode(buffer)
+            #length = len(string)
+            #self.buffer.raw = string
+            #self.buflen.value = length
 
     def get_frame(self):
         """ Returns the camera footage image decoded into ascii
@@ -75,7 +84,7 @@ class FootageThread(Thread):
         Returns:
 
         """
-        if self.box_frame is not None:
-            return str(base64.b64encode(self.box_frame), 'ascii')
+        #if self.box_frame is not None:
+        #    return str(base64.b64encode(self.box_frame), 'ascii')
         return str(base64.b64encode(self.buffer.raw[:self.buflen.value])
             , 'ascii')

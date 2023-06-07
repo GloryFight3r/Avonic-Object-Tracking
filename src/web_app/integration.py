@@ -51,13 +51,13 @@ class GeneralController:
         self.object_tracking_thread = None
         self.thread_mic = None
         self.thread_cam = None
-        self.preset = Value("i", ModelCode.PRESET, lock=False)
+        self.preset = Value("i", ModelCode.AUDIO, lock=False)
 
         # the neural network to use
         self.nn = None
 
     def load_env(self):
-        self.preset = Value("i", ModelCode.PRESET, lock=False)
+        self.preset = Value("i", ModelCode.AUDIO, lock=False)
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
@@ -78,11 +78,12 @@ class GeneralController:
         # Initialize models
         self.audio_model = AudioModel(self.cam_api, self.mic_api, filename="calibration.json")
         self.preset_model = PresetModel(filename="presets.json")
-        self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5,
-                                                       filename="calibration.json")
+        self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]),
+                                                       3, filename="calibration.json")
 
         # Initialize footage thread
         self.video = cv2.VideoCapture('rtsp://' + getenv("CAM_IP") + ':554/live/av0') # pragma: no mutate
+        #self.video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         self.footage_thread = FootageThread(self.video, self.footage_thread_event) # pragma: no mutate
         self.footage_thread.start() # pragma: no mutate
 

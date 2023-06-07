@@ -7,7 +7,7 @@ from avonic_camera_api.footage import ObjectTrackingThread
 from object_tracker.yolov2 import YOLOPredict
 
 def start_object_tracking_endpoint(integration: GeneralController):
-    integration.preset = ModelCode.OBJECT_AUDIO
+    integration.preset.value = ModelCode.OBJECT_AUDIO
     if integration.nn is None:
         integration.nn = YOLOPredict()
     if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():

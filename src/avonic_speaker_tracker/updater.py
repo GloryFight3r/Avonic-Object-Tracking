@@ -36,8 +36,6 @@ class UpdateThread(Thread):
         #else:
         #    self.model_in_use = PresetModel(filename="presets.json")
 
-        print("THREAD EVENT")
-        print(self.event.value)
         while self.event.value != 0:
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
