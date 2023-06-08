@@ -1,8 +1,9 @@
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.footage import FootageThread
 
-def get_movement_to_box(self, current_box: np.ndarray, cam_api:CameraAPI) -> \
+def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:FootageThread) -> \
     tuple[np.ndarray, np.ndarray]:
 
     """ 
@@ -29,7 +30,7 @@ def get_movement_to_box(self, current_box: np.ndarray, cam_api:CameraAPI) -> \
         + np.array([bbox[0], bbox[1]])
 
     # calculate the middle of the screen
-    screen_middles:np.ndarray = self.cam_footage.resolution / 2.0
+    screen_middles:np.ndarray = cam_footage.resolution / 2.0
 
     # find the distance from the screen middle to the box middle
     distance_to_middle:np.ndarray = screen_middles - box_middles
@@ -41,13 +42,23 @@ def get_movement_to_box(self, current_box: np.ndarray, cam_api:CameraAPI) -> \
     cam_fov:np.ndarray = cam_api.calculate_fov()
 
     # calculate how many degrees correspond to one pixel
-    angular_resolution:np.ndarray = (cam_fov / self.cam_footage.resolution)
+    angular_resolution:np.ndarray = (cam_fov / cam_footage.resolution)
 
     # find the relative angle the camera must rotate so that it centers on the bounding box
     rotate_angle:np.ndarray = angular_resolution * distance_to_middle
     
     # TODO pick a good rotation speed according to the rotation angle it has to make
-    rotate_speed:np.ndarray = self.calculate_speed(angular_resolution)
+    rotate_speed:np.ndarray = calculate_speed(rotate_angle)
 
     return (rotate_speed, rotate_angle)
 
+def calculate_speed(rotate_angle):
+    """ Picks a rotation speed depending on the rotation angle
+
+    Args:
+        rotate_angle (): Current rotation angle
+
+    Returns:
+        Rotation speed for the next camera rotation
+    """
+    return np.array([20, 20])

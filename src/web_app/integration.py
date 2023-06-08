@@ -45,8 +45,6 @@ class GeneralController:
 
         # Update thread field
         self.thread = None
-        # Footage thread field
-        self.footage_thread = None
 
         # URL of the server
         self.url = '127.0.0.1:5000'
@@ -67,7 +65,7 @@ class GeneralController:
         self.hybrid_model = None
 
         # Video related fields
-        self.camera_footage = None
+        self.footage_thread = None
         self.video = None
 
         self.object_tracking_thread = None

@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import re
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api import converter
 
@@ -23,7 +24,7 @@ class CameraAPI:
         self.camera = camera
         self.counter = 1
         self.video = "on"
-        self.latest_direction = np.array([0, 0, 1])
+        self.latest_direction = np.array([0, 0, 1], dtype='float')
 
     def set_address(self, new_socket, address=None) -> ResponseCode:
         if address is None:
@@ -208,7 +209,15 @@ class CameraAPI:
                                message, self.counter)
         if isinstance(ret, ResponseCode):
             return ret
-        print (ret)
+
+        valid = re.compile(r"b'90500[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]FF'")
+        print(str(ret))
+
+        if not valid.match(str(ret)):
+            print("NE")
+            return self.latest_direction
+        print("AS")
+
         ret_msg = str(ret)[2:-1]  # remove b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
@@ -228,12 +237,23 @@ class CameraAPI:
         self.latest_direction = direction
         return direction
 
-    def calculate_fov(self)->np.ndarray:
+    def calculate_fov(self):
+        """ Calculate the current FoV based on the current zoom
+
+            Returns: 
+                array with the two FoVs [horizontal, vertical]
+            
+        """
         current_zoom = self.get_zoom()
 
+        if isinstance(current_zoom, ResponseCode):
+            return current_zoom
+
+        assert 0 <= current_zoom <= 16384
+        
         current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
             * current_zoom / self.MAX_ZOOM_VALUE)
-
+            
         return current_fov
 
 def degrees_to_command(degree: float, step_size: float) -> str:

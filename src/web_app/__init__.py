@@ -1,4 +1,5 @@
 import signal
+import logging
 from flask import Flask, jsonify, abort, render_template, make_response, Response, request
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -11,8 +12,8 @@ import web_app.footage
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
-#log = logging.getLogger('werkzeug')
-#log.setLevel(logging.ERROR)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 integration = GeneralController()
 
@@ -221,6 +222,9 @@ def create_app(test_controller=None):
         print("CONTINUOUS TRACKER")
         return web_app.tracking_endpoints.track_continuously(integration)
 
+    @app.post('/navigate/camera')
+    def navigate_camera():
+        return web_app.camera_endpoints.navigate_camera(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED

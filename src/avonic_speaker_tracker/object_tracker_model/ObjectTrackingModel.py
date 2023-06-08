@@ -67,7 +67,6 @@ class HybridTracker(TrackingModel):
             # Get the speaker direction
             mic_direction:np.ndarray | None = mic_api.get_direction()
             
-            print("MIC", mic_direction)
             # if the mic_direction is a str, then there is some problem with the microphone API
             if isinstance(mic_direction, str):
                 #print(mic_direction)
@@ -87,14 +86,9 @@ class HybridTracker(TrackingModel):
             cur_fov:np.ndarray = cam_api.calculate_fov() / 180.0 * math.pi
 
             # transform the 3D vector to a pan and tilt numpy array
-            #print("ASDASDSADSA", cam_api.latest_direction)
             cur_angle:np.ndarray = vector_angle(cam_api.latest_direction)
 
-            #print("CAM", cam_angles)
 
-            print("Angle", cam_angles) # where to look at
-            print("Cur angle", cur_angle) # where we are currently looking at
-            print("Cur fov", cur_fov)
             # if the point that the camera has to turn to is on the screen, we need to choose
             # the bounding box of the most likely speaker
             if  cam_angles[0] - (cur_fov[0] / 2) <= cur_angle[0] <= cam_angles[0] + (cur_fov[0] / 2) \
@@ -116,8 +110,11 @@ class HybridTracker(TrackingModel):
                 # after that we divide this by the current FoV, so we can get it as a ratio
                 # and finally multiply this ratio by the screen resolution, so we can find which
                 # pixel on the screen the camera direction corresponds to
-                pixels:np.ndarray = np.array(((cur_fov - (cam_angles - (cur_fov / 2))) / cur_fov)\
-                    * self.cam_footage.resolution, dtype='int')
+                pixels:np.ndarray = np.array((cam_angles - (cur_angle - (cur_fov / 2))) / cur_fov)
+
+                pixels[1] = 1 - pixels[1]
+
+                pixels = np.array(pixels * self.cam_footage.resolution, dtype='int')
 
                 self.cam_footage.pixel = pixels
                 # find nearest box we should be tracking
@@ -125,15 +122,14 @@ class HybridTracker(TrackingModel):
 
                 if speaker_box is None:
                     # no speakers on the screen, we make no adjustments
-                    print("NO SPEAKER")
                     return
                 
                 # set this box as the last tracked box
                 self.last_tracked = speaker_box
-                print("YES SPEAKER")
+                self.cam_footage.focused_box = speaker_box
                 
                 # get the speed and rotation angle the camera should make
-                ret: tuple[np.ndarray, np.ndarray] = get_movement_to_box(speaker_box, cam_api)
+                ret: tuple[np.ndarray, np.ndarray] = get_movement_to_box(speaker_box, cam_api, self.cam_footage)
             
                 rotate_speed:np.ndarray = ret[0]
                 rotate_angle:np.ndarray = ret[1]
@@ -147,11 +143,9 @@ class HybridTracker(TrackingModel):
                 # otherwise turn the camera towards him
                 
                 # TODO possibly fix the speed
-                print("Speaker not visible")
                 cam_api.move_absolute(20, 20, cam_angles[0], cam_angles[1])
 
         else:
-            print("Noone talking")
             if self.last_tracked.size == 0:
                 return
             # if there is a person we have previously tracked, continue tracking him
@@ -164,6 +158,8 @@ class HybridTracker(TrackingModel):
             # find the box from all_boxes that has the most surface area in common
             new_box:np.ndarray | None = self.find_most_common_area(self.last_tracked, all_boxes)
 
+            self.cam_footage.focused_box = new_box
+
             if new_box is None:
                 self.last_tracked = np.array([])
                 return
@@ -172,7 +168,7 @@ class HybridTracker(TrackingModel):
             self.last_tracked = new_box
 
             # get the movement we have to make
-            ret:tuple[np.ndarray, np.ndarray] = get_movement_to_box(new_box, cam_api)
+            ret:tuple[np.ndarray, np.ndarray] = get_movement_to_box(new_box, cam_api, self.cam_footage)
             
             rotate_speed:np.ndarray = ret[0]
             rotate_angle:np.ndarray = ret[1]
@@ -194,7 +190,7 @@ class HybridTracker(TrackingModel):
             all_boxes is empty
         """
         # if there are no bounding boxes in the list, return None
-        if len(all_boxes) == 0:
+        if len(all_boxes) == 0 or current_box is None:
             return None
 
         answer_box = None
@@ -232,7 +228,7 @@ class HybridTracker(TrackingModel):
         best_box = None
         
         for box in all_boxes:
-            center = np.array([box[2] - box[0], box[1] - box[3]])
+            center = np.array([(box[2] + box[0]) / 2, (box[1] + box[3]) / 2])
 
             # squared distance to the center
             cur_dist = np.sum((center - pixels) ** 2)

@@ -3,6 +3,7 @@ from threading import Event
 import pytest
 import cv2
 from avonic_camera_api.footage import FootageThread
+from object_tracker.yolov2 import YOLOPredict
 
 class MockedCv:
     def __init__(self):

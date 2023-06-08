@@ -4,9 +4,9 @@ from ultralytics import YOLO
 import torch
 
 class YOLOPredict:
-    model = None
+    model:YOLO | None = None
 
-    def __init__(self):
+    def __init__(self, path = "./src/object_tracker/"):
         self.model = YOLO("yolov8m.pt")
 
     def get_bounding_boxes_image(self, frame):
@@ -21,17 +21,13 @@ class YOLOPredict:
         return (frame, bboxes)
 
     def get_bounding_boxes(self, frame)->np.ndarray:
-        print("START")
         results = self.model(frame, classes=0, device="mps")
         result = results[0]
-        #person_indices = torch.nonzero(result.boxes.cls.cpu() == 0)
-        #persons = [result.boxes.cls.cpu()[i] for i in person_indices]
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
-        print("DONE")
-        #persons = []
-        #for index in person_indices:
-        #    persons.append(bboxes[index])
 
         return bboxes
 
+    def draw_prediction(self, img, label, left, top, right, bottom):
+        cv2.rectangle(img, (left, top), (right, bottom), [0, 0, 0], 2)
+        cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0, 0, 0], 2)
