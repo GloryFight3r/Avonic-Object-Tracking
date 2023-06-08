@@ -72,6 +72,9 @@ class GeneralController:
         # Indicates which model should be used, check UpdateThread
         self.preset = Value("i", 0, lock=False)
 
+        # Keep in memory, whether a notification about the settings not being set has been sent
+        self.no_settings_sent = True
+
     def load_env(self) -> None:
         """Performs load procedure of all the specified parameters.
         """
@@ -96,6 +99,7 @@ class GeneralController:
                 "filepath": "",
                 "secret-key": "test"
             }
+            self.no_settings_sent = False
 
         # Setup camera API
         cam_addr = None

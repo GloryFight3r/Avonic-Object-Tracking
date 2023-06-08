@@ -35,3 +35,7 @@ socket.on("footage-update", async (args) => {
 socket.on("calibration-update", async (args) => {
     await onCameraCoordsGet(args)
 })
+
+socket.on("connect", () => socket.emit("connected", {}))
+
+socket.on("no-settings", () => openSettings())

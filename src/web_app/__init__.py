@@ -299,6 +299,11 @@ def create_app(test_controller=None):
     def settings_set():
         return web_app.settings_endpoints.set_settings(integration)
 
+    @integration.ws.on("connected")
+    def settings_not_set(data):
+        if not integration.no_settings_sent:
+            integration.ws.emit("no-settings", data)
+
     def sigterm_handler(_signo, _stack_frame):
         close_running_threads(integration)
 
