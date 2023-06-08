@@ -2,7 +2,11 @@ from threading import Event, Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value
-import yaml
+from yaml import load, dump
+try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 import requests
 import cv2
 import numpy as np
@@ -79,9 +83,10 @@ class GeneralController:
         # Load settings file
         try:
             with open("settings.yaml", "r") as f:
-                settings = yaml.load(f)
-        except IOError:
+                settings = load(f, Loader=Loader)
+        except IOError as e:
             print("Could not open settings.yaml file, proceeding without it.")
+            print(e)
             settings = {
                 "camera-ip": "0.0.0.0",
                 "camera-port": 52381,
@@ -95,10 +100,9 @@ class GeneralController:
         # Setup camera API
         cam_addr = None
         cam_port = settings["camera-port"]
-        if cam_port != None:
+        if cam_port is not None:
             cam_addr = (settings["camera-ip"], int(cam_port))
-        #verify_address(cam_addr)
-            if cam_addr != None: 
+            if cam_addr is not None:
                 self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
 
         # Setup microphone API
@@ -107,7 +111,6 @@ class GeneralController:
         print(mic_port, mic_port is None)
         if mic_port is not None:
             mic_addr = (settings["microphone-ip"], int(mic_port))
-        #verify_address(mic_addr)
             if mic_addr is not None:
                 self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(settings["microphone-thresh"]))
 
@@ -132,15 +135,42 @@ class GeneralController:
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
-        print(cam_addr,mic_addr)
-        if mic_addr != None:
+        if mic_addr is not None:
             self.thread_mic = Thread(target=self.send_update,
                 args=(self.get_mic_info, '/update/microphone'))
             self.thread_mic.start()
-        if cam_addr != None:
+        if cam_addr is not None:
             self.thread_cam = Thread(target=self.send_update,
                 args=(self.get_cam_info, '/update/camera'))
             self.thread_cam.start()
+
+    def save(self):
+        """
+        Saves current settings to `settings.yaml`
+
+        Returns:
+            True on success
+            False on error
+        """
+        try:
+            with open("settings.yaml", "w") as f:
+                cam_addr = self.cam_api.camera.address
+                mic_addr = self.mic_api.sock.address
+                data = {
+                    "camera-ip": cam_addr[0],
+                    "camera-port": cam_addr[1],
+                    "microphone-ip": mic_addr[0],
+                    "microphone-port": mic_addr[1],
+                    "microphone-thresh": self.mic_api.threshold,
+                    "filepath": self.filepath,
+                    "secret-key": self.secret
+                }
+                dump(data, f, Dumper=Dumper)
+            return True
+        except IOError as e:
+            print("Error while writing settings file!")
+            print(e)
+            return False
 
     def __del__(self):
         self.preset.value = 0  # pragma: no mutate

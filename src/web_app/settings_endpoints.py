@@ -1,5 +1,4 @@
 from flask import make_response, jsonify, request
-
 import web_app.camera_endpoints
 from web_app.integration import GeneralController
 
@@ -46,6 +45,9 @@ def set_settings(integration: GeneralController):
         if filepath is None:
             filepath = ""
         integration.filepath = str(filepath)
-        return make_response(jsonify({}), 200)
+        if integration.save():
+            return make_response(jsonify({}), 200)
+        return make_response(jsonify(
+            {"message": "Something went wrong while saving settings file! Check application output!"}), 500)
     except (ValueError, KeyError):
         return make_response(jsonify({"message": "Invalid threshold or filepath."}), 400)
