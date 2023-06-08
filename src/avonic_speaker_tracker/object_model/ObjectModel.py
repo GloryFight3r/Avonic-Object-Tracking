@@ -16,10 +16,10 @@ class ObjectModel():
     """
 
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI,
-                 object_tracking_thread, resolution: np.ndarray = np.array([0, 0])):
+                 object_tracking_thread_event, resolution: np.ndarray = np.array([0, 0])):
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.object_tracking_thread = object_tracking_thread
+        self.object_tracking_thread_event = object_tracking_thread_event
         self.resolution = resolution
         self.speak_delay = 0
         self.wait = 20
@@ -105,7 +105,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
     def __init__(self, cam: CameraAPI, mic: MicrophoneAPI, object_tracking_thread,
                  resolution: np.ndarray, threshold: int,
-                 filename = None):
+                 filename = ""):
         super().__init__(cam, mic, object_tracking_thread)
         self.resolution = resolution
         self.threshold = threshold
@@ -159,7 +159,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         if avg >= self.threshold:
             print("STOPPING OBJECT TRACKING")
             self.time_without_movement.value = 0
-            self.object_tracking_thread.event.value = 1
+            self.object_tracking_thread_event.value = 1
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct[1])*2
@@ -179,7 +179,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         if self.time_without_movement.value == self.wait:
             print("STARTING OBJECT TRACKING")
-            self.object_tracking_thread.event.value = 2
+            self.object_tracking_thread_event.value = 2
         self.time_without_movement.value += 1
         print(self.time_without_movement.value)
 

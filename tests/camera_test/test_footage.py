@@ -2,8 +2,9 @@ import base64
 from threading import Event
 import pytest
 import cv2
-from avonic_camera_api.footage import FootageThread
+from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
 from object_tracker.yolov2 import YOLOPredict
+from multiprocessing import Value
 
 class MockedCv:
     def __init__(self):
@@ -14,7 +15,9 @@ class MockedCv:
 class MockedBoxTracker:
     def __init__(self):
         pass
-    def camera_track(self, bx):
+    def track_object(self, box):
+        pass
+    def get_center_box(self, box):
         pass
 
 class MockedYoloPredict:
@@ -27,6 +30,8 @@ class MockedYoloPredict:
         pass
     def draw_prediction(self, img, lbl, x, y, x2, y2):
         pass
+
+
 
 @pytest.fixture
 def footage_thread():
@@ -48,3 +53,21 @@ def test_run(footage_thread, monkeypatch):
     footage_thread.run()
 
     assert footage_thread.get_frame() == base64.b64encode(b'FEEB').decode('ascii')
+
+@pytest.fixture
+def object_tracking_thread(footage_thread):
+    mocked_box_tracker = MockedBoxTracker()
+    mocked_yolo = MockedYoloPredict()
+    event = Value("i", 2, lock=False)
+    tracking_thread = ObjectTrackingThread(mocked_yolo,
+                    mocked_box_tracker, footage_thread, event)
+
+    return tracking_thread
+
+def test_object_thread_run(object_tracking_thread, monkeypatch):
+    def mocked_imdecode(im, code):
+        object_tracking_thread.event.value = 0
+        return b'FEEB'
+
+    monkeypatch.setattr(cv2, "imdecode", mocked_imdecode)
+    object_tracking_thread.run()

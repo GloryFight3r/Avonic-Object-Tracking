@@ -37,24 +37,17 @@ class ObjectTrackingThread(Thread):
                 frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)  # read the camera frame
                 if frame is not None:
                     boxes = self.nn.get_bounding_boxes(frame)
-                    print("LEN BOXES")
-                    print(len(boxes))
                     if len(boxes) > 0:
                         last_box = self.trck.get_center_box(boxes)
-                        print("TRACK?!?!?!?!!?")
                         self.trck.track_object(last_box)
 
                         # this won't work in production. It is purely for debugging purposes
-                        if True:
-                            (x, y, x2, y2) = last_box
-                            self.nn.draw_prediction(frame, "person", x, y, x2, y2)
-                            self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
-                    self.out.write(frame)
+                        #if True:
+                        #    (x, y, x2, y2) = last_box
+                        #    self.nn.draw_prediction(frame, "person", x, y, x2, y2)
+                        #    self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
+                    #self.out.write(frame)
                 time.sleep(2)
-
-    def __del__():
-        self.out.release()
-        cv2.destroyAllWindows()
 
 
 class FootageThread(Thread):
@@ -77,10 +70,6 @@ class FootageThread(Thread):
                 ret, buffer = cv2.imencode('.jpg', self.frame)
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
-            #string = base64.b64encode(buffer)
-            #length = len(string)
-            #self.buffer.raw = string
-            #self.buflen.value = length
 
     def get_frame(self):
         """ Returns the camera footage image decoded into ascii
@@ -88,8 +77,6 @@ class FootageThread(Thread):
         Returns:
 
         """
-        #if self.box_frame is not None:
-        #    return str(base64.b64encode(self.box_frame), 'ascii')
         ret = str(base64.b64encode(self.buffer.raw[:self.buflen.value])
             , 'ascii')
         return ret
