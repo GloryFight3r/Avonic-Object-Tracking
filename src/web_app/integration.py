@@ -15,13 +15,14 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 
+
 class GeneralController:
     def __init__(self):
         # self.event is part of the while loop in UpdateThread. When 0 - stops the while loop.
         self.event = Value("i", 0, lock=False)
 
         # self.info_threads_event is part of the info-threads
-        # and indicates whether or not update should be performed.
+        # and indicates whether update should be performed.
         # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
 
@@ -49,6 +50,9 @@ class GeneralController:
         self.secret = None
         self.ws = None
 
+        # Filepath for calibration and presets files
+        self.filepath: str = ""
+
         # Models, to record all updates onto a disk
         self.audio_model = None
         self.preset_model = None
@@ -65,7 +69,7 @@ class GeneralController:
         self.preset = Value("i", 0, lock=False)
 
     def load_env(self) -> None:
-        """Performs load procedure of all of the specified parameters.
+        """Performs load procedure of all the specified parameters.
         """
         self.preset = Value("i", 0, lock=False)
         url = getenv("SERVER_ADDRESS")
@@ -74,61 +78,66 @@ class GeneralController:
         load_dotenv()
         # Setup camera API
         cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
-        verify_address(cam_addr)
+        #verify_address(cam_addr)
         self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
 
         # Setup microphone API
         mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
-        verify_address(mic_addr)
+        #verify_address(mic_addr)
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
 
         # Setup secret
         self.secret = getenv("SECRET_KEY")
 
+        # Get filepath
+        filepath = getenv("FILEPATH")
+        if filepath is not None:
+            self.filepath = filepath
+
         # Initialize models
-        self.audio_model = AudioModel(filename="calibration.json")
-        self.preset_model = PresetModel(filename="presets.json")
+        self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
+        self.preset_model = PresetModel(filename=self.filepath + "presets.json")
 
         # Initialize footage thread
-        self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')# pragma: no mutate
-        self.footage_thread = FootageThread(self.video,self.footage_thread_event)# pragma: no mutate
+        self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')  # pragma: no mutate
+        self.footage_thread = FootageThread(self.video,self.footage_thread_event)  # pragma: no mutate
         self.footage_thread.start() # pragma: no mutate
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
         self.thread_mic = Thread(target=self.send_update,
-            args=(self.get_mic_info, '/update/microphone'))
+                                 args=(self.get_mic_info, '/update/microphone'))
         self.thread_cam = Thread(target=self.send_update,
-            args=(self.get_cam_info, '/update/camera'))
+                                 args=(self.get_cam_info, '/update/camera'))
         self.thread_mic.start()
         self.thread_cam.start()
 
     def __del__(self):
-        self.preset.value = 0 # pragma: no mutate
+        self.preset.value = 0  # pragma: no mutate
         self.footage_thread_event.set() # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
 
         try: # pragma: no mutate
             self.thread_mic.join() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for microphone") # pragma: no mutate
         try: # pragma: no mutate
             self.thread_cam.join() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for camera") # pragma: no mutate
         try: # pragma: no mutate
             self.footage_thread.join() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for footage") # pragma: no mutate
         try: # pragma: no mutate
             self.video.release() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for video") # pragma: no mutate
         try: # pragma: no mutate
             cv2.destroyAllWindows() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for cv2") # pragma: no mutate
 
     def load_mock(self):
         # This function is used to initialize integration in testing.

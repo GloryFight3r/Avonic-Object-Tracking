@@ -7,6 +7,7 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
+import web_app.settings_endpoints
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
@@ -34,30 +35,31 @@ def create_app(test_controller=None):
 
     @app.get('/')
     def view():
-        to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
-                   "footage", "thread", "scene", "socket", "settings", "tracking", "main"]
+        to_import = ["main", "footage-vis", "camera", "microphone", "presets", "calibration",
+                     "footage", "thread", "scene", "socket", "settings", "tracking"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
     def camera_view():
-        to_import=["camera", "socket", "settings", "main"]
+        to_import = ["main", "camera", "socket", "settings"]
         return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
+
     @app.get('/microphone_control')
     def microphone_view():
-        to_import=["microphone", "socket", "settings", "main"]
+        to_import = ["main", "microphone", "socket", "settings"]
         return render_template('single_page.html', name="microphone", to_import=to_import,
                                page_name="Microphone View")
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        to_import=["socket", "camera", "microphone", "presets", "calibration", "settings", "main"]
-        return render_template('single_page.html', name="presets_and_calibration", to_import=to_import,
-                               page_name="Presets & Calibration View")
+        to_import = ["main", "socket", "camera", "microphone", "presets", "calibration", "settings"]
+        return render_template('single_page.html', name="presets_and_calibration",
+                               to_import=to_import, page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
-        to_import=["footage", "socket", "settings", "main"]
+        to_import = ["main", "footage", "socket", "settings"]
         return render_template('single_page.html', name="live_footage", to_import=to_import,
                                page_name="Live Footage")
 
@@ -270,7 +272,7 @@ def create_app(test_controller=None):
         return web_app.tracking_endpoints.update_camera(integration)
 
     @integration.ws.on("request-frame")
-    def camera_frame_requested(message):
+    def camera_frame_requested():
         web_app.footage.emit_frame(integration)
 
     @app.post('/update/calibration')
@@ -287,8 +289,15 @@ def create_app(test_controller=None):
     @app.post('/info-thread/stop')
     def info_thread_stop():
         integration.info_threads_event.value = 0
-        print(integration.info_threads_event.value)
         return make_response(jsonify({}), 200)
+
+    @app.get('/settings/get')
+    def settings_get():
+        return web_app.settings_endpoints.get(integration)
+
+    @app.post('/settings/set')
+    def settings_set():
+        return web_app.settings_endpoints.set_settings(integration)
 
     def sigterm_handler(_signo, _stack_frame):
         close_running_threads(integration)
@@ -297,6 +306,7 @@ def create_app(test_controller=None):
     signal.signal(signal.SIGTERM, sigterm_handler)
 
     return app
+
 
 if __name__ == "__main__":
     application = create_app()

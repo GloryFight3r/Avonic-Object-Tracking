@@ -1,3 +1,10 @@
+/*
+ * Modal
+ *
+ * Pico.css - https://picocss.com
+ * Copyright 2019-2023 - Licensed under MIT
+ * https://github.com/picocss/examples/blob/master/v1-preview/js/modal.js
+ */
 const isOpenClass = "modal-is-open";
 const openingClass = "modal-is-opening";
 const closingClass = "modal-is-closing";
@@ -64,3 +71,8 @@ const getScrollbarWidth = () => {
 const isScrollbarVisible = () => {
     return document.body.scrollHeight > screen.height
 }
+
+// Custom code
+onSuccess = Object.assign({}, onSuccess, {
+    "settings-form": closeSettings
+})

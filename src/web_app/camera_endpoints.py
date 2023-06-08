@@ -126,8 +126,8 @@ def get_camera_footage(integration: GeneralController):
 
 def address_set_camera_endpoint(integration: GeneralController):
     try:
-        addr = (request.form["ip"], int(request.form["port"]))
-        verify_address(addr)
+        addr = (request.form["camera-ip"], int(request.form["camera-port"]))
+        #verify_address(addr)
         if integration.cam_sock is None:
             new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         else:

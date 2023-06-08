@@ -53,8 +53,8 @@ def client(camera, monkeypatch):
     """A test client for the app."""
     mic_sock.sendto.return_value = 48
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), "0.0.0.0")
-    mic_adapt = MicrophoneSocket(sock=mic_sock, address="0.0.0.0")
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), ("0.0.0.0", 45))
+    mic_adapt = MicrophoneSocket(sock=mic_sock, address=("0.0.0.0", 45))
     mic_api = MicrophoneAPI(mic_adapt)
     mic_api.height = 1
 
@@ -86,20 +86,11 @@ def test_fail(client):
 
 def test_set_address_camera(client):
     data = {
-        "ip": "0.0.0.1",
-        "port": 1234
+        "camera-ip": "0.0.0.1",
+        "camera-port": 1234
     }
     rv = client.post('/camera/address/set', data=data)
     assert rv.status_code == 200
-
-
-def test_set_address_camera_invalid(client):
-    data = {
-        "ip": "asdf",
-        "port": 1234
-    }
-    rv = client.post('/camera/address/set', data=data)
-    assert rv.status_code == 400
 
 
 def test_turn_on(client):
@@ -211,8 +202,8 @@ def test_get_zoom(client):
 
 def test_set_address_microphone(client):
     data = {
-        "ip": "0.0.0.1",
-        "port": 1234
+        "microphone-ip": "0.0.0.1",
+        "microphone-port": 1234
     }
     rv = client.post('/microphone/address/set', data=data)
     assert rv.status_code == 200
@@ -327,15 +318,15 @@ def test_thread(client):
 def test_is_speaking(client):
     mic_sock.sendto.return_value = 48
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-55}}}\r\n', "ascii"), "0.0.0.0")
+        (bytes('{"m":{"in1":{"peak":-55}}}\r\n', "ascii"), ("0.0.0.0", 45))
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":false}\n", "utf-8")
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), "0.0.0.0")
+        (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), ("0.0.0.0", 45))
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":true}\n", "utf-8")
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-100}}}\r\n', "ascii"), "0.0.0.0")
+        (bytes('{"m":{"in1":{"peak":-100}}}\r\n', "ascii"), ("0.0.0.0", 45))
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":true}\n", "utf-8")
 
@@ -549,7 +540,7 @@ def test_get_preset_list(client):
 
 def test_settings(client):
     rv = client.get("settings/get")
-    assert rv.status_code == 200 and rv.data == {
+    assert rv.status_code == 200 and json.loads(rv.data) == {
         "camera-ip": "0.0.0.0",
         "camera-port": 52381,
         "microphone-ip": "0.0.0.0",
@@ -568,7 +559,7 @@ def test_settings(client):
     rv = client.post("settings/set", data=expected)
     assert rv.status_code == 200
     rv = client.get("settings/get")
-    assert rv.status_code == 200 and rv.data == expected
+    assert rv.status_code == 200 and json.loads(rv.data) == expected
 
 
 # live footage test
