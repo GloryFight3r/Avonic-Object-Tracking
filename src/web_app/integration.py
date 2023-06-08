@@ -2,7 +2,7 @@ from threading import Event, Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value
-from dotenv import load_dotenv
+import yaml
 import requests
 import cv2
 import numpy as np
@@ -75,41 +75,57 @@ class GeneralController:
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
-        load_dotenv()
+
+        # Load settings file
+        try:
+            with open("settings.yaml", "r") as f:
+                settings = yaml.load(f)
+        except IOError:
+            print("Could not open settings.yaml file, proceeding without it.")
+            settings = {
+                "camera-ip": "0.0.0.0",
+                "camera-port": 52381,
+                "microphone-ip": "0.0.0.0",
+                "microphone-port": 45,
+                "microphone-thresh": -55,
+                "filepath": "",
+                "secret-key": "test"
+            }
+
         # Setup camera API
         cam_addr = None
-        cam_port = getenv("CAM_PORT")
+        cam_port = settings["camera-port"]
         if cam_port != None:
-            cam_addr = (getenv("CAM_IP"), int(cam_port))
+            cam_addr = (settings["camera-ip"], int(cam_port))
         #verify_address(cam_addr)
             if cam_addr != None: 
                 self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
 
         # Setup microphone API
         mic_addr = None
-        mic_port = getenv("MIC_PORT")
-        print(mic_port,mic_port==None)
-        if mic_port != None:
-            mic_addr = (getenv("MIC_IP"), int(mic_port))
+        mic_port = settings["microphone-port"]
+        print(mic_port, mic_port is None)
+        if mic_port is not None:
+            mic_addr = (settings["microphone-ip"], int(mic_port))
         #verify_address(mic_addr)
-            if mic_addr != None:
-                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
+            if mic_addr is not None:
+                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(settings["microphone-thresh"]))
 
         # Setup secret
-        self.secret = getenv("SECRET_KEY")
+        self.secret = settings["secret-key"]
 
         # Get filepath
-        filepath = getenv("FILEPATH")
+        filepath = settings["filepath"]
         if filepath is not None:
-            self.filepath = filepath
+            self.filepath = str(filepath)
 
         # Initialize models
         self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(filename=self.filepath + "presets.json")
 
         # Initialize footage thread
-        if cam_addr != None:
-            self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')# pragma: no mutate
+        if cam_addr is not None:
+            self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"] + ':554/live/av0')# pragma: no mutate
             self.footage_thread = FootageThread(self.video,self.footage_thread_event)# pragma: no mutate
             self.footage_thread.start() # pragma: no mutate
 

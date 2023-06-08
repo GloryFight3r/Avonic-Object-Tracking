@@ -28,6 +28,18 @@ const openSettings = () => {
         document.documentElement.style.setProperty("--scrollbar-width", `${getScrollbarWidth()}px`)
     }
     document.documentElement.classList.add(isOpenClass, openingClass)
+
+    // get current settings
+    fetch("/settings/get", { method: "get" }).then(async (response) => {
+        const d = await response.json()
+        document.getElementById("settings-camera-ip").value = d["camera-ip"]
+        document.getElementById("settings-camera-port").value = d["camera-port"]
+        document.getElementById("settings-microphone-ip").value = d["microphone-ip"]
+        document.getElementById("settings-microphone-port").value = d["microphone-port"]
+        document.getElementById("settings-microphone-thresh").value = d["microphone-thresh"]
+        document.getElementById("settings-files-path").value = d["filepath"]
+    })
+
     const modal = document.getElementById("settings")
     setTimeout(() => {
         visibleModal = modal;
