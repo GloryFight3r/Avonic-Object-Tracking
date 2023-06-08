@@ -3,7 +3,7 @@ import os
 import pytest
 import numpy as np
 
-from avonic_speaker_tracker.calibration import Calibration, angle_between_vectors
+from avonic_speaker_tracker.audio_model.calibration import Calibration, angle_between_vectors
 
 def test_set_height():
     cal = Calibration()
@@ -37,7 +37,7 @@ def test_reset_calibration():
     assert cal.mic_to_cam[1] == 0.0
     assert cal.mic_to_cam[2] == 0.0
     assert not cal.speaker_points
-    assert cal.to_mic_direction is None
+    assert np.allclose(cal.to_mic_direction, np.array([0, 0, 0]))
 
 def test_is_calibrated():
     cal = Calibration()
@@ -137,10 +137,16 @@ def test_angle_between_vectors(v1, v2, exp_angle):
     assert abs(angle - exp_angle) <= 1E-4
 
 def test_with_file():
-    cal = Calibration("TEST_WITH_FILE_CALIBRATION.json")
-    d = np.array([1, 1])
-    p = (np.array([1, 1]), np.array([0, 0, 0]))
+    try:
+        cal = Calibration("TEST_WITH_FILE_CALIBRATION.json")
+        d = np.array([1, 1, 1])
+        p = (np.array([1, 0.2, 0]), np.array([0, 0.2, 1]))
 
-    cal.add_speaker_point(p)
-    cal.add_direction_to_mic(d)
-    os.remove("TEST_WITH_FILE_CALIBRATION.json")
+        cal.add_speaker_point(p)
+        cal.add_direction_to_mic(d)
+        second_cal = Calibration("TEST_WITH_FILE_CALIBRATION.json")
+        assert np.allclose(cal.to_mic_direction, second_cal.to_mic_direction)
+        assert len(cal.speaker_points) == len(second_cal.speaker_points) == 1
+        assert np.allclose(cal.speaker_points[0], second_cal.speaker_points[0])
+    finally:
+        os.remove("TEST_WITH_FILE_CALIBRATION.json")

@@ -1,5 +1,6 @@
 from unittest import mock
 import socket
+import time
 import pytest
 import numpy as np
 from web_app.integration import GeneralController
@@ -7,7 +8,6 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
-from avonic_speaker_tracker.preset import PresetCollection
 import web_app
 
 sock = mock.Mock()
@@ -58,6 +58,7 @@ def camera(monkeypatch):
 
     return cam_api
 
+test_controller = GeneralController()
 
 @pytest.fixture
 def client(camera):
@@ -70,16 +71,13 @@ def client(camera):
 
     cam_api = camera
 
-    test_controller = GeneralController()
-    test_controller.cam_sock = sock
-    test_controller.load_mock()
-    test_controller.set_cam_api(cam_api)
-    test_controller.set_mic_api(mic_api)
-    test_controller.set_preset_collection(PresetCollection(filename=None))
+    test_controller.load_env()
     test_controller.ws = mock.Mock()
-    app = web_app.create_app(test_controller=None)
+    app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
     return app.test_client()
 
 def test_load_env(client):
-    pass
+    time.sleep(0.5)
+    test_controller.footage_thread_event.set()
+    test_controller.info_threads_break.value = 1

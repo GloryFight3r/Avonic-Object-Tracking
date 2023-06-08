@@ -1,7 +1,7 @@
-import pytest
-from threading import Event
-import cv2
 import base64
+from threading import Event
+import pytest
+import cv2
 from avonic_camera_api.footage import FootageThread
 from object_tracker.yolov2 import YOLOPredict
 
@@ -31,10 +31,8 @@ class MockedYoloPredict:
 @pytest.fixture
 def footage_thread():
     mocked_cam_footage = MockedCv()
-    mocked_box_tracker = MockedBoxTracker()
-    mocked_yolo = MockedYoloPredict()
     event = Event()
-    thread = FootageThread(mocked_cam_footage, mocked_yolo, event, mocked_box_tracker)
+    thread = FootageThread(mocked_cam_footage, event)
 
     return thread
 

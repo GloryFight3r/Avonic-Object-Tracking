@@ -4,9 +4,9 @@ if (typeof onSuccess !== 'undefined') {
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "camera-position-get-form": onPositionGet,
-    "camera-coords-get-form": onCameraCoordsGet,
-    "presets-camera-position-set-form": onPositionSet,
-    "presets-camera-zoom-set-form": onZoomSet,
+    "cam-dir-button": onPositionSet,
+    "cam-zoom-button": onZoomSet,
+    "camera-coords-get-form": onCameraCoordsGet
   });
 }
 else {
@@ -15,8 +15,9 @@ else {
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
     "camera-position-get-form": onPositionGet,
-    "presets-camera-position-set-form": onPositionSet,
-    "presets-camera-zoom-set-form": onZoomSet,
+    "cam-dir-button": onPositionSet,
+    "cam-zoom-button": onZoomSet,
+    "camera-coords-get-form": onCameraCoordsGet
   }
 }
 
@@ -53,6 +54,20 @@ async function onPositionSet(data) {
 async function onZoomSet(data) {
   document.getElementById("camera-zoom-value").value =
     (await data)["zoom-value"]
+}
+
+async function onCameraCoordsGet(data) {
+    const d = (await data)["camera-coords"]
+    document.getElementById("camera-coords-x").value = d[0].toFixed(5)
+    document.getElementById("camera-coords-y").value = d[1].toFixed(5)
+    document.getElementById("camera-coords-z").value = d[2].toFixed(5)
+}
+
+if (document.getElementById("presets") !== null) {
+  selectCaliTab()
+}
+if (document.getElementById("calibration-button") !== null) {
+  calibrationIsSet().then()
 }
 
 function selectMovement() {

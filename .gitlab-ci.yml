@@ -37,6 +37,8 @@ test:
     # PORT of Microphone
     MIC_PORT: 45
     MIC_THRESH: 55
+  cache:
+    policy: pull
   before_script:
     - apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
   script:
@@ -63,6 +65,8 @@ test:
 pylint:
   stage: test
   image: python:3.10-slim
+  cache:
+    policy: pull
   before_script:
     - mkdir -p public/badges public/lint
     - echo undefined > public/badges/$CI_JOB_NAME.score
@@ -85,6 +89,7 @@ pylint:
 
 run:
   stage: build
+  image: python:3.10-slim
   script:
     - python --version  # For debugging
     - pip install virtualenv
@@ -93,6 +98,8 @@ run:
     - pip install build
     - python -m build
     - pip install .
+  cache:
+    policy: push
   artifacts:
     paths:
       - dist/*.whl
@@ -100,6 +107,8 @@ run:
 git-inspector:
   stage: reports
   image: python:2.7.16-alpine3.8
+  cache:
+    policy: pull
   script: 
     - apk add git
     - git clone https://github.com/ejwa/gitinspector.git
@@ -112,6 +121,8 @@ git-inspector:
 compile-report:
   stage: reports
   image: texlive/texlive:latest
+  cache:
+    policy: pull
   script:
     - cd docs
     - pdflatex -interaction=nonstopmode final-report.tex

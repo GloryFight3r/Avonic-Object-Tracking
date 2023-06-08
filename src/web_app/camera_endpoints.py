@@ -1,8 +1,10 @@
 import socket
+import numpy as np
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode
 from avonic_camera_api.converter import vector_angle
+from avonic_speaker_tracker.utils.camera_navigation_utils import get_movement_to_box
 
 def responses():
     return {
@@ -141,8 +143,11 @@ def navigate_camera(integration: GeneralController):
     x = float(request.get_json()["x-pos"])
     y = float(request.get_json()["y-pos"])
     #print(x, y)
-    x = x * 1920
-    y = y * 1080
+    x *= integration.footage_thread.resolution[0]
+    y *= integration.footage_thread.resolution[1]
     #print(x, y)
-    integration.box_tracker.camera_track([x, y, x, y])
+    camera_speed, camera_rotation = get_movement_to_box(np.array([x, y, x, y]), integration.cam_api, integration.footage_thread)
+
+    integration.cam_api.move_relative(int(camera_speed[0]), int(camera_speed[1]),\
+                                      camera_rotation[0], camera_rotation[1])
     return success()

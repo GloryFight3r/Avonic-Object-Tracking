@@ -15,24 +15,15 @@
           }
       }
   </script>
-  {%- if 'footage-vis' in to_import -%}
-  <script src="{{ url_for('static', filename='js/footage_vis.js') }}" defer></script> {% endif %}
-  {%- if 'scene' in to_import -%}
-  <script src="{{ url_for('static', filename='js/scene.js')}}" type="module" defer></script> {% endif %}
-  {%- if 'socket' in to_import -%}
-  <script src="{{ url_for('static', filename='js/socket.js') }}" defer></script> {% endif %}
-  {%- if 'calibration' in to_import -%}
-  <script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script> {% endif %}
-  {%- if 'camera' in to_import -%}
-  <script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script> {% endif %}
-  {%- if 'microphone' in to_import -%}
-  <script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script> {% endif %}
-  {%- if 'footage' in to_import -%}
-  <script src="{{ url_for('static', filename='js/footage.js') }}" defer></script> {% endif %}
-  {%- if 'presets' in to_import -%}
-  <script src="{{ url_for('static', filename='js/presets.js') }}" defer></script> {% endif %}
-  {%- if 'thread' in to_import -%}
-  <script src="{{ url_for('static', filename='js/thread.js') }}" defer></script> {% endif %}
-  {%- if 'main' in to_import -%}
-  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>{% endif %}
+  {%- if 'footage-vis' in to_import -%}<script src="{{ url_for('static', filename='js/footage_vis.js') }}" defer></script> {% endif %}
+  {%- if 'scene' in to_import -%}<script src="{{ url_for('static', filename='js/scene.js')}}" type="module" defer></script> {% endif %}
+  {%- if 'socket' in to_import -%}<script src="{{ url_for('static', filename='js/socket.js') }}" defer></script> {% endif %}
+  {%- if 'calibration' in to_import -%}<script src="{{ url_for('static', filename='js/calibration.js') }}" defer></script> {% endif %}
+  {%- if 'camera' in to_import -%}<script src="{{ url_for('static', filename='js/camera_on_success.js') }}" defer></script> {% endif %}
+  {%- if 'microphone' in to_import -%}<script src="{{ url_for('static', filename='js/microphone_on_success.js') }}" defer></script> {% endif %}
+  {%- if 'footage' in to_import -%}<script src="{{ url_for('static', filename='js/footage.js') }}" defer></script> {% endif %}
+  {%- if 'presets' in to_import -%}<script src="{{ url_for('static', filename='js/presets.js') }}" defer></script> {% endif %}
+  {%- if 'thread' in to_import -%}<script src="{{ url_for('static', filename='js/thread.js') }}" defer></script> {% endif %}
+  {%- if 'main' in to_import -%}<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>{% endif %}
+  {%- if 'tracking' in to_import -%}<script src="{{ url_for('static', filename='js/tracking.js') }}" defer></script>{% endif %}
 </head>

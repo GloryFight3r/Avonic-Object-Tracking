@@ -12,7 +12,7 @@ async function onError(button) {
     button.classList.remove("contrast");
 }
 
-[...document.forms].filter((f) => f.id != "preset-form").forEach(
+[...document.forms].filter((f) => f.id !== "preset-form").forEach(
     (f) =>
         (f.onsubmit = async (e) => {
             e.preventDefault();

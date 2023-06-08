@@ -1,8 +1,9 @@
 import pytest
 import numpy as np
+from CameraMock import CameraMock
 from avonic_camera_api.camera_control_api import CameraAPI, insert_zoom_in_hex
 from avonic_camera_api.camera_adapter import ResponseCode
-from tests.CameraMock import CameraMock
+
 
 def test_get_zoom():
     """
