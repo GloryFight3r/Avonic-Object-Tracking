@@ -6,12 +6,12 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 class TrackingModel(ABC):
     prev_dir: np.ndarray = None
     @abstractmethod
-    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
+    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI) -> np.ndarray:
         pass
 
     @abstractmethod
     def reload(self):
         pass
 
-    def set_speak_delay(self, speak_delay):
+    def set_speak_delay(self, speak_delay: int) -> None:
         pass

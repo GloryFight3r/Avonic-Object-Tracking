@@ -195,7 +195,7 @@ def create_app(test_controller=None):
     @app.get('/hybrid/track')
     def hybrid_tracker():
         print("HYBRID TRACKER")
-        return web_app.tracking_endpoints.track_presets(integration)
+        return web_app.tracking_endpoints.track_hybrid(integration)
 
     @app.get('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():

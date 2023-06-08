@@ -1,6 +1,7 @@
 from time import sleep
 from threading import Thread
 from multiprocessing import Value
+from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.object_tracker_model.ObjectTrackingModel import HybridTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -25,14 +26,16 @@ class UpdateThread(Thread):
             event - event from threading module, that acts as a flag/lock of the thread
         """
         super().__init__()
-        self.event = event
-        self.cam_api = cam_api
-        self.mic_api = mic_api
+        self.event: c_int = event
+
+        self.cam_api: CameraAPI = cam_api
+        self.mic_api: MicrophoneAPI = mic_api
         self.model_index = model_index.value
         self.all_models = all_models
         self.model_in_use = None
+        self.value: int = 0
 
-    def run(self):
+    def run(self) -> None:
         """ Actual body of the thread.
         Continuously calls point method of the supplied model, to calculate the direction
         and point the camera towards it.
@@ -49,19 +52,18 @@ class UpdateThread(Thread):
         self.model_in_use = self.all_models[self.model_index]
         self.model_in_use.reload()
 
-        print(self.model_index)
-
         while self.event.value != 0:
-            print("RUNNING")
+            print("RUNNING UPDATE THREAD")
 
             if self.mic_api.is_speaking():
-                speak_delay = 0 
+                speak_delay = 0
             else:
-                speak_delay = speak_delay + 1 
+                speak_delay = speak_delay + 1
             self.model_in_use.set_speak_delay(speak_delay)
             direct = self.model_in_use.point(self.cam_api, self.mic_api)
 
             print(direct)
 
-            sleep(0.05)
+            self.value += 1
+            sleep(2)
         print("Exiting thread")

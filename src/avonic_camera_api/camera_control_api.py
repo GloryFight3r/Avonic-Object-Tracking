@@ -8,6 +8,8 @@ TILT_STEP = 121/(1296+443)
 
 class CameraAPI:
     latest_direction = None
+    latest_fov = np.array([60.38, 35.80])
+
     MIN_FOV = np.array([3.72, 2.14])
     MAX_FOV = np.array([60.38, 35.80])
     MAX_ZOOM_VALUE = 16384
@@ -166,9 +168,10 @@ class CameraAPI:
         ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
                                message, self.counter)
         if isinstance(ret, ResponseCode):
-            return ret
+            return self.latest_fov
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
-        return int(hex_res, 16)
+        self.latest_fov = int(hex_res, 16)
+        return self.latest_fov
 
     def direct_zoom(self, zoom: int) -> ResponseCode:
         """ Change the value of the zoom to the specified value.
@@ -205,6 +208,7 @@ class CameraAPI:
                                message, self.counter)
         if isinstance(ret, ResponseCode):
             return ret
+        print (ret)
         ret_msg = str(ret)[2:-1]  # remove b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]

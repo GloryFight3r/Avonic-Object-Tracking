@@ -1,6 +1,5 @@
 from time import sleep
 from flask import make_response, jsonify
-import numpy as np
 from web_app.integration import GeneralController
 
 def success():
@@ -68,9 +67,8 @@ def get_calibration(integration: GeneralController):
             camera-coordinates: the coordinates of the camera
                 relative to the microphone.
     """
-    cam_coord = np.array([0.0, 0.0, 0.0])
     if integration.audio_model.calibration.is_calibrated():
-        cam_coord = integration.audio_model.calibration.calculate_distance()
+        integration.audio_model.calibration.calculate_distance()
     return make_response(jsonify({
         "camera-coords": list(integration.audio_model.calibration.mic_to_cam)
     }), 200)

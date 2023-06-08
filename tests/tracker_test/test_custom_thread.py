@@ -1,7 +1,6 @@
-from threading import Event
 from unittest import mock
-import numpy as np
 from multiprocessing import Value
+import numpy as np
 from avonic_speaker_tracker.updater import UpdateThread
 
 
@@ -16,7 +15,7 @@ def test_constructor():
     assert ct.event == e
     assert ct.mic_api == mic_api
     assert ct.cam_api == cam_api
-    assert ct.value is None
+    assert ct.value == 0
 
 
 def test_setter():
@@ -28,7 +27,7 @@ def test_setter():
     model = mock.Mock()
     ct = UpdateThread(e, mic_api, cam_api, model, [])
     assert ct.event == e
-    assert ct.value is None
+    assert ct.value == 0
     e.value = 1
     ct.start()
     e.value = 0
