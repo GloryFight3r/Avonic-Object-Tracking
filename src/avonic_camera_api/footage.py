@@ -31,22 +31,26 @@ class ObjectTrackingThread(Thread):
 
     def run(self):
         """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
-        while not self.event.is_set():
-            im_arr = np.frombuffer(self.stream.buffer.raw[:self.stream.buflen.value], np.byte)
-            frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)  # read the camera frame
-            if frame is not None:
-                boxes = self.nn.get_bounding_boxes(frame)
-                if len(boxes) > 0:
-                    last_box = self.trck.get_center_box(boxes)
-                    self.trck.track_object(last_box)
+        while self.event.value != 0:
+            if self.event.value != 1:
+                im_arr = np.frombuffer(self.stream.buffer.raw[:self.stream.buflen.value], np.byte)
+                frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)  # read the camera frame
+                if frame is not None:
+                    boxes = self.nn.get_bounding_boxes(frame)
+                    print("LEN BOXES")
+                    print(len(boxes))
+                    if len(boxes) > 0:
+                        last_box = self.trck.get_center_box(boxes)
+                        print("TRACK?!?!?!?!!?")
+                        self.trck.track_object(last_box)
 
-                    # this won't work in production. It is purely for debugging purposes
-                    if True:
-                        (x, y, x2, y2) = last_box
-                        self.nn.draw_prediction(frame, "person", x, y, x2, y2)
-                        self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
-                self.out.write(frame)
-            time.sleep(2)
+                        # this won't work in production. It is purely for debugging purposes
+                        if True:
+                            (x, y, x2, y2) = last_box
+                            self.nn.draw_prediction(frame, "person", x, y, x2, y2)
+                            self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
+                    self.out.write(frame)
+                time.sleep(2)
 
     def __del__():
         self.out.release()

@@ -243,9 +243,9 @@ def create_app(test_controller=None):
         print("OBJECT TRACKER")
         return web_app.tracking_endpoints.track_object_continuously(integration)
 
-    @app.post('/object_tracking/stop')
-    def object_tracking_stop():
-        return web_app.tracking_endpoints.stop_object_tracking_endpoint(integration)
+    #@app.post('/object_tracking/stop')
+    #def object_tracking_stop():
+    #    return web_app.tracking_endpoints.stop_object_tracking_endpoint(integration)
 
     #@app.post('/thread/start/<allow_movement>')
     #def thread_start(allow_movement):

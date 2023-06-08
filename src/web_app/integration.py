@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import requests
 import cv2
 import numpy as np
-from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
+from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -32,14 +32,13 @@ class GeneralController:
         # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
 
-        self.footage_thread_event = Event()
-
         # self.info_threads_break used to completely destroy info-thread, and not just pause
         # Used for safe finish of the program, for safe destruction.
         # When 1 - finishes the thread ASAP.
         self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
 
-        self.object_tracking_event = Event()
+        self.footage_thread_event = Event()
+        self.object_tracking_event = Value("i", 0, lock=False)
 
         # Update thread field
         self.thread = None
@@ -105,8 +104,10 @@ class GeneralController:
         self.secret = getenv("SECRET_KEY")
 
         # Initialize models
-        self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]),
-                                                       5, filename="calibration.json")
+        self.object_audio_model = WaitObjectAudioModel(
+                self.cam_api, self.mic_api, self.object_tracking_thread,
+                np.array([1920.0, 1080.0]),
+                5, filename="calibration.json")
         self.audio_model = AudioModel(self.cam_api, self.mic_api, filename="calibration.json")
         self.preset_model = PresetModel(filename="presets.json")
 
@@ -128,7 +129,7 @@ class GeneralController:
 
     def __del__(self):
         self.video.release()
-        self.object_tracking_event.set() # pragma: no mutate
+        self.object_tracking_event.value = 0 # pragma: no mutate
         self.preset.value = 0 # pragma: no mutate
         self.footage_thread_event.set() # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate

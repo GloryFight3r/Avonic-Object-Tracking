@@ -1,18 +1,20 @@
 from flask import make_response, jsonify, request
+import numpy as np
 from avonic_speaker_tracker.updater import UpdateThread
 from web_app.integration import GeneralController
 
 from web_app.integration import GeneralController, ModelCode
 from avonic_camera_api.footage import ObjectTrackingThread
 from object_tracker.yolov2 import YOLOPredict
+from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
 
 
-def stop_object_tracking_endpoint(integration: GeneralController):
-    # stop (pause) the object tracking thread
-    integration.object_tracking_event.set()
-    integration.object_tracking_thread.join()
-    #integration.footage_thread.show_bounding_boxes = False
-    return make_response(jsonify({}), 200)
+#def stop_object_tracking_endpoint(integration: GeneralController):
+#    # stop (pause) the object tracking thread
+#    integration.object_tracking_event.set()
+#    integration.object_tracking_thread.join()
+#    #integration.footage_thread.show_bounding_boxes = False
+#    return make_response(jsonify({}), 200)
 
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
@@ -31,12 +33,16 @@ def start_thread_endpoint(integration: GeneralController):
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
-            if integration.object_tracking_thread is None or integration.object_tracking_event.is_set():
-                integration.object_tracking_thread = \
-                    ObjectTrackingThread(integration.nn, integration.object_audio_model,
-                        integration.footage_thread, integration.object_tracking_event)
-            integration.object_tracking_event.clear()
+            integration.object_tracking_thread = \
+                ObjectTrackingThread(integration.nn, integration.object_audio_model,
+                    integration.footage_thread, integration.object_tracking_event)
+            integration.object_tracking_event.value = 1
             integration.object_tracking_thread.start()
+
+            integration.object_audio_model = WaitObjectAudioModel(
+                    integration.cam_api, integration.mic_api, integration.object_tracking_thread,
+                    np.array([1920.0, 1080.0]),
+                    5, filename="calibration.json")
             model = integration.object_audio_model
 
         print(model)
@@ -58,6 +64,10 @@ def stop_thread_endpoint(integration: GeneralController):
     # stop (pause) the thread
     integration.event.value = 0
     integration.info_threads_event.value = 0
+    integration.object_tracking_event.value = 0
+
+    if integration.object_tracking_thread is not None:
+        integration.object_tracking_thread.join()
     integration.thread.join()
     return make_response(jsonify({}), 200)
 
