@@ -25,12 +25,9 @@ def vector_angle(v: np.ndarray) -> tuple[float, float]:
     Returns:
         alpha - horizontal angle, beta - vertical angle in rad
     """
-    if len(v) != 3 or not isinstance(v[0], np.float64):
-        if isinstance(v[0], float):
-            np.float64(v)
-        else:
-            raise TypeError("Vector must contain three floats")
-    norm = np.linalg.norm(v)
+    if len(v) != 3 or not isinstance(v, np.ndarray):
+        raise TypeError("Vector must contain three floats and be instance of np.ndarray")
+    norm = np.linalg.norm(v.astype(np.float64))
     if norm == 0:
         raise ValueError("Vector not normalizable")
     vec = v / norm  # normalise
