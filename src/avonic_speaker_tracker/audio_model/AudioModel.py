@@ -52,11 +52,11 @@ class AudioModel(TrackingModel):
 
         direct_np = np.array([int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val])
 
-        diffX = math.fabs(self.prev_dir[0]-direct[0])*2
-        diffY = math.fabs(self.prev_dir[1]-direct[1])*2
+        diffX = math.fabs(self.prev_dir[0]-direct_np[0])*2.0/360.0
+        diffY = math.fabs(self.prev_dir[1]-direct_np[1])*2.0/120.0
 
-        speedX : int = int(13 + diffX/360*11)
-        speedY : int = int(11 + diffY/120*9)
+        speedX : int = int(13 + diffX*11.0)
+        speedY : int = int(11 + diffY*9.0)
 
         speedX = min(speedX,24)
         speedY = min(speedY,20)
