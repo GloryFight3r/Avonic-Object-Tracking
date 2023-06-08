@@ -48,6 +48,7 @@ def set_settings(integration: GeneralController):
         if integration.save():
             return make_response(jsonify({}), 200)
         return make_response(jsonify(
-            {"message": "Something went wrong while saving settings file! Check application output!"}), 500)
+            {"message": "Something went wrong while saving settings file! Check application output!"}),
+            500)
     except (ValueError, KeyError):
         return make_response(jsonify({"message": "Invalid threshold or filepath."}), 400)

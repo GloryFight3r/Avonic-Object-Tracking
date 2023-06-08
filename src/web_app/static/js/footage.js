@@ -6,9 +6,7 @@ if (document.getElementById("footage")) {
             );
         });
         window.setInterval(() => {
-            if (document.getElementById("footage-switch").checked) {
-                socket.emit('request-frame', {})
-            }
+            socket.emit('request-frame', {})
         }, 100)
     });
 }

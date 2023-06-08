@@ -82,7 +82,7 @@ class GeneralController:
 
         # Load settings file
         try:
-            with open("settings.yaml", "r") as f:
+            with open("settings.yaml", "r", encoding="utf-8") as f:
                 settings = load(f, Loader=Loader)
         except IOError as e:
             print("Could not open settings.yaml file, proceeding without it.")
@@ -112,7 +112,8 @@ class GeneralController:
         if mic_port is not None:
             mic_addr = (settings["microphone-ip"], int(mic_port))
             if mic_addr is not None and verify_address(mic_addr):
-                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(settings["microphone-thresh"]))
+                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr),
+                                             int(settings["microphone-thresh"]))
 
         # Setup secret
         self.secret = settings["secret-key"]
@@ -128,9 +129,11 @@ class GeneralController:
 
         # Initialize footage thread
         if cam_addr is not None:
-            self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"] + ':554/live/av0')# pragma: no mutate
-            self.footage_thread = FootageThread(self.video,self.footage_thread_event)# pragma: no mutate
-            self.footage_thread.start() # pragma: no mutate
+            self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
+                                          + ':554/live/av0')  # pragma: no mutate
+            self.footage_thread = FootageThread(self.video,
+                                                self.footage_thread_event)  # pragma: no mutate
+            self.footage_thread.start()  # pragma: no mutate
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
@@ -153,7 +156,7 @@ class GeneralController:
             False on error
         """
         try:
-            with open("settings.yaml", "w") as f:
+            with open("settings.yaml", "w", encoding="utf-8") as f:
                 cam_addr = self.cam_api.camera.address
                 mic_addr = self.mic_api.sock.address
                 data = {

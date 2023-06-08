@@ -597,7 +597,8 @@ def test_settings_invalid(client):
             "filepath": ""
         }
         rv = client.post("settings/set", data=data)
-        assert rv.status_code == 400 and json.loads(rv.data)["message"] == "Invalid threshold or filepath."
+        assert rv.status_code == 400 and json.loads(rv.data)["message"] ==\
+               "Invalid threshold or filepath."
 
 
 # live footage test
@@ -609,6 +610,7 @@ def generate_single_page_views():
         "/microphone_control",
         "/presets_and_calibration"
     ]
+
 
 @pytest.mark.parametrize("url", generate_single_page_views())
 def test_live_footage(client, url):
