@@ -48,7 +48,8 @@ class ObjectTrackingThread(Thread):
                         #    (x, y, x2, y2) = last_box
                         #    self.nn.draw_prediction(frame, "person", x, y, x2, y2)
                         #    self.stream.box_frame = cv2.imencode('.jpg', frame)[1]
-                    self.out.write(frame)
+                    # to write results to video
+                    #self.out.write(frame)
                 time.sleep(2)
 
 
