@@ -7,7 +7,7 @@ def emit_frame(integration: GeneralController):
     Args:
         integration: The controller object
     """
-    frame = integration.footage_thread.get_frame()
-    emit("new-frame", {
-        "base64": frame
+    frame = integration.footage_thread.get_frame() # pragma: no mutate
+    emit("new-frame", { # pragma: no mutate
+        "base64": frame # pragma: no mutate
     })

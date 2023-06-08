@@ -1,3 +1,4 @@
+import signal
 from flask import Flask, jsonify, abort, render_template, make_response
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -6,7 +7,7 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
 #log = logging.getLogger('werkzeug')
@@ -34,13 +35,13 @@ def create_app(test_controller=None):
     @app.get('/')
     def view():
         to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
-                   "footage", "thread", "scene", "socket", "settings", "main"]
+                   "footage", "thread", "scene", "socket", "settings", "tracking", "main"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
     def camera_view():
         to_import=["camera", "socket", "settings", "main"]
-        return render_template('single_page.html', name="camera", to_import=to_import, 
+        return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
     @app.get('/microphone_control')
     def microphone_view():
@@ -185,6 +186,11 @@ def create_app(test_controller=None):
     def point_to_preset():
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
 
+    @app.get('/preset/track')
+    def preset_tracker():
+        print("PRESET TRACKER")
+        return web_app.tracking_endpoints.track_presets(integration)
+
     @app.get('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
@@ -205,6 +211,12 @@ def create_app(test_controller=None):
     def calibration_get_cam_coords():
         return web_app.calibration_endpoints.get_calibration(integration)
 
+    @app.get('/calibration/track')
+    def continuous_tracker():
+        print("CONTINUOUS TRACKER")
+        return web_app.tracking_endpoints.track_continuously(integration)
+
+
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
 
@@ -224,9 +236,9 @@ def create_app(test_controller=None):
 
     # create the event and start the thread
 
-    @app.post('/thread/start/<allow_movement>')
-    def thread_start(allow_movement):
-        return web_app.tracking_endpoints.start_thread_endpoint(integration, allow_movement)
+    @app.post('/thread/start')
+    def thread_start():
+        return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():
@@ -256,7 +268,7 @@ def create_app(test_controller=None):
     @app.post('/update/camera')
     def thread_camera():
         return web_app.tracking_endpoints.update_camera(integration)
-    
+
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)
@@ -264,6 +276,25 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
+
+    # Info-thread section
+
+    @app.post('/info-thread/start')
+    def info_thread_start():
+        integration.info_threads_event.value = 1
+        return make_response(jsonify({}), 200)
+
+    @app.post('/info-thread/stop')
+    def info_thread_stop():
+        integration.info_threads_event.value = 0
+        print(integration.info_threads_event.value)
+        return make_response(jsonify({}), 200)
+
+    def sigterm_handler(_signo, _stack_frame):
+        close_running_threads(integration)
+
+    signal.signal(signal.SIGINT, sigterm_handler)
+    signal.signal(signal.SIGTERM, sigterm_handler)
 
     return app
 

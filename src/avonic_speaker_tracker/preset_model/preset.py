@@ -1,20 +1,20 @@
 import json
 import numpy as np
-from avonic_speaker_tracker.persistency_utils import CustomEncoder
+from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 
 class Preset:
     def __init__(self, camera_info: np.ndarray, microphone_direction: np.ndarray):
-        self.camera_info = camera_info
-        self.microphone_direction = microphone_direction
+        self.camera_info: np.ndarray = camera_info
+        self.microphone_direction: np.ndarray = microphone_direction
 
+    def __str__(self):
+        return f"Preset({self.camera_info}, {self.microphone_direction})"
 
 class PresetCollection:
-    preset_locations = {}
-    filename = None
-    def __init__(self, filename=None):
-        self.filename = filename
-        self.preset_locations = {}
+    def __init__(self, filename: str = ""):
+        self.filename: str = filename
+        self.preset_locations: dict[str, Preset] = {}
         self.load()
 
     def add_preset(self, to_add: str,
@@ -30,7 +30,7 @@ class PresetCollection:
         self.preset_locations[to_add] = Preset(cam_info, microphone_direction)
         self.record()
 
-    def remove_preset(self, to_remove: str):
+    def remove_preset(self, to_remove: str) -> None:
         """ Removes a preset from the dictionary of presets with the given name
 
         Args:
@@ -41,7 +41,7 @@ class PresetCollection:
         self.record()
 
     def edit_preset(self, to_edit: str,
-        new_cam_info: np.ndarray, new_microphone_direction: np.ndarray):
+        new_cam_info: np.ndarray, new_microphone_direction: np.ndarray) -> None:
         """ Edits a preset with the given name only if it is already inside the dictionary
 
         Args:
@@ -53,7 +53,7 @@ class PresetCollection:
         self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
-    def get_preset_list(self):
+    def get_preset_list(self) -> list[str]:
         """ Returns a list with the names of the presets
 
         Returns: List with presets names
@@ -61,7 +61,7 @@ class PresetCollection:
         """
         return list(self.preset_locations.keys())
 
-    def get_preset_info(self, to_get: str):
+    def get_preset_info(self, to_get: str) -> tuple[np.ndarray, np.ndarray]:
         """ Returns the camera angle and microphone direction for a preset with a given name
 
         Args:
@@ -74,13 +74,13 @@ class PresetCollection:
         return (self.preset_locations[to_get].camera_info,
                 self.preset_locations[to_get].microphone_direction)
 
-    def record(self):
-        if self.filename is not None:
+    def record(self) -> None:
+        if self.filename != "":
             with open(self.filename, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps(self.preset_locations, indent=4, cls=CustomEncoder))
 
-    def load(self):
-        if self.filename is not None:
+    def load(self) -> None:
+        if self.filename != "":
             try:
                 with open(self.filename, encoding="utf-8") as f:
                     print("Loading json...")
@@ -90,9 +90,8 @@ class PresetCollection:
                     outfile.write(json.dumps({}, indent=4, cls=CustomEncoder))
             with open(self.filename, encoding="utf-8") as f:
                 data = json.load(f)
-                print(data)
                 self.preset_locations = {}
                 for key in data:
                     self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
                         np.array(data[key]["microphone_direction"]))
-                print(self.preset_locations)
+                print("Loaded presets: ", self.preset_locations)

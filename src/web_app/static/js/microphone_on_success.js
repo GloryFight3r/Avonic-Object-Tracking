@@ -1,24 +1,26 @@
 if (typeof onSuccess !== 'undefined') {
   onSuccess = Object.assign({}, onSuccess, {
     "microphone-get-direction-form": onDirectionGet,
-    "microphone-set-direction-form": onMicrophoneDirectionSet,
+    "set-mic-button": onMicrophoneDirectionSet,
     "microphone-speaking-form": onSpeaking,
   });
 }
 else {
   onSuccess = {
     "microphone-get-direction-form": onDirectionGet,
-    "microphone-set-direction-form": onMicrophoneDirectionSet,
+    "set-mic-button": onMicrophoneDirectionSet,
     "microphone-speaking-form": onSpeaking,
   }
 }
 
 async function onMicrophoneDirectionSet(data) {
-    const d = (await data)["microphone-direction"];
+  const d = (await data)["microphone-direction"];
 
-    document.getElementById("mic-direction-x2").value = d[0].toFixed(5)
-    document.getElementById("mic-direction-y2").value = d[1].toFixed(5)
-    document.getElementById("mic-direction-z2").value = d[2].toFixed(5)
+  document.getElementById("mic-direction-x2").value = d[0].toFixed(5);
+  document.getElementById("mic-direction-y2").value = d[1].toFixed(5);
+  document.getElementById("mic-direction-z2").value = d[2].toFixed(5);
+
+  set_mic_button.ariaBusy = "false"
 }
 
 async function onDirectionGet(data) {

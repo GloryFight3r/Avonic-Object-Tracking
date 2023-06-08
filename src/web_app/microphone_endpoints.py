@@ -16,9 +16,9 @@ def address_set_microphone_endpoint(integration: GeneralController):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
 
 def height_set_microphone_endpoint(integration: GeneralController):
-    integration.calibration.set_height(float(request.form["microphone-height"]))
+    integration.audio_model.calibration.set_height(float(request.form["microphone-height"]))
     return make_response(jsonify(
-        {"microphone-height": integration.calibration.mic_height}), 200)
+        {"microphone-height": integration.audio_model.calibration.mic_height}), 200)
 
 
 def direction_get_microphone_endpoint(integration: GeneralController):
@@ -50,8 +50,10 @@ def wait_for_speaker(integration: GeneralController):
         integration: The controller object
 
     Returns: Direction towards the speaker
-        
+
     """
-    while not integration.mic_api.is_speaking():
+    approaching_limit: int = 0
+    while not integration.mic_api.is_speaking() and approaching_limit < 10:
+        approaching_limit += 1
         sleep(0.1)
     return integration.mic_api.get_direction()

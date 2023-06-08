@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "avonic_speaker_tracker"
+name = "avonic_speaker_tracker_system"
 version = "0.1.0"
 description = "A program for tracking the speaker using an Avonic camera using data from a Sennheiser TeamConnect Ceiling 2 microphone."
 readme = "README.md"

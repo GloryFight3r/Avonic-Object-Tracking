@@ -1,19 +1,19 @@
 <article id="thread">
   <h1>Thread 🧵</h1>
-  <form action="/thread/preset" method="post" id="thread-preset">
-    <button type="submit">Use Presets</button>
-  </form>
-  <input id="preset-use" name="preset-use" readonly>
   <div class="grid">
-    <form action="/thread/start/true" method="post" id="thread-start-form">
+    <form action="/thread/start" method="post" id="thread-start-form">
       <button type="submit">Start</button>
     </form>
     <form action="/thread/stop" method="post" id="thread-stop-form">
       <button type="submit">Stop</button>
     </form>
   </div>
-  <form action="/thread/value" method="get" id="thread-value-form" class="grid">
-    <input id="thread-value" readonly>
-    <button type="submit">Get value</button>
-  </form>
+  <div class="grid">
+    <form action="/info-thread/start" method="post" id="info-thread-start-form">
+        <button type="submit">Start INFO</button>
+    </form>
+    <form action="/info-thread/stop" method="post" id="info-thread-stop-form">
+        <button type="submit">Stop INFO</button>
+    </form>
+  </div>
 </article>
