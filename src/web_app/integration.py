@@ -77,14 +77,23 @@ class GeneralController:
             self.url = url
         load_dotenv()
         # Setup camera API
-        cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
+        cam_addr = None
+        cam_port = getenv("CAM_PORT")
+        if cam_port != None:
+            cam_addr = (getenv("CAM_IP"), int(cam_port))
         #verify_address(cam_addr)
-        self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
+            if cam_addr != None: 
+                self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
 
         # Setup microphone API
-        mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
+        mic_addr = None
+        mic_port = getenv("MIC_PORT")
+        print(mic_port,mic_port==None)
+        if mic_port != None:
+            mic_addr = (getenv("MIC_IP"), int(mic_port))
         #verify_address(mic_addr)
-        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
+            if mic_addr != None:
+                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
 
         # Setup secret
         self.secret = getenv("SECRET_KEY")
@@ -99,19 +108,23 @@ class GeneralController:
         self.preset_model = PresetModel(filename=self.filepath + "presets.json")
 
         # Initialize footage thread
-        self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')  # pragma: no mutate
-        self.footage_thread = FootageThread(self.video,self.footage_thread_event)  # pragma: no mutate
-        self.footage_thread.start() # pragma: no mutate
+        if cam_addr != None:
+            self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')# pragma: no mutate
+            self.footage_thread = FootageThread(self.video,self.footage_thread_event)# pragma: no mutate
+            self.footage_thread.start() # pragma: no mutate
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
-        self.thread_mic = Thread(target=self.send_update,
-                                 args=(self.get_mic_info, '/update/microphone'))
-        self.thread_cam = Thread(target=self.send_update,
-                                 args=(self.get_cam_info, '/update/camera'))
-        self.thread_mic.start()
-        self.thread_cam.start()
+        print(cam_addr,mic_addr)
+        if mic_addr != None:
+            self.thread_mic = Thread(target=self.send_update,
+                args=(self.get_mic_info, '/update/microphone'))
+            self.thread_mic.start()
+        if cam_addr != None:
+            self.thread_cam = Thread(target=self.send_update,
+                args=(self.get_cam_info, '/update/camera'))
+            self.thread_cam.start()
 
     def __del__(self):
         self.preset.value = 0  # pragma: no mutate

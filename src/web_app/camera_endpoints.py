@@ -125,6 +125,8 @@ def get_camera_footage(integration: GeneralController):
     return integration.footage_thread.get_frame()
 
 def address_set_camera_endpoint(integration: GeneralController):
+    if integration.cam_api == None :
+        return make_response(jsonify({"message": "Invalid address!"}), 400)
     try:
         addr = (request.form["camera-ip"], int(request.form["camera-port"]))
         #verify_address(addr)

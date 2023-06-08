@@ -40,6 +40,9 @@ class MicrophoneSocket:
             responses: how many responses are expected to arrive back
         """
         res = []
+        if self.address == None:
+            print("WARNING: Microphone address not specified!")
+            return ret 
         self.sock.sendto(bytes(command, 'ascii'), self.address)
         self.sock.settimeout(5)
         received = 0
