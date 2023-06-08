@@ -3,6 +3,10 @@ import numpy as np
 from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 class Calibration:
+    default_camera_vec: list[float] = [0.0, 0.0, 1.0]
+    default_mic_vec: list[float] = [0.0, 0.0, 1.0]
+    default_to_mic: list[float] = [0.0, 0.0, 0.0]
+    default_height: float = 1.0
     def __init__(self, filename: str = ""):
         self.filename = filename
 
@@ -122,26 +126,37 @@ class Calibration:
                     print(f"No file {self.filename} was found. Create new preset json...")
                     outfile.write(json.dumps({"speaker_points": [],
                     "to_mic_direction": [0.0, 0.0, 0.0], "mic_height": 1.0}, indent=4))
-            try:
                 with open(self.filename, encoding="utf-8") as f:
                     data = json.load(f)
                     self.speaker_points = []
-                    for key in data["speaker_points"]:
-                        self.speaker_points.append((np.array(key[0]),
-                            np.array(key[1])))
-                        assert len(key[0]) == 3
-                        assert len(key[1]) == 3
-                    self.to_mic_direction = np.array(data["to_mic_direction"])
-                    assert len(data["to_mic_direction"]) == 3
-                    self.mic_height = float(data["mic_height"])
+                    if "speaker_points" in data.keys():
+                        for key in data["speaker_points"]:
+                            try:
+                                tuple_to_add = [np.array(key[0]), np.array(key[1])]
+                                if len(key[0]) != 3:
+                                    tuple_to_add[0] = np.array(Calibration.default_camera_vec)
+                                if len(key[1]) != 3:
+                                    tuple_to_add[1] = np.array(Calibration.default_mic_vec)
+                                self.speaker_points.append((tuple_to_add[0], tuple_to_add[1]))
+                            except:
+                                self.speaker_points.append(
+                                    (np.array(Calibration.default_camera_vec), np.array(Calibration.default_mic_vec)))
+                    else:
+                        self.record()
+                    try:
+                        self.to_mic_direction = np.array(data["to_mic_direction"])
+                        if len(data["to_mic_direction"]) != 3:
+                            tuple_to_add[1] = np.array(Calibration.default_to_mic)
+                    except:
+                        self.to_mic_direction = np.array(np.array(Calibration.default_to_mic))
+                    try:
+                        self.mic_height = float(data["mic_height"])
+                    except:
+                        self.mic_height = Calibration.default_height
                     self.calculate_distance()
                     print("Loaded speaker points: ", self.speaker_points)
                     print("Loaded camera to microphone vector: ", self.to_mic_direction)
                     print("Loaded microphone height: ", self.mic_height)
-            except:
-                print("The appplication couldn't load calibration data from specified files. "
-                    + "Please check your config files. Exiting...")
-                raise SystemExit
 
 
 def angle_between_vectors(p: np.ndarray, q: np.ndarray) -> float:
