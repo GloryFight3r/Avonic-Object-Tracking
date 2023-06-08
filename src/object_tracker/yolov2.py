@@ -8,8 +8,6 @@ class YOLOPredict:
 
     def __init__(self, path = "./src/object_tracker/"):
         self.model = YOLO("yolov8m.pt")
-        with open(path+"yolo.txt", 'r') as f:
-            self.labels = [line.strip() for line in f.readlines()]
 
     def get_bounding_boxes_image(self, frame):
         results = self.model(frame, device="mps", classes=0)
@@ -18,7 +16,7 @@ class YOLOPredict:
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
         for x in bboxes:
             (x, y, x2, y2) = x
-            self.draw_prediction(frame, self.labels[0], x, y, x2, y2)
+            self.draw_prediction(frame, "person", x, y, x2, y2)
 
         return frame
 
