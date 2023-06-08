@@ -539,27 +539,65 @@ def test_get_preset_list(client):
 
 
 def test_settings(client):
-    rv = client.get("settings/get")
-    assert rv.status_code == 200 and json.loads(rv.data) == {
-        "camera-ip": "0.0.0.0",
-        "camera-port": 52381,
-        "microphone-ip": "0.0.0.0",
-        "microphone-port": 45,
-        "microphone-thresh": -55,
-        "filepath": ""
-    }
-    expected = {
-        "camera-ip": "1.1.1.1",
-        "camera-port": 123,
-        "microphone-ip": "2.2.2.2",
-        "microphone-port": 456,
-        "microphone-thresh": -5,
-        "filepath": "/usr/bin/"
-    }
-    rv = client.post("settings/set", data=expected)
-    assert rv.status_code == 200
-    rv = client.get("settings/get")
-    assert rv.status_code == 200 and json.loads(rv.data) == expected
+    m = mock.mock_open()
+    with mock.patch('web_app.integration.open', m):
+        rv = client.get("settings/get")
+        original = {
+            "camera-ip": "0.0.0.0",
+            "camera-port": 52381,
+            "microphone-ip": "0.0.0.0",
+            "microphone-port": 45,
+            "microphone-thresh": -55,
+            "filepath": ""
+        }
+        assert rv.status_code == 200 and json.loads(rv.data) == original
+        expected = {
+            "camera-ip": "1.1.1.1",
+            "camera-port": 123,
+            "microphone-ip": "2.2.2.2",
+            "microphone-port": 456,
+            "microphone-thresh": -5,
+            "filepath": "/usr/bin/"
+        }
+        rv = client.post("settings/set", data=expected)
+        assert rv.status_code == 200
+        rv = client.get("settings/get")
+        assert rv.status_code == 200 and json.loads(rv.data) == expected
+
+
+def test_settings_invalid(client):
+    m = mock.mock_open()
+    with mock.patch('web_app.integration.open', m):
+        data = {
+            "camera-ip": 123,
+            "camera-port": "asdf",
+            "microphone-ip": "2.2.2.2",
+            "microphone-port": 456,
+            "microphone-thresh": -5,
+            "filepath": "/usr/bin/"
+        }
+        rv = client.post("settings/set", data=data)
+        assert rv.status_code == 400 and json.loads(rv.data)["message"] == "Invalid address!"
+        data = {
+            "camera-ip": "1.1.1.1",
+            "camera-port": 123,
+            "microphone-ip": 34,
+            "microphone-port": "asd",
+            "microphone-thresh": -5,
+            "filepath": "/usr/bin/"
+        }
+        rv = client.post("settings/set", data=data)
+        assert rv.status_code == 400 and json.loads(rv.data)["message"] == "Invalid address!"
+        data = {
+            "camera-ip": "1.1.1.1",
+            "camera-port": 123,
+            "microphone-ip": "gugu",
+            "microphone-port": 456,
+            "microphone-thresh": "asdf",
+            "filepath": ""
+        }
+        rv = client.post("settings/set", data=data)
+        assert rv.status_code == 400 and json.loads(rv.data)["message"] == "Invalid threshold or filepath."
 
 
 # live footage test

@@ -102,7 +102,7 @@ class GeneralController:
         cam_port = settings["camera-port"]
         if cam_port is not None:
             cam_addr = (settings["camera-ip"], int(cam_port))
-            if cam_addr is not None:
+            if cam_addr is not None and verify_address(cam_addr):
                 self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
 
         # Setup microphone API
@@ -111,7 +111,7 @@ class GeneralController:
         print(mic_port, mic_port is None)
         if mic_port is not None:
             mic_addr = (settings["microphone-ip"], int(mic_port))
-            if mic_addr is not None:
+            if mic_addr is not None and verify_address(mic_addr):
                 self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(settings["microphone-thresh"]))
 
         # Setup secret
@@ -298,15 +298,14 @@ class GeneralController:
         print("Closing " + path + " updater thread")
 
 
-def verify_address(address) -> None:
+def verify_address(address) -> bool:
     try:
         assert 0 <= address[1] <= 65535
-        assert 0 <= int(address[0].split(".")[0]) <= 255 and \
-               0 <= int(address[0].split(".")[1]) <= 255 and \
-               0 <= int(address[0].split(".")[2]) <= 255 and \
-               0 <= int(address[0].split(".")[3]) <= 255
-    except AssertionError:
+        assert isinstance(address[0], str)
+        return True
+    except (AssertionError, TypeError):
         print("ERROR: Address " + address + " is invalid!")
+        return False
 
 
 def close_running_threads(integration_passed) -> None:
