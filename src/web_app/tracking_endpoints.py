@@ -40,7 +40,7 @@ def start_thread_endpoint(integration: GeneralController):
             integration.object_tracking_thread.start()
 
             integration.object_audio_model = WaitObjectAudioModel(
-                    integration.cam_api, integration.mic_api, integration.object_tracking_thread,
+                    integration.cam_api, integration.mic_api, integration.object_tracking_thread.event,
                     np.array([1920.0, 1080.0]),
                     5, filename="calibration.json")
             model = integration.object_audio_model

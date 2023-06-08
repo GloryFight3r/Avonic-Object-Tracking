@@ -22,7 +22,7 @@ class ObjectModel():
         self.object_tracking_thread_event = object_tracking_thread_event
         self.resolution = resolution
         self.speak_delay = 0
-        self.wait = 20
+        self.wait = 10
 
     def get_center_box(self, boxes: [np.array]):
         """ Gets the box closest to the center of the screen.
@@ -188,45 +188,3 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         self.prev_dir = direct
         return direct
-
-#class ThresholdCalibrationTracker(CalibrationTracker):
-#    """ This class extends CalibrationTracker. It uses the strategy of using audio
-#        tracking when the movement is big and object tracking when the movement is small.
-#    """
-#
-#    # do not move the camera if camera is moved by more degrees than this threshold
-#    threshold = None
-#
-#    def __init__(self, cam: CameraAPI, mic: MicrophoneAPI, resolution: np.ndarray, threshold: int):
-#        super().__init__(cam, mic, resolution)
-#        self.threshold = threshold
-#
-#    def track_object(self, current_box: list):
-#        speed, angle = self.get_movement_to_box(current_box)
-#        avg_angle = (angle[0] + angle[1]) / 2
-#
-#        if abs(avg_angle) <= self.threshold:
-#            print("Moving!!!", str(avg_angle))
-#            self.cam_api.move_relative(speed[0], speed[1],\
-#                                angle[0], angle[1])
-#        else:
-#            print("Not moving!!!", str(avg_angle))
-#
-#    def track_audio(self, direct, prev_dir=(0.0, 0.0)):
-#        """ Points the camera towards the calculated direction.
-#            Args:
-#                direct: the direction in which to point the camera
-#                prev_dir: The previous direction to which the camera was pointing
-#            Returns: the pitch and yaw of the camera and the zoom value
-#        """
-#        if direct is None:
-#            return prev_dir
-#        if prev_dir[0] != direct[0] or prev_dir[1] != direct[1]:
-#            avg = (abs(direct[0] - prev_dir[0]) + abs(direct[1] - prev_dir[1])) / 2
-#            if avg >= 0:
-#                print("DIRECTION")
-#                print(direct)
-#                self.cam_api.move_absolute(24,20, direct[0], direct[1])
-#            prev_dir = direct
-#
-#        return prev_dir
