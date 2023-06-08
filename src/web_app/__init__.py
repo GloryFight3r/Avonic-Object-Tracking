@@ -216,7 +216,6 @@ def create_app(test_controller=None):
         print("CONTINUOUS TRACKER")
         return web_app.tracking_endpoints.track_continuously(integration)
 
-
     @app.post('/navigate/camera')
     def navigate_camera():
         return web_app.camera_endpoints.navigate_camera(integration)

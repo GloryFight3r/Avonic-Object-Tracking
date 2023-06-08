@@ -44,5 +44,4 @@ class FootageThread(Thread):
         Returns:
             
         """
-
         return str(self.buffer.raw[:self.buflen.value], 'ascii')
