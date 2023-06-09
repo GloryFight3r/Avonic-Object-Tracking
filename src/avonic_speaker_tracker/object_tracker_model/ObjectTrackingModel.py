@@ -60,7 +60,6 @@ class HybridTracker(TrackingModel):
             mic_api: API of the microphone
             cam_api: API of the camera
         """
-        print("HEREEEE")
         # get information about current speaker
         if mic_api.is_speaking(): # he is currently speaking
 
@@ -134,8 +133,6 @@ class HybridTracker(TrackingModel):
                 rotate_speed:np.ndarray = ret[0]
                 rotate_angle:np.ndarray = ret[1]
 
-                print(rotate_speed, rotate_angle)
-
                 # rotate the camera
                 cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
                                       rotate_angle[0], rotate_angle[1])
@@ -156,7 +153,7 @@ class HybridTracker(TrackingModel):
             self.cam_footage.set_bbxes(all_boxes)
 
             # find the box from all_boxes that has the most surface area in common
-            new_box:np.ndarray | None = self.find_most_common_area(self.last_tracked, all_boxes)
+            new_box:np.ndarray | None = self.find_next_box(self.last_tracked, all_boxes)
 
             self.cam_footage.focused_box = new_box
 
@@ -178,8 +175,9 @@ class HybridTracker(TrackingModel):
                                   rotate_angle[0], rotate_angle[1])
 
             
-    def find_most_common_area(self, current_box: np.ndarray, all_boxes: list[np.ndarray])-> np.ndarray | None:
-        """ Finds the box that has the most surface area in common with current_box
+    def find_next_box(self, current_box: np.ndarray, all_boxes: list[np.ndarray])-> np.ndarray | None:
+        """ Finds the box that is most likely to be the same box from the previous frame by comparing distances
+            to the box centers
 
         Args:
             current_box: the current bounding box in the format np.array[left top right bottom]
@@ -193,21 +191,19 @@ class HybridTracker(TrackingModel):
         if len(all_boxes) == 0 or current_box is None:
             return None
 
-        answer_box = None
-        most_area = 0
+        answer_box:np.ndarray | None = None
+        closest_distance:float = 0
+
+        cur_box_midde:np.ndarray = np.array([(current_box[0] + current_box[2]) / 2, (current_box[1] + current_box[3]) / 2])
 
         for bbox in all_boxes:
-            # calculate the overlapping area
-            x_side = min(current_box[2], bbox[2]) - max(current_box[0], bbox[0])
-            y_side = min(current_box[1], bbox[1]) - max(current_box[3], bbox[3])
+            # calculate the middle pixel of the current box
+            bbox_middle:np.ndarray = np.array([(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2])
+            cur_dist: float = float(np.sum((bbox_middle - cur_box_midde) ** 2))
 
-            # if there is overlap on both of the dimensions
-            if x_side > 0 and y_side > 0:
-                cur_area =  x_side * y_side
-
-                if cur_area > most_area:
-                    answer_box = bbox
-                    most_area = cur_area
+            if closest_distance > cur_dist:
+                closest_distance = cur_dist
+                answer_box = bbox
             
         return answer_box
 
