@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
@@ -51,3 +50,6 @@ class PresetModel(TrackingModel):
         self.prev_dir = direct
 
         return direct
+
+    def set_filename(self, filename: str):
+        self.preset_locations.set_filename(filename)

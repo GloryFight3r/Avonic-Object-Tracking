@@ -121,7 +121,7 @@ class Calibration:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print(f"No file {self.filename} was found. Create new preset json...")
                     outfile.write(json.dumps({"speaker_points": [],
-                    "to_mic_direction": None, "mic_height": 1.0}, indent=4))
+                                  "to_mic_direction": None, "mic_height": 1.0}, indent=4))
             with open(self.filename, encoding="utf-8") as f:
                 data = json.load(f)
                 self.speaker_points = []
@@ -134,6 +134,11 @@ class Calibration:
                 print("Loaded speaker points: ", self.speaker_points)
                 print("Loaded camera to microphone vector: ", self.to_mic_direction)
                 print("Loaded microphone height: ", self.mic_height)
+
+    def set_filename(self, filename: str) -> None:
+        self.filename = filename
+        self.load()
+
 
 def angle_between_vectors(p: np.ndarray, q: np.ndarray) -> float:
     """ Calculates the cosine of the smallest angle between two vectors.

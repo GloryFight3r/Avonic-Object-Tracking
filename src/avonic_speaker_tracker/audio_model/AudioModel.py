@@ -72,3 +72,6 @@ class AudioModel(TrackingModel):
 
         self.prev_dir = direct_np
         return direct_np
+
+    def set_filename(self, filename: str):
+        self.calibration.set_filename(filename)

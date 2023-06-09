@@ -2,9 +2,10 @@ from time import sleep
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 
+
 def address_set_microphone_endpoint(integration: GeneralController):
     try:
-        addr = (request.form["ip"], int(request.form["port"]))
+        addr = (request.form["microphone-ip"], int(request.form["microphone-port"]))
         verify_address(addr)
         ret_msg, code = integration.mic_api.set_address(addr)
         if code:
@@ -14,6 +15,7 @@ def address_set_microphone_endpoint(integration: GeneralController):
         return make_response(jsonify(ret_msg), ret_code)
     except (AssertionError, ValueError):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
+
 
 def height_set_microphone_endpoint(integration: GeneralController):
     integration.audio_model.calibration.set_height(float(request.form["microphone-height"]))
