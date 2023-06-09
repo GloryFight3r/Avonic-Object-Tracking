@@ -6,8 +6,14 @@ if (document.getElementById("footage")) {
             );
         });
         window.setInterval(() => {
+            const img = document.getElementById("live-footage")
             if (document.getElementById("footage-switch").checked) {
+                if (img.style.display === "none") {
+                    img.style.display = "block"
+                }
                 socket.emit('request-frame', {})
+            } else {
+                img.style.display = "none"
             }
         }, 100)
     });

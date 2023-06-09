@@ -29,6 +29,7 @@ def create_app(test_controller=None):
     else:
         integration.copy(test_controller)
         app.config['SECRET_KEY'] = 'test'
+        integration.testing.value = 1
 
     @app.get('/fail-me')
     def fail_me():
@@ -304,6 +305,8 @@ def create_app(test_controller=None):
     def settings_not_set(data):
         if not integration.no_settings_sent:  # prompt user to set up if no settings file found
             integration.ws.emit("no-settings", data)
+        else:
+            integration.ws.emit("yes-settings", {})
 
     def sigterm_handler(_signo, _stack_frame):
         close_running_threads(integration)

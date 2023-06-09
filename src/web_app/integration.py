@@ -79,6 +79,7 @@ class GeneralController:
 
         # PID of master process
         self.pid = Value("i", os.getpid())
+        self.testing = Value("i", 0, lock=False)
 
     def load_env(self) -> None:
         """Performs load procedure of all the specified parameters.

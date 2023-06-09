@@ -39,3 +39,8 @@ socket.on("calibration-update", async (args) => {
 socket.on("connect", () => socket.emit("connected", {}))
 
 socket.on("no-settings", () => openSettings())
+
+socket.on("yes-settings", () => {
+    document.getElementById("settings-save-button").ariaBusy = "false"
+    closeSettings()
+})
