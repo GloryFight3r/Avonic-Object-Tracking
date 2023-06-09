@@ -29,9 +29,19 @@ socket.on("new-camera-zoom", async (args) => {
 });
 
 socket.on("footage-update", async (args) => {
-  onFootageGet(args).then()
+    onFootageGet(args).then()
 })
 
 socket.on("calibration-update", async (args) => {
     await onCameraCoordsGet(args)
+})
+
+socket.on("connect", () => socket.emit("connected", {}))
+
+socket.on("no-settings", () => openSettings())
+
+socket.on("yes-settings", () => {
+    document.getElementById("settings-save-button").ariaBusy = "false"
+    closeSettings()
+    refreshPresetList().then()
 })

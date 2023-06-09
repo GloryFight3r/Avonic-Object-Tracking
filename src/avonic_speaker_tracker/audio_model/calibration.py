@@ -174,6 +174,10 @@ class Calibration:
                 print("Loaded camera to microphone vector: ", self.to_mic_direction)
                 print("Loaded microphone height: ", self.mic_height)
 
+    def set_filename(self, filename: str) -> None:
+        self.filename = filename
+        self.load()
+
 
 def angle_between_vectors(p: np.ndarray, q: np.ndarray) -> float:
     """ Calculates the cosine of the smallest angle between two vectors.

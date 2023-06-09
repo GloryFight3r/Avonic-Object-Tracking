@@ -114,3 +114,7 @@ class PresetCollection:
                         print("Setting one of the presets to default values")
                 print("Loaded presets: ", self.preset_locations)
             self.record()
+
+    def set_filename(self, filename: str):
+        self.filename = filename
+        self.load()

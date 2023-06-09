@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 import pytest
 import numpy as np
 import json
@@ -177,3 +178,13 @@ def test_with_file_corrupted_missed_full_one_cam_vector():
             PresetCollection.default_mic_info)
     finally:
         os.remove("test_with_file_corrupted_missed_one_cam_vector.json")
+
+def test_set_filename(preset_collection: PresetCollection):
+
+    def x(self):
+        pass
+
+    with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+        assert preset_collection.filename == ""
+        preset_collection.set_filename("asdf")
+        assert preset_collection.filename == "asdf"

@@ -1,5 +1,7 @@
 import math
 import os
+from unittest import mock
+
 import pytest
 import numpy as np
 import json
@@ -153,7 +155,7 @@ def test_with_file():
         assert np.allclose(cal.speaker_points[0], second_cal.speaker_points[0])
     finally:
         os.remove("TEST_WITH_FILE_CALIBRATION.json")
-
+ 
 def test_with_file_corrupted_to_mic():
     try:
         data = {
@@ -432,3 +434,13 @@ def test_with_file_corrupted_to_mic_missing():
         assert cal.mic_height == 1.7
     finally:
         os.remove("test_with_file_corrupted_to_mic_missing.json")
+
+def test_set_filename():
+    def mock_load(self):
+        pass
+
+    with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", mock_load):
+        cal = Calibration()
+        assert cal.filename == ""
+        cal.set_filename("asdf")
+        assert cal.filename == "asdf"
