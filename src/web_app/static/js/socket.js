@@ -43,4 +43,5 @@ socket.on("no-settings", () => openSettings())
 socket.on("yes-settings", () => {
     document.getElementById("settings-save-button").ariaBusy = "false"
     closeSettings()
+    refreshPresetList().then()
 })

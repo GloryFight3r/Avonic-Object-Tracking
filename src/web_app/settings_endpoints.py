@@ -51,8 +51,8 @@ def set_settings(integration: GeneralController):
             integration.filepath = str(filepath)
             if integration.filepath[-1] != "/":
                 integration.filepath += "/"
-        integration.audio_model.set_filename(integration.filepath)
-        integration.preset_model.set_filename(integration.filepath)
+        integration.audio_model.set_filename(integration.filepath + "calibration.json")
+        integration.preset_model.set_filename(integration.filepath + "presets.json")
 
         saved = integration.save()
         if saved:
