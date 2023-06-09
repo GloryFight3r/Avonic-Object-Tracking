@@ -273,7 +273,7 @@ def create_app(test_controller=None):
         return web_app.tracking_endpoints.update_camera(integration)
 
     @integration.ws.on("request-frame")
-    def camera_frame_requested():
+    def camera_frame_requested(message):
         web_app.footage.emit_frame(integration)
 
     @app.post('/update/calibration')
