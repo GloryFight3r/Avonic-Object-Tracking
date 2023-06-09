@@ -4,15 +4,17 @@ from ultralytics import YOLO
 import torch
 
 class YOLOPredict:
-    def __init__(self):
+    def __init__(self, conf_level = 0.0):
         self.model = YOLO("yolov8m.pt")
+
+        # change conf_level to a higher number to filter low confidence boxes
+        self.conf_level = conf_level
 
     def get_bounding_boxes(self, frame):
         results = self.model.predict(frame, classes=0, device="cpu")
         result = results[0]
 
-        # change 0.0 to a higher number to filter low confidence boxes
-        conf_indices = set(torch.nonzero(result.boxes.conf.cpu() > 0.0))
+        conf_indices = set(torch.nonzero(result.boxes.conf.cpu() > self.conf_level))
         person_indices = set(torch.nonzero(result.boxes.cls.cpu() == 0))
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
