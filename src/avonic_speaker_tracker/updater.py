@@ -9,7 +9,8 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
     def __init__(self, event: c_int,
-        cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: c_int):
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: c_int,
+                 filepath: str):
         """ Class constructor
 
         Args:
@@ -22,6 +23,7 @@ class UpdateThread(Thread):
         self.mic_api: MicrophoneAPI = mic_api
         self.preset_or_tracking: int = preset_or_tracking.value
         self.model_in_use: TrackingModel
+        self.filepath = filepath
 
     def run(self) -> None:
         """ Actual body of the thread.
@@ -36,9 +38,9 @@ class UpdateThread(Thread):
         """
         speak_delay: int = 0
         if self.preset_or_tracking == 0:
-            self.model_in_use = AudioModel(filename="calibration.json")
+            self.model_in_use = AudioModel(filename=self.filepath + "calibration.json")
         else:
-            self.model_in_use = PresetModel(filename="presets.json")
+            self.model_in_use = PresetModel(filename=self.filepath + "presets.json")
 
         while self.event.value != 0:
             print("RUNNING UPDATE THREAD")
