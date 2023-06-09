@@ -1,6 +1,7 @@
 import os
 import pytest
 import numpy as np
+import json
 from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
 
 
@@ -74,3 +75,105 @@ def test_presets_with_file_system(preset_collection_with_file: PresetCollection)
     assert "preset-to-add" in preset_collection_with_file.preset_locations
     new_preset_collection = PresetCollection(filename="test.json")
     assert "preset-to-add" in new_preset_collection.preset_locations
+
+def test_with_file_corrupted_missed_one_cam_vector():
+    try:
+        data = {
+            "1": {
+                "camera_info": [
+                    1.57055,
+                    0.52341
+                ],
+                "microphone_direction": [
+                    -0.65177,
+                    -0.62932,
+                    -0.42326
+                ]
+            },
+            "3": {
+                "camera_info": [
+                    -0.78528,
+                    0.7845,
+                    1000.0
+                ],
+                "microphone_direction": [
+                    -0.65177,
+                    -0.62932,
+                    -0.42326
+                ]
+            },
+            "2": {
+                "camera_info": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "microphone_direction": [
+                    0.58553,
+                    -0.78801,
+                    -0.19025
+                ]
+            }
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_missed_one_cam_vector.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        pc = PresetCollection("test_with_file_corrupted_missed_one_cam_vector.json")
+        assert np.allclose(pc.preset_locations["1"].camera_info,
+            PresetCollection.default_camera_info)
+        assert np.allclose(pc.preset_locations["1"].microphone_direction,
+            np.array([
+                    -0.65177,
+                    -0.62932,
+                    -0.42326
+                ]))
+    finally:
+        os.remove("test_with_file_corrupted_missed_one_cam_vector.json")
+
+def test_with_file_corrupted_missed_full_one_cam_vector():
+    try:
+        data = {
+            "1": {
+                "microphone_direction": [
+                    -0.65177,
+                    -0.62932,
+                    -0.42326
+                ]
+            },
+            "3": {
+                "camera_info": [
+                    -0.78528,
+                    0.7845,
+                    1000.0
+                ],
+                "microphone_direction": [
+                    -0.65177,
+                    -0.62932,
+                    -0.42326
+                ]
+            },
+            "2": {
+                "camera_info": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "microphone_direction": [
+                    0.58553,
+                    -0.78801,
+                    -0.19025
+                ]
+            }
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_missed_one_cam_vector.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        pc = PresetCollection("test_with_file_corrupted_missed_one_cam_vector.json")
+        assert np.allclose(pc.preset_locations["1"].camera_info,
+            PresetCollection.default_camera_info)
+        assert np.allclose(pc.preset_locations["1"].microphone_direction,
+            PresetCollection.default_mic_info)
+    finally:
+        os.remove("test_with_file_corrupted_missed_one_cam_vector.json")

@@ -12,7 +12,7 @@ class Preset:
         return f"Preset({self.camera_info}, {self.microphone_direction})"
 
 class PresetCollection:
-    default_camera_info: list[float] = [0.0, 0.0, 0.0]
+    default_camera_info: list[float] = [0.0, 0.0, 1.0]
     default_mic_info: list[float] = [0.0, 1.0, 0.0]
     def __init__(self, filename: str = ""):
         self.filename: str = filename
@@ -90,24 +90,22 @@ class PresetCollection:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print("Create new preset json...")
                     outfile.write(json.dumps({}, indent=4, cls=CustomEncoder))
-            try:
-                with open(self.filename, encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.preset_locations = {}
-                    for key in data:
-                        try:
-                            self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
-                                np.array(data[key]["microphone_direction"]))
-                            if len(data[key]["camera_info"]) != 3:
-                                self.preset_locations[key].camera_info = \
-                                    np.array(PresetCollection.default_camera_info)
-                            if len(data[key]["microphone_direction"]) != 3:
-                                self.preset_locations[key].microphone_direction = \
-                                    np.array(PresetCollection.default_mic_info)
-                        except:
-                            self.preset_locations[key] = Preset(np.array(PresetCollection.default_camera_info), np.array(PresetCollection.default_mic_info))
-                    print("Loaded presets: ", self.preset_locations)
-            except:
-                print("The application couldn't load preset data from specified files. "
-                    + "Please check your config files. Exiting...")
-                raise SystemExit
+            with open(self.filename, encoding="utf-8") as f:
+                data = json.load(f)
+                self.preset_locations = {}
+                for key in data:
+                    try:
+                        self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
+                            np.array(data[key]["microphone_direction"]))
+                        if len(data[key]["camera_info"]) != 3:
+                            self.preset_locations[key].camera_info = \
+                                np.array(PresetCollection.default_camera_info)
+                            print("Setting camera_info in one of the presets to default value")
+                        if len(data[key]["microphone_direction"]) != 3:
+                            self.preset_locations[key].microphone_direction = \
+                                np.array(PresetCollection.default_mic_info)
+                            print("Setting microphone_direction in one of the presets to default value")
+                    except:
+                        self.preset_locations[key] = Preset(np.array(PresetCollection.default_camera_info), np.array(PresetCollection.default_mic_info))
+                        print("Setting one of the presets to default values")
+                print("Loaded presets: ", self.preset_locations)
