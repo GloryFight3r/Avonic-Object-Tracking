@@ -261,6 +261,16 @@ def test_calibration_get_camera(client):
            == bytes("{\"camera-coords\":[0.0,0.0,0.0]}\n", "utf-8")
 
 
+def test_update_microphone(client):
+    rv = client.post('/update/microphone', json=json.dumps({"test": "testington"}))
+    assert rv.status_code == 200
+
+
+def test_update_camera(client):
+    rv = client.post('/update/camera', json=json.dumps({"test": "testington"}))
+    assert rv.status_code == 200
+
+
 def test_update_calibration(client):
     rv = client.post('/update/calibration', json=json.dumps({"test": "testington"}))
     assert rv.status_code == 200
