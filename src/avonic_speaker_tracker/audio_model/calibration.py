@@ -139,12 +139,12 @@ class Calibration:
                             tuple_to_add = [np.array(key[0]), np.array(key[1])]
                             if len(key[0]) != 3:
                                 tuple_to_add[0] = np.array(Calibration.default_camera_vec)
-                                print("Setting one fo the values in \
-                                    speaker_points to default value")
+                                print("Setting one fo the values in " +
+                                    "speaker_points to default value")
                             if len(key[1]) != 3:
                                 tuple_to_add[1] = np.array(Calibration.default_mic_vec)
-                                print("Setting one fo the values in \
-                                    speaker_points to default value")
+                                print("Setting one fo the values in " +
+                                    "speaker_points to default value")
                             self.speaker_points.append((tuple_to_add[0], tuple_to_add[1]))
                         except Exception as e:
                             print(e)

@@ -104,8 +104,8 @@ class PresetCollection:
                         if len(data[key]["microphone_direction"]) != 3:
                             self.preset_locations[key].microphone_direction = \
                                 np.array(PresetCollection.default_mic_info)
-                            print("Setting microphone_direction in \
-                                one of the presets to default value")
+                            print("Setting microphone_direction in " +
+                                "one of the presets to default value")
                     except Exception as e:
                         print(e)
                         self.preset_locations[key] = Preset(
@@ -113,3 +113,4 @@ class PresetCollection:
                             np.array(PresetCollection.default_mic_info))
                         print("Setting one of the presets to default values")
                 print("Loaded presets: ", self.preset_locations)
+            self.record()
