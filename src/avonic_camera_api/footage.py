@@ -37,8 +37,6 @@ class ObjectTrackingThread(Thread):
                 frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)  # read the camera frame
                 if frame is not None:
                     boxes = self.nn.get_bounding_boxes(frame)
-                    print("BOX COUNT")
-                    print(len(boxes))
                     if len(boxes) > 0:
                         last_box = self.trck.get_center_box(boxes)
                         self.trck.track_object(last_box)

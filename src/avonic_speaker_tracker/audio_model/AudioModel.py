@@ -10,8 +10,7 @@ from avonic_speaker_tracker.audio_model.calibration import Calibration
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class AudioModel(TrackingModel):
-
-    def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename=""):
+    def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.cam_api = cam_api
         self.mic_api = mic_api
@@ -44,7 +43,6 @@ class AudioModel(TrackingModel):
         cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
                                                         self.calibration.mic_height)
-        print(cam_vec)
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
         vec_len = min(vec_len,10.0)
         zoom_val = (int)((vec_len/10.0)*16000)

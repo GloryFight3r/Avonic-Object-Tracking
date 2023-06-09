@@ -109,7 +109,7 @@ class GeneralController:
                 np.array([1920.0, 1080.0]),
                 5, filename="calibration.json")
         self.audio_model = AudioModel(self.cam_api, self.mic_api, filename="calibration.json")
-        self.preset_model = PresetModel(filename="presets.json")
+        self.preset_model = PresetModel(self.cam_api, self.mic_api, filename="presets.json")
 
         # Initialize footage thread
         self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')# pragma: no mutate
@@ -125,7 +125,6 @@ class GeneralController:
             args=(self.get_cam_info, '/update/camera'))
         self.thread_mic.start()
         self.thread_cam.start()
-
 
     def __del__(self):
         self.video.release()
@@ -162,9 +161,9 @@ class GeneralController:
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
-        self.preset_model = PresetModel()
+        self.preset_model = PresetModel(self.cam_api, self.mic_api)
         #self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
-        self.preset.value = 1
+        self.preset.value = ModelCode.PRESET
         self.thread = None
 
     def copy(self, new_controller):
@@ -174,7 +173,7 @@ class GeneralController:
         self.mic_api = new_controller.mic_api
         self.ws = new_controller.ws
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
-        self.preset_model = PresetModel()
+        self.preset_model = PresetModel(self.cam_api, self.mic_api)
         self.preset.value = new_controller.preset.value
 
     def set_mic_api(self, new_mic_api) -> None:
@@ -251,9 +250,12 @@ class GeneralController:
                 flag = False
             if self.info_threads_event.value != 0:
                 d = data()
-                response = requests.post('http://' + self.url + path, json=d)
-                if response.status_code != 200:
-                    print("Could not update flask at path " + path)
+                try:
+                    response = requests.post('http://' + self.url + path, json=d)
+                    if response.status_code != 200:
+                        print("Could not update flask at path " + path)
+                except:
+                    pass
             sleep(0.3)
         print("Closing " + path + " updater thread")
 

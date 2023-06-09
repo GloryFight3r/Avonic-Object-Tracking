@@ -11,7 +11,7 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 class UpdateThread(Thread):
 
     def __init__(self, event: c_int,
-        cam_api: CameraAPI, mic_api: MicrophoneAPI, model):
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel):
         """ Class constructor
 
         Args:
@@ -43,17 +43,14 @@ class UpdateThread(Thread):
                 sleep(5)
                 continue
 
-            if isinstance(self.model, PresetModel) and len(self.model.preset_locations.get_preset_list()) == 0:
-                print("No locations preset")
             if self.mic_api.is_speaking():
                 speak_delay = 0
-                if isinstance(self.model, PresetModel):
-                    prev_dir = self.model.point(self.cam_api, self.mic_api)
-                else:
-                    prev_dir = self.model.point()
-            else:
+            elif speak_delay < 100:
                 speak_delay = speak_delay + 1
             self.model.set_speak_delay(speak_delay)
+            direct = self.model.point()
+
+            print(direct)
 
             self.value += 1
             sleep(0.05)

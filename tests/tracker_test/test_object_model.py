@@ -26,16 +26,17 @@ def test_calculate_speed():
 
 def generate_box_with_movement():
     return [
-            (np.array([0, 0, 10, 10]), np.array([10, 10]), (np.array([20, 20]), np.array([0, 0]))),
-            (np.array([5, 5, 10, 10]), np.array([10, 10]), (np.array([20, 20]), np.array([0, 0])))
+            (np.array([0, 0, 10, 10]), np.array([10, 10]), (np.array([20, 20]), np.array([0, 25]))),
+            (np.array([5, 5, 10, 10]), np.array([10, 10]), (np.array([20, 20]), np.array([25, 0])))
     ]
 
 @pytest.mark.parametrize("box, resolution, movement", generate_box_with_movement())
 def test_get_movement_to_box(box, resolution, movement):
     cam_api = mock.Mock()
-    cam_api.calculate_fov.return_value = 0
+    cam_api.calculate_fov.return_value = 100
     obj_model = ObjectModel(cam_api, None, None, resolution)
     res = obj_model.get_movement_to_box(box)
+    print(res[1])
     assert (res[0] == movement[0]).all()
     assert (res[1] == movement[1]).all()
 

@@ -14,19 +14,22 @@ def test_preset_pointer_good_weather():
     mic2_api.latest_direction = np.array([7, 8, 10])
     mic2_api.get_direction.return_value = np.array([7, 8, 10])
     mic2_api.is_speaking.return_value = True
-    pm = PresetModel()
+    pm = PresetModel(cam_api, mic_api)
+    pm2 = PresetModel(cam_api, mic2_api)
     mic_api.get_direction.return_value = "some error"
-    dir0 = pm.point(cam_api, mic_api)
+    dir0 = pm.point()
     assert (dir0 == pm.prev_dir).all()
     assert (dir0 == np.array([0, 0, 1])).all()
     mic_api.get_direction.return_value = np.array([1, 2, 3])
-    dir0 = pm.point(cam_api, mic_api)
+    dir0 = pm.point()
     assert (dir0 == pm.prev_dir).all()
     pm.preset_locations.add_preset("preset", np.array([4, 7, 5000]), np.array([1, 2, 3]))
     pm.preset_locations.add_preset("preset1", np.array([1, 5, 5000]), np.array([6, 8, 9]))
+    pm2.preset_locations.add_preset("preset", np.array([4, 7, 5000]), np.array([1, 2, 3]))
+    pm2.preset_locations.add_preset("preset1", np.array([1, 5, 5000]), np.array([6, 8, 9]))
 
-    dir1 = pm.point(cam_api, mic_api)
-    dir2 = pm.point(cam_api, mic2_api)
+    dir1 = pm.point()
+    dir2 = pm2.point()
 
     assert np.allclose(dir1, np.array([np.rad2deg(4), np.rad2deg(7), 5000]))
     assert np.allclose(dir2, np.array([np.rad2deg(1), np.rad2deg(5), 5000]))

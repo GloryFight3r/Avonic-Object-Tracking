@@ -8,14 +8,6 @@ from avonic_camera_api.footage import ObjectTrackingThread
 from object_tracker.yolov2 import YOLOPredict
 from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
 
-
-#def stop_object_tracking_endpoint(integration: GeneralController):
-#    # stop (pause) the object tracking thread
-#    integration.object_tracking_event.set()
-#    integration.object_tracking_thread.join()
-#    #integration.footage_thread.show_bounding_boxes = False
-#    return make_response(jsonify({}), 200)
-
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     if (integration.thread is None) or (integration.event.value == 0):
@@ -24,8 +16,6 @@ def start_thread_endpoint(integration: GeneralController):
         else:
             old_calibration = integration.thread.value
         integration.event.value = 1
-        print("VALUE")
-        print(integration.preset.value)
         if integration.preset.value == ModelCode.PRESET:
             model = integration.preset_model
         elif integration.preset.value == ModelCode.AUDIO:
@@ -110,13 +100,3 @@ def track_object_continuously(integration: GeneralController):
     integration.preset.value = ModelCode.OBJECT_AUDIO
     print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)
-
-#TO-DO: Change to enums for models
-def preset_use(integration: GeneralController):
-    pass
-#    if integration.preset.value == ModelCode.AUDIO:
-#        integration.preset.value = ModelCode.PRESET
-#    else:
-#        integration.preset.value = ModelCode.AUDIO
-#    print(integration.preset.value)
-#    return make_response(jsonify({"preset":integration.preset.value}), 200)

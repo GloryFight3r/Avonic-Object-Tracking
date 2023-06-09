@@ -243,14 +243,6 @@ def create_app(test_controller=None):
         print("OBJECT TRACKER")
         return web_app.tracking_endpoints.track_object_continuously(integration)
 
-    #@app.post('/object_tracking/stop')
-    #def object_tracking_stop():
-    #    return web_app.tracking_endpoints.stop_object_tracking_endpoint(integration)
-
-    #@app.post('/thread/start/<allow_movement>')
-    #def thread_start(allow_movement):
-    #    return web_app.tracking_endpoints.start_thread_endpoint(integration, allow_movement)
-
     @app.post('/thread/start')
     def thread_start():
         return web_app.tracking_endpoints.start_thread_endpoint(integration)
@@ -291,10 +283,7 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
-#    # Camera footage
-#    @app.route('/video_feed')
-#    def video_feed():
-#        return Response(web_app.camera_endpoints.get_camera_footage(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
     # Info-thread section
 

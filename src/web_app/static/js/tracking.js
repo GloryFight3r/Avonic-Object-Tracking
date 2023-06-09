@@ -11,7 +11,6 @@ if (typeof onSuccess !== 'undefined') {
 
 function selectTracking() {
     const selected = document.getElementById("tracking-select").value
-    console.log(selected)
     const header = document.getElementById("tracking-title")
     switch(selected) {
         case "preset":

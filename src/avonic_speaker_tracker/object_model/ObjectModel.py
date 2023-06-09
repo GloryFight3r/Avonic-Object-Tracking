@@ -34,10 +34,9 @@ class ObjectModel():
                 box (np.array): the box closest to the center
         """
         get_center = lambda box: np.array([(box[0] + box[2])/2, (box[1] + box[3])/2])
-        #center_point = np.array([self.resolution[0] / 2, self.resolution[1] / 3 * 2])
+        #center_point = np.array([self.resolution[0] / 2, self.resolution[1] / 3])
         center = sorted(boxes,
                         key=lambda box: np.linalg.norm(get_center(box) - self.resolution/2))[0]
-        print(self.resolution)
         return center
 
     def get_movement_to_box(self, current_box: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -54,7 +53,7 @@ class ObjectModel():
         """
         # current_box is in the format [left top right bottom] and want to use the format
         # [left bottom width height] so we change it
-        current_box = [current_box[0], current_box[1]*1.5, current_box[2], current_box[3]*1.5]
+        current_box = [current_box[0], current_box[1], current_box[2], current_box[3]/2]
         bbox:np.ndarray = np.array([current_box[0],\
                          current_box[3],\
                          current_box[2] - current_box[0],\
@@ -112,18 +111,15 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         self.calibration = Calibration(filename=filename)
         self.calibration.load()
         self.prev_dir = np.array([0, 0, 1])
-        self.time_without_movement = Value("i", 0, lock=False)
+        self.time_without_movement = 0
 
     def track_object(self, current_box: list):
         speed, angle = self.get_movement_to_box(current_box)
         avg_angle = (angle[0] + angle[1]) / 2
 
-        if abs(avg_angle) <= self.threshold:
-            print("Moving!!!", str(avg_angle))
+        if abs(avg_angle) <= self.threshold*3:
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
-        else:
-            print("Not moving!!!", str(avg_angle))
 
     def point(self):
         """ Points the camera towards the calculated direction from either:
@@ -134,9 +130,12 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         """
 
         if self.speak_delay == 100:
+            self.object_tracking_thread_event.value = 1
             self.cam_api.direct_zoom(0)
             self.prev_dir[2]=0
             return self.prev_dir
+        elif self.speak_delay < 2:
+            self.object_tracking_thread_event.value = 2
 
         mic_direction = self.mic_api.get_direction()
 
@@ -144,21 +143,24 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             print(mic_direction)
             return self.prev_dir
 
-        cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
+        try:
+            cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
                                                         self.calibration.mic_height)
+            vec_len = np.sqrt(cam_vec.dot(cam_vec))
+            vec_len = min(vec_len,10.0)
+            zoom_val = (int)((vec_len/10.0)*16000)
 
-        vec_len = np.sqrt(cam_vec.dot(cam_vec))
-        vec_len = min(vec_len,10.0)
-        zoom_val = (int)((vec_len/10.0)*16000)
+            direct = vector_angle(cam_vec)
+            direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
 
-        direct = vector_angle(cam_vec)
-        direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
+        except AssertionError:
+            direct = self.prev_dir
+
 
         avg = abs(direct[0] - self.prev_dir[0])
         if avg >= self.threshold:
-            print("STOPPING OBJECT TRACKING")
-            self.time_without_movement.value = 0
+            self.time_without_movement = 0
             self.object_tracking_thread_event.value = 1
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2
@@ -173,15 +175,12 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         if direct is None:
             return self.prev_dir
 
-        if self.time_without_movement.value < self.wait:
+        if self.time_without_movement < self.wait:
             if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
                 self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
-
-        if self.time_without_movement.value == self.wait:
-            print("STARTING OBJECT TRACKING")
+        elif self.time_without_movement == self.wait:
             self.object_tracking_thread_event.value = 2
-        self.time_without_movement.value += 1
-        print(self.time_without_movement.value)
+        self.time_without_movement += 1
 
         if self.prev_dir[2] != direct[2]:
             self.cam_api.direct_zoom(direct[2])

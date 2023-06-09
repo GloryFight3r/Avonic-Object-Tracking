@@ -5,6 +5,7 @@ import cv2
 from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
 from object_tracker.yolov2 import YOLOPredict
 from multiprocessing import Value
+from avonic_camera_api.footage import FootageThread
 
 class MockedCv:
     def __init__(self):

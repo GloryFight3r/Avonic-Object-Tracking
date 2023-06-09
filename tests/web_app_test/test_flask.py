@@ -300,7 +300,6 @@ def test_thread(client):
             "preset-name": "test-another-preset-name"
         }
     )
-    #client.app.integration.preset.value = 1
     assert rv.status_code == 200
     rv = client.post('/thread/start')
     assert rv.status_code == 200
