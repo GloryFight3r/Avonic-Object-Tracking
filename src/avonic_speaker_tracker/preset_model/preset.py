@@ -106,7 +106,8 @@ class PresetCollection:
                                 np.array(PresetCollection.default_mic_info)
                             print("Setting microphone_direction in \
                                 one of the presets to default value")
-                    except:
+                    except Exception as e:
+                        print(e)
                         self.preset_locations[key] = Preset(
                             np.array(PresetCollection.default_camera_info),
                             np.array(PresetCollection.default_mic_info))

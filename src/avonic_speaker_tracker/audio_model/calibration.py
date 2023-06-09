@@ -146,7 +146,8 @@ class Calibration:
                                 print("Setting one fo the values in \
                                     speaker_points to default value")
                             self.speaker_points.append((tuple_to_add[0], tuple_to_add[1]))
-                        except:
+                        except Exception as e:
+                            print(e)
                             self.speaker_points.append(
                                 (np.array(Calibration.default_camera_vec),
                                 np.array(Calibration.default_mic_vec)))
@@ -156,12 +157,14 @@ class Calibration:
                     if len(data["to_mic_direction"]) != 3:
                         self.to_mic_direction = np.array(Calibration.default_to_mic)
                         print("Setting to_mic_direction to default value")
-                except:
+                except Exception as e:
+                    print(e)
                     self.to_mic_direction = np.array(Calibration.default_to_mic)
                     print("Setting to_mic_direction to default value")
                 try:
                     self.mic_height = float(data["mic_height"])
-                except:
+                except Exception as e:
+                    print(e)
                     self.mic_height = Calibration.default_height
                     print("Setting microphone height to default value")
                 self.record()
