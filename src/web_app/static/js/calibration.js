@@ -27,7 +27,7 @@ function addCalibrationSpeaker() {
                 calibratingSpeakerCount = 1
             } else {
                 // after at least one calibration point, the calibration process can be finished
-                if (calibratingSpeakerCount == 1) {
+                if (calibratingSpeakerCount === 1) {
                     document.getElementById("camera-direction-button").disabled = false
                 }
                 const nextButton = button.parentNode.children[calibratingSpeakerCount]

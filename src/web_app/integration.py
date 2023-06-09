@@ -1,9 +1,15 @@
+import os
 from threading import Event, Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value
-from dotenv import load_dotenv
+
 import requests
+from yaml import load, dump
+try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 import cv2
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
@@ -15,13 +21,14 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 
+
 class GeneralController:
     def __init__(self):
         # self.event is part of the while loop in UpdateThread. When 0 - stops the while loop.
         self.event = Value("i", 0, lock=False)
 
         # self.info_threads_event is part of the info-threads
-        # and indicates whether or not update should be performed.
+        # and indicates whether update should be performed.
         # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
 
@@ -49,6 +56,9 @@ class GeneralController:
         self.secret = None
         self.ws = None
 
+        # Filepath for calibration and presets files
+        self.filepath: str = ""
+
         # Models, to record all updates onto a disk
         self.audio_model = None
         self.preset_model = None
@@ -64,78 +74,154 @@ class GeneralController:
         # Indicates which model should be used, check UpdateThread
         self.preset = Value("i", 0, lock=False)
 
+        # Keep in memory, whether a notification about the settings not being set has been sent
+        self.no_settings_sent = True
+
+        # PID of master process
+        self.pid = Value("i", os.getpid())
+        self.testing = Value("i", 0, lock=False)
+
     def load_env(self) -> None:
-        """Performs load procedure of all of the specified parameters.
+        """Performs load procedure of all the specified parameters.
         """
         self.preset = Value("i", 0, lock=False)
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
-        load_dotenv()
+
+        # Load settings file
+        try:
+            with open("settings.yaml", "r", encoding="utf-8") as f:
+                settings = load(f, Loader=Loader)
+        except IOError as e:
+            print("Could not open settings.yaml file, proceeding without it.")
+            print(e)
+            settings = {
+                "camera-ip": "0.0.0.0",
+                "camera-port": 52381,
+                "microphone-ip": "0.0.0.0",
+                "microphone-port": 45,
+                "microphone-thresh": -55,
+                "filepath": "",
+                "secret-key": "test"
+            }
+            self.no_settings_sent = False
+
         # Setup camera API
-        cam_addr = (getenv("CAM_IP"), int(getenv("CAM_PORT")))
-        verify_address(cam_addr)
-        self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
+        cam_addr = None
+        cam_port = settings["camera-port"]
+        if cam_port is not None:
+            cam_addr = (settings["camera-ip"], int(cam_port))
+            if cam_addr is not None and verify_address(cam_addr):
+                self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
 
         # Setup microphone API
-        mic_addr = (getenv("MIC_IP"), int(getenv("MIC_PORT")))
-        verify_address(mic_addr)
-        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), int(getenv("MIC_THRESH")))
+        mic_addr = None
+        mic_port = settings["microphone-port"]
+        print(mic_port, mic_port is None)
+        if mic_port is not None:
+            mic_addr = (settings["microphone-ip"], int(mic_port))
+            if mic_addr is not None and verify_address(mic_addr):
+                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr),
+                                             int(settings["microphone-thresh"]))
 
         # Setup secret
-        self.secret = getenv("SECRET_KEY")
+        self.secret = settings["secret-key"]
+
+        # Get filepath
+        filepath = settings["filepath"]
+        if filepath is not None and filepath != "":
+            res = str(filepath)
+            if res[-1] != '/':
+                res += "/"
+            self.filepath = res
+        else:
+            self.filepath = ""
 
         # Initialize models
-        self.audio_model = AudioModel(filename="calibration.json")
-        self.preset_model = PresetModel(filename="presets.json")
+        self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
+        self.preset_model = PresetModel(filename=self.filepath + "presets.json")
 
         # Initialize footage thread
-        self.video = cv2.VideoCapture('rtsp://'+getenv("CAM_IP")+':554/live/av0')# pragma: no mutate
-        self.footage_thread = FootageThread(self.video,self.footage_thread_event)# pragma: no mutate
-        self.footage_thread.start() # pragma: no mutate
+        if cam_addr is not None:
+            self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
+                                          + ':554/live/av0')  # pragma: no mutate
+            self.footage_thread = FootageThread(self.video,
+                                                self.footage_thread_event)  # pragma: no mutate
+            self.footage_thread.start()  # pragma: no mutate
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
-        self.thread_mic = Thread(target=self.send_update,
-            args=(self.get_mic_info, '/update/microphone'))
-        self.thread_cam = Thread(target=self.send_update,
-            args=(self.get_cam_info, '/update/camera'))
-        self.thread_mic.start()
-        self.thread_cam.start()
+        if mic_addr is not None:
+            self.thread_mic = Thread(target=self.send_update,
+                args=(self.get_mic_info, '/update/microphone'))
+            self.thread_mic.start()
+        if cam_addr is not None:
+            self.thread_cam = Thread(target=self.send_update,
+                args=(self.get_cam_info, '/update/camera'))
+            self.thread_cam.start()
+
+    def save(self):
+        """
+        Saves current settings to `settings.yaml`
+
+        Returns:
+            True on success
+            False on error
+        """
+        try:
+            with open("settings.yaml", "w", encoding="utf-8") as f:
+                cam_addr = self.cam_api.camera.address
+                mic_addr = self.mic_api.sock.address
+                data = {
+                    "camera-ip": cam_addr[0],
+                    "camera-port": cam_addr[1],
+                    "microphone-ip": mic_addr[0],
+                    "microphone-port": mic_addr[1],
+                    "microphone-thresh": self.mic_api.threshold,
+                    "filepath": self.filepath,
+                    "secret-key": self.secret
+                }
+                dump(data, f, Dumper=Dumper)
+            return True
+        except IOError as e:
+            print("Error while writing settings file!")
+            print(e)
+            return False
 
     def __del__(self):
-        self.preset.value = 0 # pragma: no mutate
+        self.preset.value = 0  # pragma: no mutate
         self.footage_thread_event.set() # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
 
         try: # pragma: no mutate
             self.thread_mic.join() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for microphone") # pragma: no mutate
         try: # pragma: no mutate
             self.thread_cam.join() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for camera") # pragma: no mutate
         try: # pragma: no mutate
             self.footage_thread.join() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for footage") # pragma: no mutate
         try: # pragma: no mutate
             self.video.release() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for video") # pragma: no mutate
         try: # pragma: no mutate
             cv2.destroyAllWindows() # pragma: no mutate
         except: # pragma: no mutate
-            print("Trying to destruct None thread") # pragma: no mutate
+            print("Trying to destruct None thread for cv2") # pragma: no mutate
 
     def load_mock(self):
         # This function is used to initialize integration in testing.
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
-        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
+        self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
         self.thread = None
@@ -166,6 +252,7 @@ class GeneralController:
 
         Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
+        print(self.mic_api.sock.address)
         return {
             "microphone-direction": list(self.mic_api.get_direction()),
             "microphone-speaking": self.mic_api.is_speaking()
@@ -230,15 +317,14 @@ class GeneralController:
         print("Closing " + path + " updater thread")
 
 
-def verify_address(address) -> None:
+def verify_address(address) -> bool:
     try:
         assert 0 <= address[1] <= 65535
-        assert 0 <= int(address[0].split(".")[0]) <= 255 and \
-               0 <= int(address[0].split(".")[1]) <= 255 and \
-               0 <= int(address[0].split(".")[2]) <= 255 and \
-               0 <= int(address[0].split(".")[3]) <= 255
-    except AssertionError:
+        assert isinstance(address[0], str)
+        return True
+    except (AssertionError, TypeError):
         print("ERROR: Address " + address + " is invalid!")
+        return False
 
 
 def close_running_threads(integration_passed) -> None:

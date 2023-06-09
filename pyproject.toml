@@ -19,7 +19,7 @@ dependencies = [
     "flask",
     "flask-socketio",
     "numpy",
-    "python-dotenv",
+    "pyyaml",
     "requests",
     "opencv-python"
 ]

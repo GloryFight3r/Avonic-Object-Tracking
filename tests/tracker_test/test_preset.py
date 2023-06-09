@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 import pytest
 import numpy as np
 from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
@@ -74,3 +75,14 @@ def test_presets_with_file_system(preset_collection_with_file: PresetCollection)
     assert "preset-to-add" in preset_collection_with_file.preset_locations
     new_preset_collection = PresetCollection(filename="test.json")
     assert "preset-to-add" in new_preset_collection.preset_locations
+
+
+def test_set_filename(preset_collection: PresetCollection):
+
+    def x(self):
+        pass
+
+    with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+        assert preset_collection.filename == ""
+        preset_collection.set_filename("asdf")
+        assert preset_collection.filename == "asdf"

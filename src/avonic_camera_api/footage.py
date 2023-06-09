@@ -2,7 +2,7 @@ from threading import Thread
 from multiprocessing import Value, Array
 import base64
 import time
-import cv2 # type: ignore
+import cv2  # type: ignore
 
 
 class FootageThread(Thread):
@@ -41,6 +41,6 @@ class FootageThread(Thread):
         """ Returns the camera footage image decoded into ascii
         
         Returns:
-            
+            Stringified base64 encoded frame
         """
         return str(self.buffer.raw[:self.buflen.value], 'ascii')
