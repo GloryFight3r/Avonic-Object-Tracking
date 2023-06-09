@@ -63,6 +63,6 @@ def set_settings(integration: GeneralController):
     except (ValueError, KeyError):
         return make_response(jsonify({"message": "Invalid threshold or filepath."}), 400)
     finally:
-        if saved:
+        if saved and integration.thread is not None:  # do not exit when testing
             print("Restarting server...")
             os.kill(integration.pid.value, signal.SIGINT)

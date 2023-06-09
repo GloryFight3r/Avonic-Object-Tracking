@@ -37,7 +37,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "recv", mocked_recv)
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=cam_sock, address=('0.0.0.0', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=cam_sock, address=('0.0.0.1', 52381)))
 
     def mocked_get_zoom():
         return 128
@@ -56,8 +56,8 @@ def client(camera, monkeypatch):
     """A test client for the app."""
     mic_sock.sendto.return_value = 48
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), ("0.0.0.0", 45))
-    mic_adapt = MicrophoneSocket(sock=mic_sock, address=("0.0.0.0", 45))
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_adapt = MicrophoneSocket(sock=mic_sock, address=("0.0.0.1", 45))
     mic_api = MicrophoneAPI(mic_adapt)
     mic_api.height = 1
 
@@ -312,15 +312,15 @@ def test_thread(client):
 def test_is_speaking(client):
     mic_sock.sendto.return_value = 48
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-55}}}\r\n', "ascii"), ("0.0.0.0", 45))
+        (bytes('{"m":{"in1":{"peak":-55}}}\r\n', "ascii"), ("0.0.0.1", 45))
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":false}\n", "utf-8")
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), ("0.0.0.0", 45))
+        (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), ("0.0.0.1", 45))
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":true}\n", "utf-8")
     mic_sock.recvfrom.return_value = \
-        (bytes('{"m":{"in1":{"peak":-100}}}\r\n', "ascii"), ("0.0.0.0", 45))
+        (bytes('{"m":{"in1":{"peak":-100}}}\r\n', "ascii"), ("0.0.0.1", 45))
     rv = client.get('/microphone/speaking')
     assert rv.status_code == 200 and rv.data == bytes("{\"microphone-speaking\":true}\n", "utf-8")
 
@@ -538,9 +538,9 @@ def test_settings(client):
     with mock.patch('web_app.integration.open', m):
         rv = client.get("settings/get")
         original = {
-            "camera-ip": "0.0.0.0",
+            "camera-ip": "0.0.0.1",
             "camera-port": 52381,
-            "microphone-ip": "0.0.0.0",
+            "microphone-ip": "0.0.0.1",
             "microphone-port": 45,
             "microphone-thresh": -55,
             "filepath": ""

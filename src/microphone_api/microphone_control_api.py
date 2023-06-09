@@ -48,7 +48,8 @@ class MicrophoneAPI:
         message = '{"m":{"beam":{"azimuth":null}}}'
         sent = self.sock.send(message)
         if len(sent) == 0:
-            return "Microphone returned nothing."
+            print("Microphone returned nothing.")
+            return self.azimuth
         ret = sent[0]
         try:
             res = json.loads(ret)["m"]["beam"]["azimuth"]
@@ -56,7 +57,7 @@ class MicrophoneAPI:
             if 0 <= res <= 360:
                 self.azimuth = np.deg2rad(res)
         except KeyError:
-            return "Unable to get azimuth from the microphone, response was: " + ret
+            print("Unable to get azimuth from the microphone, response was: " + ret)
         return self.azimuth
 
     def get_elevation(self) -> float | str:
@@ -68,7 +69,8 @@ class MicrophoneAPI:
         message = '{"m":{"beam":{"elevation":null}}}'
         sent = self.sock.send(message)
         if len(sent) == 0:
-            return "Microphone returned nothing."
+            print("Microphone returned nothing.")
+            return self.elevation
         ret = sent[0]
         try:
             res = json.loads(ret)["m"]["beam"]["elevation"]
@@ -76,7 +78,7 @@ class MicrophoneAPI:
             if 0 <= res <= 90:
                 self.elevation = np.deg2rad(res)
         except KeyError:
-            return "Unable to get elevation from microphone, response was: " + ret
+            print("Unable to get elevation from microphone, response was: " + ret)
         return self.elevation
 
     def get_direction(self) -> np.ndarray | str:
