@@ -329,7 +329,6 @@ def test_thread(client, monkeypatch):
         self.start = lambda: 0
         self.event = None
 
-    #monkeypatch.setattr(web_app.integration.object_tracking_thread, "start", mocked_start)
     monkeypatch.setattr(ObjectTrackingThread, "__init__", mocked_init)
     web_app.integration.preset.value = ModelCode.OBJECT
     rv = client.post('/thread/start')

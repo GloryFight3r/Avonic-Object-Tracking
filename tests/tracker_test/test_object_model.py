@@ -36,7 +36,6 @@ def test_get_movement_to_box(box, resolution, movement):
     cam_api.calculate_fov.return_value = 100
     obj_model = ObjectModel(cam_api, None, None, resolution)
     res = obj_model.get_movement_to_box(box)
-    print(res[1])
     assert (res[0] == movement[0]).all()
     assert (res[1] == movement[1]).all()
 

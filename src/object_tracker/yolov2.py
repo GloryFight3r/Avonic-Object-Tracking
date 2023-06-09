@@ -23,11 +23,8 @@ class YOLOPredict:
     def get_bounding_boxes(self, frame):
         results = self.model.predict(frame, classes=0, device="cpu")
         result = results[0]
-        print("CONFIDENCE")
         conf_indices = set(torch.nonzero(result.boxes.conf.cpu() > 0.0))
         person_indices = set(torch.nonzero(result.boxes.cls.cpu() == 0))
-        print(conf_indices)
-        #persons = [result.boxes.cls.cpu()[i] for i in person_indices]
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
         persons = []

@@ -97,7 +97,6 @@ class MicrophoneAPI:
             if "message" in obj:
                 return obj["message"]
             return "Unable to get direction from microphone, response was: " + ret
-        #self.latest_direction.raw = self.vector().tolist()
         return self.vector()
 
     def vector(self) -> np.ndarray:

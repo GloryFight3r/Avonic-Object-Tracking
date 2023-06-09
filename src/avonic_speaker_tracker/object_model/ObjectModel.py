@@ -36,7 +36,6 @@ class ObjectModel():
         def get_center(box):
             return np.array([(box[0] + box[2])/2, (box[1] + box[3])/2])
 
-        #center_point = np.array([self.resolution[0] / 2, self.resolution[1] / 3])
         center = sorted(boxes,
                         key=lambda box: np.linalg.norm(get_center(box) - self.resolution/2))[0]
         return center
@@ -55,6 +54,7 @@ class ObjectModel():
         """
         # current_box is in the format [left top right bottom] and want to use the format
         # [left bottom width height] so we change it
+        # The height is divided by two so the upper half of the person's body is used
         current_box = [current_box[0], current_box[1], current_box[2], current_box[3]/2]
         bbox:np.ndarray = np.array([current_box[0],\
                          current_box[3],\
@@ -99,11 +99,6 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         the microphone doesn't detect large movements and then uses object tracking
         till the microphone detects big movements again.
     """
-
-    # do not move the camera if camera is moved by more degrees than this threshold
-    threshold = None
-    #time_without_movement = None
-
     def __init__(self, cam: CameraAPI, mic: MicrophoneAPI, object_tracking_thread,
                  resolution: np.ndarray, threshold: int,
                  filename = ""):
@@ -120,6 +115,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         avg_angle = (angle[0] + angle[1]) / 2
 
         if abs(avg_angle) <= self.threshold*3:
+            print("MOVING!!!!!")
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
 
