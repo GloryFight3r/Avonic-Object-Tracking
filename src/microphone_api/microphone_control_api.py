@@ -16,7 +16,7 @@ class MicrophoneAPI:
         self.azimuth: float = 0.0
         self.speaking: bool = False
         self.threshold: int = threshold
-        self.prev_dir = np.array([0, 0, 1])
+        self.prev_dir = np.array([0.0, 0.0, 1.0])
 
     def set_address(self, address):
         """
