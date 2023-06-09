@@ -95,7 +95,13 @@ class MicrophoneAPI:
             obj = json.loads(ret)
             if "message" in obj:
                 return obj["message"]
-            return "Unable to get direction from microphone, response was: " + ret
+            try:  # in case of peak message being received instead
+                peak = obj["m"]["in1"]["peak"]
+                assert isinstance(peak, int)
+                if -90 <= peak <= 0:
+                    self.speaking = peak > self.threshold
+            except KeyError:
+                return "Unable to get direction from microphone, response was: " + ret
         return self.vector()
 
     def vector(self) -> np.ndarray:
@@ -126,5 +132,15 @@ class MicrophoneAPI:
             obj = json.loads(ret)
             if "message" in obj:
                 return obj["message"]
-            return "Unable to get peak loudness, response was: " + ret
+            try:  # in case of receiving direction message instead
+                azimuth = obj["m"]["beam"]["azimuth"]
+                elevation = obj["m"]["beam"]["elevation"]
+                assert isinstance(azimuth, int)
+                assert isinstance(elevation, int)
+                if 0 <= elevation <= 90:
+                    self.elevation = np.deg2rad(elevation)
+                if 0 <= azimuth < 360:
+                    self.azimuth = np.deg2rad(azimuth)
+            except KeyError:
+                return "Unable to get peak loudness, response was: " + ret
         return self.speaking

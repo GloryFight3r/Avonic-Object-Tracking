@@ -24,7 +24,9 @@
         <input id="mic-direction-y2" name="mic-direction-y" readonly />
         <input id="mic-direction-z2" name="mic-direction-z" readonly />
       </div>
-      <button id="set-mic-button" type="submit">Get the microphone direction towards the speaker</button>
+      <button id="set-mic-button" type="submit" data-tooltip="Click this to record the microphone direction for preset use">
+        Get the microphone direction towards the speaker
+      </button>
       <h6>Camera info[pan,tilt,zoom]:</h6>
       <div class="grid">
         <input id="camera-direction-alpha" name="camera-direction-alpha" readonly />
@@ -32,14 +34,24 @@
         <input id="camera-zoom-value" name="camera-zoom-value" readonly />
       </div>
       <div class="grid">
-          <button id="cam-dir-button" type="submit">Get the camera direction</button>
-          <button id="cam-zoom-button" type="submit">Get the camera zoom</button>
+          <button id="cam-dir-button" type="submit" data-tooltip="Record the camera direction (zoom separate!) for preset use">
+            Get the camera direction
+          </button>
+          <button id="cam-zoom-button" type="submit" data-tooltip="Record the camera zoom for preset use">
+            Get the camera zoom
+          </button>
       </div>
       <h6>Preset Controls</h6>
       <div class="grid">
-        <button id="add-preset-button" type="submit">Add the new preset</button>
-        <button id="edit-preset-button" type="submit">Edit current preset</button>
-        <button id="remove-preset-button" type="submit">Remove current preset</button>
+        <button id="add-preset-button" type="submit" data-tooltip="Add a new preset based on the information provided above">
+          Add the new preset
+        </button>
+        <button id="edit-preset-button" type="submit" data-tooltip="Edit the currently selected preset">
+          Edit current preset
+        </button>
+        <button id="remove-preset-button" type="submit" data-tooltip="Remove the currently selected preset" data-placement="left">
+          Remove current preset
+        </button>
       </div>
     </form>
 
@@ -47,11 +59,18 @@
   <div id="cal">
     <h5 id="calibration-instruction">Set the height, then click below to calibrate point 1</h5>
     <div class="grid">
-      <button class="calibration-button" onclick="startCalibration(this)">Start 1</button>
-      <button class="calibration-button" onclick="startCalibration(this)" disabled="disabled">Start 2</button>
-      <button class="calibration-button" onclick="startCalibration(this)" disabled="disabled">Start 3</button>
+      <button class="calibration-button" onclick="startCalibration(this)"
+              data-tooltip="Stand somewhere in the room, press this button and speak"
+              data-placement="bottom">Start 1</button>
+      <button class="calibration-button" onclick="startCalibration(this)"
+              disabled="disabled" data-tooltip="Stand somewhere in the room, press this button and speak"
+              data-placement="bottom">Start 2</button>
+      <button class="calibration-button" onclick="startCalibration(this)"
+              disabled="disabled" data-tooltip="Stand somewhere in the room, press this button and speak"
+              data-placement="left">Start 3</button>
     </div>
-    <button id="camera-direction-button" onclick="pointCameraCalibration(this)" disabled="disabled">
+    <button id="camera-direction-button" onclick="pointCameraCalibration(this)" disabled="disabled"
+            data-tooltip="Point the camera at the microphone, then press this button">
       Submit current camera direction.
     </button>
     <form action="/calibration/camera" method="get" id="camera-coords-get-form" class="grid">
@@ -59,7 +78,8 @@
       <input id="camera-coords-x" />
       <input id="camera-coords-y" />
       <input id="camera-coords-z" />
-      <button type="submit">Get calculated camera coordinates</button>
+      <button type="submit" data-tooltip="Either after calibrating, or try loading the last calibration"
+              data-placement="left">Get calculated camera coordinates</button>
     </form>
     </div>
   </div>

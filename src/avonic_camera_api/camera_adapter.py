@@ -110,7 +110,7 @@ class CameraSocket:
 
         self.sock.sendall(message)
 
-        self.sock.settimeout(5.0)
+        self.sock.settimeout(0.05)
         try:
             data = binascii.hexlify(self.sock.recv(2048)).upper()
         except TimeoutError:
@@ -133,7 +133,7 @@ class CameraSocket:
                     return self.response_codes[ret]
                 return ret
             else:
-                self.sock.settimeout(5.0)
+                self.sock.settimeout(0.05)
                 try:
                     data = binascii.hexlify(self.sock.recv(2048)).upper()
                 except TimeoutError:
