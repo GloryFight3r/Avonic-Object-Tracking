@@ -7,13 +7,12 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
-import web_app.footage
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+#import logging
+#log = logging.getLogger('werkzeug')
+#log.setLevel(logging.ERROR)
 
 integration = GeneralController()
 
@@ -190,7 +189,6 @@ def create_app(test_controller=None):
 
     @app.get('/preset/track')
     def preset_tracker():
-        print("PRESET TRACKER")
         return web_app.tracking_endpoints.track_presets(integration)
 
     @app.get('/calibration/add_directions_to_speaker')
@@ -215,7 +213,6 @@ def create_app(test_controller=None):
 
     @app.get('/calibration/track')
     def continuous_tracker():
-        print("CONTINUOUS TRACKER")
         return web_app.tracking_endpoints.track_continuously(integration)
 
 
@@ -240,7 +237,6 @@ def create_app(test_controller=None):
 
     @app.get('/object/track')
     def object_tracking_start():
-        print("OBJECT TRACKER")
         return web_app.tracking_endpoints.track_object_continuously(integration)
 
     @app.post('/thread/start')

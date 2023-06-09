@@ -2,10 +2,6 @@ from threading import Thread
 from multiprocessing import Value, Array
 import base64
 import time
-from threading import Thread
-import base64
-import copy
-import time
 import numpy as np
 import cv2 # type: ignore
 
@@ -68,7 +64,7 @@ class FootageThread(Thread):
             success, self.frame = self.camera.read()
 
             if success:
-                ret, buffer = cv2.imencode('.jpg', self.frame)
+                buffer = cv2.imencode('.jpg', self.frame)[1]
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
 

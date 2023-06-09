@@ -1,12 +1,10 @@
 from flask import make_response, jsonify, request
 import numpy as np
 from avonic_speaker_tracker.updater import UpdateThread
-from web_app.integration import GeneralController
-
+from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
 from web_app.integration import GeneralController, ModelCode
 from avonic_camera_api.footage import ObjectTrackingThread
 from object_tracker.yolov2 import YOLOPredict
-from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
 
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
@@ -30,7 +28,8 @@ def start_thread_endpoint(integration: GeneralController):
             integration.object_tracking_thread.start()
 
             integration.object_audio_model = WaitObjectAudioModel(
-                    integration.cam_api, integration.mic_api, integration.object_tracking_thread.event,
+                    integration.cam_api, integration.mic_api,
+                    integration.object_tracking_thread.event,
                     np.array([1920.0, 1080.0]),
                     5, filename="calibration.json")
             model = integration.object_audio_model
@@ -97,6 +96,6 @@ def track_continuously(integration: GeneralController):
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_object_continuously(integration: GeneralController):
-    integration.preset.value = ModelCode.OBJECT_AUDIO
+    integration.preset.value = ModelCode.OBJECT
     print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)

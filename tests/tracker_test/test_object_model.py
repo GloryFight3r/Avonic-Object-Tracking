@@ -1,7 +1,7 @@
-import pytest
-import numpy as np
 from unittest import mock
 from multiprocessing import Value
+import pytest
+import numpy as np
 
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel, WaitObjectAudioModel
 
@@ -73,20 +73,24 @@ class MockedMicAPIWrongDirection:
 
 
 def test_track_object():
-    object_audio_model = WaitObjectAudioModel(MockedCamAPI(), None, None, np.array([100, 100]), 0)
+    object_audio_model = WaitObjectAudioModel(MockedCamAPI(),
+                                              None, None, np.array([100, 100]), 0)
     object_audio_model.track_object(np.array([0, 0, 10, 10]))
-    object_audio_model2 = WaitObjectAudioModel(MockedCamAPI(), None, None, np.array([100, 100]), 100)
+    object_audio_model2 = WaitObjectAudioModel(MockedCamAPI(),
+                                               None, None, np.array([100, 100]), 100)
     object_audio_model2.track_object(np.array([0, 0, 10, 10]))
 
 def test_point(monkeypatch):
-    object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPI(), Value("i", 0, lock=False),
+    object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPI(),
+                                              Value("i", 0, lock=False),
                                               np.array([100, 100]), 0)
     monkeypatch.setattr(object_audio_model.calibration, "mic_to_cam", np.array([1, 2, 3]))
     monkeypatch.setattr(object_audio_model.calibration, "mic_height", 1.5)
     object_audio_model.point()
 
 def test_point_zoom(monkeypatch):
-    object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPI(), Value("i", 0, lock=False),
+    object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPI(),
+                                              Value("i", 0, lock=False),
                                               np.array([100, 100]), 0)
     monkeypatch.setattr(object_audio_model.calibration, "mic_to_cam", np.array([1, 2, 3]))
     monkeypatch.setattr(object_audio_model.calibration, "mic_height", 1.5)
@@ -94,8 +98,8 @@ def test_point_zoom(monkeypatch):
     object_audio_model.point()
 
 def test_point_wrong_direction(monkeypatch):
-    object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPIWrongDirection(), Value("i", 0, lock=False),
+    object_audio_model = WaitObjectAudioModel(MockedCamAPI(),
+                                              MockedMicAPIWrongDirection(),
+                                              Value("i", 0, lock=False),
                                               np.array([100, 100]), 0)
-    #monkeypatch.setattr(object_audio_model.calibration, "mic_to_cam", np.array([1, 2, 3]))
-    #monkeypatch.setattr(object_audio_model.calibration, "mic_height", 1.5)
     object_audio_model.point()

@@ -4,9 +4,6 @@ from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.audio_model.calibration import Calibration
-from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
 
@@ -35,7 +32,6 @@ class UpdateThread(Thread):
         1 - PresetModel aka presets, which selects the camera direction
         from the limited pool of options, based on cosine similarity.
         """
-        prev_dir = [0.0, 0.0]
         speak_delay: int = 0
         while self.event.value != 0:
             if self.value is None:

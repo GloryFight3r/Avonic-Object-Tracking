@@ -1,12 +1,12 @@
-import numpy as np
 import math
-from multiprocessing import Value
+import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
-from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.converter import vector_angle
+from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.audio_model.calibration import Calibration
-from avonic_speaker_tracker.utils.coordinate_translation import translate_microphone_to_camera_vector
+from avonic_speaker_tracker.utils.coordinate_translation \
+    import translate_microphone_to_camera_vector
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 
 class ObjectModel():
@@ -33,7 +33,9 @@ class ObjectModel():
             returns:
                 box (np.array): the box closest to the center
         """
-        get_center = lambda box: np.array([(box[0] + box[2])/2, (box[1] + box[3])/2])
+        def get_center(box):
+            return np.array([(box[0] + box[2])/2, (box[1] + box[3])/2])
+
         #center_point = np.array([self.resolution[0] / 2, self.resolution[1] / 3])
         center = sorted(boxes,
                         key=lambda box: np.linalg.norm(get_center(box) - self.resolution/2))[0]
@@ -77,7 +79,7 @@ class ObjectModel():
         cam_fov:np.ndarray = self.cam_api.calculate_fov()
 
         # calculate how many degrees correspond to one pixel
-        angular_resolution:np.ndarray = (cam_fov / self.resolution)
+        angular_resolution:np.ndarray = cam_fov / self.resolution
 
         # find the relative angle the camera must rotate so that it centers on the bounding box
         rotate_angle:np.ndarray = angular_resolution * distance_to_middle

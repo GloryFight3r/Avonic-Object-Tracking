@@ -2,14 +2,14 @@ from unittest import mock
 import socket
 import json
 import pytest
-import time
 import numpy as np
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, ModelCode
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 import web_app
+from avonic_camera_api.footage import ObjectTrackingThread
 
 mic_sock = mock.Mock()
 
@@ -69,6 +69,7 @@ def client(camera, monkeypatch):
     test_controller.ws = mock.Mock()
 
     app = web_app.create_app(test_controller=test_controller)
+
     app.config['TESTING'] = True
 
     return app.test_client()
@@ -276,7 +277,7 @@ def test_update_calibration(client):
     assert rv.status_code == 200
 
 
-def test_thread(client):
+def test_thread(client, monkeypatch):
     rv = client.post("preset/add",
     data={
             "camera-direction-alpha" : 0,
@@ -316,6 +317,22 @@ def test_thread(client):
     rv = client.post('/thread/start')
     assert rv.status_code == 403
     rv = client.post('/thread/stop')
+    assert rv.status_code == 200
+
+    web_app.integration.preset.value = ModelCode.AUDIO
+    rv = client.post('/thread/start')
+    assert rv.status_code == 200
+    rv = client.post('/thread/stop')
+    assert rv.status_code == 200
+
+    def mocked_init(self, nn, oam, ft, ote):
+        self.start = lambda: 0
+        self.event = None
+
+    #monkeypatch.setattr(web_app.integration.object_tracking_thread, "start", mocked_start)
+    monkeypatch.setattr(ObjectTrackingThread, "__init__", mocked_init)
+    web_app.integration.preset.value = ModelCode.OBJECT
+    rv = client.post('/thread/start')
     assert rv.status_code == 200
 
 def test_is_speaking(client):
@@ -554,3 +571,15 @@ def generate_single_page_views():
 def test_live_footage(client, url):
     rv = client.get(url)
     assert rv.status_code == 200
+
+def test_calibration_track(client):
+    rv = client.get("/calibration/track")
+    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":0}\n", "utf-8")
+
+def test_preset_track(client):
+    rv = client.get("/preset/track")
+    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":1}\n", "utf-8")
+
+def test_object_track(client):
+    rv = client.get("/object/track")
+    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":2}\n", "utf-8")

@@ -1,5 +1,4 @@
 import numpy as np
-import math
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.preset_model.preset import PresetCollection

@@ -15,12 +15,11 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
-from enum import Enum
 
 class ModelCode():
     AUDIO = 0
     PRESET = 1
-    OBJECT_AUDIO = 2
+    OBJECT = 2
 
 class GeneralController:
     def __init__(self):
@@ -57,12 +56,6 @@ class GeneralController:
         self.secret = None
         self.ws = None
 
-        # Clean this up
-        self.audio_model = None
-        self.preset_model = None
-        self.object_audio_model = None
-        self.model = None
-        self.object_tracking_thread = None
 
         # the neural network to use
         self.nn = None
@@ -70,6 +63,9 @@ class GeneralController:
         # Models, to record all updates onto a disk
         self.audio_model = None
         self.preset_model = None
+        self.object_audio_model = None
+        self.object_tracking_thread = None
+        self.model = None
 
         # Video related fields
         self.camera_footage = None
@@ -162,9 +158,13 @@ class GeneralController:
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), 55)
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
-        #self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
+        self.object_audio_model = WaitObjectAudioModel(
+                self.cam_api, self.mic_api, self.object_tracking_thread,
+                np.array([1920.0, 1080.0]),
+                5, filename="calibration.json")
         self.preset.value = ModelCode.PRESET
         self.thread = None
+        self.nn = ""
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -175,6 +175,7 @@ class GeneralController:
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
         self.preset.value = new_controller.preset.value
+        self.nn = new_controller.nn
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api
@@ -250,12 +251,9 @@ class GeneralController:
                 flag = False
             if self.info_threads_event.value != 0:
                 d = data()
-                try:
-                    response = requests.post('http://' + self.url + path, json=d)
-                    if response.status_code != 200:
-                        print("Could not update flask at path " + path)
-                except:
-                    pass
+                response = requests.post('http://' + self.url + path, json=d)
+                if response.status_code != 200:
+                    print("Could not update flask at path " + path)
             sleep(0.3)
         print("Closing " + path + " updater thread")
 

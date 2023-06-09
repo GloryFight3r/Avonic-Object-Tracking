@@ -1,7 +1,6 @@
 import json
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
-from multiprocessing import Array
 
 
 class MicrophoneAPI:
@@ -93,8 +92,7 @@ class MicrophoneAPI:
                 self.elevation = np.deg2rad(elevation)
             if 0 <= azimuth < 360:
                 self.azimuth = np.deg2rad(azimuth)
-        #except KeyError:
-        except:
+        except KeyError:
             obj = json.loads(ret)
             if "message" in obj:
                 return obj["message"]

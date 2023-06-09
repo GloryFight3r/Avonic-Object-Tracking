@@ -1,11 +1,9 @@
 import base64
 from threading import Event
+from multiprocessing import Value
 import pytest
 import cv2
 from avonic_camera_api.footage import ObjectTrackingThread, FootageThread
-from object_tracker.yolov2 import YOLOPredict
-from multiprocessing import Value
-from avonic_camera_api.footage import FootageThread
 
 class MockedCv:
     def __init__(self):
@@ -37,8 +35,6 @@ class MockedYoloPredict:
 @pytest.fixture
 def footage_thread():
     mocked_cam_footage = MockedCv()
-    mocked_box_tracker = MockedBoxTracker()
-    mocked_yolo = MockedYoloPredict()
     event = Event()
     thread = FootageThread(mocked_cam_footage, event)
 

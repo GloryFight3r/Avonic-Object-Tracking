@@ -3,8 +3,7 @@ import socket
 import time
 import pytest
 import numpy as np
-import time
-from web_app.integration import GeneralController, close_running_threads
+from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI

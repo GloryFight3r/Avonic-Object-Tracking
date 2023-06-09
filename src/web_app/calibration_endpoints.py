@@ -1,6 +1,5 @@
 from time import sleep
 from flask import make_response, jsonify
-import numpy as np
 from web_app.integration import GeneralController
 
 def success():
