@@ -39,7 +39,7 @@ class MicrophoneAPI:
         assert height >= 0.0
         self.height = height
 
-    def get_azimuth(self) -> float | str:
+    def get_azimuth(self) -> float:
         """ Get azimuth from the camera.
 
         Returns:
@@ -60,7 +60,7 @@ class MicrophoneAPI:
             print("Unable to get azimuth from the microphone, response was: " + ret)
         return self.azimuth
 
-    def get_elevation(self) -> float | str:
+    def get_elevation(self) -> float:
         """ Get elevation from the camera.
 
         Returns:

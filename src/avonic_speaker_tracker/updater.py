@@ -10,7 +10,7 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 class UpdateThread(Thread):
     def __init__(self, event: c_int,
                  cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: c_int,
-                 filepath: str):
+                 filepath: str = ""):
         """ Class constructor
 
         Args:
