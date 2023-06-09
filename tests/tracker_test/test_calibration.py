@@ -1,5 +1,7 @@
 import math
 import os
+from unittest import mock
+
 import pytest
 import numpy as np
 
@@ -150,3 +152,14 @@ def test_with_file():
         assert np.allclose(cal.speaker_points[0], second_cal.speaker_points[0])
     finally:
         os.remove("TEST_WITH_FILE_CALIBRATION.json")
+
+
+def test_set_filename():
+    def mock_load(self):
+        pass
+
+    with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", mock_load):
+        cal = Calibration()
+        assert cal.filename == ""
+        cal.set_filename("asdf")
+        assert cal.filename == "asdf"

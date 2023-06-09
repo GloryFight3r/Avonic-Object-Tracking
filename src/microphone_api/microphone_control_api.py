@@ -39,38 +39,44 @@ class MicrophoneAPI:
         assert height >= 0.0
         self.height = height
 
-    def get_azimuth(self) -> float:
+    def get_azimuth(self) -> float | str:
         """ Get azimuth from the camera.
 
         Returns:
             the azimuth in radians
         """
         message = '{"m":{"beam":{"azimuth":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            return "Microphone returned nothing."
+        ret = sent[0]
         try:
             res = json.loads(ret)["m"]["beam"]["azimuth"]
             assert isinstance(res, int)
             if 0 <= res <= 360:
                 self.azimuth = np.deg2rad(res)
         except KeyError:
-            print("Unable to get azimuth from the microphone, response was: " + ret)
+            return "Unable to get azimuth from the microphone, response was: " + ret
         return self.azimuth
 
-    def get_elevation(self) -> float:
+    def get_elevation(self) -> float | str:
         """ Get elevation from the camera.
 
         Returns:
             the elevation in radians
         """
         message = '{"m":{"beam":{"elevation":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            return "Microphone returned nothing."
+        ret = sent[0]
         try:
             res = json.loads(ret)["m"]["beam"]["elevation"]
             assert isinstance(res, int)
             if 0 <= res <= 90:
                 self.elevation = np.deg2rad(res)
         except KeyError:
-            print("Unable to get elevation from microphone, response was: " + ret)
+            return "Unable to get elevation from microphone, response was: " + ret
         return self.elevation
 
     def get_direction(self) -> np.ndarray | str:
@@ -80,7 +86,10 @@ class MicrophoneAPI:
             the direction vector (normalized)
         """
         message = '{"m":{"beam":{"azimuth":null,"elevation":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            return "Microphone returned nothing."
+        ret = sent[0]
         try:
             json_object = json.loads(ret)["m"]["beam"]
             azimuth = json_object["azimuth"]
@@ -116,7 +125,10 @@ class MicrophoneAPI:
             whether the peak loudness is higher than the threshold
         """
         message = '{"m":{"in1":{"peak":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            return "Microphone returned nothing."
+        ret = sent[0]
         try:
             res = json.loads(ret)["m"]["in1"]["peak"]
             assert isinstance(res, int)

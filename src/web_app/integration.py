@@ -1,13 +1,15 @@
+import os
 from threading import Event, Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value
+
+import requests
 from yaml import load, dump
 try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
-import requests
 import cv2
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
@@ -75,6 +77,9 @@ class GeneralController:
         # Keep in memory, whether a notification about the settings not being set has been sent
         self.no_settings_sent = True
 
+        # PID of master process
+        self.pid = Value("i", os.getpid())
+
     def load_env(self) -> None:
         """Performs load procedure of all the specified parameters.
         """
@@ -124,8 +129,13 @@ class GeneralController:
 
         # Get filepath
         filepath = settings["filepath"]
-        if filepath is not None:
-            self.filepath = str(filepath)
+        if filepath is not None and filepath != "":
+            res = str(filepath)
+            if res[-1] != '/':
+                res += "/"
+            self.filepath = res
+        else:
+            self.filepath = ""
 
         # Initialize models
         self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
@@ -241,6 +251,7 @@ class GeneralController:
 
         Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
+        print(self.mic_api.sock.address)
         return {
             "microphone-direction": list(self.mic_api.get_direction()),
             "microphone-speaking": self.mic_api.is_speaking()

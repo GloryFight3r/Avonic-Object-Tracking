@@ -50,3 +50,6 @@ class PresetModel(TrackingModel):
         self.prev_dir = direct
 
         return direct
+
+    def set_filename(self, filename: str):
+        self.preset_locations.set_filename(filename)

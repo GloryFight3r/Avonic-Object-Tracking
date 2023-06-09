@@ -16,6 +16,7 @@ from web_app.integration import GeneralController, close_running_threads
 
 integration = GeneralController()
 
+restart_queue = None
 
 def create_app(test_controller=None):
     # create and configure the app
@@ -301,7 +302,7 @@ def create_app(test_controller=None):
 
     @integration.ws.on("connected")
     def settings_not_set(data):
-        if not integration.no_settings_sent:
+        if not integration.no_settings_sent:  # prompt user to set up if no settings file found
             integration.ws.emit("no-settings", data)
 
     def sigterm_handler(_signo, _stack_frame):

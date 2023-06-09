@@ -1,3 +1,5 @@
+import os
+import signal
 from flask import make_response, jsonify, request
 import web_app.camera_endpoints
 from web_app.integration import GeneralController
@@ -38,17 +40,29 @@ def set_settings(integration: GeneralController):
     microphone_response = web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
     if microphone_response.status_code != 200:
         return microphone_response
+    saved = False
     try:
         data = request.form
         integration.mic_api.threshold = int(data["microphone-thresh"])
         filepath = data["filepath"]
-        if filepath is None:
-            filepath = ""
-        integration.filepath = str(filepath)
-        if integration.save():
+        if filepath is None or len(filepath) < 1:
+            integration.filepath = ""
+        else:
+            integration.filepath = str(filepath)
+            if integration.filepath[-1] != "/":
+                integration.filepath += "/"
+        integration.audio_model.set_filename(integration.filepath)
+        integration.preset_model.set_filename(integration.filepath)
+
+        saved = integration.save()
+        if saved:
             return make_response(jsonify({}), 200)
         return make_response(jsonify(
             {"message": "Something went wrong while saving settings file! Check application output!"}),
             500)
     except (ValueError, KeyError):
         return make_response(jsonify({"message": "Invalid threshold or filepath."}), 400)
+    finally:
+        if saved:
+            print("Restarting server...")
+            os.kill(integration.pid.value, signal.SIGINT)

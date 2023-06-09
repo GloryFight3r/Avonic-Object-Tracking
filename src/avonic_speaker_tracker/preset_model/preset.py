@@ -95,3 +95,7 @@ class PresetCollection:
                     self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
                         np.array(data[key]["microphone_direction"]))
                 print("Loaded presets: ", self.preset_locations)
+
+    def set_filename(self, filename: str):
+        self.filename = filename
+        self.load()
