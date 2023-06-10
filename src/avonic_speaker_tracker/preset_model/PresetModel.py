@@ -37,10 +37,17 @@ class PresetModel(TrackingModel):
 
         preset = self.preset_locations.get_preset_info(
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
-        direct = np.array([np.rad2deg(preset[0][0]), np.rad2deg(preset[0][1]), preset[0][2]])
+        direct = np.array([int(np.rad2deg(preset[0][0]))%360, int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
+
+        if direct[0]>180:
+            direct[0] = direct[0]-360
+        if direct[1]>180:
+            direct[1] = direct[1]-360
 
         diffX = math.fabs(self.prev_dir[0]-direct[0])*2.0/360.0
         diffY = math.fabs(self.prev_dir[1]-direct[1])*2.0/120.0
+
+        print(self.prev_dir,direct)
 
         speedX : int = int(13 + diffX*11.0)
         speedY : int = int(11 + diffY*9.0)

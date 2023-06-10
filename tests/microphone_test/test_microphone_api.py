@@ -6,6 +6,17 @@ from microphone_api.microphone_adapter import MicrophoneSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 
+
+def test_init():
+    sock = MicrophoneSocket(None)
+    mic = MicrophoneAPI(sock)
+
+    assert mic.height == 0.0
+    assert mic.elevation == 0.0
+    assert mic.azimuth == 0.0
+    assert mic.speaking == False 
+    assert mic.threshold == -55
+
 def test_set_height_api():
     mic = MicrophoneSocket(None)
     api = MicrophoneAPI(mic)

@@ -50,7 +50,12 @@ class AudioModel(TrackingModel):
 
         direct = vector_angle(cam_vec)
 
-        direct_np = np.array([int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val])
+        direct_np = np.array([int(np.rad2deg(direct[0]))%360, int(np.rad2deg(direct[1]))%360, zoom_val])
+
+        if direct_np[0]>180:
+            direct_np[0] = direct_np[0]-360
+        if direct_np[1]>180:
+            direct_np[1] = direct_np[1]-360
 
         diffX = math.fabs(self.prev_dir[0]-direct_np[0])*2.0/360.0
         diffY = math.fabs(self.prev_dir[1]-direct_np[1])*2.0/120.0
