@@ -3,6 +3,7 @@ import math
 import pytest
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI, PAN_STEP, TILT_STEP, degrees_to_command
+from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api import converter
 
@@ -43,7 +44,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "close", mocked_close)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    return CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52382)))
+    return CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52382)), CameraHTTP(("", 1)))
 
 
 @pytest.mark.parametrize("speed_alpha, speed_beta, alpha, beta, expected, expected2", generate_relative_commands())
@@ -333,7 +334,7 @@ def camera_no_address(monkeypatch):
     monkeypatch.setattr(sock, "close", mocked_close)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    return CameraAPI(CameraSocket(sock=sock))
+    return CameraAPI(CameraSocket(sock=sock), CameraHTTP(("", 1)))
 
 
 def test_init_no_address(monkeypatch, camera_no_address):

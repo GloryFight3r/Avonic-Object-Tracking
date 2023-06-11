@@ -16,9 +16,10 @@
         <br />
         <form id="settings-form" action="/settings/set" method="post">
             <div class="grid">
-                <label for="settings-camera-ip">Camera address (IP, port)</label>
+                <label for="settings-camera-ip">Camera address (IP, port, http-port)</label>
                 <input id="settings-camera-ip" name="camera-ip" />
                 <input id="settings-camera-port" name="camera-port" type="number" min="0" max="65535" />
+                <input id="settings-camera-http-port" name="camera-http-port" type="number" value="80" min="0" max="65535" />
             </div>
             <div class="grid">
                 <label for="settings-microphone-ip">Microphone address (IP, port)</label>
