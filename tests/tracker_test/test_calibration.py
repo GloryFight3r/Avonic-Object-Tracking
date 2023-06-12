@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 import numpy as np
+import json
 
 from avonic_speaker_tracker.audio_model.calibration import Calibration, angle_between_vectors
 
@@ -147,12 +148,292 @@ def test_with_file():
         cal.add_speaker_point(p)
         cal.add_direction_to_mic(d)
         second_cal = Calibration("TEST_WITH_FILE_CALIBRATION.json")
+        print(cal.to_mic_direction, second_cal.to_mic_direction)
+        print(cal.speaker_points[0], second_cal.speaker_points[0])
         assert np.allclose(cal.to_mic_direction, second_cal.to_mic_direction)
         assert len(cal.speaker_points) == len(second_cal.speaker_points) == 1
         assert np.allclose(cal.speaker_points[0], second_cal.speaker_points[0])
     finally:
         os.remove("TEST_WITH_FILE_CALIBRATION.json")
+ 
+def test_with_file_corrupted_to_mic():
+    try:
+        data = {
+            "speaker_points": [
+                [
+                    [
+                        -0.1566478190028709,
+                        0.058144828910475836,
+                        0.9859414991127086
+                    ],
+                    [
+                        -0.5147397816609846,
+                        -0.39073112848927377,
+                        -0.7631331092313455
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        -0.5607285742301801,
+                        -0.45399049973954675,
+                        0.6924421219048029
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        0.8243025903159147,
+                        -0.4694715627858908,
+                        0.31642011840881235
+                    ]
+                ]
+            ],
+            "to_mic_direction": [
+                0.21048846637682528,
+                0.1497270856790396
+            ],
+            "mic_height": 1.0
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_to_mic.json", 'w') as outfile:
+            outfile.write(json_string)
 
+        cal = Calibration("test_with_file_corrupted_to_mic.json")
+        assert np.allclose(cal.to_mic_direction, Calibration.default_to_mic)
+    finally:
+        os.remove("test_with_file_corrupted_to_mic.json")
+
+def test_with_file_corrupted_one_mic():
+    try:
+        data = {
+            "speaker_points": [
+                [
+                    [
+                        -0.1566478190028709,
+                        0.058144828910475836,
+                        0.9859414991127086
+                    ],
+                    [
+                        -0.5147397816609846,
+                        -0.39073112848927377
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        -0.5607285742301801,
+                        -0.45399049973954675,
+                        0.6924421219048029
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        0.8243025903159147,
+                        -0.4694715627858908,
+                        0.31642011840881235
+                    ]
+                ]
+            ],
+            "to_mic_direction": [
+                0.21048846637682528,
+                0.1497270856790396,
+                0
+            ],
+            "mic_height": 1.0
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_one_mic.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        cal = Calibration("test_with_file_corrupted_one_mic.json")
+        assert np.allclose(cal.speaker_points[0][1], Calibration.default_mic_vec)
+    finally:
+        os.remove("test_with_file_corrupted_one_mic.json")
+
+def test_with_file_corrupted_one_cam():
+    try:
+        data = {
+            "speaker_points": [
+                [
+                    [
+                        -0.1566478190028709,
+                        0.058144828910475836
+                    ],
+                    [
+                        -0.5147397816609846,
+                        -0.39073112848927377,
+                        -0.7631331092313455
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        -0.5607285742301801,
+                        -0.45399049973954675,
+                        0.6924421219048029
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        0.8243025903159147,
+                        -0.4694715627858908,
+                        0.31642011840881235
+                    ]
+                ]
+            ],
+            "to_mic_direction": [
+                0.21048846637682528,
+                0.1497270856790396,
+                0
+            ],
+            "mic_height": 1.0
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_one_cam.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        cal = Calibration("test_with_file_corrupted_one_cam.json")
+        assert np.allclose(cal.speaker_points[0][0], Calibration.default_camera_vec)
+    finally:
+        os.remove("test_with_file_corrupted_one_cam.json")
+
+def test_with_file_corrupted_missed_one_cam():
+    try:
+        data = {
+            "speaker_points": [
+                [
+                    [
+                        -0.1566478190028709,
+                        0.058144828910475836,
+                        0.9859414991127086
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        -0.5607285742301801,
+                        -0.45399049973954675,
+                        0.6924421219048029
+                    ]
+                ],
+                [
+                    [
+                        0.023023299547353826,
+                        0.016967664563590747,
+                        0.9995909293492065
+                    ],
+                    [
+                        0.8243025903159147,
+                        -0.4694715627858908,
+                        0.31642011840881235
+                    ]
+                ]
+            ],
+            "to_mic_direction": [
+                0.21048846637682528,
+                0.1497270856790396,
+                0
+            ],
+            "mic_height": 1.0
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_missed_one_cam.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        cal = Calibration("test_with_file_corrupted_missed_one_cam.json")
+        assert np.allclose(cal.speaker_points[0][0], Calibration.default_camera_vec)
+    finally:
+        os.remove("test_with_file_corrupted_missed_one_cam.json")
+
+def test_with_file_corrupted_speaker_points_missing():
+    try:
+        data = {
+            "to_mic_direction": [
+                0.21048846637682528,
+                0.1497270856790396,
+                0
+            ],
+            "mic_height": 1.7
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_speaker_points_missing.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        cal = Calibration("test_with_file_corrupted_speaker_points_missing.json")
+        assert len(cal.speaker_points) == 0
+        assert np.allclose(cal.to_mic_direction,
+            np.array([0.21048846637682528, 0.1497270856790396, 0]))
+        assert cal.mic_height == 1.7
+    finally:
+        os.remove("test_with_file_corrupted_speaker_points_missing.json")
+
+def test_with_file_corrupted_height_missing():
+    try:
+        data = {
+            "to_mic_direction": [
+                0.21048846637682528,
+                0.1497270856790396,
+                0
+            ]
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_height_missing.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        cal = Calibration("test_with_file_corrupted_height_missing.json")
+        assert len(cal.speaker_points) == 0
+        assert np.allclose(cal.to_mic_direction,
+            np.array([0.21048846637682528, 0.1497270856790396, 0]))
+        assert cal.mic_height == Calibration.default_height
+    finally:
+        os.remove("test_with_file_corrupted_height_missing.json")
+
+def test_with_file_corrupted_to_mic_missing():
+    try:
+        data = {
+            "mic_height": 1.7
+        }
+        json_string = json.dumps(data)
+        with open("test_with_file_corrupted_to_mic_missing.json", 'w') as outfile:
+            outfile.write(json_string)
+
+        cal = Calibration("test_with_file_corrupted_to_mic_missing.json")
+        assert len(cal.speaker_points) == 0
+        assert np.allclose(cal.to_mic_direction, Calibration.default_to_mic)
+        assert cal.mic_height == 1.7
+    finally:
+        os.remove("test_with_file_corrupted_to_mic_missing.json")
 
 def test_set_filename():
     def mock_load(self):
