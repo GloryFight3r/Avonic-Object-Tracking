@@ -43,7 +43,7 @@ def test_preset_prev_dir():
     pm.preset_locations.add_preset("preset", np.array([4, 7, 5000]), np.array([1, 2, 3]))
     pm.preset_locations.add_preset("preset1", np.array([1, 5, 4000]), np.array([6, 8, 9]))
     dir0 = pm.point(cam_api,mic_api)
-    cam_api.move_absolute.assert_called_with(21, 17, -131, 41)
+    cam_api.move_absolute.assert_called_with(24, 20, -131, 41)
     cam_api.direct_zoom.assert_called_with(5000)    
     dir1 = pm.point(cam_api,mic_api)
     cam_api.direct_zoom.assert_called_with(5000)    
@@ -108,7 +108,7 @@ def test_zoom():
 
 
 
-def test_various_speed_preset():
+def test_preset_more():
     cam_api = mock.Mock()
     cam3_api = mock.Mock()
     mic_api = mock.Mock()
@@ -143,13 +143,13 @@ def test_various_speed_preset():
     pm.point(cam_api,mic_api_pre)
     print(pm.prev_dir)
     dir1 = pm.point(cam_api, mic_api)
-    cam_api.move_absolute.assert_called_with(13,20,-160,88)
+    cam_api.move_absolute.assert_called_with(24,20,-160,88)
     dir2 = pm.point(cam_api, mic2_api)
-    cam_api.move_absolute.assert_called_with(24,11,170,88)
+    cam_api.move_absolute.assert_called_with(24,20,170,88)
     pm.point(cam_api,mic3_api)
-    cam_api.move_absolute.assert_called_with(17,11,100,88)
+    cam_api.move_absolute.assert_called_with(24,20,100,88)
     pm.point(cam_api,mic4_api)
-    cam_api.move_absolute.assert_called_with(13,18,100,40)
+    cam_api.move_absolute.assert_called_with(24,20,100,40)
 
 
 def test_various_speed_X_axis_audio():

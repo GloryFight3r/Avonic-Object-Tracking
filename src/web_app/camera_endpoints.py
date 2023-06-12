@@ -37,8 +37,7 @@ def reboot_camera_endpoint(integration: GeneralController):
     else:
         new_socket = integration.cam_sock
     ret = integration.cam_api.reboot(new_socket)
-    response_tuple = responses()[ret]
-    return make_response(response_tuple[0], response_tuple[1])
+    return make_response(responses()[ret])
 
 
 def turn_on_camera_endpoint(integration: GeneralController):
@@ -46,8 +45,7 @@ def turn_on_camera_endpoint(integration: GeneralController):
     if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "on"})
         return success()
-    response_tuple = responses()[ret]
-    return make_response(response_tuple[0], response_tuple[1])
+    return make_response(responses()[ret])
 
 
 def turn_off_camera_endpoint(integration: GeneralController):
@@ -55,13 +53,11 @@ def turn_off_camera_endpoint(integration: GeneralController):
     if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "off"})
         return success()
-    response_tuple = responses()[ret]
-    return make_response(response_tuple[0], response_tuple[1])
+    return make_response(responses()[ret][0], responses()[ret][1])
 
 
 def move_home_camera_endpoint(integration: GeneralController):
-    response_tuple = responses()[integration.cam_api.home()]
-    return make_response(response_tuple[0], response_tuple[1])
+    return make_response(responses()[integration.cam_api.home()])
 
 
 def move_absolute_camera_endpoint(integration: GeneralController):
@@ -70,8 +66,7 @@ def move_absolute_camera_endpoint(integration: GeneralController):
         ret = integration.cam_api.move_absolute(
             int(data["absolute-speed-x"]), int(data["absolute-speed-y"]),
             int(data["absolute-degrees-x"]), int(data["absolute-degrees-y"]))
-        response_tuple = responses()[ret]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[ret])
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
 
@@ -82,8 +77,7 @@ def move_relative_camera_endpoint(integration: GeneralController):
         ret = integration.cam_api.move_relative(
             int(data["relative-speed-x"]), int(data["relative-speed-y"]),
             int(data["relative-degrees-x"]), int(data["relative-degrees-y"]))
-        response_tuple = responses()[ret]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[ret])
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
 
@@ -96,30 +90,26 @@ def move_vector_camera_endpoint(integration: GeneralController):
                                               [float(data["vector-x"]),
                                                float(data["vector-y"]),
                                                float(data["vector-z"])])
-        response_tuple = responses()[ret]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[ret])
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
 
 
 def move_stop_camera_endpoint(integration: GeneralController):
-    response_tuple = responses()[integration.cam_api.stop()]
-    return make_response(response_tuple[0], response_tuple[1])
+    return make_response(responses()[integration.cam_api.stop()])
 
 
 def zoom_get_camera_endpoint(integration: GeneralController):
     zoom = integration.cam_api.get_zoom()
     if isinstance(zoom, ResponseCode):
-        response_tuple = responses()[zoom]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[zoom])
     return make_response(jsonify({"zoom-value": zoom}), 200)
 
 
 def zoom_set_camera_endpoint(integration: GeneralController):
     try:
         ret = integration.cam_api.direct_zoom(int(request.form["zoom-value"]))
-        response_tuple = responses()[ret]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[ret])
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
 
@@ -127,8 +117,7 @@ def zoom_set_camera_endpoint(integration: GeneralController):
 def position_get_camera_endpoint(integration: GeneralController):
     position = integration.cam_api.get_direction()
     if isinstance(position, ResponseCode):
-        response_tuple = responses()[position]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[position])
     pos = vector_angle(position)
     return make_response(jsonify({"position-alpha-value": pos[0],
                                   "position-beta-value": pos[1]}), 200)
@@ -145,7 +134,6 @@ def address_set_camera_endpoint(integration: GeneralController):
         else:
             new_socket = integration.cam_sock
         ret = integration.cam_api.set_address(new_socket, address=addr)
-        response_tuple = responses()[ret]
-        return make_response(response_tuple[0], response_tuple[1])
+        return make_response(responses()[ret])
     except (AssertionError, ValueError):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
