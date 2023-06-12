@@ -250,7 +250,6 @@ class GeneralController:
 
         Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
-        print(self.mic_api.sock.address)
         return {
             "microphone-direction": list(self.mic_api.get_direction()),
             "microphone-speaking": self.mic_api.is_speaking()

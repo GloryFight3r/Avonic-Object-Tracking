@@ -14,7 +14,7 @@ def add_preset_location(integration: GeneralController):
         integration: The controller containing all the dependencies
 
     Returns: A http response which indicates success(200) or failure(400)
-        
+
     """
     data = request.form
     try:

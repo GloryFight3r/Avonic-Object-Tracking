@@ -29,6 +29,8 @@ class PresetCollection:
             microphone_direction: Direction of the speaker
         """
         assert to_add not in self.preset_locations
+        assert isinstance(cam_info, np.ndarray) and len(cam_info) == 3
+        assert isinstance(microphone_direction, np.ndarray) and len(microphone_direction) == 3
         self.preset_locations[to_add] = Preset(cam_info, microphone_direction)
         self.record()
 
@@ -52,6 +54,8 @@ class PresetCollection:
             new_microphone_direction: Direction of the speaker
         """
         assert to_edit in self.preset_locations
+        assert isinstance(new_cam_info, np.ndarray) and len(new_cam_info) == 3
+        assert isinstance(new_microphone_direction, np.ndarray) and len(new_microphone_direction) == 3
         self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
