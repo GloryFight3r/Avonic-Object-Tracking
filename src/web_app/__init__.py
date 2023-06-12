@@ -7,7 +7,6 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
-import web_app.footage
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
