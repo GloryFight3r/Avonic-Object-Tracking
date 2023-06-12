@@ -1,10 +1,11 @@
 import json
+from json import JSONDecodeError
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
 
 
 class MicrophoneAPI:
-    def __init__(self, sock: MicrophoneSocket, threshold: int =-55):
+    def __init__(self, sock: MicrophoneSocket, threshold: int = -55):
         """ Constructor for the Microphone
 
         Args:
@@ -104,8 +105,8 @@ class MicrophoneAPI:
                 self.azimuth = np.deg2rad(azimuth)
         except KeyError:
             obj = json.loads(ret)
-            if "message" in obj:
-                return obj["message"]
+            if "osc" in obj and "error" in obj["osc"]:
+                return json.dumps(obj["osc"]["error"])
             try:  # in case of peak message being received instead
                 peak = obj["m"]["in1"]["peak"]
                 assert isinstance(peak, int)
@@ -113,6 +114,9 @@ class MicrophoneAPI:
                     self.speaking = peak > self.threshold
             except KeyError:
                 return "Unable to get direction from microphone, response was: " + ret
+        except JSONDecodeError:
+            return "Did not receive a valid JSON," \
+                   " are you sure you are communicating with the microphone? Received: " + ret
         return self.vector()
 
     def vector(self) -> np.ndarray:
@@ -144,8 +148,8 @@ class MicrophoneAPI:
                 self.speaking = res > self.threshold
         except KeyError:
             obj = json.loads(ret)
-            if "message" in obj:
-                return obj["message"]
+            if "osc" in obj and "error" in obj["osc"]:
+                return json.dumps(obj["osc"]["error"])
             try:  # in case of receiving direction message instead
                 azimuth = obj["m"]["beam"]["azimuth"]
                 elevation = obj["m"]["beam"]["elevation"]
@@ -157,4 +161,7 @@ class MicrophoneAPI:
                     self.azimuth = np.deg2rad(azimuth)
             except KeyError:
                 return "Unable to get peak loudness, response was: " + ret
+        except JSONDecodeError:
+            return "Did not receive a valid JSON," \
+                   " are you sure you are communicating with the microphone? Received: " + ret
         return self.speaking

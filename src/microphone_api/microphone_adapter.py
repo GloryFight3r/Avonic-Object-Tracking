@@ -51,7 +51,7 @@ class MicrophoneSocket:
             try:
                 data, addr = self.sock.recvfrom(1024)
             except TimeoutError:
-                return ['{"message":"Microphone timed out"}']
+                return ['{"osc":{"error":[408,{"desc":"Microphone timed out"}]}}']
             if addr == self.address:
                 # all the microphone's responses end in CRLF
                 res.append(data.decode("ascii").split("\r\n")[0])
