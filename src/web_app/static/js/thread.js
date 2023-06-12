@@ -1,22 +1,14 @@
-if (typeof onSuccess !== 'undefined') {
-  onSuccess = Object.assign({}, onSuccess, {
+onSuccess = Object.assign({}, onSuccess, {
     "thread-preset" : usePresets
-  });
-}
-else {
-  onSuccess = {
-    "thread-preset" : usePresets
-  }
-} 
+})
 
 async function usePresets(data) {
+    const d = (await data)["preset"];
 
-  const d = (await data)["preset"];
-  
-  if(d === 0) {
-    document.getElementById("preset-use").value = "Using continuous tracking";
-  }
-  else if(d === 1){
-    document.getElementById("preset-use").value = "Using presets";  
-  }
+    if(d === 0) {
+        document.getElementById("preset-use").value = "Using continuous tracking";
+    }
+    else if(d === 1){
+        document.getElementById("preset-use").value = "Using presets";
+    }
 }

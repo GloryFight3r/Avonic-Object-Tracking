@@ -42,6 +42,6 @@ class FootageThread(Thread):
         """ Returns the camera footage image decoded into ascii
         
         Returns:
-            
+            Stringified base64 encoded frame
         """
         return str(self.buffer.raw[:self.buflen.value], 'ascii')
