@@ -96,7 +96,7 @@ def test_calculate_fov(monkeypatch, zoom, expected):
     assert np.array_equal(api.calculate_fov(), expected)
 
 @pytest.mark.parametrize("zoom", generate_incorrect_fov())
-def test_calculate_fov(monkeypatch, zoom):
+def test_calculate_fov_bad_weather(monkeypatch, zoom):
     api = CameraAPI(None)
 
     def mocked_get_zoom():

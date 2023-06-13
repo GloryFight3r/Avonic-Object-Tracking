@@ -283,11 +283,6 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
-#    # Camera footage
-#    @app.route('/video_feed')
-#    def video_feed():
-#        return Response(web_app.camera_endpoints.get_camera_footage(integration), mimetype='multipart/x-mixed-replace; boundary=frame')
-
     # Info-thread section
 
     @app.post('/info-thread/start')
