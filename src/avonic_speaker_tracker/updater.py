@@ -65,5 +65,5 @@ class UpdateThread(Thread):
             print(direct)
 
             self.value += 1
-            sleep(0.2)
+            sleep(1)
         print("Exiting thread")

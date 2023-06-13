@@ -41,7 +41,7 @@ class MicrophoneSocket:
         """
         res = []
         self.sock.sendto(bytes(command, 'ascii'), self.address)
-        self.sock.settimeout(5)
+        self.sock.settimeout(3)
         received = 0
         while received < responses:
             try:

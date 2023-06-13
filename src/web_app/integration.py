@@ -127,7 +127,7 @@ class GeneralController:
 
         # choose a strategy for tracking
         self.calibration_tracker:WaitCalibrationTracker = \
-        WaitCalibrationTracker(self.cam_api, self.mic_api, np.array([1920.0, 1080.0]), 5)
+        WaitCalibrationTracker(self.cam_api, self.mic_api, self.footage_thread.resolution, 5)
 
     def __del__(self):
         self.preset.value = 0 # pragma: no mutate

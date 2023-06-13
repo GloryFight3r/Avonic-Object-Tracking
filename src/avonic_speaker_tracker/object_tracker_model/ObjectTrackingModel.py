@@ -15,7 +15,7 @@ from avonic_speaker_tracker.utils.camera_navigation_utils import get_movement_to
 
 class HybridTracker(TrackingModel):
     # last bounding box we were tracking
-    last_tracked = np.array([])
+    last_tracked = np.array([0, 0, 0, 0])
 
     def __init__(self, filename:str, bbox: YOLOPredict, cam_footage:FootageThread):
         # load the calibration
@@ -68,7 +68,6 @@ class HybridTracker(TrackingModel):
             
             # if the mic_direction is a str, then there is some problem with the microphone API
             if isinstance(mic_direction, str):
-                #print(mic_direction)
                 return
             
             # translate the microphone direction to a camera direction using the calibration
@@ -94,10 +93,9 @@ class HybridTracker(TrackingModel):
                 and \
                 cam_angles[1] - (cur_fov[1] / 2) <= cur_angle[1] <= cam_angles[1] + (cur_fov[1] / 2):
 
-                #print("GETTING BOXES")
                 # get all the bounding boxes from the current frame
-                #print(self.cam_footage.frame)
                 all_boxes = self.bbox.get_bounding_boxes(self.cam_footage.frame)
+
                 
                 self.cam_footage.set_bbxes(all_boxes)
 
@@ -192,7 +190,7 @@ class HybridTracker(TrackingModel):
             return None
 
         answer_box:np.ndarray | None = None
-        closest_distance:float = 0
+        closest_distance:float = float('inf')
 
         cur_box_midde:np.ndarray = np.array([(current_box[0] + current_box[2]) / 2, (current_box[1] + current_box[3]) / 2])
 
