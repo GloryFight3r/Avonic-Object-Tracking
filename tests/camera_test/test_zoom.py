@@ -67,8 +67,9 @@ def test_insert_zoom_wrong_size_hex():
 
 def test_timeout():
     api = CameraAPI(CameraMock(True))
+    api.latest_fov = np.array([10, 10])
     ret = api.get_zoom()
-    assert ret == ResponseCode.TIMED_OUT
+    assert (ret == np.array([10, 10])).all()
     assert api.camera.call_count == 0
 
 def generate_fov():

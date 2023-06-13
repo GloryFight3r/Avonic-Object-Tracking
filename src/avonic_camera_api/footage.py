@@ -12,17 +12,18 @@ class FootageThread(Thread):
     bbxes = np.array([])
     pixel:np.ndarray | None = None
     focused_box:np.ndarray | None = None
-    #resolution = np.array([1920.0, 1080.0])
-    resolution = np.array([1280.0, 720.0])
+    resolution:np.ndarray | None = None 
+    #resolution = np.array([1280.0, 720.0])
 
-    def __init__(self, camera, event):
+    def __init__(self, camera, event, resolution: np.ndarray):
         super().__init__()
         self.camera = camera
         self.frame = None
         self.event = event
         self.show_bounding_boxes = False
+        self.resolution = resolution
         #self.resolution = np.array([1920, 1080])
-        self.resolution = np.array([1280.0, 720.0])
+        #self.resolution = np.array([1280.0, 720.0])
 
     def run(self):
         while not self.event.is_set():

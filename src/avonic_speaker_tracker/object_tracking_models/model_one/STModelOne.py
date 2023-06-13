@@ -4,7 +4,7 @@ import math
 
 from avonic_camera_api.footage import FootageThread
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from object_tracker.yolov2 import YOLOPredict
+from avonic_speaker_tracker.object_tracking_models.yolo_model import YOLOPredict
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.audio_model.calibration import Calibration

@@ -17,6 +17,20 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
     Returns:
         tuple of numpy arrays which represent (camera_speed, camera_angles)
     """
+
+    assert 0 <= current_box[0] <= cam_footage.resolution[0]
+    assert 0 <= current_box[2] <= cam_footage.resolution[0]
+
+    assert 0 <= current_box[1] <= cam_footage.resolution[1]
+    assert 0 <= current_box[3] <= cam_footage.resolution[1]
+
+    box_width = current_box[2] - current_box[0]
+
+    box_height = current_box[1] - current_box[3]
+
+    assert 0 <= box_width <= cam_footage.resolution[0]
+    assert 0 <= box_height <= cam_footage.resolution[1]
+
     # current_box is in the format [left top right bottom] and want to use the format
     # [left bottom width height] so we change it
     bbox:np.ndarray = np.array([current_box[0],\
@@ -28,6 +42,8 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
     # calculate the middle of the box in the format [x, y]
     box_middles:np.ndarray = (np.array([bbox[2], bbox[3]]) / 2)\
         + np.array([bbox[0], bbox[1]])
+
+    assert 0 <= box_middles[0] <= cam_footage.resolution[0] and 0 <= box_middles[1] <= cam_footage.resolution[1]
 
     # calculate the middle of the screen
     screen_middles:np.ndarray = cam_footage.resolution / 2.0
@@ -62,3 +78,4 @@ def calculate_speed(rotate_angle):
         Rotation speed for the next camera rotation
     """
     return np.array([20, 20])
+

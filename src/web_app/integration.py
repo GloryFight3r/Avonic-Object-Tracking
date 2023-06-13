@@ -18,11 +18,10 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import CameraSocket
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
-from avonic_speaker_tracker.object_tracker_model.ObjectTrackingModel import HybridTracker
+from avonic_speaker_tracker.object_tracking_models.model_one.STModelOne import HybridTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
-from avonic_speaker_tracker.calibration_tracker import WaitCalibrationTracker
-from object_tracker.yolov2 import YOLOPredict
+from avonic_speaker_tracker.object_tracking_models.yolo_model import YOLOPredict
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
@@ -67,6 +66,7 @@ class GeneralController:
 
         # Filepath for calibration and presets files
         self.filepath: str = ""
+        self.resolution = np.array([1920.0, 1080.0])
 
         # Models, to record all updates onto a disk
         self.audio_model = None
@@ -82,7 +82,6 @@ class GeneralController:
         # Info-threads
         self.thread_mic = None
         self.thread_cam = None
-
 
         # Indicates which model should be used, check UpdateThread
         self.preset = Value("i", 0, lock=False)
@@ -140,8 +139,6 @@ class GeneralController:
                                              int(settings["microphone-thresh"]))
 
         # Setup secret
-        self.secret = getenv("SECRET_KEY")
-       
         self.secret = settings["secret-key"]
 
         # Get filepath
@@ -153,6 +150,7 @@ class GeneralController:
             self.filepath = res
         else:
             self.filepath = ""
+        # Initialize footage thread
 
         self.nn:YOLOPredict = YOLOPredict()
         # Initialize models
@@ -168,7 +166,10 @@ class GeneralController:
             self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
                                           + ':554/live/av0')  # pragma: no mutate
             self.footage_thread = FootageThread(self.video,
-                                                self.footage_thread_event)  # pragma: no mutate
+                                                self.footage_thread_event, self.resolution)  # pragma: no mutate
+
+            self.footage_thread.resolution = self.resolution
+            
             self.footage_thread.start()  # pragma: no mutate
 
         # Initialize camera and microphone info threads
@@ -340,7 +341,6 @@ class GeneralController:
             sleep(0.3)
         print("Closing " + path + " updater thread")
 
-
 def verify_address(address) -> bool:
     try:
         assert 0 <= address[1] <= 65535
@@ -349,7 +349,6 @@ def verify_address(address) -> bool:
     except (AssertionError, TypeError):
         print("ERROR: Address " + address + " is invalid!")
         return False
-
 
 def close_running_threads(integration_passed) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""

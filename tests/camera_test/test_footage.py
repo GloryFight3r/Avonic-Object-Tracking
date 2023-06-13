@@ -3,7 +3,7 @@ from threading import Event
 import pytest
 import cv2
 from avonic_camera_api.footage import FootageThread
-from object_tracker.yolov2 import YOLOPredict
+from avonic_speaker_tracker.object_tracking_models.yolo_model import YOLOPredict
 
 class MockedCv:
     def __init__(self):
@@ -34,7 +34,7 @@ def footage_thread():
     mocked_box_tracker = MockedBoxTracker()
     mocked_yolo = MockedYoloPredict()
     event = Event()
-    thread = FootageThread(mocked_cam_footage, event)
+    thread = FootageThread(mocked_cam_footage, event, np.array([1920.0, 1080.0]))
 
     return thread
 

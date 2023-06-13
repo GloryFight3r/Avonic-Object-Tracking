@@ -3,11 +3,8 @@ from threading import Thread
 from multiprocessing import Value
 from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_speaker_tracker.object_tracker_model.ObjectTrackingModel import HybridTracker
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
     event: Value = None

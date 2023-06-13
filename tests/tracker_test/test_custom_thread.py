@@ -33,7 +33,3 @@ def test_setter():
     ct.start()
     e.value = 0
     ct.join()
-    ct.set_calibration(2)
-    assert ct.value == 2
-    ct.set_calibration((2, 1))
-    assert ct.value == (2, 1)

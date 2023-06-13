@@ -74,14 +74,17 @@ def client(camera):
     def x(self, method=None, encoding=None):
         if encoding == "utf-8":
             raise IOError("testing")
+    def x2(self):
+        pass
 
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
          with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
-             with mock.patch("web_app.integration.open", x):
-                test_controller.load_env()
-                test_controller.ws = mock.Mock()
-                app = web_app.create_app(test_controller=test_controller)
-                app.config['TESTING'] = True
+             with mock.patch("builtins.open", x):
+                with mock.patch("avonic_speaker_tracker.object_tracking_models.yolo_model.YOLOPredict.__init__", x2):
+                    test_controller.load_env()
+                    test_controller.ws = mock.Mock()
+                    app = web_app.create_app(test_controller=test_controller)
+                    app.config['TESTING'] = True
     return app.test_client()
 
 def test_load_env(client):
