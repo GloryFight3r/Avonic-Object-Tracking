@@ -15,6 +15,8 @@ class PresetCollection:
     preset_locations = {}
     filename = None
     
+    default_camera_info: list[float] = [0.0, 0.0, 1.0]
+    default_mic_info: list[float] = [0.0, 1.0, 0.0]
     def __init__(self, filename: str = ""):
         self.filename: str = filename
         self.preset_locations: dict[str, Preset] = {}
@@ -30,6 +32,8 @@ class PresetCollection:
             microphone_direction: Direction of the speaker
         """
         assert to_add not in self.preset_locations
+        assert isinstance(cam_info, np.ndarray) and len(cam_info) == 3
+        assert isinstance(microphone_direction, np.ndarray) and len(microphone_direction) == 3
         self.preset_locations[to_add] = Preset(cam_info, microphone_direction)
         self.record()
 
@@ -53,6 +57,8 @@ class PresetCollection:
             new_microphone_direction: Direction of the speaker
         """
         assert to_edit in self.preset_locations
+        assert isinstance(new_cam_info, np.ndarray) and len(new_cam_info) == 3
+        assert isinstance(new_microphone_direction, np.ndarray) and len(new_microphone_direction) == 3
         self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
@@ -95,6 +101,27 @@ class PresetCollection:
                 data = json.load(f)
                 self.preset_locations = {}
                 for key in data:
-                    self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
-                        np.array(data[key]["microphone_direction"]))
+                    try:
+                        self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
+                            np.array(data[key]["microphone_direction"]))
+                        if len(data[key]["camera_info"]) != 3:
+                            self.preset_locations[key].camera_info = \
+                                np.array(PresetCollection.default_camera_info)
+                            print("Setting camera_info in one of the presets to default value")
+                        if len(data[key]["microphone_direction"]) != 3:
+                            self.preset_locations[key].microphone_direction = \
+                                np.array(PresetCollection.default_mic_info)
+                            print("Setting microphone_direction in " +
+                                "one of the presets to default value")
+                    except Exception as e:
+                        print(e)
+                        self.preset_locations[key] = Preset(
+                            np.array(PresetCollection.default_camera_info),
+                            np.array(PresetCollection.default_mic_info))
+                        print("Setting one of the presets to default values")
                 print("Loaded presets: ", self.preset_locations)
+            self.record()
+
+    def set_filename(self, filename: str):
+        self.filename = filename
+        self.load()

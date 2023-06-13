@@ -19,7 +19,8 @@ class UpdateThread(Thread):
     all_models: list[TrackingModel] = None
 
     def __init__(self, event: Value,
-                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model_index: Value, all_models: list[TrackingModel]):
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model_index: Value, all_models: list[TrackingModel],
+                 filepath: str = ""):
         """ Class constructor
 
         Args:
@@ -34,6 +35,7 @@ class UpdateThread(Thread):
         self.all_models = all_models
         self.model_in_use = None
         self.value: int = 0
+        self.filepath = filepath
 
     def run(self) -> None:
         """ Actual body of the thread.

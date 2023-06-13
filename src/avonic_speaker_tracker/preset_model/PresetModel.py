@@ -1,7 +1,7 @@
 import math
 from typing_extensions import override
-
 import numpy as np
+
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.preset_model.preset import PresetCollection
@@ -48,7 +48,13 @@ class PresetModel(TrackingModel):
 
         preset = self.preset_locations.get_preset_info(
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
-        direct = np.array([np.rad2deg(preset[0][0]), np.rad2deg(preset[0][1]), preset[0][2]])
+        direct = np.array([int(np.rad2deg(preset[0][0]))%360, int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
+
+        if direct[0]>180:
+            direct[0] = direct[0]-360
+        if direct[1]>180:
+            direct[1] = direct[1]-360
+
 
         if direct is None:
             print("Something wrong with direct here")
@@ -62,3 +68,6 @@ class PresetModel(TrackingModel):
         self.prev_dir = direct
 
         return direct
+
+    def set_filename(self, filename: str):
+        self.preset_locations.set_filename(filename)

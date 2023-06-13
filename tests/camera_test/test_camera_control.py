@@ -62,6 +62,25 @@ def test_move_relative(monkeypatch, camera: CameraAPI, speed_alpha, speed_beta, 
 
     assert camera.move_relative(speed_alpha, speed_beta, alpha, beta) == expected2
 
+def test_init(monkeypatch):
+    def mocked_connect(addr):
+        pass
+
+    def mocked_close():
+        pass
+
+    def mocked_timeout(ms):
+        pass
+
+    sock = socket.socket
+    monkeypatch.setattr(sock, "connect", mocked_connect)
+    monkeypatch.setattr(sock, "close", mocked_close)
+    monkeypatch.setattr(sock, "settimeout", mocked_timeout)
+
+    cam =CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52382)))
+    assert cam.counter == 1
+    assert cam.video == "on"
+    assert (cam.latest_direction == np.array([0,0,1])).all()
 
 def generate_relative_commands_bad_parameters():
     return [
@@ -337,11 +356,11 @@ def camera_no_address(monkeypatch):
 
 
 def test_init_no_address(monkeypatch, camera_no_address):
-    assert camera_no_address.camera.address is None
+    assert camera_no_address.camera.address == ('0.0.0.0', 52381)
 
 
 def test_reconnect_new_address(monkeypatch, camera_no_address):
-    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381))\
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.1', 52381))\
            == ResponseCode.COMPLETION
 
 
@@ -350,7 +369,7 @@ def test_reconnect_new_address_timeout(monkeypatch, camera_no_address):
         raise TimeoutError
 
     monkeypatch.setattr(camera_no_address.camera.sock, "connect", mocked_return)
-    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.0', 52381)) \
+    assert camera_no_address.set_address(camera_no_address.camera.sock, ('0.0.0.1', 52381)) \
            == ResponseCode.TIMED_OUT
 
 

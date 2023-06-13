@@ -43,8 +43,9 @@ class CameraSocket:
             address: camera IP and port in the format (IP, port)
         """
         self.sock = sock
-        if address is None:
+        if address is None or address == ('0.0.0.0', 52381):
             print("WARNING: Camera address not specified!")
+            self.address = ('0.0.0.0', 52381)
             return
         self.address = address
         self.sock.connect(self.address)
@@ -58,8 +59,8 @@ class CameraSocket:
     def reconnect(self, sock, address=None):
         """ Re-connect to camera after a reboot
         """
-        if address is None:
-            if self.address is None:
+        if address is None or address == ('0.0.0.0', 52381):
+            if self.address is None or self.address == ('0.0.0.0', 52381):
                 print("WARNING: Camera address not specified!")
                 return ResponseCode.NO_ADDRESS
         else:
@@ -81,7 +82,7 @@ class CameraSocket:
             header: header for the current command
             command: the command the camera has to execute in accordance to the VISCA protocol
         """
-        if self.address is None:
+        if self.address is None or self.address == ('0.0.0.0', 52381):
             print("WARNING: Camera address not specified!")
             return
         header = bytes.fromhex(header)
@@ -101,7 +102,7 @@ class CameraSocket:
         Returns:
             Response code from the camera
         """
-        if self.address is None:
+        if self.address is None or self.address == ('0.0.0.0', 52381):
             print("WARNING: Camera address not specified!")
             return ResponseCode.NO_ADDRESS
         header = bytes.fromhex(header)
@@ -110,7 +111,7 @@ class CameraSocket:
 
         self.sock.sendall(message)
 
-        self.sock.settimeout(1.5)
+        self.sock.settimeout(0.05)
         try:
             data = binascii.hexlify(self.sock.recv(2048)).upper()
         except TimeoutError:
@@ -133,7 +134,7 @@ class CameraSocket:
                     return self.response_codes[ret]
                 return ret
             else:
-                self.sock.settimeout(1.5)
+                self.sock.settimeout(0.05)
                 try:
                     data = binascii.hexlify(self.sock.recv(2048)).upper()
                 except TimeoutError:

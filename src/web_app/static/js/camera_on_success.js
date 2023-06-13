@@ -1,5 +1,4 @@
-if (typeof onSuccess !== 'undefined') {
-  onSuccess = Object.assign({}, onSuccess, {
+onSuccess = Object.assign({}, onSuccess, {
     "camera-off-form": hideOff,
     "camera-on-form": hideOn,
     "camera-zoom-get-form": onZoomGet,
@@ -7,53 +6,41 @@ if (typeof onSuccess !== 'undefined') {
     "cam-dir-button": onPositionSet,
     "cam-zoom-button": onZoomSet,
     "camera-coords-get-form": onCameraCoordsGet
-  });
-}
-else {
-  onSuccess = {
-    "camera-off-form": hideOff,
-    "camera-on-form": hideOn,
-    "camera-zoom-get-form": onZoomGet,
-    "camera-position-get-form": onPositionGet,
-    "cam-dir-button": onPositionSet,
-    "cam-zoom-button": onZoomSet,
-    "camera-coords-get-form": onCameraCoordsGet
-  }
-}
+})
 
 function hideOff() {
-  document.getElementById("camera-off-form").style.display = "none"
-  document.getElementById("camera-on-form").style.display = "block"
+    document.getElementById("camera-off-form").style.display = "none"
+    document.getElementById("camera-on-form").style.display = "block"
 }
 
 function hideOn() {
-  document.getElementById("camera-off-form").style.display = "block"
-  document.getElementById("camera-on-form").style.display = "none"
+    document.getElementById("camera-off-form").style.display = "block"
+    document.getElementById("camera-on-form").style.display = "none"
 }
 
 async function onZoomGet(data) {
-  document.getElementById("zoom-value-get").value = (await data)["zoom-value"]
+    document.getElementById("zoom-value-get").value = (await data)["zoom-value"]
 }
 
 async function onPositionGet(data) {
-  const d = await data
-  document.getElementById("position-alpha-value").value =
-    d["position-alpha-value"].toFixed(5)
-  document.getElementById("position-beta-value").value =
-    d["position-beta-value"].toFixed(5)
+    const d = await data
+    document.getElementById("position-alpha-value").value =
+        d["position-alpha-value"].toFixed(5)
+    document.getElementById("position-beta-value").value =
+        d["position-beta-value"].toFixed(5)
 }
 
 async function onPositionSet(data) {
-  const d = await data
-  document.getElementById("camera-direction-alpha").value =
-    d["position-alpha-value"].toFixed(5)
-  document.getElementById("camera-direction-beta").value =
-    d["position-beta-value"].toFixed(5)
+    const d = await data
+    document.getElementById("camera-direction-alpha").value =
+        d["position-alpha-value"].toFixed(5)
+    document.getElementById("camera-direction-beta").value =
+        d["position-beta-value"].toFixed(5)
 }
 
 async function onZoomSet(data) {
-  document.getElementById("camera-zoom-value").value =
-    (await data)["zoom-value"]
+    document.getElementById("camera-zoom-value").value =
+        (await data)["zoom-value"]
 }
 
 async function onCameraCoordsGet(data) {
@@ -64,24 +51,24 @@ async function onCameraCoordsGet(data) {
 }
 
 if (document.getElementById("presets") !== null) {
-  selectCaliTab()
+    selectCaliTab()
 }
 if (document.getElementById("calibration-button") !== null) {
-  calibrationIsSet().then()
+    calibrationIsSet().then()
 }
 
 function selectMovement() {
-  document.getElementById("camera-move-absolute").style.display = "none"
-  document.getElementById("camera-move-relative").style.display = "none"
-  document.getElementById("camera-move-vector").style.display = "none"
-  document.getElementById(
-    document.getElementById("movement-select").value
-  ).style.display = "block"
+    document.getElementById("camera-move-absolute").style.display = "none"
+    document.getElementById("camera-move-relative").style.display = "none"
+    document.getElementById("camera-move-vector").style.display = "none"
+    document.getElementById(
+        document.getElementById("movement-select").value
+    ).style.display = "block"
 }
 
 if(document.getElementById("camera-off-form") !== null) {
-  hideOn()
+    hideOn()
 }
 if(document.getElementById("camera-move-absolute") !== null) {
-  selectMovement()
+    selectMovement()
 }

@@ -2,18 +2,19 @@
   <h1>Thread 🧵</h1>
   <div class="grid">
     <form action="/thread/start" method="post" id="thread-start-form">
-      <button type="submit">Start</button>
+      <button type="submit" data-tooltip="Start tracking" data-placement="right">Start</button>
     </form>
     <form action="/thread/stop" method="post" id="thread-stop-form">
-      <button type="submit">Stop</button>
+      <button type="submit" data-tooltip="Stop tracking">Stop</button>
     </form>
   </div>
   <div class="grid">
     <form action="/info-thread/start" method="post" id="info-thread-start-form">
-        <button type="submit">Start INFO</button>
+        <button type="submit" data-tooltip="Start updating info on this page (started automatically when tracking is on)"
+                data-placement="right">Start INFO</button>
     </form>
     <form action="/info-thread/stop" method="post" id="info-thread-stop-form">
-        <button type="submit">Stop INFO</button>
+        <button type="submit" data-tooltip="Stop updating info on this page">Stop INFO</button>
     </form>
   </div>
 </article>

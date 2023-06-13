@@ -13,8 +13,9 @@ class MicrophoneSocket:
             address: the IP and port in the format (IP, port)
         """
         self.sock = sock
-        if address is None:
+        if address is None or address == ('0.0.0.0', 45):
             print("WARNING: Microphone address not specified!")
+            self.address = ('0.0.0.0', 45)
             return
         self.address = address
 
@@ -25,7 +26,7 @@ class MicrophoneSocket:
         self.sock.close()
 
     def connect(self, address=None) -> bool:
-        if address is None:
+        if address is None or address == ('0.0.0.0', 45):
             print("WARNING: Microphone address not specified!")
             return False
         self.address = address
@@ -40,14 +41,17 @@ class MicrophoneSocket:
             responses: how many responses are expected to arrive back
         """
         res = []
+        if self.address is None or self.address == ('0.0.0.0', 45):
+            print("WARNING: Microphone address not specified!")
+            return res
         self.sock.sendto(bytes(command, 'ascii'), self.address)
-        self.sock.settimeout(3)
+        self.sock.settimeout(0.1)
         received = 0
         while received < responses:
             try:
                 data, addr = self.sock.recvfrom(1024)
             except TimeoutError:
-                return ['{"message":"Microphone timed out"}']
+                return ['{"osc":{"error":[408,{"desc":"Microphone timed out"}]}}']
             if addr == self.address:
                 # all the microphone's responses end in CRLF
                 res.append(data.decode("ascii").split("\r\n")[0])

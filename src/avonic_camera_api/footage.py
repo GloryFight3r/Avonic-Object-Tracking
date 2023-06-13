@@ -40,7 +40,7 @@ class FootageThread(Thread):
         """ Returns the camera footage image decoded into ascii
 
         Returns:
-
+            Stringified base64 encoded frame
         """
         #if self.box_frame is not None:
         #    return str(base64.b64encode(self.box_frame), 'ascii')
