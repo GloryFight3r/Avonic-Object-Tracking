@@ -1,18 +1,18 @@
 This chapter presents an overview of the required functionality of the speaker tracking camera. 
 These requirements dictate the design of our system. 
-We have ordered them using the MoSCoW method \cite{moscow} which we will describe in (4.1). 
+We have ordered them using the MoSCoW method\cite{moscow} which we will describe in \hyperref[]{(4.1)}. %TODO
 All of the requirements fall under one of the following categories ‘Must-have’, 
 ‘Should-have’, ‘Could-have’, ‘Won't-have’. Furthermore, we also list some non-functional requirements we have for our system.
-Final requirements are listed in (4.2).
-Finally, we also go through the evolution of the requirements in (4.3).
+Final requirements are listed in \hyperref[]{(4.2)}. %TODO
+Finally, we also go through the evolution of the requirements in \hyperref[]{(4.3)}. %TODO
 \section{MoSCoW method}
 First, the requirements are divided into two sections.
 \begin{itemize}
   \item Functional requirements - Describe what a product must do.
   \item Non-functional requirements - Describe how the system works.
 \end{itemize}
-Furthermore, since we have a limited amount of time, we decided to prioritise the functional requirements in order to make progress 
-and keep to deadlines. MoSCoW is a prioritisation technique for helping to understand and manage priorities. The letters stand
+Furthermore, since we have a limited amount of time, we decided to prioritize the functional requirements in order to make progress 
+and keep to deadlines. MoSCoW is a prioritization technique for helping to understand and manage priorities. The letters stand
 for 
 \begin{itemize}
   \item \textbf{M}ust have - Functional requirements that are critical to the current delivery time-box for a
@@ -21,7 +21,7 @@ for
                                 have requirements. Therefore, they can be delivered in the future delivery time-box.
   \item \textbf{C}ould have - Functional requirements that are desirable but not necessary. Usually, these
                                 requirements improve user or customer experience.
-  \item \textbf{W}ont have - Requirements that are perceived as the least-critical by stakeholders. This
+  \item \textbf{W}on’t have - Requirements that are perceived as the least-critical by stakeholders. This
                                 category includes requirements that are dropped and considered for inclusion in a future
                                 version of the project.
 \end{itemize}
@@ -60,24 +60,24 @@ Role: The \textbf{system} could
   \item Add visual tracking to improve the positioning of the camera.
   \item Enable the camera to zoom in appropriately depending on the speaker’s distance from it.
 \end{itemize}
-\subsection{Wont have}
+\subsection{Won’t have}
 Role: The \textbf{system} won't
 \begin{itemize}
   \item If two people are talking at the same time, focus on both. 
-  \item Make the camera work with multiple microphones.
+  \item Work with multiple microphones.
 \end{itemize}
 
 \subsection{Non-functional requirements}
 \begin{itemize}
-  \item The project should be written with Python 3.10.
-  \item Should work with Avonic CM-70 camera.
+  \item The project should be written in Python 3.10.
+  \item The system should work with the Avonic CM-70 camera.
   \item The designed system should work on single-board computers.
   \item There should be more than 80\% test coverage.
   \item The system should be easy to install and calibration can be 
     done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
 \end{itemize}
 \section{Evolution of requirements}
-Since the beggining of the project we have came up with few new requirements and have got rid of others we have deemed unnecessary. 
+Since the beginning of the project we have come up with few new requirements and have got rid of others we have deemed unnecessary. 
 A short list of the changes we have made is:
 \begin{itemize}
   \item Added WebUI as a must requirement.
