@@ -28,6 +28,7 @@ class ModelCode():
     OBJECT = 2
 
 
+
 class GeneralController:
     def __init__(self):
         # self.event is part of the while loop in UpdateThread. When 0 - stops the while loop.
@@ -84,6 +85,13 @@ class GeneralController:
 
         # Indicates which model should be used, check UpdateThread
         self.preset = Value("i", ModelCode.AUDIO, lock=False)
+
+        # Keep in memory, whether a notification about the settings not being set has been sent
+        self.no_settings_sent = True
+
+        # PID of master process
+        self.pid = Value("i", os.getpid())
+        self.testing = Value("i", 0, lock=False)
 
         # Keep in memory, whether a notification about the settings not being set has been sent
         self.no_settings_sent = True

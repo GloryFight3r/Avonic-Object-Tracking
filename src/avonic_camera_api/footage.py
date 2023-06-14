@@ -2,8 +2,7 @@ from threading import Thread
 from multiprocessing import Value, Array
 import base64
 import time
-import numpy as np
-import cv2 # type: ignore
+import cv2  # type: ignore
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)

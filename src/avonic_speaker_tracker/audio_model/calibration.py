@@ -3,17 +3,21 @@ import numpy as np
 from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 class Calibration:
+    default_camera_vec: list[float] = [0.0, 0.0, 1.0]
+    default_mic_vec: list[float] = [0.0, 1.0, 0.0]
+    default_to_mic: list[float] = [0.0, 0.0, 0.0]
+    default_height: float = 1.0
     def __init__(self, filename: str = ""):
         self.filename = filename
 
         # height of the microphone above the speaker
-        self.mic_height: float = 1.0
+        self.mic_height: float = Calibration.default_height
         self.mic_to_cams: list[np.ndarray] = []
         self.mic_to_cam: np.ndarray = np.array([0.0, 0.0, 0.0])
 
         # variables of calibration
         self.speaker_points: list[tuple[np.ndarray, np.ndarray]] = []
-        self.to_mic_direction: np.ndarray = np.array([0.0, 0.0, 0.0])
+        self.to_mic_direction: np.ndarray = np.array(Calibration.default_to_mic)
 
         self.load()
 
@@ -120,17 +124,52 @@ class Calibration:
             except FileNotFoundError:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print(f"No file {self.filename} was found. Create new preset json...")
-                    outfile.write(json.dumps({"speaker_points": [],
-                                  "to_mic_direction": None, "mic_height": 1.0}, indent=4))
+                    outfile.write(json.dumps({
+                        "speaker_points": [],
+                        "to_mic_direction": Calibration.default_to_mic,
+                        "mic_height": Calibration.default_height
+                    }, indent=4))
+                return
             with open(self.filename, encoding="utf-8") as f:
                 data = json.load(f)
                 self.speaker_points = []
-                for key in data["speaker_points"]:
-                    self.speaker_points.append((np.array(key[0]),
-                        np.array(key[1])))
-                self.to_mic_direction = np.array(data["to_mic_direction"])
-                self.mic_height = float(data["mic_height"])
-                self.calculate_distance()
+                if "speaker_points" in data.keys():
+                    for key in data["speaker_points"]:
+                        try:
+                            tuple_to_add = [np.array(key[0]), np.array(key[1])]
+                            if len(key[0]) != 3:
+                                tuple_to_add[0] = np.array(Calibration.default_camera_vec)
+                                print("Setting one fo the values in " +
+                                    "speaker_points to default value")
+                            if len(key[1]) != 3:
+                                tuple_to_add[1] = np.array(Calibration.default_mic_vec)
+                                print("Setting one fo the values in " +
+                                    "speaker_points to default value")
+                            self.speaker_points.append((tuple_to_add[0], tuple_to_add[1]))
+                        except Exception as e:
+                            print(e)
+                            self.speaker_points.append(
+                                (np.array(Calibration.default_camera_vec),
+                                np.array(Calibration.default_mic_vec)))
+                            print("Setting one fo the values in speaker_points to default value")
+                try:
+                    self.to_mic_direction = np.array(data["to_mic_direction"])
+                    if len(data["to_mic_direction"]) != 3:
+                        self.to_mic_direction = np.array(Calibration.default_to_mic)
+                        print("Setting to_mic_direction to default value")
+                except Exception as e:
+                    print(e)
+                    self.to_mic_direction = np.array(Calibration.default_to_mic)
+                    print("Setting to_mic_direction to default value")
+                try:
+                    self.mic_height = float(data["mic_height"])
+                except Exception as e:
+                    print(e)
+                    self.mic_height = Calibration.default_height
+                    print("Setting microphone height to default value")
+                self.record()
+                if self.is_calibrated():
+                    self.calculate_distance()
                 print("Loaded speaker points: ", self.speaker_points)
                 print("Loaded camera to microphone vector: ", self.to_mic_direction)
                 print("Loaded microphone height: ", self.mic_height)

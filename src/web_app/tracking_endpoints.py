@@ -80,3 +80,11 @@ def track_continuously(integration: GeneralController):
 def track_object_continuously(integration: GeneralController):
     integration.preset.value = ModelCode.OBJECT
     return make_response(jsonify({"preset":integration.preset.value}), 200)
+
+def preset_use(integration: GeneralController):
+    if integration.preset.value == 1:
+        integration.preset.value = 0
+    else:
+        integration.preset.value = 1
+    print(integration.preset.value)
+    return make_response(jsonify({"preset":integration.preset.value}), 200)

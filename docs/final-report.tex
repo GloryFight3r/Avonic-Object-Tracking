@@ -9,6 +9,7 @@
 \usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
+\usepackage{hyperref}
 \pagestyle{fancy}
 \graphicspath{ {./images/} }
 \fancyfoot[LE,RO]{Avonic camera-microphone integration}
@@ -41,6 +42,10 @@
     \end{titlepage}
 
     \tableofcontents
+    \addcontentsline{toc}{chapter}{Preface} % https://tex.stackexchange.com/questions/222959/adding-the-preface-to-contents
+
+    \chapter*{Preface}\label{ch:preface}
+    \input{chapters/preface}
 
     \chapter{Introduction}\label{ch:introduction}
     \input{chapters/introduction}
@@ -48,11 +53,11 @@
     \chapter{Problem analysis}\label{ch:problem-analysis}
     \input{chapters/problem-analysis}
 
-    \chapter{Solution}\label{ch:solution}
-    \input{chapters/solution}
-
     \chapter{Requirements}\label{ch:requirements}
     \input{chapters/requirements}
+
+    \chapter{Solution}\label{ch:solution}
+    \input{chapters/solution}
 
     \chapter{Workflow and Teamwork}\label{ch:workflow-and-teamwork}
     \input{chapters/workflow-and-teamwork}

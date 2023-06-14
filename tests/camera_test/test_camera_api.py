@@ -19,15 +19,25 @@ def test_angle_vector_complex():
     result = np.array([0.25, np.sqrt(3) / 2, np.sqrt(3) / 4])
     assert np.allclose(angle_vector(np.deg2rad(alpha), np.deg2rad(beta)), result)
 
+def test_vector_angle_bad_weather():
+    # 4 floats
+    result = np.array([0.25, np.sqrt(3) / 2, np.sqrt(3) / 4, 0.3])
+    with pytest.raises (TypeError) as excinfo:
+        vector_angle(result)
+    assert "Vector must contain three floats and be instance of np.ndarray" == str(excinfo.value)
+    result_int = np.array([1.0, 1.0])
+    with pytest.raises (TypeError) as excinfo:
+        vector_angle(result_int)
+    assert "Vector must contain three floats and be instance of np.ndarray" == str(excinfo.value)
 
 def test_vector_angle_basic():
-    assert vector_angle([0.0, 0.0, 1.0]) == (0, 0)
+    assert vector_angle(np.array([0.0, 0.0, 1.0])) == (0, 0)
 
 
 def test_vector_angle_complex_normalised():
     alpha = -30
     beta = 60
-    (a, b) = vector_angle([0.25, np.sqrt(3)/2, np.sqrt(3)/4])
+    (a, b) = vector_angle(np.array([0.25, np.sqrt(3)/2, np.sqrt(3)/4]))
     assert pytest.approx(a) == np.deg2rad(alpha)
     assert pytest.approx(b) == np.deg2rad(beta)
 
@@ -36,18 +46,12 @@ def test_vector_angle_complex():
     """ not normalized, length of vector is 2 """
     alpha = -30
     beta = 60
-    (a, b) = vector_angle([0.5, np.sqrt(3), np.sqrt(3)/2])
+    (a, b) = vector_angle(np.array([0.5, np.sqrt(3), np.sqrt(3)/2]))
     assert pytest.approx(a) == np.deg2rad(alpha)
     assert pytest.approx(b) == np.deg2rad(beta)
 
 
 def test_vector_angle_invalid():
     with pytest.raises(ValueError) as excinfo:
-        vector_angle([0.0, 0.0, 0.0])
+        vector_angle(np.array([0.0, 0.0, 0.0]))
     assert "Vector not normalizable" == str(excinfo.value)
-
-
-def test_vector_angle_invalid_type():
-    with pytest.raises(TypeError) as excinfo:
-        vector_angle([1, 2])
-    assert "Vector must contain three floats" == str(excinfo.value)

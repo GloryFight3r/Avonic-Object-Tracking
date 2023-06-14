@@ -2,11 +2,11 @@ from unittest import mock
 import socket
 import pytest
 import numpy as np
-from flask import jsonify
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 import web_app
+from web_app.tracking_endpoints import track_presets, track_continuously, preset_use
 
 sock = mock.Mock()
 
@@ -49,10 +49,7 @@ mic_api = mock.Mock()
 
 @pytest.fixture
 def client(camera, monkeypatch):
-    """A test client for the app."""
-    sock.sendto.return_value = 48
-    sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
+
 
     mic_api.height = 1
 
@@ -70,34 +67,25 @@ def client(camera, monkeypatch):
 
     return app.test_client()
 
-def test_address_set_microphone_endpoint_bad_weather(client):
-    mic_api.set_address.return_value = ("msg", None)
-    data = {
-        "ip": "0.0.0.1",
-        "port": 1234
-    }
-    rv = client.post('/microphone/address/set', data=data)
-    assert rv.status_code == 400
 
-def test_direction_get_microphone_endpoint_bad_weather(client):
-    mic_api.get_direction.return_value = \
-        "Unable to get direction from microphone, response was: 404"
-    rv = client.get('microphone/direction')
-    assert rv.status_code == 504
 
-def test_direction_is_speaking_endpoint_bad_weather(client):
-    mic_api.is_speaking.return_value = "Unable to get peak loudness, response was: 404"
-    rv = client.get('microphone/speaking')
-    assert rv.status_code == 504
 
-def test_get_speaker_direction_endpoint_good_weather(client):
-    mic_api.get_direction.return_value = bytes('', "utf-8")
-    rv = client.get('microphone/speaker/direction')
+def test_track_presets(client):
+    rv = client.get('preset/track')
     assert rv.status_code == 200
-    assert rv.data == bytes('{"microphone-direction":[]}\n',"utf-8")
+    assert rv.data == bytes('{"preset":1}\n', "utf-8")
 
+def test_track_continuously(client):
+    rv = client.get('calibration/track')
+    assert rv.status_code == 200
+    assert rv.data == bytes('{"preset":0}\n', "utf-8")
 
-def test_get_speaker_direction_endpoint_bad_weather(client):
-    mic_api.get_direction.return_value = "error"
-    rv = client.get('microphone/speaker/direction')
-    assert rv.status_code == 504
+def test_preset_use(client):
+    rv = client.get('preset/track')
+    rv = client.post('thread/preset')
+    assert rv.status_code == 200
+    assert rv.data == bytes('{"preset":0}\n', "utf-8")
+
+    rv = client.post('thread/preset')
+    assert rv.status_code == 200
+    assert rv.data == bytes('{"preset":1}\n', "utf-8")
