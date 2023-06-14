@@ -37,6 +37,7 @@ class Calibration:
                 speaker_point: the camera direction and the microphone direction respectively
         """
         self.speaker_points.append(speaker_point)
+        print(speaker_point)
         self.record()
 
     def add_direction_to_mic(self, to_mic: np.ndarray):
@@ -131,8 +132,11 @@ class Calibration:
                     }, indent=4))
                 return
             with open(self.filename, encoding="utf-8") as f:
-                data = json.load(f)
                 self.speaker_points = []
+                try:
+                    data = json.load(f)
+                except:
+                    self.record()
                 if "speaker_points" in data.keys():
                     for key in data["speaker_points"]:
                         try:
@@ -167,7 +171,6 @@ class Calibration:
                     print(e)
                     self.mic_height = Calibration.default_height
                     print("Setting microphone height to default value")
-                self.record()
                 if self.is_calibrated():
                     self.calculate_distance()
                 print("Loaded speaker points: ", self.speaker_points)
