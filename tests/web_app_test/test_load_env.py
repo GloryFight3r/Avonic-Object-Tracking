@@ -67,7 +67,6 @@ def client(camera):
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
     mic_api = MicrophoneAPI(MicrophoneSocket(None, sock))
-    mic_api.height = 1
 
     cam_api = camera
 

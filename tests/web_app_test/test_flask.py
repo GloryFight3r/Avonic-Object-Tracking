@@ -59,7 +59,6 @@ def client(camera, monkeypatch):
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), ("0.0.0.1", 45))
     mic_adapt = MicrophoneSocket(sock=mic_sock, address=("0.0.0.1", 45))
     mic_api = MicrophoneAPI(mic_adapt)
-    mic_api.height = 1
 
     cam_api = camera
 

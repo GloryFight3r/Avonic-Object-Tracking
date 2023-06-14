@@ -12,7 +12,6 @@ class MicrophoneAPI:
             sock: wrapper for the socket
         """
         self.sock: MicrophoneSocket = sock
-        self.height: float = 0.0
         self.elevation: float = 0.0
         self.azimuth: float = 0.0
         self.speaking: bool = False
@@ -30,16 +29,6 @@ class MicrophoneAPI:
         if not ret:
             return '{"message":"No address specified"}', False
         return '{"message":"Address set successfully"}', True
-
-    def set_height(self, height: float):
-        """
-        Sets the height of the microphone.
-
-        Args:
-            height (float): the new height
-        """
-        assert height >= 0.0
-        self.height = height
 
     def get_azimuth(self) -> float:
         """ Get azimuth from the camera.

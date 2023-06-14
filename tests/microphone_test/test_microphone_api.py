@@ -12,33 +12,10 @@ def test_init():
     sock = MicrophoneSocket(None)
     mic = MicrophoneAPI(sock)
 
-    assert mic.height == 0.0
     assert mic.elevation == 0.0
     assert mic.azimuth == 0.0
     assert mic.speaking == False
     assert mic.threshold == -55
-
-def test_set_height_api():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    assert api.height == 0
-    api.set_height(10)
-    assert api.height == 10
-
-
-def test_set_height_negative():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    with pytest.raises(AssertionError):
-        api.set_height(-1)
-
-
-def test_set_height_float():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    api.set_height(2.5)
-    assert api.height == 2.5
-
 
 def test_elevation():
     sock = mock.Mock()

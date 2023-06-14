@@ -7,6 +7,7 @@ class Calibration:
     default_mic_vec: list[float] = [0.0, 1.0, 0.0]
     default_to_mic: list[float] = [0.0, 0.0, 0.0]
     default_height: float = 1.0
+
     def __init__(self, filename: str = ""):
         self.filename = filename
 
