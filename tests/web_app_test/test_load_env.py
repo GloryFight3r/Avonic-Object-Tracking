@@ -77,7 +77,7 @@ def client(camera):
 
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
          with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
-             with mock.patch("web_app.integration.open", x):
+             with mock.patch("builtins.open", x):
                 test_controller.load_env()
                 test_controller.ws = mock.Mock()
                 app = web_app.create_app(test_controller=test_controller)
