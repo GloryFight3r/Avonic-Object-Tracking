@@ -1,11 +1,16 @@
-The goal of this chapter is to give a clear idea of why the project was needed, who is impacted by the project and how it stands in relation to other projects. 
-First, we look at the user story from the perspective of Avonic. Then we consider three cases of other companies that had solved a similar problem and explain how they relate to our own project, % add links to relevant parts
-before describing the stakeholders and assessing the ethical implications of our project. Finally, we take a look at some potential bottlenecks we could have run into. 
+The goal of this chapter is to give a clear idea of why the project was needed,
+who is impacted by the project and how it stands in relation to other projects.
+First, we look at the user story from the perspective of Avonic.
+Then we consider three cases of other companies that had solved
+a similar problem and explain how they relate to our own project, % add links to relevant parts
+before describing the stakeholders and assessing the ethical implications of our project.
+Finally, we take a look at some potential bottlenecks we could have run into.
 
-\section{Problem statement}
-During our first meeting with Mr. Kahawati, he described the following scenario to be used as a user story:
 
-As a company, Avonic would like to make it easier to record educational sessions by creating a camera that follows the speaker as they
+\section{Problem statement}\label{sec:problem-statement}
+During our first meeting with a client, we have identified the problem statement as follows:
+
+Avonic would like to make it easier to record educational sessions by creating a camera that follows the speaker as they
 move around in a room. For example, a camera could be in the back of a lecture hall, and a microphone could be in the front, close to the
 speaker. This is a common setup for universities. Since these devices
 use their own firmware, it is not an option to reprogram them. Therefore, using a Nvidia Jetson Nano or another single-board
@@ -24,20 +29,22 @@ who is yawning may look like someone who is talking and someone who is speaking 
 to use the camera in combination with the microphone to locate a speaker. The microphone that has to be used is the Sennheiser TeamConnect
 Ceiling 2\cite{team-connect-2}, which provides a direction from itself towards the sound that it records. The camera Avonic wants us to use is the Avonic CM-70
 model.
+
+
 Using the microphone and the visual information mentioned earlier, the goal is to find a way to automatically move the camera to point at a
 speaker in the same room after minimal manual installation; it should not take more than a few minutes to set up the software and start
 recording. Specifically, Avonic has asked us to write an API for both the camera and the microphone, and use those to calculate the position
 of a speaker in real-time.
 
-\section{Available solutions}
+\section{Available solutions}\label{sec:available-solutions}
 We now discuss three different solutions that are already available for customers. These products were created by companies other than Avonic to solve a similar
 problem to the one described in section 1.1. Looking at such products helps to get a better idea of the state of the art.
 For every case below, we contrast the solution with Avonic’s vision and explain how it relates
 to the project we worked on.
 
 \subsection{AVer}
-AVer created a camera that can “automatically track a presenter’s face and movements.”\cite{aver} The camera
-stands alone and is not helped by an external microphone. Instead, it has a so-called 'dual-lens design' that allows to keep a secondary
+AVer created a camera that can ``automatically track a presenter’s face and movements''\cite{aver-camera} The camera
+stands alone and is not helped by an external microphone. Instead, it has a so-called ``dual-lens design'' that allows to keep a secondary
 panorama view while zooming in on the speaker. In this way, new speakers can still be recognized when they are not recorded by the zoomed in
 lens.
 Avonic wants to try something other than a dual-lens design. Instead, they chose to try a microphone. This way it is still possible to detect new
@@ -58,12 +65,11 @@ less complex. Avonic wants to use only one camera and one microphone and try to 
 like Cisco do with two or more cameras.
 
 
-
 As we can see, the most common approach to the speaker localization problem is to use a dual-lens or dual-camera design. On behalf of
 Avonic, we experimented with a new approach: one camera and one microphone. This poses new problems. Our devised solution is described in
 \hyperref[ch:solution]{Chapter 4}.
 
-\section{Stakeholders}
+\section{Stakeholders}\label{sec:stakeholders}
 This section describes who the stakeholders of our project are and how we considered their interests during the ten week process. The
 definition of stakeholder that we are going to use is as follows: “All those who have an interest in the system and who will eventually be
 responsible for its acceptance.”\cite{stakeholder-definition}
@@ -92,7 +98,7 @@ Throughout the project, this helped to stay in touch with the wants of the stake
 group was mainly represented by the Avonic team.
 
 
-\section{Possible pitfalls}
+\section{Possible pitfalls}\label{sec:possible-pitfalls}
 At the start of the project, we identified a few possible risks which we needed to decide on how to avert.
 As these risks threatened to slow down our progress, we tried to reduce their impact as much as possible.
 Below are the issues listed in order of severity.
