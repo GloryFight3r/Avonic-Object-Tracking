@@ -1,5 +1,5 @@
 import signal
-from flask import Flask, jsonify, abort, render_template, make_response, Response, request
+from flask import Flask, jsonify, abort, render_template, make_response
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
 import web_app.microphone_endpoints
@@ -7,6 +7,7 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
+import web_app.settings_endpoints
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
@@ -16,6 +17,7 @@ from web_app.integration import GeneralController, close_running_threads
 
 integration = GeneralController()
 
+restart_queue = None
 
 def create_app(test_controller=None):
     # create and configure the app
@@ -28,6 +30,7 @@ def create_app(test_controller=None):
     else:
         integration.copy(test_controller)
         app.config['SECRET_KEY'] = 'test'
+        integration.testing.value = 1
 
     @app.get('/fail-me')
     def fail_me():
@@ -35,30 +38,31 @@ def create_app(test_controller=None):
 
     @app.get('/')
     def view():
-        to_import=["footage-vis", "camera", "microphone", "presets", "calibration",
-                   "footage", "thread", "scene", "socket", "main", "tracking"]
+        to_import = ["main", "footage-vis", "camera", "microphone", "presets", "calibration",
+                     "footage", "thread", "scene", "socket", "settings", "tracking"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
     def camera_view():
-        to_import=["camera", "socket", "main"]
+        to_import = ["main", "camera", "socket", "settings"]
         return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
+
     @app.get('/microphone_control')
     def microphone_view():
-        to_import=["microphone", "socket", "main"]
+        to_import = ["main", "microphone", "socket", "settings"]
         return render_template('single_page.html', name="microphone", to_import=to_import,
                                page_name="Microphone View")
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
-        to_import=["socket", "camera", "microphone", "presets", "calibration", "main"]
+        to_import = ["main", "socket", "camera", "microphone", "presets", "calibration", "settings"]
         return render_template('single_page.html', name="presets_and_calibration",
-            to_import=to_import, page_name="Presets & Calibration View")
+                               to_import=to_import, page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
-        to_import=["footage", "socket", "main"]
+        to_import = ["main", "footage", "socket", "settings"]
         return render_template('single_page.html', name="live_footage", to_import=to_import,
                                page_name="Live Footage")
 
@@ -291,8 +295,22 @@ def create_app(test_controller=None):
     @app.post('/info-thread/stop')
     def info_thread_stop():
         integration.info_threads_event.value = 0
-        print(integration.info_threads_event.value)
         return make_response(jsonify({}), 200)
+
+    @app.get('/settings/get')
+    def settings_get():
+        return web_app.settings_endpoints.get(integration)
+
+    @app.post('/settings/set')
+    def settings_set():
+        return web_app.settings_endpoints.set_settings(integration)
+
+    @integration.ws.on("connected")
+    def settings_not_set(data):
+        if not integration.no_settings_sent:  # prompt user to set up if no settings file found
+            integration.ws.emit("no-settings", data)
+        else:
+            integration.ws.emit("yes-settings", {})
 
     def sigterm_handler(_signo, _stack_frame):
         close_running_threads(integration)
@@ -301,6 +319,7 @@ def create_app(test_controller=None):
     signal.signal(signal.SIGTERM, sigterm_handler)
 
     return app
+
 
 if __name__ == "__main__":
     application = create_app()

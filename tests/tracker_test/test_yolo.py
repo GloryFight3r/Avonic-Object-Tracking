@@ -4,7 +4,7 @@ from unittest import mock
 from ultralytics import YOLO
 import numpy as np
 
-from object_tracker.yolov2 import YOLOPredict
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
 class MockedBoxes:
     def __init__(self):

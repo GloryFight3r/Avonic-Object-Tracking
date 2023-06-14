@@ -40,9 +40,13 @@ class AudioModel(TrackingModel):
             print(mic_direction)
             return self.prev_dir
 
-        cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
+        try:
+            cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
                                                         self.calibration.mic_height)
+        except AssertionError:
+            return self.prev_dir
+
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
         vec_len = min(vec_len,10.0)
         zoom_val = (int)((vec_len/10.0)*16000)
@@ -70,3 +74,6 @@ class AudioModel(TrackingModel):
 
         self.prev_dir = direct_np
         return direct_np
+
+    def set_filename(self, filename: str):
+        self.calibration.set_filename(filename)

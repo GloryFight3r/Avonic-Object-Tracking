@@ -2,12 +2,10 @@ import math
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.converter import vector_angle
+from avonic_camera_api.footage import FootageThread
 from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_speaker_tracker.audio_model.calibration import Calibration
-from avonic_speaker_tracker.utils.coordinate_translation \
-    import translate_microphone_to_camera_vector
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
 class ObjectModel():
     """ Class with helper methods for calibration tracking. This class has to be extended
@@ -16,13 +14,19 @@ class ObjectModel():
     """
 
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI,
-                 object_tracking_thread_event, resolution: np.ndarray = np.array([0, 0])):
+                 stream: FootageThread, nn: YOLOPredict,
+                 resolution: np.ndarray = np.array([0, 0])):
         self.cam_api = cam_api
         self.mic_api = mic_api
-        self.object_tracking_thread_event = object_tracking_thread_event
+
+        # the resolution of the camera frames
         self.resolution = resolution
-        self.speak_delay = 0
-        self.wait = 10
+
+        # the neural network to use for object detection
+        self.nn = nn
+
+        # the thread that reads the footage stream of the camera
+        self.stream = stream
 
     def get_center_box(self, boxes: [np.array]):
         """ Gets the box closest to the center of the screen.
@@ -76,7 +80,11 @@ class ObjectModel():
         distance_to_middle[0] = -distance_to_middle[0]
 
         # calculate current FoV of the camera
-        cam_fov:np.ndarray = self.cam_api.calculate_fov()
+        try:
+            cam_fov:np.ndarray = self.cam_api.calculate_fov()
+        except TypeError as e:
+            print(e)
+            return ([20, 20], [0, 0])
 
         # calculate how many degrees correspond to one pixel
         angular_resolution:np.ndarray = cam_fov / self.resolution
@@ -92,96 +100,3 @@ class ObjectModel():
 
     def calculate_speed(self, rotate_angle: np.ndarray):
         return [20, 20]
-
-
-class WaitObjectAudioModel(ObjectModel, AudioModel):
-    """ This class extends CalibrationTracker. It uses the strategy of waiting till
-        the microphone doesn't detect large movements and then uses object tracking
-        till the microphone detects big movements again.
-    """
-    def __init__(self, cam: CameraAPI, mic: MicrophoneAPI, object_tracking_thread,
-                 resolution: np.ndarray, threshold: int,
-                 filename = ""):
-        super().__init__(cam, mic, object_tracking_thread)
-        self.resolution = resolution
-        self.threshold = threshold
-        self.calibration = Calibration(filename=filename)
-        self.calibration.load()
-        self.prev_dir = np.array([0, 0, 1])
-        self.time_without_movement = 0
-
-    def track_object(self, current_box: list):
-        speed, angle = self.get_movement_to_box(current_box)
-        avg_angle = (angle[0] + angle[1]) / 2
-
-        if abs(avg_angle) <= self.threshold*3:
-            print("MOVING!!!!!")
-            self.cam_api.move_relative(speed[0], speed[1],\
-                                angle[0], angle[1])
-
-    def point(self):
-        """ Points the camera towards the calculated direction from either:
-        the presets or the continuous follower.
-            Args:
-                direct: the direction in which to point the camera
-            Returns: the pitch and yaw of the camera and the zoom value
-        """
-
-        if self.speak_delay == 100:
-            self.object_tracking_thread_event.value = 1
-            self.cam_api.direct_zoom(0)
-            self.prev_dir[2]=0
-            return self.prev_dir
-        elif self.speak_delay < 2:
-            self.object_tracking_thread_event.value = 2
-
-        mic_direction = self.mic_api.get_direction()
-
-        if isinstance(mic_direction, str):
-            print(mic_direction)
-            return self.prev_dir
-
-        try:
-            cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
-                                                        mic_direction,
-                                                        self.calibration.mic_height)
-            vec_len = np.sqrt(cam_vec.dot(cam_vec))
-            vec_len = min(vec_len,10.0)
-            zoom_val = (int)((vec_len/10.0)*16000)
-
-            direct = vector_angle(cam_vec)
-            direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
-
-        except AssertionError:
-            direct = self.prev_dir
-
-
-        avg = abs(direct[0] - self.prev_dir[0])
-        if avg >= self.threshold:
-            self.time_without_movement = 0
-            self.object_tracking_thread_event.value = 1
-
-        diffX = math.fabs(self.prev_dir[0]-direct[0])*2
-        diffY = math.fabs(self.prev_dir[1]-direct[1])*2
-
-        speedX = (int)(13 + diffX/360*11)
-        speedY = (int)(11 + diffY/120*9)
-
-        speedX = min(speedX,24)
-        speedY = min(speedY,20)
-
-        if direct is None:
-            return self.prev_dir
-
-        if self.time_without_movement < self.wait:
-            if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
-                self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
-        elif self.time_without_movement == self.wait:
-            self.object_tracking_thread_event.value = 2
-        self.time_without_movement += 1
-
-        if self.prev_dir[2] != direct[2]:
-            self.cam_api.direct_zoom(direct[2])
-
-        self.prev_dir = direct
-        return direct

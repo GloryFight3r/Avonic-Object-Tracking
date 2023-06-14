@@ -1,13 +1,6 @@
-if (typeof onSuccess !== 'undefined') {
-    onSuccess = Object.assign({}, onSuccess, {
-      "tracking-select": selectTracking,
-    });
-  }
-  else {
-    onSuccess = {
-      "tracking-select": selectTracking,
-    }
-  }
+onSuccess = Object.assign({}, onSuccess, {
+    "tracking-select": selectTracking,
+})
 
 function selectTracking() {
     const selected = document.getElementById("tracking-select").value

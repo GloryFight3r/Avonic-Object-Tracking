@@ -1,22 +1,10 @@
-if (typeof onSuccess !== 'undefined') {
-    onSuccess = Object.assign({}, onSuccess, {
-        "preset-get-list-form": refreshPresetList,
-        "camera-position-get-form": onPositionGet,
-        "add-preset-button": loadPresets,
-        "edit-preset-button": loadPresets,
-        "remove-preset-button": loadPresets,
-
-    });
-}
-else {
-    onSuccess = {
-        "preset-get-list-form": refreshPresetList,
-        "camera-position-get-form": onPositionGet,
-        "add-preset-button": loadPresets,
-        "edit-preset-button": loadPresets,
-        "remove-preset-button": loadPresets,
-    }
-}
+onSuccess = Object.assign({}, onSuccess, {
+    "preset-get-list-form": refreshPresetList,
+    "camera-position-get-form": onPositionGet,
+    "add-preset-button": loadPresets,
+    "edit-preset-button": loadPresets,
+    "remove-preset-button": loadPresets,
+})
 
 async function refreshPresetList(data) {
     const d = (await data)["preset-list"];
@@ -25,7 +13,7 @@ async function refreshPresetList(data) {
     d.forEach((preset_ind) => presetList.add(new Option(preset_ind, preset_ind)));
 
     if (d.length !== 0) {
-        changePreset();
+        changePreset().then()
     }
 }
 
@@ -124,7 +112,7 @@ presetform.onsubmit = async (e) => {
     const fun = onSuccess[button_id];
     if (response.status === 200) {
         fun(response.json());
-        
+
     }
     e.submitter.ariaBusy = "false"
     if (response.status !== 200) {

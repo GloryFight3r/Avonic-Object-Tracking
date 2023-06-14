@@ -13,8 +13,9 @@ class MicrophoneSocket:
             address: the IP and port in the format (IP, port)
         """
         self.sock = sock
-        if address is None:
+        if address is None or address == ('0.0.0.0', 45):
             print("WARNING: Microphone address not specified!")
+            self.address = ('0.0.0.0', 45)
             return
         self.address = address
 
@@ -22,10 +23,13 @@ class MicrophoneSocket:
         """ Destructor for Microphone Socket
             Closes UDP connection
         """
-        self.sock.close()
+        try:
+            self.sock.close()
+        except:
+            pass
 
     def connect(self, address=None) -> bool:
-        if address is None:
+        if address is None or address == ('0.0.0.0', 45):
             print("WARNING: Microphone address not specified!")
             return False
         self.address = address
@@ -40,6 +44,9 @@ class MicrophoneSocket:
             responses: how many responses are expected to arrive back
         """
         res = []
+        if self.address is None or self.address == ('0.0.0.0', 45):
+            print("WARNING: Microphone address not specified!")
+            return res
         self.sock.sendto(bytes(command, 'ascii'), self.address)
         self.sock.settimeout(5)
         received = 0

@@ -47,7 +47,11 @@ class MicrophoneAPI:
             the azimuth in radians
         """
         message = '{"m":{"beam":{"azimuth":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            print("Microphone returned nothing.")
+            return self.azimuth
+        ret = sent[0]
         try:
             res = json.loads(ret)["m"]["beam"]["azimuth"]
             assert isinstance(res, int)
@@ -64,7 +68,11 @@ class MicrophoneAPI:
             the elevation in radians
         """
         message = '{"m":{"beam":{"elevation":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            print("Microphone returned nothing.")
+            return self.elevation
+        ret = sent[0]
         try:
             res = json.loads(ret)["m"]["beam"]["elevation"]
             assert isinstance(res, int)
@@ -81,7 +89,10 @@ class MicrophoneAPI:
             the direction vector (normalized)
         """
         message = '{"m":{"beam":{"azimuth":null,"elevation":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            return "Microphone returned nothing."
+        ret = sent[0]
         try:
             json_object = json.loads(ret)["m"]["beam"]
             azimuth = json_object["azimuth"]
@@ -106,7 +117,8 @@ class MicrophoneAPI:
             the vector, pointing in [0, 0, 1] when elevation and azimuth 0
             (aka. Sennheiser logo should point away from camera by default)
         """
-        if self.is_speaking():
+        speaking = self.is_speaking()
+        if isinstance(speaking, bool) and speaking:
             cose = np.cos(self.elevation)
             self.prev_dir = np.array([-np.sin(self.azimuth) * cose,
                             -np.sin(self.elevation), np.cos(self.azimuth) * cose])
@@ -119,7 +131,10 @@ class MicrophoneAPI:
             whether the peak loudness is higher than the threshold
         """
         message = '{"m":{"in1":{"peak":null}}}'
-        ret = self.sock.send(message)[0]
+        sent = self.sock.send(message)
+        if len(sent) == 0:
+            return "Microphone returned nothing."
+        ret = sent[0]
         try:
             res = json.loads(ret)["m"]["in1"]["peak"]
             assert isinstance(res, int)

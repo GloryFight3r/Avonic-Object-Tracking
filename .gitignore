@@ -11,7 +11,6 @@ build/
 cov.xml
 html_cov/
 .coverage
-src/avonic_speaker_tracker_system.egg-info/
 .env
 calibration.json
 presets.json
@@ -29,3 +28,4 @@ run_pylint.sh
 src/.DS_Store
 src/avonic_speaker_tracker_system.egg-info/
 src/avonic_speaker_tracker.egg-info/
+settings.yaml

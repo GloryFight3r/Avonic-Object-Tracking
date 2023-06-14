@@ -1,10 +1,9 @@
 from flask import make_response, jsonify, request
 import numpy as np
 from avonic_speaker_tracker.updater import UpdateThread
-from avonic_speaker_tracker.object_model.ObjectModel import WaitObjectAudioModel
+from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
 from web_app.integration import GeneralController, ModelCode
-from avonic_camera_api.footage import ObjectTrackingThread
-from object_tracker.yolov2 import YOLOPredict
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
@@ -21,24 +20,14 @@ def start_thread_endpoint(integration: GeneralController):
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
-            integration.object_tracking_thread = \
-                ObjectTrackingThread(integration.nn, integration.object_audio_model,
-                    integration.footage_thread, integration.object_tracking_event)
-            integration.object_tracking_event.value = 1
-            integration.object_tracking_thread.start()
+                integration.object_audio_model.nn = integration.nn
 
-            integration.object_audio_model = WaitObjectAudioModel(
-                    integration.cam_api, integration.mic_api,
-                    integration.object_tracking_thread.event,
-                    np.array([1920.0, 1080.0]),
-                    5, filename="calibration.json")
             model = integration.object_audio_model
-
-        print(model)
 
         integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
-                                          model)
+                                          model, integration.filepath)
+        integration.event.value = 1
         integration.thread.set_calibration(old_calibration)
 
         integration.info_threads_event.value = 1
@@ -53,10 +42,7 @@ def stop_thread_endpoint(integration: GeneralController):
     # stop (pause) the thread
     integration.event.value = 0
     integration.info_threads_event.value = 0
-    integration.object_tracking_event.value = 0
 
-    if integration.object_tracking_thread is not None:
-        integration.object_tracking_thread.join()
     integration.thread.join()
     return make_response(jsonify({}), 200)
 
@@ -80,22 +66,17 @@ def update_calibration(integration: GeneralController):
 
 
 def is_running_endpoint(integration: GeneralController):
-    print(integration.thread)
-    print(integration.thread.is_alive())
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
 def track_presets(integration: GeneralController):
     integration.preset.value = ModelCode.PRESET
-    print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_continuously(integration: GeneralController):
     integration.preset.value = ModelCode.AUDIO
-    print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_object_continuously(integration: GeneralController):
     integration.preset.value = ModelCode.OBJECT
-    print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)

@@ -4,11 +4,13 @@ from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
+from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 class UpdateThread(Thread):
 
     def __init__(self, event: c_int,
-                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel):
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel,
+                 filepath: str = ""):
         """ Class constructor
 
         Args:
@@ -20,6 +22,7 @@ class UpdateThread(Thread):
         self.cam_api: CameraAPI = cam_api
         self.mic_api: MicrophoneAPI = mic_api
         self.model: TrackingModel = model
+        self.filepath = filepath
 
     def run(self) -> None:
         """ Actual body of the thread.
@@ -33,6 +36,8 @@ class UpdateThread(Thread):
         from the limited pool of options, based on cosine similarity.
         """
         speak_delay: int = 0
+        object_tracking = False
+        object_tracking_counter = 0
         while self.event.value != 0:
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -44,11 +49,15 @@ class UpdateThread(Thread):
             elif speak_delay < 100:
                 speak_delay = speak_delay + 1
             self.model.set_speak_delay(speak_delay)
-            direct = self.model.point()
+            object_tracking = self.model.point()
+            #object_tracking = True
+            if isinstance(self.model, ObjectModel):
+                if object_tracking and object_tracking_counter % 40 == 0:
+                    self.model.track_object()
 
-            print(direct)
 
             self.value += 1
+            object_tracking_counter += 1
             sleep(0.05)
         print("Exiting thread")
 
