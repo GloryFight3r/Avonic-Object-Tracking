@@ -7,7 +7,7 @@ Additionally, our project relies on 2 special hardware devices -- a camera, and 
 Unfortunately, the microphone does not provide location information, as it is quite a difficult technical challenge\cite{distance-urbana-champaign}.
 So the list of important limitations, that significantly impact the project can be formulated with three limitations:
 \begin{itemize}
-    \item The system should run on a single-board computer(SBC)
+    \item The system should run on a single-board computer (SBC)
     \item The system should be able to run on the same network as a camera and a microphone.
     \item Microphone does not provide distance information
 \end{itemize}
@@ -178,11 +178,11 @@ simultaneously with speaker tracking. This helps to centralize the speaker on th
 
 \paragraph{Switch strategy}
 The last approach we consider is always relying on microphone coordinations when there is an active speaker, but furthermore adjusts the camera based on camera footage and bounding boxes. When there is an active speaker, we first search for his location using the microphone information. If he is in the FoV of the camera, we get the bounding speaker boxes from the current frame and after translating the microphone direction to a camera direction and finding its position on the screen as a pixel, we search which bounding box’s center is the closest to that pixel. After finding it, we move the camera so that this bounding box is in the middle of the camera screen. If the speaker is not currently visible on the screen, we again translate the microphone direction to a camera direction and rotate the camera so that it faces that way. And finally in the case that there is no active speaker, we attempt to continue tracking the last active speaker. In order to achieve that, we rely on the fact that the bounding box of the last active speaker in the current frame should be the closest to his new bounding box in the new frame. Relying on that fact, we get all of the new bounding boxes from the new frame and choose to track the one that has its center the closest to the previous bounding box.
-A diagram that illustrates the possible states we could be in is the following.
+A diagram that illustrates the possible states we could be in is the depicted in Figure \ref{fig:object_strategy}.
 \begin{figure}[h]
     \caption{Possible states diagram}
     \centering
-    \includegraphics[width=0.8\textwidth]{object_strategy}
+    \includegraphics[width=0.8\textwidth]{tree}
     \label{fig:object_strategy}
 \end{figure}
 
