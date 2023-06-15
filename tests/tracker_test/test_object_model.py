@@ -84,10 +84,14 @@ def test_track_object(monkeypatch):
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(),
                                               None, np.array([100, 100]), 0,
                                               nn, stream)
+    object_audio_model.is_object_tracking = True
+    object_audio_model.object_tracking_counter = 40
     object_audio_model.track_object()
     object_audio_model2 = WaitObjectAudioModel(MockedCamAPI(),
                                                None, np.array([100, 100]), 100,
                                                nn, stream)
+    object_audio_model2.is_object_tracking = True
+    object_audio_model2.object_tracking_counter = 40
     object_audio_model2.track_object()
 
 def test_point(monkeypatch):
