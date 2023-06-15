@@ -2,6 +2,7 @@
 
 if [ "$1" = "jetson" ]
   then
+    export SERVER_ADDRESS=0.0.0.0:8000
     while true
     do
       python3 -c "\
