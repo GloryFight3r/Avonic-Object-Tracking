@@ -291,10 +291,17 @@ class GeneralController:
 
         Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
-        return {
-            "microphone-direction": list(self.mic_api.get_direction()),
+        mic_direction = self.mic_api.get_direction()
+        if isinstance(mic_direction, str):
+            return {
+            "microphone-direction": list(np.array([0,0,0])),
             "microphone-speaking": self.mic_api.is_speaking()
         }
+        else:
+            return {
+                "microphone-direction": list(mic_direction),
+                "microphone-speaking": self.mic_api.is_speaking()
+            }
 
     def get_cam_info(self) -> dict:
         """ Get the direction of the camera.
