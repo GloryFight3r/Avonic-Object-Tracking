@@ -42,11 +42,6 @@ class UpdateThread(Thread):
                 sleep(5)
                 continue
 
-            if self.mic_api.is_speaking():
-                speak_delay = 0
-            elif speak_delay < 100:
-                speak_delay = speak_delay + 1
-            self.model.set_speak_delay(speak_delay)
             self.model.point()
 
             self.value += 1
