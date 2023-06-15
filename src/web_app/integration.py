@@ -21,12 +21,13 @@ from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 
 class ModelCode():
     AUDIO = 0
     PRESET = 1
     OBJECT = 2
-
+    AUDIONOZOOM = 4
 
 
 class GeneralController:
@@ -71,6 +72,7 @@ class GeneralController:
         self.audio_model = None
         self.preset_model = None
         self.object_audio_model = None
+        self.audio_no_zoom_model = None
         self.model = None
 
         # Video related fields
@@ -174,6 +176,8 @@ class GeneralController:
                                       filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api, 
+                                        filename = self.filepath + "calibration.json")
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
@@ -251,6 +255,7 @@ class GeneralController:
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
         self.object_audio_model = WaitObjectAudioModel(
                 self.cam_api, self.mic_api,
@@ -270,6 +275,7 @@ class GeneralController:
         self.ws = new_controller.ws
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
         self.preset.value = new_controller.preset.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
@@ -279,11 +285,6 @@ class GeneralController:
 
     def set_cam_api(self, new_cam_api) -> None:
         self.cam_api = new_cam_api
-
-    def get_model_based_on_choice(self) -> TrackingModel:
-        if self.preset.value == 0:
-            return self.preset_model
-        return self.audio_model
 
     def get_mic_info(self) -> dict:
         """ Get information about the microphone.

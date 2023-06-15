@@ -15,6 +15,8 @@ def start_thread_endpoint(integration: GeneralController):
             model = integration.preset_model
         elif integration.preset.value == ModelCode.AUDIO:
             model = integration.audio_model
+        elif integration.preset.value == ModelCode.AUDIONOZOOM:
+            model = integration.audio_no_zoom_model
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
@@ -81,7 +83,7 @@ def track_object_continuously(integration: GeneralController):
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_continuously_without_adaptive_zooming(integration: GeneralController):
-    integration.preset.value = 4
+    integration.preset.value = ModelCode.AUDIONOZOOM
     print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
