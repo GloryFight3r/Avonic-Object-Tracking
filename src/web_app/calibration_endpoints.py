@@ -52,7 +52,15 @@ def add_calibration_to_mic(integration: GeneralController):
                 a Calibration instance.
     """
 
-    cam_dir = integration.cam_api.get_direction()
+    timeouts = 0
+    cam_dir = ResponseCode.ACK
+    while isinstance(cam_dir, ResponseCode):
+        cam_dir = integration.cam_api.get_direction()
+        timeouts += 1
+        if timeouts > 100:
+            return make_response(
+                jsonify({"message": "Could not get direction from the camera!"}, 504))
+
     integration.audio_model.calibration.add_direction_to_mic(cam_dir)
     integration.audio_model.calibration.calculate_distance()
     return success()
