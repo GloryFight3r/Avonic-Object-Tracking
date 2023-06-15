@@ -113,9 +113,9 @@ def test_continuous_pointer_without_adaptive_zooming():
     dir1 = am.point(cam_api, mic_api)
     am.point(cam_api, mic_api)
     assert cam_api.move_absolute.call_count == 1
-    cam_api.direct_zoom.call_count == 0   
+    assert cam_api.direct_zoom.call_count == 0   
     dir2 = am.point(cam_api, mic2_api)
-    cam_api.direct_zoom.call_count == 0   
+    assert cam_api.direct_zoom.call_count == 0   
     assert(dir1 == np.array([-13,4,1])).all()
     assert(dir2 == np.array([-2,6,1])).all()
 
