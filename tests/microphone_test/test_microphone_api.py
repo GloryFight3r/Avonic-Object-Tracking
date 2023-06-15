@@ -1,6 +1,5 @@
 import json
 from unittest import mock
-import pytest
 from hypothesis import given, strategies as st
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
@@ -14,7 +13,7 @@ def test_init():
 
     assert mic.elevation == 0.0
     assert mic.azimuth == 0.0
-    assert mic.speaking == False
+    assert mic.speaking is False
     assert mic.threshold == -55
 
 def test_elevation():

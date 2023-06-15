@@ -1,7 +1,7 @@
-import torch
-import cv2
 from unittest import mock
 from ultralytics import YOLO
+import torch
+import cv2
 import numpy as np
 
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict

@@ -1,7 +1,5 @@
 from flask import make_response, jsonify, request
-import numpy as np
 from avonic_speaker_tracker.updater import UpdateThread
-from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
 from web_app.integration import GeneralController, ModelCode
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
@@ -43,7 +41,8 @@ def stop_thread_endpoint(integration: GeneralController):
     integration.event.value = 0
     integration.info_threads_event.value = 0
 
-    integration.thread.join()
+    if integration.thread is not None:
+        integration.thread.join()
     return make_response(jsonify({}), 200)
 
 

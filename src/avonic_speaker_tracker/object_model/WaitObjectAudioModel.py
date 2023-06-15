@@ -1,18 +1,17 @@
-import numpy as np
 import math
 import cv2
+import numpy as np
 
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_camera_api.camera_control_api import CameraAPI
-
 from avonic_speaker_tracker.utils.coordinate_translation \
     import translate_microphone_to_camera_vector
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_camera_api.converter import vector_angle
 from avonic_camera_api.footage import FootageThread
+from avonic_camera_api.camera_control_api import CameraAPI
 
 class WaitObjectAudioModel(ObjectModel, AudioModel):
     """ This class extends CalibrationTracker. It uses the strategy of waiting till
@@ -55,6 +54,8 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         # get the bounding box to center on
         boxes = self.nn.get_bounding_boxes(frame)
+        if len(boxes) == 0:
+            return
         current_box = self.get_center_box(boxes)
 
         # get the movement to this box
@@ -66,6 +67,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         # only move if this angle is smaller than the threshold
         # the *3 can be adapted to optimize object tracking
         if abs(avg_angle) <= self.threshold*3:
+            print("MOVE OBJECT TRACKING")
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
 
@@ -130,7 +132,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
                     self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
                 except AssertionError as e:
                     print(e)
-        elif self.time_without_movement == self.wait:
+        elif self.time_without_movement >= self.wait:
             start_object_tracking = True
         self.time_without_movement += 1
 

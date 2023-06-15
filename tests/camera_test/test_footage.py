@@ -1,5 +1,4 @@
 import base64
-from threading import Event
 from multiprocessing import Value
 import pytest
 import cv2
