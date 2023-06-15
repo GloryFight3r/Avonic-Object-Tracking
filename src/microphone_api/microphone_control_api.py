@@ -116,12 +116,9 @@ class MicrophoneAPI:
             the vector, pointing in [0, 0, 1] when elevation and azimuth 0
             (aka. Sennheiser logo should point away from camera by default)
         """
-        speaking = self.is_speaking()
-        if isinstance(speaking, bool) and speaking:
-            cose = np.cos(self.elevation)
-            self.prev_dir = np.array([-np.sin(self.azimuth) * cose,
-                            -np.sin(self.elevation), np.cos(self.azimuth) * cose])
-        return self.prev_dir
+        cose = np.cos(self.elevation)
+        return np.array([-np.sin(self.azimuth) * cose,
+                         -np.sin(self.elevation), np.cos(self.azimuth) * cose])
 
     def is_speaking(self) -> bool | str:
         """ Determine whether someone is speaking based on the peak loudness

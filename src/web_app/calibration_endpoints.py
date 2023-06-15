@@ -7,6 +7,10 @@ from avonic_camera_api.camera_adapter import ResponseCode
 def success():
     return make_response(jsonify({}), 200)
 
+def get_number_of_speaker_points(integration: GeneralController):
+    return make_response(jsonify({
+        "speaker-points-length": len(integration.audio_model.calibration.speaker_points)
+    }), 200)
 
 def add_calibration_speaker(integration: GeneralController):
     """ Adds a speaker point to the calibration. This includes
@@ -16,20 +20,24 @@ def add_calibration_speaker(integration: GeneralController):
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
-    timeouts = 0  # this variable is here to not create an infinite loop in case microphone or camera fail
+    # this variable is here to not create an infinite loop in case microphone or camera fail
+    timeouts = 0
+
     mic_dir = ""
     while isinstance(mic_dir, str):
         mic_dir = wait_for_speaker(integration)
         timeouts += 1
         if timeouts > 100:
-            return make_response(jsonify({"message": "Could not get direction from the microphone!"}, 504))
+            return make_response(
+                jsonify({"message": "Could not get direction from the microphone!"}, 504))
     timeouts = 0
     cam_dir = ResponseCode.ACK
     while isinstance(cam_dir, ResponseCode):
         cam_dir = integration.cam_api.get_direction()
         timeouts += 1
         if timeouts > 100:
-            return make_response(jsonify({"message": "Could not get direction from the camera!"}, 504))
+            return make_response(
+                jsonify({"message": "Could not get direction from the camera!"}, 504))
 
     integration.audio_model.calibration.add_speaker_point((cam_dir, mic_dir))
     return success()

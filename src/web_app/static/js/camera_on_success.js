@@ -50,13 +50,6 @@ async function onCameraCoordsGet(data) {
     document.getElementById("camera-coords-z").value = d[2].toFixed(5)
 }
 
-if (document.getElementById("presets") !== null) {
-    selectCaliTab()
-}
-if (document.getElementById("calibration-button") !== null) {
-    calibrationIsSet().then()
-}
-
 function selectMovement() {
     document.getElementById("camera-move-absolute").style.display = "none"
     document.getElementById("camera-move-relative").style.display = "none"
