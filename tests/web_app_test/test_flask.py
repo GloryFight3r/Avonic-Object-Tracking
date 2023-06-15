@@ -230,18 +230,18 @@ def test_get_microphone_direction(client):
 
 
 def test_add_direction_to_mic(client):
-    client.get('/calibration/reset')
-    rv = client.get('/calibration/add_direction_to_mic')
+    client.post('/calibration/reset')
+    rv = client.post('/calibration/add_direction_to_mic')
     assert rv.status_code == 200
 
 
 def test_add_direction_to_speaker(client):
-    rv = client.get('/calibration/add_directions_to_speaker')
+    rv = client.post('/calibration/add_directions_to_speaker')
     assert rv.status_code == 200
 
 
 def test_calibration_reset(client):
-    rv = client.get('/calibration/reset')
+    rv = client.post('/calibration/reset')
     assert rv.status_code == 200
 
 
