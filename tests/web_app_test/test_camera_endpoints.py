@@ -1,17 +1,14 @@
 import json
 from unittest import mock
-from avonic_camera_api.footage import FootageThread
-import pytest
 import socket
+import pytest
 import web_app
 import numpy as np
 from web_app.camera_endpoints import responses
-from avonic_camera_api.camera_control_api import ResponseCode
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
-from avonic_speaker_tracker.utils import camera_navigation_utils
-import avonic_speaker_tracker.utils.camera_navigation_utils
+from avonic_camera_api.camera_control_api import ResponseCode
 
 sock = mock.Mock()
 @pytest.fixture()

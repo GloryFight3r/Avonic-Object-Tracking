@@ -79,8 +79,8 @@ def client(camera, monkeypatch):
         pass
 
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
-         with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
-             with mock.patch("builtins.open", x):
+        with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+            with mock.patch("builtins.open", x):
                 with mock.patch("cv2.VideoCapture", x2):
                     test_controller.load_env()
                     test_controller.ws = mock.Mock()
@@ -92,4 +92,3 @@ def test_load_env(client):
     time.sleep(0.5)
     test_controller.footage_thread_event.set()
     test_controller.info_threads_break.value = 1
-

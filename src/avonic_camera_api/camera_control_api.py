@@ -238,10 +238,8 @@ class CameraAPI:
             return current_zoom
 
         assert 0 <= current_zoom <= 16384
-        
         current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
             * current_zoom / self.MAX_ZOOM_VALUE)
-            
         return current_fov
 
 def degrees_to_command(degree: float, step_size: float) -> str:

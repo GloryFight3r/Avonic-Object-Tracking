@@ -1,6 +1,5 @@
 from flask_socketio import emit
 from web_app.integration import GeneralController
-import base64
 
 
 

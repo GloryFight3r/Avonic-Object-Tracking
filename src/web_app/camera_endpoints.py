@@ -1,6 +1,6 @@
 import socket
-import numpy as np
 import json
+import numpy as np
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode

@@ -31,4 +31,3 @@ class YOLOPredict:
     def draw_prediction(self, img, label, left, top, right, bottom):
         cv2.rectangle(img, (left, top), (right, bottom), [0, 0, 0], 2)
         cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0, 0, 0], 2)
-
