@@ -1,5 +1,5 @@
 import os
-from threading import Event, Thread
+from threading import Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value
@@ -291,7 +291,6 @@ class GeneralController:
 
         Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
-        print(self.mic_api.sock.address)
         return {
             "microphone-direction": list(self.mic_api.get_direction()),
             "microphone-speaking": self.mic_api.is_speaking()

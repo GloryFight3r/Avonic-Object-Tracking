@@ -1,5 +1,4 @@
 from unittest import mock
-from multiprocessing import Value
 import pytest
 import numpy as np
 import cv2
@@ -110,7 +109,7 @@ def test_point_zoom(monkeypatch):
     assert not object_audio_model.point()
     assert (object_audio_model.prev_dir == np.array([0, 0, 0])).all()
 
-def test_point_wrong_direction(monkeypatch):
+def test_point_wrong_direction():
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(),
                                               MockedMicAPIWrongDirection(),
                                               np.array([100, 100]), 0,

@@ -272,7 +272,7 @@ def test_update_calibration(client):
     assert rv.status_code == 200
 
 
-def test_thread(client, monkeypatch):
+def test_thread(client):
     rv = client.post("preset/add",
                      data={
                          "camera-direction-alpha": 0,
@@ -319,10 +319,6 @@ def test_thread(client, monkeypatch):
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
-
-    def mocked_init(self, nn, oam, ft, ote):
-        self.start = lambda: 0
-        self.event = None
 
     web_app.integration.preset.value = ModelCode.OBJECT
     rv = client.post('/thread/start')
