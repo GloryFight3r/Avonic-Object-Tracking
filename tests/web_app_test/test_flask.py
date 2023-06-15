@@ -552,7 +552,7 @@ def test_get_preset_list(client):
 
 def test_settings(client):
     m = mock.mock_open()
-    with mock.patch('web_app.integration.open', m):
+    with mock.patch('builtins.open', m):
         rv = client.get("settings/get")
         original = {
             "camera-ip": "0.0.0.1",
@@ -585,7 +585,7 @@ def test_settings(client):
 
 def test_settings_invalid(client):
     m = mock.mock_open()
-    with mock.patch('web_app.integration.open', m):
+    with mock.patch('builtins.open', m):
         data = {
             "camera-ip": 123,
             "camera-port": "asdf",

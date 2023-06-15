@@ -218,6 +218,10 @@ def create_app(test_controller=None):
     @app.get('/calibration/track')
     def continuous_tracker():
         return web_app.tracking_endpoints.track_continuously(integration)
+    @app.get('/calibration/track/no/zoom')
+    def continuous_tracker_without_adaprive_zoom():
+        print("CONTINUOUS TRACKER WITHOUT ADAPTIVE ZOOMING")
+        return web_app.tracking_endpoints.track_continuously_without_adaptive_zooming(integration)
 
     @app.get('/calibration/number-of-calibrated')
     def number_of_calibrated():

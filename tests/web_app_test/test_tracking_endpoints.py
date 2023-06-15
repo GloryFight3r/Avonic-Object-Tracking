@@ -80,6 +80,11 @@ def test_track_continuously(client):
     assert rv.status_code == 200
     assert rv.data == bytes('{"preset":0}\n', "utf-8")
 
+def test_track_continuously_without_adaptive_zooming(client):
+    rv = client.get('calibration/track/no/zoom')
+    assert rv.status_code == 200 
+    assert rv.data == bytes('{"preset":4}\n', "utf-8")
+
 def test_preset_use(client):
     rv = client.get('preset/track')
     rv = client.post('thread/preset')

@@ -107,7 +107,6 @@ def test_point_zoom(monkeypatch):
     monkeypatch.setattr(object_audio_model.calibration, "mic_height", 1.5)
     object_audio_model.speak_delay = 100
     assert not object_audio_model.point()
-    assert (object_audio_model.prev_dir == np.array([0, 0, 0])).all()
 
 def test_point_wrong_direction():
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(),

@@ -40,9 +40,6 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         # how how time_without_movement has to be before object tracking starts
         self.wait = 10
 
-        # the amount of iterations without sound
-        self.speak_delay = 0
-
 
     def track_object(self):
         # read the fream from the footage thread
@@ -67,6 +64,8 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         # only move if this angle is smaller than the threshold
         # the *3 can be adapted to optimize object tracking
         if abs(avg_angle) <= self.threshold*3:
+            # this print statement is there to see when object tracking is used and when
+            # audio tracking is used
             print("MOVE OBJECT TRACKING")
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
@@ -79,12 +78,6 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             Returns: a boolean whether or not object tracking should start
         """
         start_object_tracking = False
-
-        # zoom out if the there has been no sound for 100 iterations
-        if self.speak_delay == 100:
-            self.cam_api.direct_zoom(0)
-            self.prev_dir[2]=0
-            return start_object_tracking
 
         mic_direction = self.mic_api.get_direction()
 
@@ -101,21 +94,25 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             zoom_val = (int)((vec_len/10.0)*16000)
 
             direct = vector_angle(cam_vec)
-            direct = [int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val]
+            direct_np = np.array([int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val])
+
+            if direct_np[0]>180:
+                direct_np[0] = direct_np[0]-360
+            if direct_np[1]>180:
+                direct_np[1] = direct_np[1]-360
 
         except AssertionError:
-            direct = self.prev_dir
+            direct_np = self.prev_dir
 
 
-        avg_angle = ((direct[0] - self.prev_dir[0])**2 + (direct[1] - self.prev_dir[1])**2)**0.5
-        #avg_angle = abs(direct[0] - self.prev_dir[0])
+        avg_angle = ((direct_np[0] - self.prev_dir[0])**2 + (direct_np[1] - self.prev_dir[1])**2)**0.5
         if avg_angle >= self.threshold:
             # reset the time_without_movement if we move above the threshold
             self.time_without_movement = 0
             start_object_tracking = False
 
-        diffX = math.fabs(self.prev_dir[0]-direct[0])*2
-        diffY = math.fabs(self.prev_dir[1]-direct[1])*2
+        diffX = math.fabs(self.prev_dir[0]-direct_np[0])*2
+        diffY = math.fabs(self.prev_dir[1]-direct_np[1])*2
 
         speedX = (int)(13 + diffX/360*11)
         speedY = (int)(11 + diffY/120*9)
@@ -123,21 +120,21 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         speedX = min(speedX,24)
         speedY = min(speedY,20)
 
-        if direct is None:
+        if direct_np is None:
             return start_object_tracking
 
         if self.time_without_movement < self.wait:
-            if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
+            if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
                 try:
-                    self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
+                    self.cam_api.move_absolute(speedX, speedY, direct_np[0], direct_np[1])
                 except AssertionError as e:
                     print(e)
         elif self.time_without_movement >= self.wait:
             start_object_tracking = True
         self.time_without_movement += 1
 
-        if self.prev_dir[2] != direct[2]:
-            self.cam_api.direct_zoom(direct[2])
+        if self.prev_dir[2] != direct_np[2]:
+            self.cam_api.direct_zoom(direct_np[2])
 
-        self.prev_dir = direct
+        self.prev_dir = direct_np
         return start_object_tracking
