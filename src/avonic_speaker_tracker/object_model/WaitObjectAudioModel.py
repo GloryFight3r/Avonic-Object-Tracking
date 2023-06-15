@@ -40,8 +40,14 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         # how how time_without_movement has to be before object tracking starts
         self.wait = 10
 
+        self.object_tracking_counter = 0
+        self.is_object_tracking = False
+
 
     def track_object(self):
+        if not self.is_object_tracking or self.object_tracking_counter % 40 != 0:
+            return
+
         # read the fream from the footage thread
         im_arr = np.frombuffer(self.stream.buffer.raw[:self.stream.buflen.value], np.byte)
         frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)
@@ -77,6 +83,9 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
                 direct: the direction in which to point the camera
             Returns: a boolean whether or not object tracking should start
         """
+        self.object_tracking_counter += 1
+        self.track_object()
+
         start_object_tracking = False
 
         mic_direction = self.mic_api.get_direction()
@@ -137,4 +146,4 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             self.cam_api.direct_zoom(direct_np[2])
 
         self.prev_dir = direct_np
-        return start_object_tracking
+        self.is_object_tracking = start_object_tracking

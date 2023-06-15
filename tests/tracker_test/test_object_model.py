@@ -96,7 +96,7 @@ def test_point(monkeypatch):
                                               None, None)
     monkeypatch.setattr(object_audio_model.calibration, "mic_to_cam", np.array([1, 2, 3]))
     monkeypatch.setattr(object_audio_model.calibration, "mic_height", 1.5)
-    assert not object_audio_model.point()
+    object_audio_model.point()
     assert (object_audio_model.prev_dir == np.array([139, -35, 9715])).all()
 
 def test_point_zoom(monkeypatch):

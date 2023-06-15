@@ -36,8 +36,6 @@ class UpdateThread(Thread):
         from the limited pool of options, based on cosine similarity.
         """
         speak_delay: int = 0
-        object_tracking = False
-        object_tracking_counter = 0
         while self.event.value != 0:
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
@@ -49,14 +47,9 @@ class UpdateThread(Thread):
             elif speak_delay < 100:
                 speak_delay = speak_delay + 1
             self.model.set_speak_delay(speak_delay)
-            object_tracking = self.model.point()
-            if isinstance(self.model, ObjectModel):
-                if object_tracking and object_tracking_counter % 40 == 0:
-                    self.model.track_object()
-
+            self.model.point()
 
             self.value += 1
-            object_tracking_counter += 1
             sleep(0.05)
         print("Exiting thread")
 
