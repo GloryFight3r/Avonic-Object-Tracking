@@ -62,7 +62,10 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         current_box = self.get_center_box(boxes)
 
         # get the movement to this box
-        speed, angle = self.get_movement_to_box(current_box)
+        try:
+            speed, angle = self.get_movement_to_box(current_box)
+        except TypeError:
+            return
 
         # calculate the angle between the current position and the position to move to
         avg_angle = (angle[0]**2 + angle[1]**2)**0.5
