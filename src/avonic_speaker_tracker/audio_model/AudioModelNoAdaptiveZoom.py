@@ -41,7 +41,8 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
 
         direct = vector_angle(cam_vec)
 
-        direct_np = np.array([int(np.rad2deg(direct[0]))%360, int(np.rad2deg(direct[1]))%360, self.prev_dir[2]])
+        direct_np = np.array([int(np.rad2deg(direct[0]))%360, 
+                int(np.rad2deg(direct[1]))%360, self.prev_dir[2]])
 
         if direct_np[0]>180:
             direct_np[0] = direct_np[0]-360
