@@ -1,3 +1,9 @@
+import numpy as np
+from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
+from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 from flask import make_response, jsonify, request
 from avonic_speaker_tracker.updater import UpdateThread
 from web_app.integration import GeneralController, ModelCode
@@ -12,17 +18,23 @@ def start_thread_endpoint(integration: GeneralController):
             old_calibration = integration.thread.value
         integration.event.value = 1
         if integration.preset.value == ModelCode.PRESET:
-            model = integration.preset_model
+            model = PresetModel(integration.cam_api, integration.mic_api,
+                                    filename=integration.filepath + "presets.json")
         elif integration.preset.value == ModelCode.AUDIO:
-            model = integration.audio_model
+            model = AudioModel(integration.cam_api, integration.mic_api,
+                                    filename=integration.filepath + "calibration.json")
         elif integration.preset.value == ModelCode.AUDIONOZOOM:
-            model = integration.audio_no_zoom_model
+            model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api, 
+                                    filename = integration.filepath + "calibration.json")
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
-                integration.object_audio_model.nn = integration.nn
 
-            model = integration.object_audio_model
+            model = WaitObjectAudioModel(
+                integration.cam_api, integration.mic_api,
+                np.array([1920.0, 1080.0]),
+                5, integration.nn, integration.footage_thread,
+                filename=integration.filepath + "calibration.json")
 
         integration.thread = UpdateThread(integration.event,
                                           integration.cam_api, integration.mic_api,
