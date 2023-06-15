@@ -279,7 +279,7 @@ def test_zoom_out():
     cam_api = mock.Mock()
     mic_api = mock.Mock()
     calibration = mock.Mock()
-    mic_api.is_speaking = False
+    mic_api.is_speaking.return_value = False
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
     am = AudioModel(cam_api, mic_api)
@@ -296,7 +296,7 @@ def test_speak_delay():
     cam_api = mock.Mock()
     mic_api = mock.Mock()
     calibration = mock.Mock()
-    mic_api.is_speaking = True
+    mic_api.is_speaking.return_value = True
     calibration.mic_to_cam = -np.array([0.4,-1.5,3.7])
     calibration.mic_height = -0.65
     am = AudioModel(cam_api, mic_api)
@@ -306,7 +306,7 @@ def test_speak_delay():
     assert (am.prev_dir==np.array([-32,-16,4739])).all()
     cam_api.direct_zoom.assert_called_with(4739)
 
-    mic_api.is_speaking = False
+    mic_api.is_speaking.return_value = False
     am.set_speak_delay(100)
 
     am.point()
