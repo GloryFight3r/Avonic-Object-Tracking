@@ -44,7 +44,7 @@ class FootageThread(Thread):
         """
         #if self.box_frame is not None:
         #    return str(base64.b64encode(self.box_frame), 'ascii')
-        self.draw_bb()
+        #self.draw_bb()
         return str(base64.b64encode(self.buffer.raw[:self.buflen.value])
             , 'ascii')
 

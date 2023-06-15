@@ -7,6 +7,7 @@ from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.object_tracking_models.yolo_model import YOLOPredict
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_adapter import ResponseCode
 from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.utils.coordinate_translation\
     import translate_microphone_to_camera_vector
@@ -32,12 +33,12 @@ class HybridTracker(TrackingModel):
 
     @override
     def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
-        """ 
-        Overrides the point method from TrackingModel. This method uses both:with expression as target:
-            pass
+        """
+        Overrides the point method from TrackingModel.
+        This method uses both:with expression as target:pass
         object tracking and the audio speaker tracking in order to achieve
         better accuracy. It works in the following way
-        
+
         1. A speaker is talking
             Get speaker direction
             Transform to camera direction
@@ -49,9 +50,9 @@ class HybridTracker(TrackingModel):
 
         2. A speaker is not currently talking
             Get the last bounding box we were tracking on the last frame
-            
+
             Get the bounding boxes from the current frame
-            
+
             From all the bounding boxes from the current frame, pick the one that has the most pixel
             area in common with the last bounding box
 
@@ -65,7 +66,7 @@ class HybridTracker(TrackingModel):
 
             # Get the speaker direction
             mic_direction:np.ndarray | None = mic_api.get_direction()
-            
+
             # if the mic_direction is a str, then there is some problem with the microphone API
             if isinstance(mic_direction, str):
                 return
@@ -84,7 +85,10 @@ class HybridTracker(TrackingModel):
             cur_fov:np.ndarray = np.deg2rad(cam_api.calculate_fov())
 
             # transform the 3D vector to a pan and tilt numpy array
-            cur_angle:np.ndarray = vector_angle(cam_api.get_direction())
+            cam_res = cam_api.get_direction()
+            if isinstance(cam_res, ResponseCode):
+                return
+            cur_angle:np.ndarray = vector_angle(cam_res)
 
 
             print(cam_angles, cur_fov, cur_angle)
@@ -122,14 +126,14 @@ class HybridTracker(TrackingModel):
                 if speaker_box is None:
                     # no speakers on the screen, we make no adjustments
                     return
-                
+
                 # set this box as the last tracked box
                 self.last_tracked = speaker_box
                 self.cam_footage.focused_box = speaker_box
-                
+
                 # get the speed and rotation angle the camera should make
                 ret: tuple[np.ndarray, np.ndarray] = get_movement_to_box(speaker_box, cam_api, self.cam_footage)
-            
+
                 rotate_speed:np.ndarray = ret[0]
                 rotate_angle:np.ndarray = ret[1]
 
@@ -138,7 +142,7 @@ class HybridTracker(TrackingModel):
                                       rotate_angle[0], rotate_angle[1])
             else:
                 # otherwise turn the camera towards him
-                
+
                 # TODO possibly fix the speed
                 #print("ASDASDSA", cam_angles[0], cam_angles[1])
 
