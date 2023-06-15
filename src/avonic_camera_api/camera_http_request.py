@@ -29,6 +29,8 @@ class CameraHTTP:
         try:
             response = requests.get("http://" + self.address[0] + ":" + str(self.address[1]) + "/ajaxcom?szCmd=" + command)
 
+            print(response, response.status_code, response.json(), "AS")
+
             if response.status_code == 200:
                 return (ResponseCodeHTTP.OK, response.json())
             else:
