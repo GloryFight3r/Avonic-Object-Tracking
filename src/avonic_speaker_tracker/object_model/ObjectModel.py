@@ -100,3 +100,6 @@ class ObjectModel():
 
     def calculate_speed(self, rotate_angle: np.ndarray):
         return [20, 20]
+
+    def track_object(self):
+        pass

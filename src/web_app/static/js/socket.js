@@ -5,11 +5,16 @@ socket.on("my response", (args) => {
 });
 
 socket.on("microphone-update", async (args) => {
-    onDirectionGet(args).then()
-    onSpeaking(args).then()
-});
+    if (onDirectionGet in window) {
+        onDirectionGet(args).then()
+        onSpeaking(args).then()
+    }
+})
 
 socket.on("camera-update", async (args) => {
+    if (!(hideOff in window)) {
+        return
+    }
     switch (args["camera-video"]) {
         case "on":
             hideOn();
@@ -25,14 +30,23 @@ socket.on("camera-update", async (args) => {
 });
 
 socket.on("new-camera-zoom", async (args) => {
+    if (!(onZoomGet in window)){
+        return
+    }
     await onZoomGet(args)
 });
 
 socket.on("footage-update", async (args) => {
+    if (!(onFootageGet in window)){
+        return
+    }
     onFootageGet(args).then()
 })
 
 socket.on("calibration-update", async (args) => {
+    if (!(onCameraCoordsGet in window)){
+        return
+    }
     await onCameraCoordsGet(args)
 })
 
@@ -43,5 +57,8 @@ socket.on("no-settings", () => openSettings())
 socket.on("yes-settings", () => {
     document.getElementById("settings-save-button").ariaBusy = "false"
     closeSettings()
-    refreshPresetList().then()
+    if (!(requestPresetList in window)) {
+        return
+    }
+    requestPresetList().then()
 })

@@ -52,7 +52,7 @@ class UpdateThread(Thread):
             object_tracking = self.model.point()
             #object_tracking = True
             if isinstance(self.model, ObjectModel):
-                if object_tracking and object_tracking_counter % 40 == 0:
+                if object_tracking and object_tracking_counter % 100 == 0:
                     self.model.track_object()
 
 
