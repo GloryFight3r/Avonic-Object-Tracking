@@ -62,7 +62,7 @@ class GeneralController:
         self.preset_model = None
 
         # Video related fields
-        self.footage_thread = None
+        self.footage_thread: FootageThread | None = None
         self.video = None
 
         # Info-threads
@@ -223,6 +223,7 @@ class GeneralController:
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
         self.thread = None
+        self.footage_thread = FootageThread(None, None)
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -232,6 +233,7 @@ class GeneralController:
         self.ws = new_controller.ws
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
+        self.footage_thread = new_controller.footage_thread
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api

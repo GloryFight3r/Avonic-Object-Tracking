@@ -39,13 +39,24 @@ footage_img.addEventListener("click", function(event) {
     width_percentage = Math.min(1, x / width);
     height_percentage = Math.min(1, y / height);
 
+    var form = document.createElement("form");
+    form.setAttribute("method", "post");
+    form.setAttribute("action", "/navigate/camera");
+
+    var x_input = document.createElement("input");
+    x_input.setAttribute("name", "x-pos")
+    x_input.setAttribute("value", width_percentage);
+
+    var y_input = document.createElement("input");
+    y_input.setAttribute("name", "y-pos")
+    y_input.setAttribute("value", height_percentage);
+
+    form.append(x_input)
+    form.append(y_input)
+
     // send a request to navigate the camera to that position
-    fetch("/navigate/camera", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        "x-pos": width_percentage, "y-pos": height_percentage
-      })
-    }).then(function(res) {
+    fetch(form.action, body = { method: form.method, body: new FormData(form) })
+    .then(function(res) {
       if (res.status !== 200) {
           console.log("Error with navigation")
       } 

@@ -147,14 +147,31 @@ def address_set_camera_endpoint(integration: GeneralController):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
 
 def navigate_camera(integration: GeneralController):
-    x = float(request.get_json()["x-pos"])
-    y = float(request.get_json()["y-pos"])
-    #print(x, y)
+    """ Navigates the camera so that the pixel on which the user has clicked is now in the center
+
+    Args:
+        integration: GeneralController containing all the dependencies 
+
+    Returns:
+        Success if camera has successfully moved
+        Otherwise return debug error code
+    """
+    # x and y location on the web-page: they are both in the range 0-1
+    x = float(request.form["x-pos"])
+    y = float(request.form["y-pos"])
+    
+    # multiply by the resolution to find out which pixel on the screen they correspond to
     x *= integration.footage_thread.resolution[0]
     y *= integration.footage_thread.resolution[1]
-    #print(x, y)
-    camera_speed, camera_rotation = get_movement_to_box(np.array([x, y, x, y]), integration.cam_api, integration.footage_thread)
-
-    integration.cam_api.move_relative(int(camera_speed[0]), int(camera_speed[1]),\
+    
+    # calculate the camera_speed and camera_rotation we need to make to center the camera on that pixel
+    try:
+        camera_speed, camera_rotation = get_movement_to_box(np.array([x, y, x, y]), integration.cam_api, integration.footage_thread)
+    except AssertionError as e:
+        return make_response(jsonify({"message": str(e)}), 400)
+    
+    # relatively move the camera 
+    ret = integration.cam_api.move_relative(int(camera_speed[0]), int(camera_speed[1]),\
                                       camera_rotation[0], camera_rotation[1])
-    return success()
+
+    return make_response(responses()[ret])
