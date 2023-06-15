@@ -195,15 +195,15 @@ def create_app(test_controller=None):
     def preset_tracker():
         return web_app.tracking_endpoints.track_presets(integration)
 
-    @app.get('/calibration/add_directions_to_speaker')
+    @app.post('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
 
-    @app.get('/calibration/add_direction_to_mic')
+    @app.post('/calibration/add_direction_to_mic')
     def add_calibration_mic():
         return web_app.calibration_endpoints.add_calibration_to_mic(integration)
 
-    @app.get('/calibration/reset')
+    @app.post('/calibration/reset')
     def reset_calibration():
         return web_app.calibration_endpoints.reset_calibration(integration)
 
@@ -218,6 +218,10 @@ def create_app(test_controller=None):
     @app.get('/calibration/track')
     def continuous_tracker():
         return web_app.tracking_endpoints.track_continuously(integration)
+
+    @app.get('/calibration/number-of-calibrated')
+    def number_of_calibrated():
+        return web_app.calibration_endpoints.get_number_of_speaker_points(integration)
 
 
     # THIS IS FOR DEMO PURPOSES ONLY
