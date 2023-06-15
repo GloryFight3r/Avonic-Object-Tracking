@@ -13,7 +13,6 @@ class FootageThread(Thread):
     pixel:np.ndarray | None = None
     focused_box:np.ndarray | None = None
     resolution:np.ndarray | None = None 
-    #resolution = np.array([1280.0, 720.0])
 
     def __init__(self, camera, event, resolution: np.ndarray):
         super().__init__()

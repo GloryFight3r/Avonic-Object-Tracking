@@ -48,6 +48,9 @@ class UpdateThread(Thread):
         prev_dir = [0.0, 0.0]
         speak_delay = 0
 
+
+        print(self.model_index, self.all_models)
+
         self.model_in_use = self.all_models[self.model_index]
         self.model_in_use.reload()
 

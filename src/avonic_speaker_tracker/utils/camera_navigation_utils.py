@@ -18,6 +18,9 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
         tuple of numpy arrays which represent (camera_speed, camera_angles)
     """
 
+    print(current_box, "CUR_BOX")
+    print(cam_footage.resolution, "RES")
+
     assert 0 <= current_box[0] <= cam_footage.resolution[0]
     assert 0 <= current_box[2] <= cam_footage.resolution[0]
 
@@ -26,7 +29,7 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
 
     box_width = current_box[2] - current_box[0]
 
-    box_height = current_box[1] - current_box[3]
+    box_height = current_box[3] - current_box[1]
 
     assert 0 <= box_width <= cam_footage.resolution[0]
     assert 0 <= box_height <= cam_footage.resolution[1]
@@ -34,9 +37,9 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
     # current_box is in the format [left top right bottom] and want to use the format
     # [left bottom width height] so we change it
     bbox:np.ndarray = np.array([current_box[0],\
-                     current_box[3],\
+                     current_box[1],\
                      current_box[2] - current_box[0],\
-                     current_box[1] - current_box[3]
+                     current_box[3] - current_box[1]
     ])
 
     # calculate the middle of the box in the format [x, y]
@@ -49,10 +52,10 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
     screen_middles:np.ndarray = cam_footage.resolution / 2.0
 
     # find the distance from the screen middle to the box middle
-    distance_to_middle:np.ndarray = screen_middles - box_middles
+    distance_to_middle:np.ndarray = box_middles - screen_middles# - box_middles
 
     # flip the sign of the x axis distance
-    distance_to_middle[0] = -distance_to_middle[0]
+    distance_to_middle[1] = -distance_to_middle[1]
 
     # calculate current FoV of the camera
     cam_fov:np.ndarray = cam_api.calculate_fov()

@@ -81,11 +81,13 @@ class HybridTracker(TrackingModel):
 
             # calculate the current FoV so that we can determine if the camera direction
             # we should look to is current visible on the screen
-            cur_fov:np.ndarray = cam_api.calculate_fov() / 180.0 * math.pi
+            cur_fov:np.ndarray = np.deg2rad(cam_api.calculate_fov())
 
             # transform the 3D vector to a pan and tilt numpy array
-            cur_angle:np.ndarray = vector_angle(cam_api.latest_direction)
+            cur_angle:np.ndarray = vector_angle(cam_api.get_direction())
 
+
+            print(cam_angles, cur_fov, cur_angle)
 
             # if the point that the camera has to turn to is on the screen, we need to choose
             # the bounding box of the most likely speaker
@@ -138,7 +140,10 @@ class HybridTracker(TrackingModel):
                 # otherwise turn the camera towards him
                 
                 # TODO possibly fix the speed
-                cam_api.move_absolute(20, 20, cam_angles[0], cam_angles[1])
+                #print("ASDASDSA", cam_angles[0], cam_angles[1])
+
+                rotate_angle:np.ndarray = np.rad2deg(cam_angles)
+                cam_api.move_absolute(20, 20, rotate_angle[0], rotate_angle[1])
 
         else:
             if self.last_tracked.size == 0:

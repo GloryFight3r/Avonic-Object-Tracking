@@ -25,6 +25,9 @@ class YOLOPredict:
         result = results[0]
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
+        bboxes = bboxes.clip(min=0)
+
+        print(bboxes)
 
         return bboxes
 

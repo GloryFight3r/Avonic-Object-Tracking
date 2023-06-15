@@ -9,7 +9,7 @@ TILT_STEP = 121/(1296+443)
 
 class CameraAPI:
     latest_direction = None
-    latest_fov = np.array([60.38, 35.80])
+    latest_fov = 0
 
     MIN_FOV = np.array([3.72, 2.14])
     MAX_FOV = np.array([60.38, 35.80])
@@ -214,9 +214,7 @@ class CameraAPI:
         print(str(ret))
 
         if not valid.match(str(ret)):
-            print("NE")
             return self.latest_direction
-        print("AS")
 
         ret_msg = str(ret)[2:-1]  # remove b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
@@ -248,6 +246,8 @@ class CameraAPI:
 
         if isinstance(current_zoom, ResponseCode):
             return current_zoom
+
+        print(current_zoom, "ZOOOOOOOM")
 
         assert 0 <= current_zoom <= 16384
         

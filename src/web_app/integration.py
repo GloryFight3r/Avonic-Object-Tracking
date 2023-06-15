@@ -152,14 +152,7 @@ class GeneralController:
             self.filepath = ""
         # Initialize footage thread
 
-        self.nn:YOLOPredict = YOLOPredict()
-        # Initialize models
-        self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
-        self.preset_model = PresetModel(filename=self.filepath + "presets.json")
-        self.hybrid_model = HybridTracker(\
-        filename=self.filepath + "calibration.json", bbox=self.nn, cam_footage=self.footage_thread)
 
-        self.all_models = [self.audio_model, self.preset_model, self.hybrid_model]
 
         # Initialize footage thread
         if cam_addr is not None:
@@ -168,10 +161,17 @@ class GeneralController:
             self.footage_thread = FootageThread(self.video,
                                                 self.footage_thread_event, self.resolution)  # pragma: no mutate
 
-            self.footage_thread.resolution = self.resolution
-            
             self.footage_thread.start()  # pragma: no mutate
 
+
+        self.nn:YOLOPredict = YOLOPredict()
+        # Initialize models
+        self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
+        self.preset_model = PresetModel(filename=self.filepath + "presets.json")
+        self.hybrid_model = HybridTracker(\
+        filename=self.filepath + "calibration.json", bbox=self.nn, cam_footage=self.footage_thread)
+
+        self.all_models = [self.audio_model, self.preset_model, self.hybrid_model]
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
