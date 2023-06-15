@@ -14,6 +14,10 @@ class CompressedFormat(Enum):
     H264 = 1
     H265 = 2
 
+class ImageSize(Enum):
+    P1920_1080 = 0
+    P1280_720 = 1
+
 class CameraAPI:
     latest_direction:np.ndarray | None = None
 
@@ -246,6 +250,21 @@ class CameraAPI:
             self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
         else:
             raise AssertionError("No such compression exists")
+
+    def set_image_size(self, selected: ImageSize):
+        if (selected == ImageSize.P1280_720):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}')
+        elif (selected == ImageSize.P1920_1080):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}')
+    
+    def set_frame_rate(self, selected: int):
+        assert 5 <= selected <= 60
+        self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":%d},"nChannel":0}]}}' % (selected))
+
+    def set_l_frame_rate(self, selected: int):
+        assert 1 <= selected <= 300
+        self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":%d},"nChannel":0}]}}' % (selected))
+
 
 def degrees_to_command(degree: float, step_size: float) -> str:
     """ Transforms an angle in degree to a command code for VISCA call

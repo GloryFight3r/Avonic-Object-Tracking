@@ -14,7 +14,7 @@ except ImportError:
     from yaml import Loader, Dumper
 import cv2
 import numpy as np
-from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, converter, ResponseCode
+from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -121,6 +121,15 @@ class GeneralController:
 
                 # set codec to MJPEG
                 self.cam_api.set_camera_codec(CompressedFormat.MJPEG)
+
+                # set resolution
+                self.cam_api.set_image_size(ImageSize.P1280_720)
+
+                # set frame rate
+                self.cam_api.set_frame_rate(30)
+                
+                #set frame interval
+                self.cam_api.set_l_frame_rate(60)
 
         # Setup microphone API
         mic_addr = None
