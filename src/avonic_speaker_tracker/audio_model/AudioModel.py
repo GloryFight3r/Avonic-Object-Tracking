@@ -28,9 +28,13 @@ class AudioModel(TrackingModel):
 
             Returns: the vector in which direction the camera should point and zoom value.
         """
-        if self.speak_delay == 100:
+        if self.mic_api.is_speaking():
+            self.speak_delay = 0
+        elif self.speak_delay < 100:
+            self.speak_delay += 1
+        elif self.speak_delay == 100:
             self.cam_api.direct_zoom(0)
-            self.prev_dir[2]=0
+            self.prev_dir[2] = 0
             return self.prev_dir
 
         mic_direction = self.mic_api.get_direction()
