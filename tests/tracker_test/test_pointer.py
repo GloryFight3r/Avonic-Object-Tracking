@@ -119,6 +119,20 @@ def test_continuous_pointer_without_adaptive_zooming():
     assert(dir1 == np.array([-13,4,1])).all()
     assert(dir2 == np.array([-2,6,1])).all()
 
+def test_cont_tracker_no_zoom():
+    cam_api = mock.Mock()
+    mic_api = mock.Mock()
+    mic_api.get_direction.return_value = np.array([1.0,54.0,5.0])
+    mic_api.latest_direction = np.array([1.0,54.0,5.0])
+    mic_api.is_speaking.return_value = True 
+    am = AudioModelNoAdaptiveZoom()
+    calibration = mock.Mock()
+    calibration.mic_to_cam = -np.array([0.0,0.0,1.0])
+    calibration.mic_height = -0.65 
+    am.calibration = calibration 
+    am.point(cam_api,mic_api)
+    cam_api.move_absolute.assert_called_with(13,15,0,31)
+
 def test_zoom():
     cam_api = mock.Mock()
     mic_api = mock.Mock()
