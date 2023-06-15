@@ -1,18 +1,17 @@
-import numpy as np
 import math
 import cv2
+import numpy as np
 
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_camera_api.camera_control_api import CameraAPI
-
 from avonic_speaker_tracker.utils.coordinate_translation \
     import translate_microphone_to_camera_vector
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from avonic_speaker_tracker.audio_model.calibration import Calibration
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_camera_api.converter import vector_angle
 from avonic_camera_api.footage import FootageThread
+from avonic_camera_api.camera_control_api import CameraAPI
 
 class WaitObjectAudioModel(ObjectModel, AudioModel):
     """ This class extends CalibrationTracker. It uses the strategy of waiting till

@@ -1,10 +1,8 @@
-import math
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.footage import FootageThread
 from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
 class ObjectModel():

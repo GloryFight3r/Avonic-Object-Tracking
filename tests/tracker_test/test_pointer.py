@@ -43,10 +43,10 @@ def test_preset_prev_dir():
     pm = PresetModel(cam_api, mic_api)
     pm.preset_locations.add_preset("preset", np.array([4, 7, 5000]), np.array([1, 2, 3]))
     pm.preset_locations.add_preset("preset1", np.array([1, 5, 4000]), np.array([6, 8, 9]))
-    dir0 = pm.point()
+    pm.point()
     cam_api.move_absolute.assert_called_with(24, 20, -131, 41)
     cam_api.direct_zoom.assert_called_with(5000)
-    dir1 = pm.point()
+    pm.point()
     cam_api.direct_zoom.assert_called_with(5000)
     assert cam_api.move_absolute.call_count == 1
 
@@ -115,7 +115,6 @@ def test_zoom():
 
 def test_preset_more():
     cam_api = mock.Mock()
-    cam3_api = mock.Mock()
     mic_api = mock.Mock()
     mic_api.get_direction.return_value = np.array([1, 2, 3])
     mic_api.latest_direction = np.array([1, 2, 3])
@@ -176,7 +175,7 @@ def test_various_speed_X_axis_audio():
     am.calibration = calibration
     mic_api.latest_direction = np.array([0.0,0.7,-10.0])
     mic_api.get_direction.return_value = np.array([0.0,0.7,-10.0])
-    dir1 = am.point()
+    am.point()
     cam_api.move_absolute.assert_called_with(24, 11, 180, 1)
     cam_api.direct_zoom.assert_called_with(12939)
     am.prev_dir = np.array([60,0,0])
@@ -194,7 +193,7 @@ def test_various_speed_Y_axis_audio():
     am.calibration = calibration
     mic_api.latest_direction = np.array([1.0,-3.7,-0.3])
     mic_api.get_direction.return_value = np.array([1.0,-3.7,-0.3])
-    dir1 = am.point()
+    am.point()
     cam_api.move_absolute.assert_called_with(13, 20, 7, 6)
 
     am.prev_dir = np.array([0,40,0])

@@ -1,5 +1,5 @@
-import numpy as np
 import math
+import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.converter import vector_angle

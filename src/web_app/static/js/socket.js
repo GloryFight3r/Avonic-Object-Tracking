@@ -5,14 +5,14 @@ socket.on("my response", (args) => {
 });
 
 socket.on("microphone-update", async (args) => {
-    if (onDirectionGet in window) {
+    if (onDirectionGet !== undefined) {
         onDirectionGet(args).then()
         onSpeaking(args).then()
     }
 })
 
 socket.on("camera-update", async (args) => {
-    if (!(hideOff in window)) {
+    if (hideOff === undefined) {
         return
     }
     switch (args["camera-video"]) {
@@ -30,21 +30,21 @@ socket.on("camera-update", async (args) => {
 });
 
 socket.on("new-camera-zoom", async (args) => {
-    if (!(onZoomGet in window)){
+    if (!(onZoomGet === undefined)){
         return
     }
     await onZoomGet(args)
 });
 
 socket.on("footage-update", async (args) => {
-    if (!(onFootageGet in window)){
+    if (!(onFootageGet === undefined)){
         return
     }
     onFootageGet(args).then()
 })
 
 socket.on("calibration-update", async (args) => {
-    if (!(onCameraCoordsGet in window)){
+    if (!(onCameraCoordsGet === undefined)){
         return
     }
     await onCameraCoordsGet(args)
@@ -57,7 +57,7 @@ socket.on("no-settings", () => openSettings())
 socket.on("yes-settings", () => {
     document.getElementById("settings-save-button").ariaBusy = "false"
     closeSettings()
-    if (!(requestPresetList in window)) {
+    if (!(requestPresetList === undefined)) {
         return
     }
     requestPresetList().then()

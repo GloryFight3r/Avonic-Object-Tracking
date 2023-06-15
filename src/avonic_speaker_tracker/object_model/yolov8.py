@@ -14,7 +14,6 @@ class YOLOPredict:
         results = self.model.predict(frame, classes=0, device="cpu")
         result = results[0]
 
-        conf_indices = set(torch.nonzero(result.boxes.conf.cpu() > self.conf_level))
         person_indices = set(torch.nonzero(result.boxes.cls.cpu() == 0))
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
