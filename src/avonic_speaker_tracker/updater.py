@@ -5,6 +5,7 @@ from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 
 class UpdateThread(Thread):
@@ -39,8 +40,10 @@ class UpdateThread(Thread):
         speak_delay: int = 0
         if self.preset_or_tracking == 0:
             self.model_in_use = AudioModel(filename=self.filepath + "calibration.json")
-        else:
+        elif self.preset_or_tracking == 1:
             self.model_in_use = PresetModel(filename=self.filepath + "presets.json")
+        elif self.preset_or_tracking == 4:
+            self.model_in_use = AudioModelNoAdaptiveZoom(filename=self.filepath + "calibration.json")
 
         while self.event.value != 0:
             print("RUNNING UPDATE THREAD")

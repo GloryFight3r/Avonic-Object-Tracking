@@ -2,6 +2,7 @@ from unittest import mock
 import numpy as np
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 
 
 def test_preset_pointer_good_weather():
@@ -84,6 +85,40 @@ def test_continuous_pointer():
     assert(dir1 == np.array([-8,3,3526])).all()
     assert(dir2 == np.array([-1,6,2065])).all()
 
+def test_continuous_pointer_without_adaptive_zooming():
+    cam_api = mock.Mock()
+    mic_api = mock.Mock()
+
+    mic_api.get_direction.return_value = np.array([1, 2, 3])
+    mic_api.latest_direction = np.array([1, 2, 3])
+    mic_api.is_speaking.return_value = True
+
+    mic2_api = mock.Mock()
+    mic2_api.get_direction.return_value = np.array([7, 80, 12])
+    mic2_api.latest_direction = np.array([7, 80, 12])
+    mic2_api.is_speaking.return_value = True
+
+    am = AudioModelNoAdaptiveZoom()
+    calibration = mock.Mock()
+    calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
+    calibration.mic_height = -0.65
+    am.calibration = calibration
+
+    mic_api.get_direction.return_value = "some error"
+    dir0 = am.point(cam_api, mic_api)
+    assert (dir0 == am.prev_dir).all()
+    assert (dir0 == np.array([0, 0, 1])).all()
+    mic_api.get_direction.return_value = np.array([3, 4, 5])
+
+    dir1 = am.point(cam_api, mic_api)
+    am.point(cam_api, mic_api)
+    assert cam_api.move_absolute.call_count == 1
+    cam_api.direct_zoom.call_count == 0   
+    dir2 = am.point(cam_api, mic2_api)
+    cam_api.direct_zoom.call_count == 0   
+    assert(dir1 == np.array([-13,4,1])).all()
+    assert(dir2 == np.array([-2,6,1])).all()
+
 def test_zoom():
     cam_api = mock.Mock()
     mic_api = mock.Mock()
@@ -159,16 +194,24 @@ def test_various_speed_X_axis_audio():
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
     am = AudioModel()
+    am1 = AudioModelNoAdaptiveZoom()
     am.prev_dir = np.array([-80,0,0])
+    am1.prev_dir = np.array([-80,0,0])
     am.calibration = calibration
+    am1.calibration = calibration
     mic_api.latest_direction = np.array([0.0,0.7,-10.0])
     mic_api.get_direction.return_value = np.array([0.0,0.7,-10.0])
     dir1 = am.point(cam_api,mic_api)
     cam_api.move_absolute.assert_called_with(24, 11, 180, 1)  
     cam_api.direct_zoom.assert_called_with(12939)
     am.prev_dir = np.array([60,0,0])
+    am1.prev_dir = np.array([60,0,0])
     am.point(cam_api,mic_api)
-    cam_api.move_absolute.assert_called_with(20, 11, 180, 1)  
+    cam_api.move_absolute.assert_called_with(20, 11, 180, 1) 
+    mic_api.latest_direction = np.array([0.0,1.8,-10.0])
+    mic_api.get_direction.return_value = np.array([0.0,1.8,-10.0])
+    am1.point(cam_api,mic_api)
+    cam_api.move_absolute.assert_called_with(20, 11, 180, 3) 
 
 def test_various_speed_Y_axis_audio():
     cam_api = mock.Mock()
@@ -177,8 +220,11 @@ def test_various_speed_Y_axis_audio():
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
     calibration.mic_height = -0.65
     am = AudioModel()
+    am1 = AudioModelNoAdaptiveZoom()
     am.prev_dir = np.array([0,88,0])
+    am1.prev_dir = np.array([0,88,0])
     am.calibration = calibration
+    am1.calibration = calibration
     mic_api.latest_direction = np.array([1.0,-3.7,-0.3])
     mic_api.get_direction.return_value = np.array([1.0,-3.7,-0.3])
     dir1 = am.point(cam_api,mic_api)
@@ -187,6 +233,16 @@ def test_various_speed_Y_axis_audio():
     am.prev_dir = np.array([0,40,0])
     am.point(cam_api,mic_api)
     cam_api.move_absolute.assert_called_with(13, 16, 7, 6)
+
+    mic_api.latest_direction = np.array([1.0,-4.7,-0.3])
+    mic_api.get_direction.return_value = np.array([1.0,-4.7,-0.3])
+    am1.point(cam_api,mic_api)
+    cam_api.move_absolute.assert_called_with(13, 20, 6, 6)
+
+    am1.prev_dir = np.array([0,40,0])
+    am1.point(cam_api,mic_api)
+    cam_api.move_absolute.assert_called_with(13, 16, 6, 6)
+
 
 def test_zoom_out():
     cam_api = mock.Mock()
