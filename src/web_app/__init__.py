@@ -224,6 +224,9 @@ def create_app(test_controller=None):
         print("CONTINUOUS TRACKER WITHOUT ADAPTIVE ZOOMING")
         return web_app.tracking_endpoints.track_continuously_without_adaptive_zooming(integration)
 
+    @app.post('/navigate/camera')
+    def navigate_camera():
+        return web_app.camera_endpoints.navigate_camera(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
@@ -284,7 +287,6 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
-
     # Info-thread section
 
     @app.post('/info-thread/start')

@@ -8,6 +8,9 @@ TILT_STEP = 121/(1296+443)
 
 class CameraAPI:
     latest_direction = None
+    MIN_FOV = np.array([3.72, 2.14])
+    MAX_FOV = np.array([60.38, 35.80])
+    MAX_ZOOM_VALUE = 16384
 
     def __init__(self, camera: CameraSocket):
         """ Constructor for cameraAPI
@@ -221,6 +224,24 @@ class CameraAPI:
         self.latest_direction = direction
         return direction
 
+    def calculate_fov(self) -> ResponseCode | int:
+        """ Calculate the current FoV based on the current zoom
+
+            Returns: 
+                array with the two FoVs [horizontal, vertical]
+            
+        """
+        current_zoom = self.get_zoom()
+
+        print(current_zoom)
+        if isinstance(current_zoom, ResponseCode):
+            return current_zoom
+
+        assert 0 <= current_zoom <= 16384
+        current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
+            * current_zoom / self.MAX_ZOOM_VALUE)
+        return current_fov
+
 def degrees_to_command(degree: float, step_size: float) -> str:
     """ Transforms an angle in degree to a command code for VISCA call
 
@@ -244,7 +265,6 @@ def degrees_to_command(degree: float, step_size: float) -> str:
         answer_string += '0' + t
 
     return answer_string
-
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.

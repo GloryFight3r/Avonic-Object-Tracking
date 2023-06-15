@@ -16,7 +16,6 @@ def test_general_controller_constructor():
     assert subject.ws is None
     assert subject.audio_model is None
     assert subject.preset_model is None
-    assert subject.camera_footage is None
     assert subject.video is None
     assert subject.thread_mic is None
     assert subject.thread_cam is None

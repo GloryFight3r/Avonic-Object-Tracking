@@ -41,8 +41,6 @@ class GeneralController:
 
         # Update thread field
         self.thread = None
-        # Footage thread field
-        self.footage_thread = None
 
         # URL of the server
         self.url = '127.0.0.1:5000'
@@ -64,7 +62,7 @@ class GeneralController:
         self.preset_model = None
 
         # Video related fields
-        self.camera_footage = None
+        self.footage_thread: FootageThread | None = None
         self.video = None
 
         # Info-threads
@@ -225,6 +223,7 @@ class GeneralController:
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
         self.thread = None
+        self.footage_thread = FootageThread(None, None)
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -234,6 +233,7 @@ class GeneralController:
         self.ws = new_controller.ws
         self.audio_model = AudioModel()
         self.preset_model = PresetModel()
+        self.footage_thread = new_controller.footage_thread
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api
