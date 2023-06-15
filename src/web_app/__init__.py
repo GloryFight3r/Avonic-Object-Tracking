@@ -227,6 +227,9 @@ def create_app(test_controller=None):
     def number_of_calibrated():
         return web_app.calibration_endpoints.get_number_of_speaker_points(integration)
 
+    @app.post('/navigate/camera')
+    def navigate_camera():
+        return web_app.camera_endpoints.navigate_camera(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
@@ -291,7 +294,6 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
-
 
     # Info-thread section
 

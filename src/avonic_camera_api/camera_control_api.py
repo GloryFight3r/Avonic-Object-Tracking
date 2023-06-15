@@ -224,12 +224,22 @@ class CameraAPI:
         self.latest_direction = direction
         return direction
 
-    def calculate_fov(self):
+    def calculate_fov(self) -> ResponseCode | int:
+        """ Calculate the current FoV based on the current zoom
+
+            Returns:
+                array with the two FoVs [horizontal, vertical]
+
+        """
         current_zoom = self.get_zoom()
 
+        print(current_zoom)
+        if isinstance(current_zoom, ResponseCode):
+            return current_zoom
+
+        assert 0 <= current_zoom <= 16384
         current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
             * current_zoom / self.MAX_ZOOM_VALUE)
-
         return current_fov
 
 def degrees_to_command(degree: float, step_size: float) -> str:

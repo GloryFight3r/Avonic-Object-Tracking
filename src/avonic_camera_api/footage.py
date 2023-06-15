@@ -1,12 +1,13 @@
 from threading import Thread
 from multiprocessing import Value, Array
 import base64
-import cv2  # type: ignore
+import cv2 # type: ignore
+import numpy as np
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
-    box_frame = None
+    resolution = np.array([1920.0, 1080.0])
 
     def __init__(self, camera, event):
         super().__init__()
