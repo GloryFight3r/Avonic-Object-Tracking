@@ -50,9 +50,8 @@ class UpdateThread(Thread):
                 speak_delay = speak_delay + 1
             self.model.set_speak_delay(speak_delay)
             object_tracking = self.model.point()
-            #object_tracking = True
             if isinstance(self.model, ObjectModel):
-                if object_tracking and object_tracking_counter % 100 == 0:
+                if object_tracking and object_tracking_counter % 40 == 0:
                     self.model.track_object()
 
 

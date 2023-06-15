@@ -55,6 +55,8 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         # get the bounding box to center on
         boxes = self.nn.get_bounding_boxes(frame)
+        if len(boxes) == 0:
+            return
         current_box = self.get_center_box(boxes)
 
         # get the movement to this box
@@ -66,6 +68,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         # only move if this angle is smaller than the threshold
         # the *3 can be adapted to optimize object tracking
         if abs(avg_angle) <= self.threshold*3:
+            print("MOVE OBJECT TRACKING")
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
 
@@ -130,7 +133,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
                     self.cam_api.move_absolute(speedX, speedY, direct[0], direct[1])
                 except AssertionError as e:
                     print(e)
-        elif self.time_without_movement == self.wait:
+        elif self.time_without_movement >= self.wait:
             start_object_tracking = True
         self.time_without_movement += 1
 
