@@ -7,13 +7,6 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 
 class UpdateThread(Thread):
-    event: Value = None
-    value: int = None  
-    cam_api: CameraAPI = None    
-    mic_api: MicrophoneAPI = None    
-    model_index: int = None    
-    model_in_use: TrackingModel = None
-    all_models: list[TrackingModel] = None
 
     def __init__(self, event: Value,
                  cam_api: CameraAPI, mic_api: MicrophoneAPI, model_index: Value, all_models: list[TrackingModel],
@@ -61,11 +54,11 @@ class UpdateThread(Thread):
                 speak_delay = 0
             else:
                 speak_delay = speak_delay + 1
-            self.model_in_use.set_speak_delay(speak_delay)
+            #self.model_in_use.set_speak_delay(speak_delay)
             direct = self.model_in_use.point(self.cam_api, self.mic_api)
 
             print(direct)
 
             self.value += 1
-            sleep(1)
+            sleep(2)
         print("Exiting thread")

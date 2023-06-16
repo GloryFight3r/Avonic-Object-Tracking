@@ -66,7 +66,8 @@ class GeneralController:
 
         # Filepath for calibration and presets files
         self.filepath: str = ""
-        self.resolution = np.array([1920.0, 1080.0])
+        #self.resolution = np.array([1920.0, 1080.0])
+        self.resolution = np.array([1280.0, 720.0])
 
         # Models, to record all updates onto a disk
         self.audio_model = None

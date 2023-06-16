@@ -46,6 +46,7 @@ def get_movement_to_box(current_box: np.ndarray, cam_api:CameraAPI, cam_footage:
     box_middles:np.ndarray = (np.array([bbox[2], bbox[3]]) / 2)\
         + np.array([bbox[0], bbox[1]])
 
+    print(cam_footage.resolution)
     assert 0 <= box_middles[0] <= cam_footage.resolution[0] and 0 <= box_middles[1] <= cam_footage.resolution[1]
 
     # calculate the middle of the screen

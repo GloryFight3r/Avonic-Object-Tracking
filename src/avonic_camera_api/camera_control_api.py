@@ -170,6 +170,7 @@ class CameraAPI:
                                message, self.counter)
         if isinstance(ret, ResponseCode):
             return self.latest_fov
+        print(ret)
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         self.latest_fov = int(hex_res, 16)
         return self.latest_fov

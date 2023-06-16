@@ -1,6 +1,7 @@
 from typing_extensions import override
 import numpy as np
 import math
+import cv2
 
 from avonic_camera_api.footage import FootageThread
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
@@ -61,125 +62,145 @@ class HybridTracker(TrackingModel):
             mic_api: API of the microphone
             cam_api: API of the camera
         """
-        # get information about current speaker
-        if mic_api.is_speaking(): # he is currently speaking
+        print()
+        print()
+        print()
+        print()
+        try:
+            # get information about current speaker
+            if mic_api.is_speaking(): # he is currently speaking
+                print("GOVORQ")
+                # Get the speaker direction
+                mic_direction:np.ndarray | None = mic_api.get_direction()
 
-            # Get the speaker direction
-            mic_direction:np.ndarray | None = mic_api.get_direction()
-
-            # if the mic_direction is a str, then there is some problem with the microphone API
-            if isinstance(mic_direction, str):
-                return
-            
-            # translate the microphone direction to a camera direction using the calibration
-            # information
-            cam_vec:np.ndarray = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
-                                                        mic_direction,
-                                                        self.calibration.mic_height)
-
-            # transform the 3D vector to a pan and tilt numpy array
-            cam_angles:np.ndarray = np.array(vector_angle(cam_vec))
-
-            # calculate the current FoV so that we can determine if the camera direction
-            # we should look to is current visible on the screen
-            cur_fov:np.ndarray = np.deg2rad(cam_api.calculate_fov())
-
-            # transform the 3D vector to a pan and tilt numpy array
-            cam_res = cam_api.get_direction()
-            if isinstance(cam_res, ResponseCode):
-                return
-            cur_angle:np.ndarray = vector_angle(cam_res)
-
-
-            print(cam_angles, cur_fov, cur_angle)
-
-            # if the point that the camera has to turn to is on the screen, we need to choose
-            # the bounding box of the most likely speaker
-            if  cam_angles[0] - (cur_fov[0] / 2) <= cur_angle[0] <= cam_angles[0] + (cur_fov[0] / 2) \
-                and \
-                cam_angles[1] - (cur_fov[1] / 2) <= cur_angle[1] <= cam_angles[1] + (cur_fov[1] / 2):
-
-                # get all the bounding boxes from the current frame
-                all_boxes = self.bbox.get_bounding_boxes(self.cam_footage.frame)
-
+                # if the mic_direction is a str, then there is some problem with the microphone API
+                if isinstance(mic_direction, str):
+                    return
                 
-                self.cam_footage.set_bbxes(all_boxes)
+                # translate the microphone direction to a camera direction using the calibration
+                # information
+                cam_vec:np.ndarray = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
+                                                            mic_direction,
+                                                            self.calibration.mic_height)
 
-                # (cam_angles - (cur_angle - (cur_fov / 2)) / cur_fov)
+                # transform the 3D vector to a pan and tilt numpy array
+                cam_angles:np.ndarray = np.array(vector_angle(cam_vec))
 
-                # from the current angle subtract the camera angle minus half of the current FoV,
-                # so that we can get the distance from the left most angle we can see, to the 
-                # place we should be looking to
-                # after that we divide this by the current FoV, so we can get it as a ratio
-                # and finally multiply this ratio by the screen resolution, so we can find which
-                # pixel on the screen the camera direction corresponds to
-                pixels:np.ndarray = np.array((cam_angles - (cur_angle - (cur_fov / 2))) / cur_fov)
+                # calculate the current FoV so that we can determine if the camera direction
+                # we should look to is current visible on the screen
+                cur_fov:np.ndarray = np.deg2rad(cam_api.calculate_fov())
 
-                pixels[1] = 1 - pixels[1]
+                # transform the 3D vector to a pan and tilt numpy array
+                cam_res = cam_api.get_direction()
+                if isinstance(cam_res, ResponseCode):
+                    return
+                cur_angle:np.ndarray = vector_angle(cam_res)
 
-                pixels = np.array(pixels * self.cam_footage.resolution, dtype='int')
+                # if the point that the camera has to turn to is on the screen, we need to choose
+                # the bounding box of the most likely speaker
+                if  cam_angles[0] - (cur_fov[0] / 2) <= cur_angle[0] <= cam_angles[0] + (cur_fov[0] / 2) \
+                    and \
+                    cam_angles[1] - (cur_fov[1] / 2) <= cur_angle[1] <= cam_angles[1] + (cur_fov[1] / 2):
 
-                self.cam_footage.pixel = pixels
-                # find nearest box we should be tracking
-                speaker_box:np.ndarray | None = self.find_box(all_boxes, pixels)
+                    # get all the bounding boxes from the current frame
+                    all_boxes = self.bbox.get_bounding_boxes(self.safely_get_frame())
 
-                if speaker_box is None:
-                    # no speakers on the screen, we make no adjustments
+                    # only if we want to visualize
+                    #self.cam_footage.set_bbxes(all_boxes)
+
+                    # (cam_angles - (cur_angle - (cur_fov / 2)) / cur_fov)
+
+                    # from the current angle subtract the camera angle minus half of the current FoV,
+                    # so that we can get the distance from the left most angle we can see, to the 
+                    # place we should be looking to
+                    # after that we divide this by the current FoV, so we can get it as a ratio
+                    # and finally multiply this ratio by the screen resolution, so we can find which
+                    # pixel on the screen the camera direction corresponds to
+                    
+                    pixels:np.ndarray = np.array((cam_angles - (cur_angle - (cur_fov / 2))) / cur_fov)
+
+                    pixels[1] = 1 - pixels[1]
+
+                    pixels = np.array(pixels * self.cam_footage.resolution, dtype='int')
+
+                    #visualisation purposes
+                    #self.cam_footage.pixel = pixels
+
+                    # find nearest box we should be tracking
+                    speaker_box:np.ndarray | None = self.find_box(all_boxes, pixels)
+
+                    if speaker_box is None:
+                        # no speakers on the screen, we make no adjustments
+                        return
+
+                    # set this box as the last tracked box
+                    self.last_tracked = speaker_box
+                    self.cam_footage.focused_box = speaker_box
+
+                    # get the speed and rotation angle the camera should make
+                    ret: tuple[np.ndarray, np.ndarray] = get_movement_to_box(speaker_box, cam_api, self.cam_footage)
+
+                    rotate_speed:np.ndarray = ret[0]
+                    rotate_angle:np.ndarray = ret[1]
+
+                    # rotate the camera
+                    try:
+                        # rotation angle might not be possible
+                        cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
+                                          rotate_angle[0], rotate_angle[1])
+                    except AssertionError as e:
+                        print(e)
+                else:
+                    # otherwise turn the camera towards him
+
+                    # TODO possibly fix the speed
+                    #print("ASDASDSA", cam_angles[0], cam_angles[1])
+
+                    rotate_angle:np.ndarray = np.rad2deg(cam_angles)
+                    try:
+                        # rotate angle might not be possible for the camera(boundaries)
+                        cam_api.move_absolute(20, 20, rotate_angle[0], rotate_angle[1])
+                    except AssertionError as e:
+                        print(e)
+            else:
+                if self.last_tracked.size == 0:
+                    return
+                # if there is a person we have previously tracked, continue tracking him
+                
+                # get all the bounding boxes from the current frame
+                all_boxes = self.bbox.get_bounding_boxes(self.safely_get_frame())
+
+                #self.cam_footage.set_bbxes(all_boxes)
+                # find the box from all_boxes that has the most surface area in common
+                new_box:np.ndarray | None = self.find_next_box(self.last_tracked, all_boxes)
+
+                #self.cam_footage.focused_box = new_box
+
+                if new_box is None:
+                    self.last_tracked = np.array([0, 0, 0, 0])
                     return
 
-                # set this box as the last tracked box
-                self.last_tracked = speaker_box
-                self.cam_footage.focused_box = speaker_box
+                # set the last tracked box to new_box
+                self.last_tracked = new_box
 
-                # get the speed and rotation angle the camera should make
-                ret: tuple[np.ndarray, np.ndarray] = get_movement_to_box(speaker_box, cam_api, self.cam_footage)
-
+                # get the movement we have to make
+                ret:tuple[np.ndarray, np.ndarray] = get_movement_to_box(new_box, cam_api, self.cam_footage)
+                
                 rotate_speed:np.ndarray = ret[0]
                 rotate_angle:np.ndarray = ret[1]
 
-                # rotate the camera
+                # move the camera according to that rotation speed and angle
                 cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
-                                      rotate_angle[0], rotate_angle[1])
-            else:
-                # otherwise turn the camera towards him
-
-                # TODO possibly fix the speed
-                #print("ASDASDSA", cam_angles[0], cam_angles[1])
-
-                rotate_angle:np.ndarray = np.rad2deg(cam_angles)
-                cam_api.move_absolute(20, 20, rotate_angle[0], rotate_angle[1])
-
-        else:
-            if self.last_tracked.size == 0:
-                return
-            # if there is a person we have previously tracked, continue tracking him
-            
-            # get all the bounding boxes from the current frame
-            all_boxes = self.bbox.get_bounding_boxes(self.cam_footage.frame)
-
-            self.cam_footage.set_bbxes(all_boxes)
-
-            # find the box from all_boxes that has the most surface area in common
-            new_box:np.ndarray | None = self.find_next_box(self.last_tracked, all_boxes)
-
-            self.cam_footage.focused_box = new_box
-
-            if new_box is None:
-                self.last_tracked = np.array([])
-                return
-
-            # set the last tracked box to new_box
-            self.last_tracked = new_box
-
-            # get the movement we have to make
-            ret:tuple[np.ndarray, np.ndarray] = get_movement_to_box(new_box, cam_api, self.cam_footage)
-            
-            rotate_speed:np.ndarray = ret[0]
-            rotate_angle:np.ndarray = ret[1]
-
-            # move the camera according to that rotation speed and angle
-            cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
                                   rotate_angle[0], rotate_angle[1])
+        except Exception as e:
+            print(e)
+
+
+    def safely_get_frame(self):
+        im_arr = np.frombuffer(self.cam_footage.buffer.raw[:self.cam_footage.buflen.value], np.byte)
+        frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)
+        
+        return frame
 
             
     def find_next_box(self, current_box: np.ndarray, all_boxes: list[np.ndarray])-> np.ndarray | None:

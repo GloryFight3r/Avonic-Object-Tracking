@@ -8,11 +8,6 @@ import cv2 # type: ignore
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
-    box_frame = None
-    bbxes = np.array([])
-    pixel:np.ndarray | None = None
-    focused_box:np.ndarray | None = None
-    resolution:np.ndarray | None = None 
 
     def __init__(self, camera, event, resolution: np.ndarray):
         super().__init__()
@@ -21,8 +16,11 @@ class FootageThread(Thread):
         self.event = event
         self.show_bounding_boxes = False
         self.resolution = resolution
-        #self.resolution = np.array([1920, 1080])
-        #self.resolution = np.array([1280.0, 720.0])
+
+        self.box_frame = None
+        self.bbxes = np.array([])
+        self.pixel:np.ndarray | None = None
+        self.focused_box:np.ndarray | None = None
 
     def run(self):
         while not self.event.is_set():
