@@ -1,40 +1,38 @@
 The goal of this chapter is to give a clear idea of why the project was needed,
 who is impacted by the project and how it stands in relation to other projects.
-First, we look at the user story from the perspective of Avonic.
-Then we consider three cases of other companies that had solved
-a similar problem and explain how they relate to our own project, % add links to relevant parts
-before describing the stakeholders and assessing the ethical implications of our project.
+First, we look at user story.
+Secondly, we consider three cases of other companies that have solved
+a similar problem and explain how they relate to our own project. % add links to relevant parts
+Then we describe the stakeholders and assess the ethical implications of our project.
 Finally, we take a look at some potential bottlenecks we could have run into.
 
 
 \section{Problem statement}\label{sec:problem-statement}
-During our first meeting with a client, we have identified the problem statement as follows:
+During our first meeting with Mr. Kahawati from Avonic, we have identified the problem statement as follows:
 
-Avonic would like to make it easier to record educational sessions by creating a camera that follows the speaker as they
-move around in a room. For example, a camera could be in the back of a lecture hall, and a microphone could be in the front, close to the
-speaker. This is a common setup for universities. Since these devices
-use their own firmware, it is not an option to reprogram them. Therefore, using a Nvidia Jetson Nano or another single-board
-computer (SBC) for communication
-between the camera and the microphone is the preferred solution.
+Avonic would like to make it easier to record educational sessions by creating
+a camera that follows the speaker as they move around in a room. The way they want to do
+this is by using a camera at the back of the room that automatically tracks the speaker.
+Avonic has already tried to do this using just the visual information of the camera, but
+it turned out not to be enough to accurately track speakers in all cases:
+multiple people may look like the speaker by moving or opening their mouths,
+while only one person is actually speaking.
 
+To solve this problem, Avonic wants to try to use a microphone in addition
+to the camera to identify the speaker. A common setup would be to have
+the camera in the back of the room and the microphone in the front above the speaker(s).
+In order to explore this solution, Avonic has asked us to spend
+ten weeks working on a system that tracks a speaker using both a camera and a
+microphone. The camera we have to use is the Avonic CM70 model and the
+microphone is the Sennheiser TeamConnect Ceiling 2. We are not allowed to
+reprogram these devices. That is why a single-board computer, the Nvidia Jetson Nano,
+has to be used to communicate with the camera and microphone through application programming
+interfaces (APIs). Moreover, it should be easy for a user to start the system
+and it should not require any technical knowledge.
 
-Lectures are not the only activity such rooms are used for. There may also be meetings or conferences that need to use the available setup
-to record their event, so the camera also needs to be able to detect a speaker in these circumstances. In general, every room with a speaker
-and an audience has to be able to use the camera with the software we are going to create.
-
-
-Avonic previously tried to let the camera look at the speaker and track them using visual techniques like
-motion detection. Just visuals turned out not to be enough to accurately track speakers, since the visuals do not always show who is speaking: someone
-who is yawning may look like someone who is talking and someone who is speaking may not be facing the camera. This is why Avonic has asked us
-to use the camera in combination with the microphone to locate a speaker. The microphone that has to be used is the Sennheiser TeamConnect
-Ceiling 2\cite{team-connect-2}, which provides a direction from itself towards the sound that it records. The camera Avonic wants us to use is the Avonic CM-70
-model.
-
-
-Using the microphone and the visual information mentioned earlier, the goal is to find a way to automatically move the camera to point at a
-speaker in the same room after minimal manual installation; it should not take more than a few minutes to set up the software and start
-recording. Specifically, Avonic has asked us to write an API for both the camera and the microphone, and use those to calculate the position
-of a speaker in real-time.
+To recap:
+using the camera, microphone and single-board computer mentioned above,
+we had to find a way to automatically move to camera to point at a speaker after minimal installation.
 
 \section{Available solutions}\label{sec:available-solutions}
 We now discuss three different solutions that are already available for customers. These products were created by companies other than Avonic to solve a similar
