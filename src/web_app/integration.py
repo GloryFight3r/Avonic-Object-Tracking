@@ -1,5 +1,5 @@
 import os
-from threading import Event, Thread
+from threading import Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value
@@ -13,23 +13,24 @@ except ImportError:
 import cv2
 import os
 import numpy as np
-
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import CameraSocket
 from avonic_camera_api.footage import FootageThread
-from avonic_camera_api.camera_adapter import CameraSocket
-from avonic_speaker_tracker.object_tracking_models.model_one.STModelOne import HybridTracker
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
-from avonic_speaker_tracker.object_tracking_models.yolo_model import YOLOPredict
 from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
-from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
+from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
+
+class ModelCode():
+    AUDIO = 0
+    PRESET = 1
+    OBJECT = 2
+    HYBRID = 3
+    AUDIONOZOOM = 4
 
 
 class GeneralController:
@@ -49,6 +50,8 @@ class GeneralController:
         # When 1 - finishes the thread ASAP.
         self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
 
+        self.footage_thread_event = Value("i", 1, lock=False)
+
         # Update thread field
         self.thread = None
 
@@ -63,6 +66,8 @@ class GeneralController:
         # Secret for cookies and websocket
         self.secret = None
         self.ws = None
+        # the neural network to use
+        self.nn = None
 
         # Filepath for calibration and presets files
         self.filepath: str = ""
@@ -73,9 +78,12 @@ class GeneralController:
         self.audio_model = None
         self.preset_model = None
         self.hybrid_model = None
+        self.object_audio_model = None
+        self.audio_no_zoom_model = None
+        self.model = None
 
         # Video related fields
-        self.footage_thread = None
+        self.footage_thread: FootageThread | None = None
         self.video = None
 
         self.object_tracking_thread = None
@@ -85,7 +93,14 @@ class GeneralController:
         self.thread_cam = None
 
         # Indicates which model should be used, check UpdateThread
-        self.preset = Value("i", 0, lock=False)
+        self.preset = Value("i", ModelCode.AUDIO, lock=False)
+
+        # Keep in memory, whether a notification about the settings not being set has been sent
+        self.no_settings_sent = True
+
+        # PID of master process
+        self.pid = Value("i", os.getpid())
+        self.testing = Value("i", 0, lock=False)
 
         self.all_models = None
         # Keep in memory, whether a notification about the settings not being set has been sent
@@ -98,7 +113,7 @@ class GeneralController:
     def load_env(self) -> None:
         """Performs load procedure of all the specified parameters.
         """
-        self.preset = Value("i", 0, lock=False)
+        self.preset = Value("i", ModelCode.AUDIO, lock=False)
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
@@ -151,9 +166,6 @@ class GeneralController:
             self.filepath = res
         else:
             self.filepath = ""
-        # Initialize footage thread
-
-
 
         # Initialize footage thread
         if cam_addr is not None:
@@ -167,12 +179,22 @@ class GeneralController:
 
         self.nn:YOLOPredict = YOLOPredict()
         # Initialize models
-        self.audio_model = AudioModel(filename=self.filepath + "calibration.json")
-        self.preset_model = PresetModel(filename=self.filepath + "presets.json")
-        self.hybrid_model = HybridTracker(\
-        filename=self.filepath + "calibration.json", bbox=self.nn, cam_footage=self.footage_thread)
 
-        self.all_models = [self.audio_model, self.preset_model, self.hybrid_model]
+        # Initialize models
+        self.object_audio_model = WaitObjectAudioModel(
+                self.cam_api, self.mic_api,
+                self.resolution, 
+                5, self.nn, self.footage_thread,
+                filename=self.filepath + "calibration.json")
+
+        self.audio_model = AudioModel(self.cam_api, self.mic_api,
+                                      filename=self.filepath + "calibration.json")
+        self.preset_model = PresetModel(self.cam_api, self.mic_api,
+                                        filename=self.filepath + "presets.json")
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
+                                        filename = self.filepath + "calibration.json")
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn,\
+            self.footage_thread, filename=self.filepath + "calibration.json")
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
@@ -218,7 +240,10 @@ class GeneralController:
         WaitCalibrationTracker(self.cam_api, self.mic_api, self.footage_thread.resolution, 5)
 
     def __del__(self):
-        self.preset.value = 0  # pragma: no mutate
+        if self.video is not None:
+            self.video.release()
+        self.preset.value = 0 # pragma: no mutate
+
         self.footage_thread_event.value = 0 # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
 
@@ -249,9 +274,18 @@ class GeneralController:
         mic_addr = ('0.0.0.0', 45)
         self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
-        self.audio_model = AudioModel()
-        self.preset_model = PresetModel()
+        self.audio_model = AudioModel(self.cam_api, self.mic_api)
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
+        self.preset_model = PresetModel(self.cam_api, self.mic_api)
+        self.object_audio_model = WaitObjectAudioModel(
+                self.cam_api, self.mic_api,
+                np.array([1920.0, 1080.0]),
+                5, self.nn, self.footage_thread,
+                filename=self.filepath + "calibration.json")
+        self.preset.value = ModelCode.PRESET
         self.thread = None
+        self.nn = ""
+        self.footage_thread = FootageThread(None, None)
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -259,8 +293,12 @@ class GeneralController:
         self.cam_api = new_controller.cam_api
         self.mic_api = new_controller.mic_api
         self.ws = new_controller.ws
-        self.audio_model = AudioModel()
-        self.preset_model = PresetModel()
+        self.audio_model = AudioModel(self.cam_api, self.mic_api)
+        self.preset_model = PresetModel(self.cam_api, self.mic_api)
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
+        self.preset.value = new_controller.preset.value
+        self.nn = new_controller.nn
+        self.footage_thread = new_controller.footage_thread
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api
@@ -268,21 +306,23 @@ class GeneralController:
     def set_cam_api(self, new_cam_api) -> None:
         self.cam_api = new_cam_api
 
-    def get_model_based_on_choice(self) -> TrackingModel:
-        if self.preset.value == 0:
-            return self.preset_model
-        return self.audio_model
-
     def get_mic_info(self) -> dict:
         """ Get information about the microphone.
         This function is used by microphone info-thread.
 
         Returns: dictionary with "microphone-direction" and "microphone-speaking" entries
         """
-        return {
-            "microphone-direction": list(self.mic_api.get_direction()),
+        mic_direction = self.mic_api.get_direction()
+        if isinstance(mic_direction, str):
+            return {
+            "microphone-direction": list(np.array([0,0,0])),
             "microphone-speaking": self.mic_api.is_speaking()
         }
+        else:
+            return {
+                "microphone-direction": list(mic_direction),
+                "microphone-speaking": self.mic_api.is_speaking()
+            }
 
     def get_cam_info(self) -> dict:
         """ Get the direction of the camera.

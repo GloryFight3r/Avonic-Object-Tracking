@@ -1,14 +1,14 @@
 import json
 from unittest import mock
-import pytest
 import socket
+import pytest
 import web_app
 import numpy as np
 from web_app.camera_endpoints import responses
-from avonic_camera_api.camera_control_api import ResponseCode
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
+from avonic_camera_api.camera_control_api import ResponseCode
 
 sock = mock.Mock()
 @pytest.fixture()
@@ -56,7 +56,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_api, "turn_on", mocked_turn_on)
     monkeypatch.setattr(cam_api, "turn_off", mocked_turn_off)
     monkeypatch.setattr(cam_api, "get_zoom", mocked_get_zoom)
-    #monkeypatch.setattr(cam_api, "move_vector", mocked_move)
+
     return cam_api
 
 mic_api = mock.Mock()
@@ -78,6 +78,7 @@ def client(camera, monkeypatch):
     test_controller.set_cam_api(cam_api)
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
+    #test_controller.footage_thread = FootageThread(None, None)
 
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
@@ -112,6 +113,58 @@ def test_move_vector_bad_weather(client):
 def test_get_zoom_bad_weather(client):
     rv = client.get('camera/zoom/get')
     assert rv.status_code == 409
+
+def generate_navigate_tests():
+    return [
+        (0.5, 0.8, 1920*0.5, 1080*0.8),
+        (0.12, 1, 1920*0.5, 1080*1),
+        (0.23, 0.4, 1920*0.23, 1080*0.4),
+        (0, 0.4, 1920*0, 1080*0.4)
+    ]
+
+@pytest.mark.parametrize("x, y, exp_x, exp_y", generate_navigate_tests())
+def test_navigate(client, x, y, exp_x, exp_y, monkeypatch):
+    data = {
+        "x-pos" : x,
+        "y-pos" : y
+    }
+    def mocked_get_fov(xx):
+        return np.array([60.38, 35.80])
+
+    def mocked_move_relative(zzz, xx, yy, zz, gg):
+        return ResponseCode.ACK
+    monkeypatch.setattr(CameraAPI, "calculate_fov", mocked_get_fov)
+
+    monkeypatch.setattr(CameraAPI, "move_relative", mocked_move_relative)
+    rv = client.post('navigate/camera',data = data)
+
+    assert rv.status_code == 200
+
+def generate_bad_weather_navigate_tests():
+    return [
+        (0.5, 1.1),
+        (1.5, 0.8),
+        (0.5, -1),
+        (-1, 0.2)
+    ]
+
+@pytest.mark.parametrize("x, y", generate_bad_weather_navigate_tests())
+def test_navigate_bad_weather(client, x, y, monkeypatch):
+    data = {
+        "x-pos" : 1.1,
+        "y-pos" : 0.2,
+    }
+    def mocked_get_fov(xx):
+        return np.array([60.38, 35.80])
+
+    def mocked_move_relative(zzz, xx, yy, zz, gg):
+        return ResponseCode.ACK
+    monkeypatch.setattr(CameraAPI, "calculate_fov", mocked_get_fov)
+
+    monkeypatch.setattr(CameraAPI, "move_relative", mocked_move_relative)
+    rv = client.post('navigate/camera',data = data)
+    assert rv.status_code == 400
+
 
 def test_ack_response_code():
     result = responses()[ResponseCode.ACK]

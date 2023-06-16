@@ -1,5 +1,6 @@
 from threading import Thread
 from multiprocessing import Value, Array
+from ctypes import c_int
 import base64
 import copy
 import numpy as np
@@ -9,9 +10,16 @@ class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
 
-    def __init__(self, camera, event, resolution: np.ndarray):
+    def __init__(self, footage: cv2.VideoCapture, event: c_int, resolution:np.ndarray):
+        """ Constructor for the footage thread
+
+            Params:
+                footage: the footage stream from which to read frames
+                event: the even that stops the thread when set to 0
+
+        """
         super().__init__()
-        self.camera = camera
+        self.footage = footage
         self.frame = None
         self.event = event
         self.show_bounding_boxes = False
@@ -24,12 +32,13 @@ class FootageThread(Thread):
 
     def run(self):
         while self.event.value != 0:
-            success, self.frame = self.camera.read()
+            success, self.frame = self.footage.read()
 
             if success:
-                ret, buffer = cv2.imencode('.jpg', self.frame)
+                buffer = cv2.imencode('.jpg', self.frame)[1]
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
+        print("Close footage thread")
 
     def set_bbxes(self, bbxes):
         self.bbxes = bbxes
@@ -58,11 +67,11 @@ class FootageThread(Thread):
             (x, y, x2, y2) = self.focused_box
             self.draw_prediction(cur_frame, "person", x, y, x2, y2, [0, 0, 255])
 
-        ret, buffer = cv2.imencode('.jpg', cur_frame)
+        buffer = cv2.imencode('.jpg', cur_frame)[1]
         self.buffer.raw = buffer
         self.buflen.value = len(buffer)
-
 
     def draw_prediction(self, img, label, left, top, right, bottom, clr):
         cv2.rectangle(img, (left, top), (right, bottom), clr, 2)
         cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, clr, 2)
+    

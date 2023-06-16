@@ -112,7 +112,7 @@ presetform.onsubmit = async (e) => {
     const fun = onSuccess[button_id];
     if (response.status === 200) {
         fun(response.json());
-        
+
     }
     e.submitter.ariaBusy = "false"
     if (response.status !== 200) {

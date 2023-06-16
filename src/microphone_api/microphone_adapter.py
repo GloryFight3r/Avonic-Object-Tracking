@@ -23,7 +23,10 @@ class MicrophoneSocket:
         """ Destructor for Microphone Socket
             Closes UDP connection
         """
-        self.sock.close()
+        try:
+            self.sock.close()
+        except:
+            pass
 
     def connect(self, address=None) -> bool:
         if address is None or address == ('0.0.0.0', 45):

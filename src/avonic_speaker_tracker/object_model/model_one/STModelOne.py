@@ -3,9 +3,9 @@ import numpy as np
 import math
 import cv2
 
+from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 from avonic_camera_api.footage import FootageThread
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.object_tracking_models.yolo_model import YOLOPredict
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_adapter import ResponseCode
@@ -13,27 +13,22 @@ from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.utils.coordinate_translation\
     import translate_microphone_to_camera_vector
 from avonic_camera_api.converter import vector_angle
-from avonic_speaker_tracker.utils.camera_navigation_utils import get_movement_to_box
+from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 
-class HybridTracker(TrackingModel):
+class HybridTracker(ObjectModel, AudioModel):
     # last bounding box we were tracking
     last_tracked = np.array([0, 0, 0, 0])
 
-    def __init__(self, filename:str, bbox: YOLOPredict, cam_footage:FootageThread):
+    def __init__(self, cam: CameraAPI, mic: MicrophoneAPI, nn: YOLOPredict,\
+                 stream:FootageThread, filename: str):
         # load the calibration
+
+        super().__init__(cam, mic, stream, nn, stream.resolution)
         self.calibration = Calibration(filename=filename)
         self.calibration.load()
 
-        self.bbox = bbox # the neural network which finds the bounding boxes from a frame
-
-        self.cam_footage = cam_footage # camera footage that returns frames
-
     @override
-    def reload(self):
-        self.calibration.load()
-
-    @override
-    def point(self, cam_api: CameraAPI, mic_api: MicrophoneAPI):
+    def point(self):
         """
         Overrides the point method from TrackingModel.
         This method uses both:with expression as target:pass
@@ -62,15 +57,10 @@ class HybridTracker(TrackingModel):
             mic_api: API of the microphone
             cam_api: API of the camera
         """
-        print()
-        print()
-        print()
-        print()
         # get information about current speaker
-        if mic_api.is_speaking(): # he is currently speaking
-            print("GOVORQ")
+        if self.mic_api.is_speaking(): # he is currently speaking
             # Get the speaker direction
-            mic_direction:np.ndarray | None = mic_api.get_direction()
+            mic_direction:np.ndarray | None = self.mic_api.get_direction()
 
             # if the mic_direction is a str, then there is some problem with the microphone API
             if isinstance(mic_direction, str):
@@ -87,10 +77,10 @@ class HybridTracker(TrackingModel):
 
             # calculate the current FoV so that we can determine if the camera direction
             # we should look to is current visible on the screen
-            cur_fov:np.ndarray = np.deg2rad(cam_api.calculate_fov())
+            cur_fov:np.ndarray = np.deg2rad(self.cam_api.calculate_fov())
 
             # transform the 3D vector to a pan and tilt numpy array
-            cam_res = cam_api.get_direction()
+            cam_res = self.cam_api.get_direction()
             if isinstance(cam_res, ResponseCode):
                 return
             cur_angle:np.ndarray = vector_angle(cam_res)
@@ -102,10 +92,10 @@ class HybridTracker(TrackingModel):
                 cam_angles[1] - (cur_fov[1] / 2) <= cur_angle[1] <= cam_angles[1] + (cur_fov[1] / 2):
 
                 # get all the bounding boxes from the current frame
-                all_boxes = self.bbox.get_bounding_boxes(self.safely_get_frame())
+                all_boxes = self.nn.get_bounding_boxes(self.safely_get_frame())
 
                 # only if we want to visualize
-                #self.cam_footage.set_bbxes(all_boxes)
+                #self.stream.set_bbxes(all_boxes)
 
                 # (cam_angles - (cur_angle - (cur_fov / 2)) / cur_fov)
 
@@ -120,10 +110,10 @@ class HybridTracker(TrackingModel):
 
                 pixels[1] = 1 - pixels[1]
 
-                pixels = np.array(pixels * self.cam_footage.resolution, dtype='int')
+                pixels = np.array(pixels * self.resolution, dtype='int')
 
                 #visualisation purposes
-                #self.cam_footage.pixel = pixels
+                #self.stream.pixel = pixels
 
                 # find nearest box we should be tracking
                 speaker_box:np.ndarray | None = self.find_box(all_boxes, pixels)
@@ -134,10 +124,10 @@ class HybridTracker(TrackingModel):
 
                 # set this box as the last tracked box
                 self.last_tracked = speaker_box
-                self.cam_footage.focused_box = speaker_box
+                #self.stream.focused_box = speaker_box
 
                 # get the speed and rotation angle the camera should make
-                ret: tuple[np.ndarray, np.ndarray] = get_movement_to_box(speaker_box, cam_api, self.cam_footage)
+                ret: tuple[np.ndarray, np.ndarray] = self.get_movement_to_box(speaker_box)
 
                 rotate_speed:np.ndarray = ret[0]
                 rotate_angle:np.ndarray = ret[1]
@@ -145,20 +135,17 @@ class HybridTracker(TrackingModel):
                 # rotate the camera
                 try:
                     # rotation angle might not be possible
-                    cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
+                    self.cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
                                       rotate_angle[0], rotate_angle[1])
                 except AssertionError as e:
                     print(e)
             else:
                 # otherwise turn the camera towards him
 
-                # TODO possibly fix the speed
-                #print("ASDASDSA", cam_angles[0], cam_angles[1])
-
                 rotate_angle:np.ndarray = np.rad2deg(cam_angles)
                 try:
                     # rotate angle might not be possible for the camera(boundaries)
-                    cam_api.move_absolute(20, 20, rotate_angle[0], rotate_angle[1])
+                    self.cam_api.move_absolute(20, 20, rotate_angle[0], rotate_angle[1])
                 except AssertionError as e:
                     print(e)
         else:
@@ -167,13 +154,13 @@ class HybridTracker(TrackingModel):
             # if there is a person we have previously tracked, continue tracking him
 
             # get all the bounding boxes from the current frame
-            all_boxes = self.bbox.get_bounding_boxes(self.safely_get_frame())
+            all_boxes = self.nn.get_bounding_boxes(self.safely_get_frame())
 
-            #self.cam_footage.set_bbxes(all_boxes)
+            #self.stream.set_bbxes(all_boxes)
             # find the box from all_boxes that has the most surface area in common
             new_box:np.ndarray | None = self.find_next_box(self.last_tracked, all_boxes)
 
-            #self.cam_footage.focused_box = new_box
+            #self.stream.focused_box = new_box
 
             if new_box is None:
                 self.last_tracked = np.array([0, 0, 0, 0])
@@ -183,22 +170,21 @@ class HybridTracker(TrackingModel):
             self.last_tracked = new_box
 
             # get the movement we have to make
-            ret:tuple[np.ndarray, np.ndarray] = get_movement_to_box(new_box, cam_api, self.cam_footage)
+            ret:tuple[np.ndarray, np.ndarray] = self.get_movement_to_box(new_box)
 
             rotate_speed:np.ndarray = ret[0]
             rotate_angle:np.ndarray = ret[1]
 
             # move the camera according to that rotation speed and angle
-            cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
+            self.cam_api.move_relative(int(rotate_speed[0]), int(rotate_speed[1]),\
                               rotate_angle[0], rotate_angle[1])
 
 
     def safely_get_frame(self):
-        im_arr = np.frombuffer(self.cam_footage.buffer.raw[:self.cam_footage.buflen.value], np.byte)
+        im_arr = np.frombuffer(self.stream.buffer.raw[:self.stream.buflen.value], np.byte)
         frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)
 
         return frame
-
 
     def find_next_box(self, current_box: np.ndarray, all_boxes: list[np.ndarray])-> np.ndarray | None:
         """ Finds the box that is most likely to be the same box from the previous frame by comparing distances
@@ -259,14 +245,3 @@ class HybridTracker(TrackingModel):
 
         return best_box
 
-    def calculate_speed(self, rotate_angle:np.ndarray)->np.ndarray:
-        """ Calculate the speed with which we want to make the camera
-            adjustment
-
-        Args:
-            rotate_angle: the rotation angle we will be performing
-
-        Returns:
-            2D numpy array that represents the pan and tilt rotation speed accordingly
-        """
-        return np.array([20, 20])

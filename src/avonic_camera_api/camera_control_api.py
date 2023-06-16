@@ -248,7 +248,7 @@ class CameraAPI:
         self.latest_direction = direction
         return direction
 
-    def calculate_fov(self):
+    def calculate_fov(self) -> ResponseCode | int:
         """ Calculate the current FoV based on the current zoom
 
             Returns:
@@ -257,10 +257,9 @@ class CameraAPI:
         """
         current_zoom = self.get_zoom()
 
+        print(current_zoom)
         if isinstance(current_zoom, ResponseCode):
             return current_zoom
-
-        print(current_zoom, "ZOOOOOOOM")
 
         assert 0 <= current_zoom <= 16384
 

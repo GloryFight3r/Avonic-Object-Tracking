@@ -56,4 +56,3 @@ def test_camera_assertions(cam_api, cam_footage, fov, bbox, monkeypatch):
 
     with pytest.raises(AssertionError):
         get_movement_to_box(bbox, cam_api, cam_footage)
-

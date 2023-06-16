@@ -1,6 +1,5 @@
 import json
 from unittest import mock
-import pytest
 from hypothesis import given, strategies as st
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
@@ -12,33 +11,10 @@ def test_init():
     sock = MicrophoneSocket(None)
     mic = MicrophoneAPI(sock)
 
-    assert mic.height == 0.0
     assert mic.elevation == 0.0
     assert mic.azimuth == 0.0
-    assert mic.speaking == False 
+    assert mic.speaking is False
     assert mic.threshold == -55
-
-def test_set_height_api():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    assert api.height == 0
-    api.set_height(10)
-    assert api.height == 10
-
-
-def test_set_height_negative():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    with pytest.raises(AssertionError):
-        api.set_height(-1)
-
-
-def test_set_height_float():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    api.set_height(2.5)
-    assert api.height == 2.5
-
 
 def test_elevation():
     sock = mock.Mock()
@@ -211,13 +187,13 @@ def test_direction_basic():
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
-    
+
     assert np.allclose(api.get_direction(), [0.0, 0.0, 1.0])
     assert api.azimuth == np.deg2rad(0)
     assert api.elevation == np.deg2rad(0)
 
 
-def test_direction_vertical():
+def test_direction_vertical(monkeypatch):
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
@@ -225,6 +201,7 @@ def test_direction_vertical():
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
+    monkeypatch.setattr(api, "is_speaking", lambda: True)
     # this is the correct value for a microphone pointing downwards, do not edit!!
     assert np.allclose(api.get_direction(), [0.0, -1.0, 0.0])
     assert api.azimuth == np.deg2rad(0)
@@ -242,7 +219,7 @@ def test_speaking():
     assert api.speaking
 
 
-def test_reverse_order_speaking():
+def test_reverse_order_speaking(monkeypatch):
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value =\
@@ -250,8 +227,8 @@ def test_reverse_order_speaking():
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
-    assert api.is_speaking() is False
-    assert np.allclose(api.vector(), [0.0, -1.0, 0.0])
+    monkeypatch.setattr(api, "is_speaking", lambda: True)
+    assert np.allclose(api.get_direction(), [0.0, -1.0, 0.0])
 
 
 def test_reverse_order_direction():

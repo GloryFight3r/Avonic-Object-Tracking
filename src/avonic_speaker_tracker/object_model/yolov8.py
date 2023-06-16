@@ -14,7 +14,6 @@ class YOLOPredict:
         results = self.model.predict(frame, classes=0, device="cpu")
         result = results[0]
 
-        print("START!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         person_indices = set(torch.nonzero(result.boxes.cls.cpu() == 0))
 
         bboxes = np.array(result.boxes.xyxy.cpu(), dtype='int')
@@ -22,8 +21,6 @@ class YOLOPredict:
         for index in person_indices:
             persons.append(bboxes[index])
 
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        print(persons)
         return persons
 
     def draw_prediction(self, img, label, left, top, right, bottom):

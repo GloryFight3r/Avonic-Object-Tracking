@@ -74,15 +74,18 @@ def test_timeout():
 
 def generate_fov():
     return [
-        (1000, [60.38 - ((60.38 - 3.72) * (1000 / 16384)), 35.80 - ((35.80 - 2.14) * (1000 / 16384))]),
-        (0, [60.38 - ((60.38 - 3.72) * (0 / 16384)), 35.80 - ((35.80 - 2.14) * (0 / 16384))]),
-        (16384, [60.38 - ((60.38 - 3.72) * (16384 / 16384)), 35.80 - ((35.80 - 2.14) * (16384 / 16384))]),
+        (1000, 
+        [60.38 - ((60.38 - 3.72) * (1000 / 16384)), 35.80 - ((35.80 - 2.14) * (1000 / 16384))]),
+        (0, 
+        [60.38 - ((60.38 - 3.72) * (0 / 16384)), 35.80 - ((35.80 - 2.14) * (0 / 16384))]),
+        (16384, 
+        [60.38 - ((60.38 - 3.72) * (16384 / 16384)), 35.80 - ((35.80 - 2.14) * (16384 / 16384))]),
     ]
 
 def generate_incorrect_fov():
     return [
-        -1, 
-        16385, 
+        -1,
+        16385,
     ]
 
 @pytest.mark.parametrize("zoom, expected", generate_fov())
@@ -97,7 +100,7 @@ def test_calculate_fov(monkeypatch, zoom, expected):
     assert np.array_equal(api.calculate_fov(), expected)
 
 @pytest.mark.parametrize("zoom", generate_incorrect_fov())
-def test_calculate_fov(monkeypatch, zoom):
+def test_calculate_fov_bad_weather(monkeypatch, zoom):
     api = CameraAPI(None)
 
     def mocked_get_zoom():
@@ -107,4 +110,3 @@ def test_calculate_fov(monkeypatch, zoom):
 
     with pytest.raises(AssertionError):
         api.calculate_fov()
-

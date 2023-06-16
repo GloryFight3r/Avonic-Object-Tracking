@@ -1,8 +1,5 @@
 import math
-from typing_extensions import override
-
 import numpy as np
-
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.converter import vector_angle
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
@@ -11,37 +8,21 @@ from avonic_speaker_tracker.utils.coordinate_translation\
 from avonic_speaker_tracker.audio_model.calibration import Calibration
 from microphone_api.microphone_control_api import MicrophoneAPI
 
-class AudioModel(TrackingModel):
-
+class AudioModelNoAdaptiveZoom(TrackingModel):
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
-        self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.cam_api = cam_api
-        self.speak_delay: int = 0
         self.mic_api = mic_api
+        self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.calibration: Calibration = Calibration(filename=filename)
         self.calibration.load()
-    
-    def set_speak_delay(self, speak_delay: int = 0):
-        self.speak_delay = speak_delay
 
-    @override
-    def point(self):
+    def point(self) -> np.ndarray:
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone
             information for pointing.
-
+            In addition to calculating the direction, performs movement of the camera.
             Returns: the vector in which direction the camera should point and zoom value.
         """
-        # reset speak delay some is speaking, else count up till 100 at which point we zoom out
-        if self.mic_api.is_speaking():
-            self.speak_delay = 0
-        elif self.speak_delay < 100:
-            self.speak_delay += 1
-        elif self.speak_delay == 100:
-            self.cam_api.direct_zoom(0)
-            self.prev_dir[2] = 0
-            return self.prev_dir
-
         mic_direction = self.mic_api.get_direction()
         print("Current calibration mic -> cam vector: ", self.calibration.mic_to_cam)
 
@@ -49,19 +30,18 @@ class AudioModel(TrackingModel):
             print(mic_direction)
             return self.prev_dir
 
-        try:
-            cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
+        cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
                                                         mic_direction,
                                                         self.calibration.mic_height)
-        except AssertionError:
-            return self.prev_dir
 
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
         vec_len = min(vec_len,10.0)
-        zoom_val = (int)((vec_len/10.0)*16000)
+
 
         direct = vector_angle(cam_vec)
-        direct_np = np.array([int(np.rad2deg(direct[0]))%360, int(np.rad2deg(direct[1]))%360, zoom_val])
+
+        direct_np = np.array([int(np.rad2deg(direct[0]))%360,
+                int(np.rad2deg(direct[1]))%360, self.prev_dir[2]])
 
         if direct_np[0]>180:
             direct_np[0] = direct_np[0]-360
@@ -87,7 +67,6 @@ class AudioModel(TrackingModel):
             self.cam_api.direct_zoom(direct_np[2])
 
         self.prev_dir = direct_np
-
         return direct_np
 
     def set_filename(self, filename: str):
