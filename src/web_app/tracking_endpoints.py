@@ -12,10 +12,6 @@ from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     if (integration.thread is None) or (integration.event.value == 0):
-        if integration.thread is None:
-            old_calibration = 0
-        else:
-            old_calibration = integration.thread.value
         integration.event.value = 1
         if integration.preset.value == ModelCode.PRESET:
             model = PresetModel(integration.cam_api, integration.mic_api,
@@ -24,7 +20,7 @@ def start_thread_endpoint(integration: GeneralController):
             model = AudioModel(integration.cam_api, integration.mic_api,
                                     filename=integration.filepath + "calibration.json")
         elif integration.preset.value == ModelCode.AUDIONOZOOM:
-            model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api, 
+            model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
                                     filename = integration.filepath + "calibration.json")
         elif integration.preset.value == ModelCode.HYBRID:
             model = HybridTracker(integration.cam_api, integration.mic_api, integration.nn, integration.footage_thread,
@@ -43,7 +39,6 @@ def start_thread_endpoint(integration: GeneralController):
                                           integration.cam_api, integration.mic_api,
                                           model, integration.filepath)
         integration.event.value = 1
-        #integration.thread.set_calibration(old_calibration)
 
         integration.info_threads_event.value = 1
         integration.thread.start()

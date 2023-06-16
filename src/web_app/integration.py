@@ -183,7 +183,7 @@ class GeneralController:
         # Initialize models
         self.object_audio_model = WaitObjectAudioModel(
                 self.cam_api, self.mic_api,
-                self.resolution, 
+                self.resolution,
                 5, self.nn, self.footage_thread,
                 filename=self.filepath + "calibration.json")
 
