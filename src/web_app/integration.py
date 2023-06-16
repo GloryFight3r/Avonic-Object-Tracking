@@ -161,7 +161,8 @@ class GeneralController:
         # Initialize footage thread
         if cam_addr is not None:
             self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
-                                          + ':554/live/av0')  # pragma: no mutate
+                                          + ':554/live/av0',)  # pragma: no mutate
+            self.video.set(cv2.CAP_PROP_FPS, 5)
             self.footage_thread = FootageThread(self.video,
                                                 self.footage_thread_event)  # pragma: no mutate
             self.footage_thread.start()  # pragma: no mutate
