@@ -176,7 +176,7 @@ class GeneralController:
                                       filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
-        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api, 
+        self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
                                         filename = self.filepath + "calibration.json")
 
         # Initialize camera and microphone info threads

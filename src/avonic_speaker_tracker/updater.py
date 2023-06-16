@@ -29,11 +29,12 @@ class UpdateThread(Thread):
         Continuously calls point method of the supplied model, to calculate the direction
         and point the camera towards it.
 
-        Based on the self.preset_or_tracking, that is initialized in the constructor,
-        the model is select upon the start of the thread.
-        0 - AudioModel aka continuous tracking based on microphone information.
-        1 - PresetModel aka presets, which selects the camera direction
+        The model can be one of the below:
+        - AudioModel aka continuous tracking based on microphone information.
+        - PresetModel aka presets, which selects the camera direction
         from the limited pool of options, based on cosine similarity.
+        - ObjectModel aka using object detection to figure out where to move
+        the camera.
         """
         speak_delay: int = 0
         while self.event.value != 0:

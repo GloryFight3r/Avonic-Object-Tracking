@@ -28,6 +28,7 @@ class AudioModel(TrackingModel):
 
             Returns: the vector in which direction the camera should point and zoom value.
         """
+        # reset speak delay some is speaking, else count up till 100 at which point we zoom out
         if self.mic_api.is_speaking():
             self.speak_delay = 0
         elif self.speak_delay < 100:

@@ -6,9 +6,10 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
 class ObjectModel():
-    """ Class with helper methods for calibration tracking. This class has to be extended
-        so that track_object can be implemented. This facilitates using
-        different strategies of dealing with both the object detection and the audio detection.
+    """ Class with helper methods for object tracking. This class has to be
+    extended so that track_object can be implemented. This facilitates using
+    different strategies of dealing with both the object detection and the
+    audio detection.
     """
 
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI,

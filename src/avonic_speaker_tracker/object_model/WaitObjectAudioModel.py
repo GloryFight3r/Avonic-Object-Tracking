@@ -45,6 +45,9 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
 
     def track_object(self):
+        """ Finds the bounding boxes of the latest frame and attempts to track the
+            one closest to the center.
+        """
         if not self.is_object_tracking or self.object_tracking_counter % 40 != 0:
             return
 
@@ -84,7 +87,9 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         the presets or the continuous follower.
             Args:
                 direct: the direction in which to point the camera
-            Returns: a boolean whether or not object tracking should start
+
+            Returns:
+            a boolean whether or not object tracking should start
         """
         self.object_tracking_counter += 1
         self.track_object()
@@ -135,6 +140,8 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         if direct_np is None:
             return start_object_tracking
 
+        # Only move the camera if there has been a big movement lately. Otherwise
+        # track_object will move the camera.
         if self.time_without_movement < self.wait:
             if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
                 try:
