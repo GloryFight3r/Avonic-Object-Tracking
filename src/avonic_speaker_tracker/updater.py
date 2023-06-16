@@ -19,6 +19,7 @@ class UpdateThread(Thread):
         """
         super().__init__()
         self.event: c_int = event
+        self.value: int = 0
 
         self.cam_api: CameraAPI = cam_api
         self.mic_api: MicrophoneAPI = mic_api

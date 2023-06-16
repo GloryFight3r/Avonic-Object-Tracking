@@ -282,10 +282,15 @@ class GeneralController:
                 np.array([1920.0, 1080.0]),
                 5, self.nn, self.footage_thread,
                 filename=self.filepath + "calibration.json")
-        self.preset.value = ModelCode.PRESET
-        self.thread = None
+
+
         self.nn = ""
-        self.footage_thread = FootageThread(None, None)
+        self.thread = None
+        self.footage_thread = FootageThread(None, None, np.array([1920.0, 1080.0]))
+        
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
+
+        self.preset.value = ModelCode.PRESET
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -299,6 +304,7 @@ class GeneralController:
         self.preset.value = new_controller.preset.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api

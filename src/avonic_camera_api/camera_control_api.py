@@ -23,7 +23,7 @@ class CameraAPI:
             camera: object of type Camera
         """
         self.camera = camera
-        self.counter = Value('i', 0)
+        self.counter = Value('i', 1)
         self.video = "on"
         self.latest_direction = np.array([0, 0, 1], dtype='float')
 
@@ -180,7 +180,6 @@ class CameraAPI:
                                message, cnt)
         if isinstance(ret, ResponseCode):
             return self.latest_fov
-        print(ret)
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
         self.latest_fov = int(hex_res, 16)
         return self.latest_fov
@@ -224,7 +223,6 @@ class CameraAPI:
             return ret
 
         valid = re.compile(r"b'90500[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]FF'")
-        print(str(ret))
 
         if not valid.match(str(ret)):
             return self.latest_direction
@@ -257,7 +255,6 @@ class CameraAPI:
         """
         current_zoom = self.get_zoom()
 
-        print(current_zoom)
         if isinstance(current_zoom, ResponseCode):
             return current_zoom
 

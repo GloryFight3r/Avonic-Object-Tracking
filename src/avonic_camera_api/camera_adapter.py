@@ -112,7 +112,6 @@ class CameraSocket:
         command = bytes.fromhex(command)
         message = header + command
 
-        print("sending", header, command, message_counter, message)
         self.sock.sendall(message)
 
         self.sock.settimeout(2)
@@ -122,7 +121,6 @@ class CameraSocket:
             return ResponseCode.TIMED_OUT
 
         while True:
-            print("LONG MESSAGE", str(data))
             split_messages = str(data).split("'b'")
             if len(split_messages) > 0:
                 split_messages[0] = split_messages[0][2:]

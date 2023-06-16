@@ -74,7 +74,6 @@ class ObjectModel():
         # The height is divided by two so the upper half of the person's body is used
 
         current_box = [current_box[0], current_box[1], current_box[2], current_box[3]+box_height/2]
-        print(current_box, "CURR BOX")
         bbox:np.ndarray = np.array([current_box[0],\
                          current_box[1],\
                          current_box[2] - current_box[0],\

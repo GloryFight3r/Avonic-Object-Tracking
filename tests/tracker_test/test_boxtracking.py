@@ -2,8 +2,10 @@ import pytest
 import numpy as np
 
 from avonic_camera_api.footage import FootageThread
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_speaker_tracker.utils.camera_navigation_utils import get_movement_to_box
+from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 def generate_tests():
     return [
@@ -13,26 +15,27 @@ def generate_tests():
     ]
 
 @pytest.fixture
-def cam_api():
+def obj_model():
     cam_api = CameraAPI(None)
-    return cam_api
+    mic_api = MicrophoneAPI(None)
+    stream = FootageThread(None, None, np.array([1920.0, 1080.0]))
+    nn = YOLOPredict()
 
-@pytest.fixture
-def cam_footage():
-    cam_footage = FootageThread(None, None, np.array([1920.0, 1080.0]))
-    return cam_footage
+    obj_model = ObjectModel(cam_api, mic_api, stream, nn, np.array([1920.0, 1080.0]))
+
+    return obj_model
 
 @pytest.mark.parametrize("fov, bbox, expected", generate_tests())
-def test_camera_track(cam_api, cam_footage, fov, bbox, expected, monkeypatch):
+def test_camera_track(obj_model, fov, bbox, expected, monkeypatch):
     def mocked_move(speed_one, speed_two, alpha, beta):
         assert np.array_equal(np.array([speed_one, speed_two, alpha, beta]), expected)
     def mocked_fov():
         return fov
 
-    monkeypatch.setattr(cam_api, "move_relative", mocked_move)
-    monkeypatch.setattr(cam_api, "calculate_fov", mocked_fov)
+    monkeypatch.setattr(obj_model.cam_api, "move_relative", mocked_move)
+    monkeypatch.setattr(obj_model.cam_api, "calculate_fov", mocked_fov)
 
-    get_movement_to_box(bbox, cam_api, cam_footage)
+    obj_model.get_movement_to_box(bbox)
 
 def generate_errors():
     return [
@@ -45,14 +48,14 @@ def generate_errors():
 
 
 @pytest.mark.parametrize("fov, bbox", generate_errors())
-def test_camera_assertions(cam_api, cam_footage, fov, bbox, monkeypatch):
+def test_camera_assertions(obj_model, fov, bbox, monkeypatch):
     def mocked_move(speed_one, speed_two, alpha, beta):
         pass
     def mocked_fov():
         return fov
 
-    monkeypatch.setattr(cam_api, "move_relative", mocked_move)
-    monkeypatch.setattr(cam_api, "calculate_fov", mocked_fov)
+    monkeypatch.setattr(obj_model.cam_api, "move_relative", mocked_move)
+    monkeypatch.setattr(obj_model.cam_api, "calculate_fov", mocked_fov)
 
     with pytest.raises(AssertionError):
-        get_movement_to_box(bbox, cam_api, cam_footage)
+        obj_model.get_movement_to_box(bbox)

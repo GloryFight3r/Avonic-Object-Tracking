@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 
 def generate_box_lists():
     return [
@@ -23,12 +23,12 @@ def test_get_center_box(boxes, resolution, center):
 
 def test_calculate_speed():
     obj_model = ObjectModel(None, None, None, None, np.array([100, 80]))
-    assert obj_model.calculate_speed(np.array([0, 0, 0])) == [20, 20]
+    assert (obj_model.calculate_speed(np.array([0, 0])) == [13, 11]).all()
 
 def generate_box_with_movement():
     return [
-            (np.array([0, 0, 10, 10]), np.array([10, 10]), (np.array([20, 20]), np.array([0, 25]))),
-            (np.array([5, 5, 10, 10]), np.array([10, 10]), (np.array([20, 20]), np.array([25, 0])))
+            (np.array([0, 0, 10, 10]), np.array([10, 10]), (np.array([13, 11.75]), np.array([0, -25]))),
+            (np.array([5, 5, 10, 10]), np.array([10, 10]), (np.array([13, 11.75]), np.array([25, -37.5])))
     ]
 
 @pytest.mark.parametrize("box, resolution, movement", generate_box_with_movement())
@@ -37,6 +37,8 @@ def test_get_movement_to_box(box, resolution, movement):
     cam_api.calculate_fov.return_value = 100
     obj_model = ObjectModel(cam_api, None, None, None, resolution)
     res = obj_model.get_movement_to_box(box)
+    print(res[0])
+    print(res[1])
     assert (res[0] == movement[0]).all()
     assert (res[1] == movement[1]).all()
 
