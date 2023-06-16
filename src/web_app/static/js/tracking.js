@@ -20,6 +20,13 @@ function selectTracking() {
                 headers: { "Content-Type": "application/json" }
             });
             break
+        case "object":
+            header.innerText = "Continuous object tracking  🔭"
+            fetch("/object/track", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+            break;
         case "calibnozoom":
             header.innerText = "Continuous following  without adaptive zooming🔭"
             fetch("/calibration/track/no/zoom", {

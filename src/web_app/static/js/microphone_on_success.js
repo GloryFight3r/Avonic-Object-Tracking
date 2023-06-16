@@ -25,8 +25,5 @@ async function onSpeaking(data) {
     const d = await data;
     const isSpeaking = d["microphone-speaking"]
     document.getElementById("speaking").value = isSpeaking;
-
-    if (isCalibrating && isSpeaking) {
-        addCalibrationSpeaker()
-    }
 }
+

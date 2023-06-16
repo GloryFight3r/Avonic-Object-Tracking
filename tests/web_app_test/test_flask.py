@@ -3,7 +3,7 @@ import socket
 import json
 import pytest
 import numpy as np
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, ModelCode
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -59,7 +59,6 @@ def client(camera, monkeypatch):
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), ("0.0.0.1", 45))
     mic_adapt = MicrophoneSocket(sock=mic_sock, address=("0.0.0.1", 45))
     mic_api = MicrophoneAPI(mic_adapt)
-    mic_api.height = 1
 
     cam_api = camera
 
@@ -70,11 +69,8 @@ def client(camera, monkeypatch):
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
 
-    # def mocked_on(adr):
-    #   pass
-    # monkeypatch.setattr(test_controller.ws, "on", mocked_on)
-
     app = web_app.create_app(test_controller=test_controller)
+
     app.config['TESTING'] = True
 
     return app.test_client()
@@ -234,18 +230,18 @@ def test_get_microphone_direction(client):
 
 
 def test_add_direction_to_mic(client):
-    client.get('/calibration/reset')
-    rv = client.get('/calibration/add_direction_to_mic')
+    client.post('/calibration/reset')
+    rv = client.post('/calibration/add_direction_to_mic')
     assert rv.status_code == 200
 
 
 def test_add_direction_to_speaker(client):
-    rv = client.get('/calibration/add_directions_to_speaker')
+    rv = client.post('/calibration/add_directions_to_speaker')
     assert rv.status_code == 200
 
 
 def test_calibration_reset(client):
-    rv = client.get('/calibration/reset')
+    rv = client.post('/calibration/reset')
     assert rv.status_code == 200
 
 
@@ -318,6 +314,17 @@ def test_thread(client):
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
+    web_app.integration.preset.value = ModelCode.AUDIO
+    rv = client.post('/thread/start')
+    assert rv.status_code == 200
+    rv = client.post('/thread/stop')
+    assert rv.status_code == 200
+
+    web_app.integration.preset.value = ModelCode.OBJECT
+    rv = client.post('/thread/start')
+    assert rv.status_code == 200
+    rv = client.post('/thread/stop')
+    assert rv.status_code == 200
 
 def test_is_speaking(client):
     mic_sock.sendto.return_value = 48
@@ -627,3 +634,15 @@ def generate_single_page_views():
 def test_live_footage(client, url):
     rv = client.get(url)
     assert rv.status_code == 200
+
+def test_calibration_track(client):
+    rv = client.get("/calibration/track")
+    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":0}\n", "utf-8")
+
+def test_preset_track(client):
+    rv = client.get("/preset/track")
+    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":1}\n", "utf-8")
+
+def test_object_track(client):
+    rv = client.get("/object/track")
+    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":2}\n", "utf-8")

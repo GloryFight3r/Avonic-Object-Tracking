@@ -54,7 +54,10 @@ class CameraSocket:
         """ Destructor for the current object
             Closes the TCP connection
         """
-        self.sock.close()
+        try:
+            self.sock.close()
+        except:
+            pass
 
     def reconnect(self, sock, address=None):
         """ Re-connect to camera after a reboot

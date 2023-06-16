@@ -67,7 +67,6 @@ def client(camera, monkeypatch):
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
     mic_api = MicrophoneAPI(MicrophoneSocket(None, sock))
-    mic_api.height = 1
 
     cam_api = camera
 
@@ -90,5 +89,5 @@ def client(camera, monkeypatch):
 
 def test_load_env(client):
     time.sleep(0.5)
-    test_controller.footage_thread_event.set()
+    test_controller.footage_thread_event.value = 0
     test_controller.info_threads_break.value = 1

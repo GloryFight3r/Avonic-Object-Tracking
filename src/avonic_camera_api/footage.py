@@ -1,47 +1,47 @@
 from threading import Thread
 from multiprocessing import Value, Array
+from ctypes import c_int
 import base64
-import time
-import numpy as np
 import cv2 # type: ignore
+import numpy as np
+
+from avonic_camera_api.camera_control_api import CameraAPI
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
     resolution = np.array([1920.0, 1080.0])
 
-    def __init__(self, camera_footage: cv2.VideoCapture, event):
+    def __init__(self, footage: cv2.VideoCapture, event: c_int):
         """ Constructor for the footage thread
 
-        Args:
-            event (): event that stops the thread
-            camera_footage: object to read from camera footage
+            Params:
+                footage: the footage stream from which to read frames
+                event: the even that stops the thread when set to 0
+
         """
         super().__init__()
-        self.camera_footage = camera_footage
-        self.success = None
+        self.footage = footage
         self.frame = None
         self.event = event
-        self.ret = None
+        self.show_bounding_boxes = False
 
     def run(self):
-        """ Body of the thread that keeps receiving camera footage and loads it into the buffer """
-        while not self.event.is_set():
-            time.sleep(0.01)
-            self.success, self.frame = self.camera_footage.read()  # read the camera frame
-            if self.success:
-                self.ret, buffer = cv2.imencode('.jpg', self.frame)
-                string = base64.b64encode(buffer)
-                length = len(string)
-                self.buffer.raw = string
-                self.buflen.value = length
-            else:
-                break
+        while self.event.value != 0:
+            success, self.frame = self.footage.read()
+
+            if success:
+                buffer = cv2.imencode('.jpg', self.frame)[1]
+                self.buffer.raw = buffer
+                self.buflen.value = len(buffer)
+        print("Close footage thread")
 
     def get_frame(self):
         """ Returns the camera footage image decoded into ascii
-        
+
         Returns:
             Stringified base64 encoded frame
         """
-        return str(self.buffer.raw[:self.buflen.value], 'ascii')
+        ret = str(base64.b64encode(self.buffer.raw[:self.buflen.value])
+            , 'ascii')
+        return ret

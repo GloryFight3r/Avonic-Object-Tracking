@@ -4,13 +4,12 @@ from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
-from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
+from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 class UpdateThread(Thread):
+
     def __init__(self, event: c_int,
-                 cam_api: CameraAPI, mic_api: MicrophoneAPI, preset_or_tracking: c_int,
+                 cam_api: CameraAPI, mic_api: MicrophoneAPI, model: TrackingModel,
                  filepath: str = ""):
         """ Class constructor
 
@@ -22,8 +21,7 @@ class UpdateThread(Thread):
         self.value: int = 0
         self.cam_api: CameraAPI = cam_api
         self.mic_api: MicrophoneAPI = mic_api
-        self.preset_or_tracking: int = preset_or_tracking.value
-        self.model_in_use: TrackingModel
+        self.model: TrackingModel = model
         self.filepath = filepath
 
     def run(self) -> None:
@@ -31,35 +29,21 @@ class UpdateThread(Thread):
         Continuously calls point method of the supplied model, to calculate the direction
         and point the camera towards it.
 
-        Based on the self.preset_or_tracking, that is initialized in the constructor,
-        the model is select upon the start of the thread.
-        0 - AudioModel aka continuous tracking based on microphone information.
-        1 - PresetModel aka presets, which selects the camera direction 
+        The model can be one of the below:
+        - AudioModel aka continuous tracking based on microphone information.
+        - PresetModel aka presets, which selects the camera direction
         from the limited pool of options, based on cosine similarity.
+        - ObjectModel aka using object detection to figure out where to move
+        the camera.
         """
         speak_delay: int = 0
-        if self.preset_or_tracking == 0:
-            self.model_in_use = AudioModel(filename=self.filepath + "calibration.json")
-        elif self.preset_or_tracking == 1:
-            self.model_in_use = PresetModel(filename=self.filepath + "presets.json")
-        elif self.preset_or_tracking == 4:
-            self.model_in_use = AudioModelNoAdaptiveZoom(filename=self.filepath + "calibration.json")
-
         while self.event.value != 0:
-            print("RUNNING UPDATE THREAD")
             if self.value is None:
                 print("STOPPED BECAUSE CALIBRATION IS NOT SET")
                 sleep(5)
                 continue
 
-            if self.mic_api.is_speaking():
-                speak_delay = 0
-            else:
-                speak_delay = speak_delay + 1
-            self.model_in_use.set_speak_delay(speak_delay)
-            direct = self.model_in_use.point(self.cam_api, self.mic_api)
-
-            print(direct)
+            self.model.point()
 
             self.value += 1
             sleep(0.05)

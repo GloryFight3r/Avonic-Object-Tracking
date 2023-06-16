@@ -155,7 +155,7 @@ def test_with_file():
         assert np.allclose(cal.speaker_points[0], second_cal.speaker_points[0])
     finally:
         os.remove("TEST_WITH_FILE_CALIBRATION.json")
- 
+
 def test_with_file_corrupted_to_mic():
     try:
         data = {

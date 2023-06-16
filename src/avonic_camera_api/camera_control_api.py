@@ -21,7 +21,7 @@ class CameraAPI:
         self.camera = camera
         self.counter = 1
         self.video = "on"
-        self.latest_direction = np.array([0, 0, 1])
+        self.latest_direction = np.array([0.0, 0.0, 1.0])
 
     def set_address(self, new_socket, address=None) -> ResponseCode:
         if address is None:
@@ -227,9 +227,9 @@ class CameraAPI:
     def calculate_fov(self) -> ResponseCode | int:
         """ Calculate the current FoV based on the current zoom
 
-            Returns: 
+            Returns:
                 array with the two FoVs [horizontal, vertical]
-            
+
         """
         current_zoom = self.get_zoom()
 
