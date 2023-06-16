@@ -21,7 +21,8 @@ dependencies = [
     "numpy",
     "pyyaml",
     "requests",
-    "opencv-python"
+    "opencv-python",
+    "ultralytics"
 ]
 
 [project.optional-dependencies]

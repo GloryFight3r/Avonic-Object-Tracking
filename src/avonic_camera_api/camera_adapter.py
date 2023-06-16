@@ -54,7 +54,10 @@ class CameraSocket:
         """ Destructor for the current object
             Closes the TCP connection
         """
-        self.sock.close()
+        try:
+            self.sock.close()
+        except:
+            pass
 
     def reconnect(self, sock, address=None):
         """ Re-connect to camera after a reboot
@@ -111,7 +114,7 @@ class CameraSocket:
 
         self.sock.sendall(message)
 
-        self.sock.settimeout(5.0)
+        self.sock.settimeout(2)
         try:
             data = binascii.hexlify(self.sock.recv(2048)).upper()
         except TimeoutError:
@@ -134,7 +137,7 @@ class CameraSocket:
                     return self.response_codes[ret]
                 return ret
             else:
-                self.sock.settimeout(5.0)
+                self.sock.settimeout(2)
                 try:
                     data = binascii.hexlify(self.sock.recv(2048)).upper()
                 except TimeoutError:

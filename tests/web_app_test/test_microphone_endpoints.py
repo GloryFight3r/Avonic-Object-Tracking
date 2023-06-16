@@ -3,6 +3,7 @@ import socket
 from avonic_camera_api.camera_http_request import CameraHTTP
 import pytest
 import numpy as np
+from flask import jsonify
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
@@ -71,10 +72,6 @@ def client(camera, monkeypatch):
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
 
-    #def mocked_on(adr):
-    #   pass
-    #monkeypatch.setattr(test_controller.ws, "on", mocked_on)
-
     app = web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
 
@@ -98,4 +95,16 @@ def test_direction_get_microphone_endpoint_bad_weather(client):
 def test_direction_is_speaking_endpoint_bad_weather(client):
     mic_api.is_speaking.return_value = "Unable to get peak loudness, response was: 404"
     rv = client.get('microphone/speaking')
+    assert rv.status_code == 504
+
+def test_get_speaker_direction_endpoint_good_weather(client):
+    mic_api.get_direction.return_value = bytes('', "utf-8")
+    rv = client.get('microphone/speaker/direction')
+    assert rv.status_code == 200
+    assert rv.data == bytes('{"microphone-direction":[]}\n',"utf-8")
+
+
+def test_get_speaker_direction_endpoint_bad_weather(client):
+    mic_api.get_direction.return_value = "error"
+    rv = client.get('microphone/speaker/direction')
     assert rv.status_code == 504

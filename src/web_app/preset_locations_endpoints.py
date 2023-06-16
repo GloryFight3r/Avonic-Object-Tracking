@@ -14,7 +14,7 @@ def add_preset_location(integration: GeneralController):
         integration: The controller containing all the dependencies
 
     Returns: A http response which indicates success(200) or failure(400)
-        
+
     """
     data = request.form
     try:
@@ -108,5 +108,5 @@ def get_preset_info(integration: GeneralController, preset_name: str):
 
 
 def point_to_closest_preset(integration: GeneralController):
-    integration.preset_model.point(integration.cam_api, integration.mic_api)
+    integration.preset_model.point()
     return make_response(jsonify({}), 200)

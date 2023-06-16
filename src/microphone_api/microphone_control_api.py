@@ -1,21 +1,22 @@
 import json
+from json import JSONDecodeError
 import numpy as np
 from microphone_api.microphone_adapter import MicrophoneSocket
 
 
 class MicrophoneAPI:
-    def __init__(self, sock: MicrophoneSocket, threshold: int =-55):
+    def __init__(self, sock: MicrophoneSocket, threshold: int = -55):
         """ Constructor for the Microphone
 
         Args:
             sock: wrapper for the socket
         """
         self.sock: MicrophoneSocket = sock
-        self.height: float = 0.0
         self.elevation: float = 0.0
         self.azimuth: float = 0.0
         self.speaking: bool = False
         self.threshold: int = threshold
+        self.prev_dir = np.array([0.0, 0.0, 1.0])
 
     def set_address(self, address):
         """
@@ -28,16 +29,6 @@ class MicrophoneAPI:
         if not ret:
             return '{"message":"No address specified"}', False
         return '{"message":"Address set successfully"}', True
-
-    def set_height(self, height: float):
-        """
-        Sets the height of the microphone.
-
-        Args:
-            height (float): the new height
-        """
-        assert height >= 0.0
-        self.height = height
 
     def get_azimuth(self) -> float:
         """ Get azimuth from the camera.
@@ -104,9 +95,18 @@ class MicrophoneAPI:
                 self.azimuth = np.deg2rad(azimuth)
         except KeyError:
             obj = json.loads(ret)
-            if "message" in obj:
-                return obj["message"]
-            return "Unable to get direction from microphone, response was: " + ret
+            if "osc" in obj and "error" in obj["osc"]:
+                return json.dumps(obj["osc"]["error"])
+            try:  # in case of peak message being received instead
+                peak = obj["m"]["in1"]["peak"]
+                assert isinstance(peak, int)
+                if -90 <= peak <= 0:
+                    self.speaking = peak > self.threshold
+            except KeyError:
+                return "Unable to get direction from microphone, response was: " + ret
+        except JSONDecodeError:
+            return "Did not receive a valid JSON," \
+                   " are you sure you are communicating with the microphone? Received: " + ret
         return self.vector()
 
     def vector(self) -> np.ndarray:
@@ -138,7 +138,20 @@ class MicrophoneAPI:
                 self.speaking = res > self.threshold
         except KeyError:
             obj = json.loads(ret)
-            if "message" in obj:
-                return obj["message"]
-            return "Unable to get peak loudness, response was: " + ret
+            if "osc" in obj and "error" in obj["osc"]:
+                return json.dumps(obj["osc"]["error"])
+            try:  # in case of receiving direction message instead
+                azimuth = obj["m"]["beam"]["azimuth"]
+                elevation = obj["m"]["beam"]["elevation"]
+                assert isinstance(azimuth, int)
+                assert isinstance(elevation, int)
+                if 0 <= elevation <= 90:
+                    self.elevation = np.deg2rad(elevation)
+                if 0 <= azimuth < 360:
+                    self.azimuth = np.deg2rad(azimuth)
+            except KeyError:
+                return "Unable to get peak loudness, response was: " + ret
+        except JSONDecodeError:
+            return "Did not receive a valid JSON," \
+                   " are you sure you are communicating with the microphone? Received: " + ret
         return self.speaking

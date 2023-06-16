@@ -1,3 +1,4 @@
+from asyncio import sleep
 from unittest import mock
 from multiprocessing import Value
 import numpy as np
@@ -25,7 +26,7 @@ def test_setter():
     mic_api.is_speaking.return_value = True
     cam_api = mock.Mock()
     model = mock.Mock()
-    ct = UpdateThread(e,cam_api, mic_api, model)
+    ct = UpdateThread(e, cam_api, mic_api, model)
     assert ct.event == e
     assert ct.value == 0
     e.value = 1

@@ -20,6 +20,9 @@ class ImageSize(Enum):
 
 class CameraAPI:
     latest_direction:np.ndarray | None = None
+    MIN_FOV = np.array([3.72, 2.14])
+    MAX_FOV = np.array([60.38, 35.80])
+    MAX_ZOOM_VALUE = 16384
 
     def __init__(self, camera: CameraSocket, camera_http: CameraHTTP):
         """ Constructor for cameraAPI
@@ -31,7 +34,7 @@ class CameraAPI:
         self.camera_http = camera_http
         self.counter = 1
         self.video = "on"
-        self.latest_direction = np.array([0, 0, 1])
+        self.latest_direction = np.array([0.0, 0.0, 1.0])
 
     def set_address(self, new_socket, address=None) -> ResponseCode:
         if address is None:
@@ -241,7 +244,7 @@ class CameraAPI:
         return direction
 
     def set_camera_codec(self, selected: CompressedFormat):
-        
+
         if (selected == CompressedFormat.MJPEG):
             self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}')
         elif (selected == CompressedFormat.H264):
@@ -256,7 +259,7 @@ class CameraAPI:
             self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}')
         elif (selected == ImageSize.P1920_1080):
             self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}')
-    
+
     def set_frame_rate(self, selected: int):
         assert 5 <= selected <= 60
         self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":%d},"nChannel":0}]}}' % (selected))
@@ -265,6 +268,23 @@ class CameraAPI:
         assert 1 <= selected <= 300
         self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":%d},"nChannel":0}]}}' % (selected))
 
+    def calculate_fov(self) -> ResponseCode | int:
+        """ Calculate the current FoV based on the current zoom
+
+            Returns:
+                array with the two FoVs [horizontal, vertical]
+
+        """
+        current_zoom = self.get_zoom()
+
+        print(current_zoom)
+        if isinstance(current_zoom, ResponseCode):
+            return current_zoom
+
+        assert 0 <= current_zoom <= 16384
+        current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
+            * current_zoom / self.MAX_ZOOM_VALUE)
+        return current_fov
 
 def degrees_to_command(degree: float, step_size: float) -> str:
     """ Transforms an angle in degree to a command code for VISCA call
@@ -289,7 +309,6 @@ def degrees_to_command(degree: float, step_size: float) -> str:
         answer_string += '0' + t
 
     return answer_string
-
 
 def insert_zoom_in_hex(msg: str, zoom: int) -> str:
     """ Inserts the value of the zoom into the hex string in the right format.

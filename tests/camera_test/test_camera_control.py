@@ -63,6 +63,25 @@ def test_move_relative(monkeypatch, camera: CameraAPI, speed_alpha, speed_beta, 
 
     assert camera.move_relative(speed_alpha, speed_beta, alpha, beta) == expected2
 
+def test_init(monkeypatch):
+    def mocked_connect(addr):
+        pass
+
+    def mocked_close():
+        pass
+
+    def mocked_timeout(ms):
+        pass
+
+    sock = socket.socket
+    monkeypatch.setattr(sock, "connect", mocked_connect)
+    monkeypatch.setattr(sock, "close", mocked_close)
+    monkeypatch.setattr(sock, "settimeout", mocked_timeout)
+
+    cam = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52382)), None)
+    assert cam.counter == 1
+    assert cam.video == "on"
+    assert (cam.latest_direction == np.array([0,0,1])).all()
 
 def generate_relative_commands_bad_parameters():
     return [

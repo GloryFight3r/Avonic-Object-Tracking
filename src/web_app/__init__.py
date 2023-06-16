@@ -11,6 +11,7 @@ import web_app.settings_endpoints
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
+#import logging
 #log = logging.getLogger('werkzeug')
 #log.setLevel(logging.ERROR)
 
@@ -192,18 +193,17 @@ def create_app(test_controller=None):
 
     @app.get('/preset/track')
     def preset_tracker():
-        print("PRESET TRACKER")
         return web_app.tracking_endpoints.track_presets(integration)
 
-    @app.get('/calibration/add_directions_to_speaker')
+    @app.post('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
 
-    @app.get('/calibration/add_direction_to_mic')
+    @app.post('/calibration/add_direction_to_mic')
     def add_calibration_mic():
         return web_app.calibration_endpoints.add_calibration_to_mic(integration)
 
-    @app.get('/calibration/reset')
+    @app.post('/calibration/reset')
     def reset_calibration():
         return web_app.calibration_endpoints.reset_calibration(integration)
 
@@ -217,9 +217,18 @@ def create_app(test_controller=None):
 
     @app.get('/calibration/track')
     def continuous_tracker():
-        print("CONTINUOUS TRACKER")
         return web_app.tracking_endpoints.track_continuously(integration)
+    @app.get('/calibration/track/no/zoom')
+    def continuous_tracker_without_adaprive_zoom():
+        return web_app.tracking_endpoints.track_continuously_without_adaptive_zooming(integration)
 
+    @app.get('/calibration/number-of-calibrated')
+    def number_of_calibrated():
+        return web_app.calibration_endpoints.get_number_of_speaker_points(integration)
+
+    @app.post('/navigate/camera')
+    def navigate_camera():
+        return web_app.camera_endpoints.navigate_camera(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
     # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
@@ -239,6 +248,10 @@ def create_app(test_controller=None):
     # python's "global" identifier and because threads can't be paused
 
     # create the event and start the thread
+
+    @app.get('/object/track')
+    def object_tracking_start():
+        return web_app.tracking_endpoints.track_object_continuously(integration)
 
     @app.post('/thread/start')
     def thread_start():

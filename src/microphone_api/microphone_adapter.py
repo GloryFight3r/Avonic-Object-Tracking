@@ -23,7 +23,10 @@ class MicrophoneSocket:
         """ Destructor for Microphone Socket
             Closes UDP connection
         """
-        self.sock.close()
+        try:
+            self.sock.close()
+        except:
+            pass
 
     def connect(self, address=None) -> bool:
         if address is None or address == ('0.0.0.0', 45):
@@ -45,13 +48,13 @@ class MicrophoneSocket:
             print("WARNING: Microphone address not specified!")
             return res
         self.sock.sendto(bytes(command, 'ascii'), self.address)
-        self.sock.settimeout(5)
+        self.sock.settimeout(0.1)
         received = 0
         while received < responses:
             try:
                 data, addr = self.sock.recvfrom(1024)
             except TimeoutError:
-                return ['{"message":"Microphone timed out"}']
+                return ['{"osc":{"error":[408,{"desc":"Microphone timed out"}]}}']
             if addr == self.address:
                 # all the microphone's responses end in CRLF
                 res.append(data.decode("ascii").split("\r\n")[0])
