@@ -23,7 +23,7 @@ class FootageThread(Thread):
         self.focused_box:np.ndarray | None = None
 
     def run(self):
-        while not self.event.is_set():
+        while self.event.value != 0:
             success, self.frame = self.camera.read()
 
             if success:

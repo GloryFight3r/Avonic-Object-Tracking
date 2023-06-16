@@ -42,7 +42,7 @@ class GeneralController:
         # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
 
-        self.footage_thread_event = Event()
+        self.footage_thread_event = Value("i", 1, lock=False)
 
         # self.info_threads_break used to completely destroy info-thread, and not just pause
         # Used for safe finish of the program, for safe destruction.
@@ -219,7 +219,7 @@ class GeneralController:
 
     def __del__(self):
         self.preset.value = 0  # pragma: no mutate
-        self.footage_thread_event.set() # pragma: no mutate
+        self.footage_thread_event.value = 0 # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
 
         try: # pragma: no mutate
@@ -353,7 +353,7 @@ def verify_address(address) -> bool:
 
 def close_running_threads(integration_passed) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""
-    integration_passed.footage_thread_event.set() # pragma: no mutate
+    integration_passed.footage_thread_event.value = 0 # pragma: no mutate
     integration_passed.info_threads_break.value = 1 # pragma: no mutate
 
     integration_passed.thread_mic.join() # pragma: no mutate
