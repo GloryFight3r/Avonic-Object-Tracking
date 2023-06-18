@@ -364,6 +364,8 @@ class GeneralController:
 
 
 def verify_address(address) -> bool:
+    """ Method that verifies that the given address is valid.
+    """
     try:
         assert 0 <= address[1] <= 65535
         assert isinstance(address[0], str)

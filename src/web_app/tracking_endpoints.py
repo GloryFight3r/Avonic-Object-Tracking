@@ -10,6 +10,9 @@ from web_app.integration import GeneralController, ModelCode
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 
 def start_thread_endpoint(integration: GeneralController):
+    """ This method starts the thread that controlls the actual tracking and calls 
+    the corresponding tracking model depending on the user's choice.
+    """
     # start (unpause) the thread
     if (integration.thread is None) or (integration.event.value == 0):
         if integration.thread is None:
@@ -51,7 +54,8 @@ def start_thread_endpoint(integration: GeneralController):
 
 
 def stop_thread_endpoint(integration: GeneralController):
-    # stop (pause) the thread
+    """ Stops(pauses) the thread
+    """
     integration.event.value = 0
     integration.info_threads_event.value = 0
 
@@ -61,40 +65,56 @@ def stop_thread_endpoint(integration: GeneralController):
 
 
 def update_microphone(integration: GeneralController):
+    """ Updates the new microphone data
+    """
     data = request.get_json()
     integration.ws.emit('microphone-update', data)
     return make_response(jsonify({}), 200)
 
 
 def update_camera(integration: GeneralController):
+    """ Updates the new camera data
+    """
     data = request.get_json()
     integration.ws.emit('camera-update', data)
     return make_response(jsonify({}), 200)
 
 
 def update_calibration(integration: GeneralController):
+    """ Updates the new calibration data
+    """
     data = request.get_json()
     integration.ws.emit('calibration-update', data)
     return make_response(jsonify({}), 200)
 
 
 def is_running_endpoint(integration: GeneralController):
+    """ Returns: Whether the thread is currently running
+    """
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
 def track_presets(integration: GeneralController):
+    """ Sets the current tracking model to PresetModel
+    """
     integration.preset.value = ModelCode.PRESET
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_continuously(integration: GeneralController):
+    """ Sets the current tracking model to the AudioModel
+    """
     integration.preset.value = ModelCode.AUDIO
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_object_continuously(integration: GeneralController):
+    """ Sets the current tracking model to ObjectModel
+    """
     integration.preset.value = ModelCode.OBJECT
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_continuously_without_adaptive_zooming(integration: GeneralController):
+    """ Sets the current tracking model to AudioModelNoAdaptiveZoom
+    """
     integration.preset.value = ModelCode.AUDIONOZOOM
     print(integration.preset.value)
     return make_response(jsonify({"preset":integration.preset.value}), 200)

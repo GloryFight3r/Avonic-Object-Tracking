@@ -24,6 +24,7 @@ def add_calibration_speaker(integration: GeneralController):
     timeouts = 0
 
     mic_dir = ""
+    # wait for some time until we get a microphone direction
     while isinstance(mic_dir, str):
         mic_dir = wait_for_speaker(integration)
         timeouts += 1
@@ -32,6 +33,7 @@ def add_calibration_speaker(integration: GeneralController):
                 jsonify({"message": "Could not get direction from the microphone!"}, 504))
     timeouts = 0
     cam_dir = ResponseCode.ACK
+    # wait for some time until we get a camera direction
     while isinstance(cam_dir, ResponseCode):
         cam_dir = integration.cam_api.get_direction()
         timeouts += 1
@@ -67,6 +69,11 @@ def add_calibration_to_mic(integration: GeneralController):
 
 
 def reset_calibration(integration: GeneralController):
+    """ Resets the current calibration 
+        params:
+            integration: the GeneralController instance that has
+                a Calibration instance.
+    """
     integration.audio_model.calibration.reset_calibration()
     return success()
 
@@ -86,6 +93,13 @@ def is_calibrated(integration: GeneralController):
 
 
 def wait_for_speaker(integration: GeneralController):
+    """ Wait for at most five seconds for someone to speak 
+        and get a direction from the microphone.
+        
+        params:
+            integration: the GeneralController instance that has
+                a Calibration instance.
+    """
     waited_for = 0
     while not integration.mic_api.is_speaking():
         sleep(0.1)

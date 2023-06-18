@@ -11,6 +11,10 @@ class YOLOPredict:
         self.conf_level = conf_level
 
     def get_bounding_boxes(self, frame):
+        """ Finds all the bounding boxes of the objects recognized in the given frame
+            Args:
+                frame: the given frame which to examineß
+        """
         results = self.model.predict(frame, classes=0, device="cpu")
         result = results[0]
 

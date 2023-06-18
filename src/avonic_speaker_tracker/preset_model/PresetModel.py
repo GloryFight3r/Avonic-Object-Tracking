@@ -6,7 +6,17 @@ from avonic_speaker_tracker.preset_model.preset_control import find_most_similar
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
+    """ Class that finds the location of the speaker in a set of 
+    recorded preset locations or the closest one in that set 
+    and points the camera towards that location.
+    """
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
+        """ Default constructor 
+            Args:
+                cam_api: Controller for the camera 
+                mic_api: Controller for the microphone 
+                filename: location of the file that contains the preset information
+        """
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.preset_locations: PresetCollection = PresetCollection(filename=filename)
         self.cam_api = cam_api
@@ -34,16 +44,18 @@ class PresetModel(TrackingModel):
         for i in range(len(preset_names)):
             presets_mic.append(self.preset_locations.get_preset_info(preset_names[i])[1])
 
+        # Find the closest preset and the direction of the camera towards that
         preset = self.preset_locations.get_preset_info(
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
         direct = np.array([int(np.rad2deg(preset[0][0]))%360, int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
 
+        # If either pitch an yaw is more than 180 degrees camera should rotate in the opposite direction
         if direct[0]>180:
             direct[0] = direct[0]-360
         if direct[1]>180:
             direct[1] = direct[1]-360
 
-
+        # If the direction to move is the same as the current direction camera will not move
         if direct is None:
             print("Something wrong with direct here")
             return self.prev_dir
