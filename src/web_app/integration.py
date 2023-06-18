@@ -2,7 +2,7 @@ import os
 from threading import Thread
 from os import getenv
 from time import sleep
-from multiprocessing import Value
+from multiprocessing import Value, Process
 
 import requests
 from yaml import load, dump
@@ -161,11 +161,14 @@ class GeneralController:
         # Initialize footage thread
         if cam_addr is not None:
             self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
-                                          + ':554/live/av0',)  # pragma: no mutate
-            self.video.set(cv2.CAP_PROP_FPS, 5)
+                                          + ':554/live/av0')  # pragma: no mutate
+            self.video.set(cv2.CAP_PROP_FPS, 15)
             self.footage_thread = FootageThread(self.video,
                                                 self.footage_thread_event)  # pragma: no mutate
-            self.footage_thread.start()  # pragma: no mutate
+
+            self.footage_process = Process(target=self.footage_thread.run)
+
+            self.footage_process.start()  # pragma: no mutate
 
         # Initialize models
         self.object_audio_model = WaitObjectAudioModel(
@@ -237,7 +240,7 @@ class GeneralController:
         except: # pragma: no mutate
             print("Trying to destruct None thread for camera") # pragma: no mutate
         try: # pragma: no mutate
-            self.footage_thread.join() # pragma: no mutate
+            self.footage_process.join() # pragma: no mutate
         except: # pragma: no mutate
             print("Trying to destruct None thread for footage") # pragma: no mutate
         try: # pragma: no mutate
@@ -316,7 +319,7 @@ class GeneralController:
         if isinstance(direction, ResponseCode):
             direction = np.array([0.0, 0.0, 1.0])
         if isinstance(zoom, ResponseCode):
-            zoom = np.array(0)
+            zoom = int(0)
         angles = converter.vector_angle(direction)
         if not isinstance(zoom, int):
             zoom = 0
@@ -381,7 +384,7 @@ def close_running_threads(integration_passed) -> None:
 
     integration_passed.thread_mic.join() # pragma: no mutate
     integration_passed.thread_cam.join() # pragma: no mutate
-    integration_passed.footage_thread.join() # pragma: no mutate
+    integration_passed.footage_process.join() # pragma: no mutate
     cv2.destroyAllWindows() # pragma: no mutate
     integration_passed.video.release() # pragma: no mutate
     raise SystemExit # pragma: no mutate

@@ -34,7 +34,7 @@ class FootageThread(Thread):
                 buffer = cv2.imencode('.jpg', self.frame)[1]
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
-            time.sleep(0.1)
+            time.sleep(0.05)
         print("Close footage thread")
 
     def get_frame(self):
