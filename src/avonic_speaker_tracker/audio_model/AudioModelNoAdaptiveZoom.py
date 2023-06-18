@@ -18,7 +18,8 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
     on how much the camera has to move.
     """
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
-         """ Constructor for the AudioModelNoAdaptiveZoom
+        """ Constructor for the AudioModelNoAdaptiveZoom
+        
             Args:
                 cam_api: Controller for the camera
                 mic_api: Controller for the microphone
