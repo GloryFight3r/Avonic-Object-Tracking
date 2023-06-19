@@ -222,6 +222,8 @@ class CameraAPI:
         if isinstance(ret, ResponseCode):
             return ret
 
+        # checks whether the response is in the correct format
+        # 90 50 0w 0w 0w 0w 0z 0z 0z 0z FF
         valid = re.compile(r"b'90500[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]FF'")
 
         if not valid.match(str(ret)):
