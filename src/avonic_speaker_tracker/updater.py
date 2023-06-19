@@ -43,6 +43,6 @@ class UpdateThread(Thread):
         
         while self.event.value != 0:
             self.model.point()
-            sleep(2)
+            sleep(0.3)
 
         print("Exiting thread")
