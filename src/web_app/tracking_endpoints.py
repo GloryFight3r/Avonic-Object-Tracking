@@ -1,8 +1,8 @@
+from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
 import numpy as np
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 from flask import make_response, jsonify, request
 from avonic_speaker_tracker.updater import UpdateThread
@@ -12,10 +12,6 @@ from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 def start_thread_endpoint(integration: GeneralController):
     # start (unpause) the thread
     if (integration.thread is None) or (integration.event.value == 0):
-        if integration.thread is None:
-            old_calibration = 0
-        else:
-            old_calibration = integration.thread.value
         integration.event.value = 1
         if integration.preset.value == ModelCode.PRESET:
             model = PresetModel(integration.cam_api, integration.mic_api,
@@ -24,15 +20,18 @@ def start_thread_endpoint(integration: GeneralController):
             model = AudioModel(integration.cam_api, integration.mic_api,
                                     filename=integration.filepath + "calibration.json")
         elif integration.preset.value == ModelCode.AUDIONOZOOM:
-            model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api, 
+            model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
                                     filename = integration.filepath + "calibration.json")
+        elif integration.preset.value == ModelCode.HYBRID:
+            model = HybridTracker(integration.cam_api, integration.mic_api, integration.nn, integration.footage_thread,
+                                  integration.filepath + "calibration.json")
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
 
             model = WaitObjectAudioModel(
                 integration.cam_api, integration.mic_api,
-                np.array([1920.0, 1080.0]),
+                integration.resolution,
                 5, integration.nn, integration.footage_thread,
                 filename=integration.filepath + "calibration.json")
 
@@ -40,7 +39,6 @@ def start_thread_endpoint(integration: GeneralController):
                                           integration.cam_api, integration.mic_api,
                                           model, integration.filepath)
         integration.event.value = 1
-        integration.thread.set_calibration(old_calibration)
 
         integration.info_threads_event.value = 1
         integration.thread.start()
@@ -86,6 +84,11 @@ def track_presets(integration: GeneralController):
     integration.preset.value = ModelCode.PRESET
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
+def track_hybrid(integration: GeneralController):
+    integration.preset.value = ModelCode.HYBRID
+    print(integration.preset.value)
+    return make_response(jsonify({"hybrid":integration.preset.value}), 200)
+
 def track_continuously(integration: GeneralController):
     integration.preset.value = ModelCode.AUDIO
     return make_response(jsonify({"preset":integration.preset.value}), 200)
@@ -97,6 +100,7 @@ def track_object_continuously(integration: GeneralController):
 def track_continuously_without_adaptive_zooming(integration: GeneralController):
     integration.preset.value = ModelCode.AUDIONOZOOM
     print(integration.preset.value)
+    #                        TODO preset?
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def preset_use(integration: GeneralController):

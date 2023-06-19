@@ -12,6 +12,9 @@ class Preset:
         return f"Preset({self.camera_info}, {self.microphone_direction})"
 
 class PresetCollection:
+    preset_locations = {}
+    filename = None
+    
     default_camera_info: list[float] = [0.0, 0.0, 1.0]
     default_mic_info: list[float] = [0.0, 1.0, 0.0]
     def __init__(self, filename: str = ""):

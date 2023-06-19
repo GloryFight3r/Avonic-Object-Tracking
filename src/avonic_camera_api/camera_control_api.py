@@ -1,5 +1,7 @@
 import math
 import numpy as np
+import re
+from multiprocessing import Value
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api import converter
 
@@ -8,6 +10,8 @@ TILT_STEP = 121/(1296+443)
 
 class CameraAPI:
     latest_direction = None
+    latest_fov = 0
+
     MIN_FOV = np.array([3.72, 2.14])
     MAX_FOV = np.array([60.38, 35.80])
     MAX_ZOOM_VALUE = 16384
@@ -19,9 +23,9 @@ class CameraAPI:
             camera: object of type Camera
         """
         self.camera = camera
-        self.counter = 1
+        self.counter = Value('i', 1)
         self.video = "on"
-        self.latest_direction = np.array([0.0, 0.0, 1.0])
+        self.latest_direction = np.array([0, 0, 1], dtype='float')
 
     def set_address(self, new_socket, address=None) -> ResponseCode:
         if address is None:
@@ -36,16 +40,18 @@ class CameraAPI:
         Returns:
             The current message count
         """
-        cnt_hex = self.counter.to_bytes(1, 'big').hex()
+        cnt_hex = self.counter.value.to_bytes(1, 'big').hex()
 
-        self.counter = (self.counter + 1) % 256
+        temp_counter = (self.counter.value + 1) % 256
+        self.counter.value = temp_counter
 
-        return cnt_hex
+        return (cnt_hex, temp_counter)
 
     def reboot(self, new_socket) -> ResponseCode:
         """ Reboots the camera - the camera will do a complete reboot
         """
-        self.camera.send_no_response('01 00 00 06 00 00 00' + self.message_counter(),
+        hx, cnt = self.message_counter()
+        self.camera.send_no_response('01 00 00 06 00 00 00' + hx,
                                      '81 0A 01 06 01 FF')
 
         return self.camera.reconnect(new_socket)
@@ -56,8 +62,9 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
-                                '81 01 06 01 05 05 03 03 FF', self.counter)
+        hx, cnt = self.message_counter()
+        return self.camera.send('01 00 00 09 00 00 00' + hx,
+                                '81 01 06 01 05 05 03 03 FF', cnt)
 
     def turn_on(self) -> ResponseCode:
         """ Turns on the camera
@@ -65,8 +72,9 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
-                               '81 01 04 00 02 FF', self.counter)
+        hx, cnt = self.message_counter()
+        res = self.camera.send('01 00 00 06 00 00 00' + hx,
+                               '81 01 04 00 02 FF', cnt)
         if res == ResponseCode.ACK:
             self.video = "on"
         return res
@@ -77,8 +85,9 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        res = self.camera.send('01 00 00 06 00 00 00' + self.message_counter(),
-                               '81 01 04 00 03 FF', self.counter)
+        hx, cnt = self.message_counter()
+        res = self.camera.send('01 00 00 06 00 00 00' + hx,
+                               '81 01 04 00 03 FF', cnt)
         if res == ResponseCode.ACK:
             self.video = "off"
         return res
@@ -90,8 +99,9 @@ class CameraAPI:
         Returns:
             The response code from the camera
         """
-        return self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
-                                '81 01 06 04 FF', self.counter)
+        hx, cnt = self.message_counter()
+        return self.camera.send('01 00 00 05 00 00 00' + hx,
+                                '81 01 06 04 FF', cnt)
 
     def move_relative(self, speed_x: int, speed_y: int,
                       degrees_x: float, degrees_y: float) -> ResponseCode:
@@ -111,11 +121,12 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
+        hx, cnt = self.message_counter()
+        return self.camera.send('01 00 00 0F 00 00 00' + hx,
                                 '81 01 06 03' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) + " " +
                                 degrees_to_command(degrees_x, PAN_STEP) + " " +
-                                degrees_to_command(degrees_y, TILT_STEP) + " FF", self.counter)
+                                degrees_to_command(degrees_y, TILT_STEP) + " FF", cnt)
 
     def move_absolute(self, speed_x: int, speed_y: int,
                       degrees_x: float, degrees_y: float) -> ResponseCode:
@@ -135,11 +146,12 @@ class CameraAPI:
         assert 0 < speed_x <= 24 and 0 < speed_y <= 20
         assert -170 <= degrees_x <= +170 and -30 <= degrees_y <= +90
 
-        return self.camera.send('01 00 00 0F 00 00 00' + self.message_counter(),
+        hx, cnt = self.message_counter()
+        return self.camera.send('01 00 00 0F 00 00 00' + hx,
                                 '81 01 06 02' + str(speed_x.to_bytes(1, 'big').hex()) + " " +
                                 str(speed_y.to_bytes(1, 'big').hex()) +
                                 " " + degrees_to_command(degrees_x, PAN_STEP) + " " +
-                                degrees_to_command(degrees_y, TILT_STEP) + " FF", self.counter)
+                                degrees_to_command(degrees_y, TILT_STEP) + " FF", cnt)
 
     def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> ResponseCode:
         """ Rotates the camera in the direction of a vector (with home position being [0, 0, 1]
@@ -163,12 +175,14 @@ class CameraAPI:
         """
         message = "81 09 04 47 FF"
 
-        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
-                               message, self.counter)
+        hx, cnt = self.message_counter()
+        ret = self.camera.send('01 00 00 05 00 00 00' + hx,
+                               message, cnt)
         if isinstance(ret, ResponseCode):
-            return ret
+            return self.latest_fov
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
-        return int(hex_res, 16)
+        self.latest_fov = int(hex_res, 16)
+        return self.latest_fov
 
     def direct_zoom(self, zoom: int) -> ResponseCode:
         """ Change the value of the zoom to the specified value.
@@ -179,8 +193,9 @@ class CameraAPI:
         assert 0 <= zoom <= 16384
         message = "81 01 04 47 0p 0q 0r 0s FF"
         final_message = insert_zoom_in_hex(message, int(zoom))
-        return self.camera.send('01 00 00 09 00 00 00' + self.message_counter(),
-                                final_message, self.counter)
+        hx, cnt = self.message_counter()
+        return self.camera.send('01 00 00 09 00 00 00' + hx,
+                                final_message, cnt)
 
     def get_saved_direction(self) -> np.array:
         """ Get the last direction the camera pointed to.
@@ -190,7 +205,7 @@ class CameraAPI:
         """
         return self.latest_direction
 
-    def get_direction(self):
+    def get_direction(self) -> np.ndarray | ResponseCode:
         """ Get the direction, pan and tilt, from the camera.
 
             Returns:
@@ -201,10 +216,19 @@ class CameraAPI:
                         while tilt_adjusted ranges between (-30°) and (+90°)
         """
         message = "81 09 06 12 FF"
-        ret = self.camera.send('01 00 00 05 00 00 00' + self.message_counter(),
-                               message, self.counter)
+        hx, cnt = self.message_counter()
+        ret = self.camera.send('01 00 00 05 00 00 00' + hx,
+                               message, cnt)
         if isinstance(ret, ResponseCode):
             return ret
+
+        # checks whether the response is in the correct format
+        # 90 50 0w 0w 0w 0w 0z 0z 0z 0z FF
+        valid = re.compile(r"b'90500[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]0[A-F_0-9]FF'")
+
+        if not valid.match(str(ret)):
+            return self.latest_direction
+
         ret_msg = str(ret)[2:-1]  # remove b' and '
         pan_hex = ret_msg[5] + ret_msg[7] + ret_msg[9] + ret_msg[11]
         tilt_hex = ret_msg[13] + ret_msg[15] + ret_msg[17] + ret_msg[19]
@@ -233,13 +257,14 @@ class CameraAPI:
         """
         current_zoom = self.get_zoom()
 
-        print(current_zoom)
         if isinstance(current_zoom, ResponseCode):
             return current_zoom
 
         assert 0 <= current_zoom <= 16384
+
         current_fov = self.MAX_FOV - ((self.MAX_FOV - self.MIN_FOV) \
             * current_zoom / self.MAX_ZOOM_VALUE)
+
         return current_fov
 
 def degrees_to_command(degree: float, step_size: float) -> str:
