@@ -110,7 +110,7 @@ class ObjectModel():
         rotate_angle:np.ndarray = angular_resolution * distance_to_middle
 
         # TODO pick a good rotation speed according to the rotation angle it has to make
-        rotate_speed:np.ndarray = self.calculate_speed(angular_resolution)
+        rotate_speed:np.ndarray = self.calculate_speed(rotate_angle)
 
         return (rotate_speed, rotate_angle)
 
@@ -126,7 +126,7 @@ class ObjectModel():
 
         speedAlpha = math.fabs(rotate_angle[0])/340.0*11.0+13.0
         speedBeta = math.fabs(rotate_angle[1])/120.0*9.0+11.0
-        return np.array([int(speedAlpha), (speedBeta)])
+        return np.array([int(speedAlpha), int(speedBeta)])
 
     def track_object(self):
         pass
