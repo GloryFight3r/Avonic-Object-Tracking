@@ -127,19 +127,20 @@ available for object detection and many models have been trained on these sets. 
 The YOLO (You Only Look Once) network is one of the most common ways to track objects in real-time. YOLO sees the
 problem of finding bounding boxes and classifying objects in an image as a regression problem\cite{you-only-look-once}.
 The input image is divided into a grid. The network predicts three things for each box in the grid:
-First, a constant number of bounding boxes that have their center in the grid. Second, a number
+first, a constant number of bounding boxes that have their center in the grid; second, a number
 representing the class the object in
-the box belongs to and a confidence score for that class prediction. As such, the output of the network is a vector of
+the box belongs to; third, a confidence score for that class prediction. As such, the output of the network is a vector of
 constant size. Since the network often outputs many overlapping boxes, non-maximum suppression is
 used. This is a technique that takes a group of boxes with the center in the same square and only
 keeps the best performing one. The performance of objects during non-maximum suppression is based on
 the intersection-over-union score. This is the score calculated by intersecting one boxes with the
-other boxes and dividing this by the union of the same boxes; the higher the score, the more
+other boxes and dividing this by the union of those same boxes; the higher the score, the more
 accurate the prediction.
 
-Considering the YOLO network was made for real-time performance, it fits well with our system. It can process {test this
-with Jetson} frames per second. We do not want to track objects that are not people and the classification part of the
-network helps to do this.
+Considering the YOLO network was made for real-time performance, it fits well with our system. During the
+tests described in the YOLO paper, the network can process 45 frames per second\cite{you-only-look-once}.
+Moreover, the classification part of the network helps to filter out objects that are not people. This helps to
+find out which bounding box corresponds to the speaker.
 
 
 \paragraph{RT-DETR}\mbox{} \\
@@ -185,7 +186,7 @@ This means that object tracking is used when someone is not moving a lot, but it
 simultaneously with speaker tracking. This helps to centralize the speaker on the screen.
 
 
-\paragraph{Switch strategy} \mbox{} 
+\paragraph{Switch strategy} \mbox{}
 \begin{figure}[h]
     \caption{Possible states diagram}
     \centering
@@ -193,8 +194,27 @@ simultaneously with speaker tracking. This helps to centralize the speaker on th
     \label{fig:object_strategy}
 \end{figure}
 \\
-The last approach we consider is always relying on microphone coordinations when there is an active speaker, but furthermore adjusts the camera based on camera footage and bounding boxes. When there is an active speaker, we first search for his location using the microphone information. If he is in the FoV of the camera, we get the bounding speaker boxes from the current frame and after translating the microphone direction to a camera direction and finding its position on the screen as a pixel, we search which bounding box’s center is the closest to that pixel. After finding it, we move the camera so that this bounding box is in the middle of the camera screen. If the speaker is not currently visible on the screen, we again translate the microphone direction to a camera direction and rotate the camera so that it faces that way. And finally in the case that there is no active speaker, we attempt to continue tracking the last active speaker. In order to achieve that, we rely on the fact that the bounding box of the last active speaker in the current frame should be the closest to his new bounding box in the new frame. Relying on that fact, we get all of the new bounding boxes from the new frame and choose to track the one that has its center the closest to the previous bounding box.
-A diagram that illustrates the possible states we could be in is the depicted in Figure \ref{fig:object_strategy}.
+The last approach we consider is always relying on microphone coordinations
+when there is an active speaker, but furthermore adjust the camera based on
+camera footage and bounding boxes. When there is an active speaker, we first
+search for his location using the microphone information. If he is in the FoV
+of the camera, we get the bounding speaker boxes from the current frame.
+After translating the microphone direction to a camera direction and finding
+its position on the screen as a pixel, we search which bounding box’s center is
+the closest to that pixel. After finding it, we move the camera so that this
+bounding box is in the middle of the camera screen.
+
+If the speaker is not
+currently visible on the screen, we again translate the microphone direction to
+a camera direction and rotate the camera so that it faces that way. Finally,
+in the case that there is no active speaker, we attempt to continue tracking
+the last active speaker. In order to achieve that, we rely on the fact that the
+bounding box of the last active speaker in the current frame should be the
+closest to his new bounding box in the new frame. Relying on that fact, we get
+all of the new bounding boxes from the new frame and choose to track the one
+that has its center the closest to the previous bounding box. A diagram that
+illustrates the possible states we could be in is the depicted in Figure
+\ref{fig:object_strategy}.
 
 
 \section{Application overview}
@@ -226,8 +246,8 @@ The Microphone API module contains all of the functionality related to communica
 
 \subsection{Tracking}
 All of the functionality related to speaker tracking is separated in this module.
-The most important part of it is the \verb|UpdateThread|. 
-It is a class that extends \verb|Thread| and is responsible for continuous calling of the point method to direct the camera. 
+The most important part of it is the \verb|UpdateThread|.
+It is a class that extends \verb|Thread| and is responsible for continuous calling of the point method to direct the camera.
 The module is structured in a way that every tracking type is maintained in a so-called model.
 Every model is an child of the \verb|TrackingModel| class that ensures that they have a \verb|point| method to perform calculations and point the camera.
 The picked model is instantiated at the beginning of \verb|run| method that is continuously using the model until the stop signal arrives.
@@ -253,7 +273,7 @@ Unlike the preset model, it can point the camera towards any arbitrary point in 
 The audio model also keeps track of how much time has passed since someone has last spoken.
 If no one has spoken in some time the camera will zoom out.
 This model’s point method also takes into account how far the speaker is from the camera and zooms in accordingly if this option is enabled.
-Another improvement we implemented is changing the camera speed depending on how much it has to move. 
+Another improvement we implemented is changing the camera speed depending on how much it has to move.
 It helps reduce jittering when following the speaker.
 The model also saves vectors that were added to the calibration and can load data from a supplied file. If any of the fields from that file are non-existent or corrupted, they are replaced with default values.
 \paragraph{Object-tracking model}\mbox{} \\

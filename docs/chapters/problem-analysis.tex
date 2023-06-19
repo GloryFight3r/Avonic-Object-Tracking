@@ -35,28 +35,41 @@ using the camera, microphone and single-board computer mentioned above,
 we had to find a way to automatically move to camera to point at a speaker after minimal installation.
 
 \section{Available solutions}\label{sec:available-solutions}
-We now discuss three different solutions that are already available for customers. These products were created by companies other than Avonic to solve a similar
-problem to the one described in section 1.1. Looking at such products helps to get a better idea of the state of the art.
-For every case below, we contrast the solution with Avonic’s vision and explain how it relates
-to the project we worked on.
+We now discuss three different solutions that are already available for
+customers. These products were created by companies other than Avonic to solve
+a similar problem to the one described in
+\hyperref[sec:problem-statement]{Section 2.1}. Looking at such products helps to get a
+better idea of the state of the art. For every case below, we contrast the
+solution with Avonic’s vision and explain how it relates to the project we
+worked on.
 
-\subsection{AVer}
-AVer created a camera that can ``automatically track a presenter’s face and movements''\cite{aver-camera} The camera
+\paragraph{AVer}\mbox{} \\
+AVer created a camera that can ``automatically track a presenter’s face and movements''\cite{aver-camera}. The camera
 stands alone and is not helped by an external microphone. Instead, it has a so-called ``dual-lens design'' that allows to keep a secondary
 panorama view while zooming in on the speaker. In this way, new speakers can still be recognized when they are not recorded by the zoomed in
 lens.
-Avonic wants to try something other than a dual-lens design. Instead, they chose to try a microphone. This way it is still possible to detect new
-speakers that are not in view of the camera. The video processing techniques used by AVer may be similar to the ones employed by Avonic,
-but since the microphone was an essential part of our project,
-the AVer camera could not serve as a good source of inspiration.
 
-\subsection{Yealink} On top of a dual-lens design similar to the one AVer used, the Yealink camera has a built-in microphone array which helps
-to localize the sound and track the speaker.\cite{yealink-camera} As audio from a microphone array is used to detect the speaker's location, this is similar
-to our project. The big difference is that the Yealink microphone is built into the camera, which eliminates the need to translate data from the microphone to the camera. This changes the nature of the problem. The microphone Avonic uses is not in the same place as the camera, so the most
-important steps in our process differ from Yealink's.
+Though Avonic has tried to use a dual-lens design before, our project is about
+using a single camera with a single lens. To make up for the lack of multiple
+lenses, we have to use a microphone. This way it is still possible to detect
+new speakers that are not in view of the camera. The video processing
+techniques used by AVer may be similar to the ones employed by Avonic, but
+since the microphone was an essential part of our project, the AVer camera
+could not serve as a good source of inspiration.
 
-\subsection{Cisco} Using one camera, Cisco locates the speaker and zooms in on that speaker, while another camera is watching the entire room to look for the next
-speaker.\cite{cisco-camera} This dual-camera approach helps to switch quickly between different speakers. It can be compared to the dual-lens design used
+\paragraph{Yealink}\mbox{} \\
+On top of a dual-lens design similar to the one AVer used, the Yealink camera
+has a built-in microphone array which helps to localize the sound and track the
+speaker\cite{yealink-camera}. As audio from a microphone array is used to
+detect the speaker's location, this is similar to our project. The big
+difference is that the Yealink microphone is built into the camera, which
+eliminates the need to translate data from the microphone to the camera. Since
+we have a seperate microphone at a different position from the camera, we face
+an entirely different problem from Yealink.
+
+\paragraph{Cisco}\mbox{} \\
+Using one camera, Cisco locates the speaker and zooms in on that speaker, while another camera is watching the entire room to look for the next
+speaker\cite{cisco-camera}. This dual-camera approach helps to switch quickly between different speakers. It can be compared to the dual-lens design used
 by AVer and Yealink; all these products have an option to search for a new speaker while recording the active speaker.
 The use of two cameras thus makes it easier for Cisco to localize the speaker. The overall problem is in this way made
 less complex. Avonic wants to use only one camera and one microphone and try to track speakers as well as companies
@@ -70,26 +83,26 @@ Avonic, we experimented with a new approach: one camera and one microphone. This
 \section{Stakeholders}\label{sec:stakeholders}
 This section describes who the stakeholders of our project are and how we considered their interests during the ten week process. The
 definition of stakeholder that we are going to use is as follows: “All those who have an interest in the system and who will eventually be
-responsible for its acceptance.”\cite{stakeholder-definition}
+responsible for its acceptance”\cite{stakeholder-definition}.
 Using this definition, we identified three main types of stakeholders. These people are directly affected by the result of our project.
 The types of stakeholders of our project are as follows:
 
-\subsection{Clients}
+\paragraph{Clients}\mbox{} \\
 Potential clients of Avonic who are going to make use of our software in the future. This includes university staff or conference
 organizers. Anyone who buys the Avonic camera for personal use falls into this category. It is important to these clients that the camera
 tracks speakers accurately and that it is easy to install.
-\subsection{Developers}
+\paragraph{Developers}\mbox{} \\
 Developers who are going to be building upon our code in the future. Since we write our code for Avonic, we expect this category to include
 only their developers. It is important to the developers that the code is well written and well documented. Some of the criteria we
 use to determine whether code is well written are test coverage, readability and extensibility. These criteria and more are explained in
 \hyperref[ch:workflow-and-teamwork]{Chapter 5} where we talk about the workflow.
-\subsection{Avonic}
-Avonic as a company influence the requirements of our project. They have the general picture in mind, considering both the clients and
+\paragraph{Avonic}\mbox{} \\
+Avonic as a company influences the requirements of our project. They have the general picture in mind, considering both the clients and
 the developers. It is important to them that the compromises made in the process are carefully considered and explained. This includes a
 clear and elaborate report that explains precisely what steps have been taken to reach the conclusion. Such a report can be used by Avonic
 to decide whether the experiment is worth doing again.
 
-
+\paragraph{Satisfaction of all stakeholders}\mbox{} \\
 In order to satisfy every stakeholder as much as possible, we continually talked to people from Avonic. We had weekly meetings with Ali
 Kahawati, one of the software developers at the company, and visited the office three times a week to be able to talk with other employees as well.
 Throughout the project, this helped to stay in touch with the wants of the stakeholders. We had no direct contact with the clients, so this
@@ -97,18 +110,30 @@ group was mainly represented by the Avonic team.
 
 
 \section{Possible pitfalls}\label{sec:possible-pitfalls}
-At the start of the project, we identified a few possible risks which we needed to decide on how to avert.
+At the start of the project, we identified two possible risks which we needed to decide on how to avert.
 As these risks threatened to slow down our progress, we tried to reduce their impact as much as possible.
 Below are the issues listed in order of severity.
 \subsection{Access to hardware}
-The largest risk was access to the hardware (or lack thereof).
-Since our project relies on the availability of both the camera and microphone, we would have been unable to work on it without them.
-The contact person from Avonic -- Mr. Kahawati -- informed us that we would only be able to come to the office three days a week, which would have prevented us from working on the project sometimes.
+The largest risk was access to the hardware (or lack thereof). Since our
+project relies on the availability of both the camera and microphone, we would
+have been unable to work on it without them. The contact person from Avonic --
+Mr. Kahawati -- informed us that we would only be able to come to the office
+three days a week, which would have prevented us from working on the project
+sometimes.
 
+We were allowed to bring a camera home to test, but that was not an option with
+the expensive and large ceiling microphone. We mitigated this by using a
+virtual private network (VPN) connection to the office. This way we had a way
+to access the microphone remotely, although we could not test it very well when
+nobody from the group was at the office.
 
-We were allowed to bring a camera home to test, but that was not an option with the expensive and large ceiling microphone.
-We mitigated this by using a virtual private network (VPN) connection to the office.
-This way we at the very least had a way to access the microphone, although we could not test it very well when nobody from the group was at the office.
+Apart from the camera, we also needed an NVIDIA Jetson Nano to run our software.
+This device became available during the eighth week of the project, which caused
+some new problems to appear in our code. Up untill that point we had used our own
+computers to simulate the production environment. Despite the risk of having
+too little time to fix new bugs, the last two weeks turned out to be enough to
+make everything work on the Jetson Nano.
+
 \subsection{Work space}
 During the project we could visit the office at most three days a week. This meant that we did not always have a place to work together as a
 group. Group meetings required a quiet meeting room, which we were not always able to find.
