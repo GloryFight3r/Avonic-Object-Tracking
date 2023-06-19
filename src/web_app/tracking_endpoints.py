@@ -54,7 +54,7 @@ def start_thread_endpoint(integration: GeneralController):
 
 
 def stop_thread_endpoint(integration: GeneralController):
-    """ Stops(pauses) the thread
+    """ Stops(pauses) the thread that controlls the tracking 
     """
     integration.event.value = 0
     integration.info_threads_event.value = 0
@@ -65,7 +65,7 @@ def stop_thread_endpoint(integration: GeneralController):
 
 
 def update_microphone(integration: GeneralController):
-    """ Updates the new microphone data
+    """ Updates the new microphone data in the corresponding field in the WebUI
     """
     data = request.get_json()
     integration.ws.emit('microphone-update', data)
@@ -73,7 +73,7 @@ def update_microphone(integration: GeneralController):
 
 
 def update_camera(integration: GeneralController):
-    """ Updates the new camera data
+    """ Updates the new camera data in the corresponding field in the WebUI
     """
     data = request.get_json()
     integration.ws.emit('camera-update', data)
@@ -81,7 +81,7 @@ def update_camera(integration: GeneralController):
 
 
 def update_calibration(integration: GeneralController):
-    """ Updates the new calibration data
+    """ Updates the new calibration data in the corresponding field in the WebUI
     """
     data = request.get_json()
     integration.ws.emit('calibration-update', data)
@@ -89,7 +89,7 @@ def update_calibration(integration: GeneralController):
 
 
 def is_running_endpoint(integration: GeneralController):
-    """ Returns: Whether the thread is currently running
+    """ Returns: Whether the thread that controlls the tracking is currently running
     """
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
