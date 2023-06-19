@@ -267,15 +267,21 @@ After finding the closest preset the camera is pointed towards that preset locat
 \verb|PresetCollection| can be edited from the WebUI, as well as it can be loaded from the already specified file.
 This preset model is what is mostly used throughout the industry for streaming web conferences and round-table meetings. The reason it is so widely used is that it is simple to set up for people without technical background and the fact that it is very precise in those scenarios.
 Setting up only requires recording a couple of possible locations for the speaker in the room.
+Exactly the simplicity of the installation and the wide usage are the reason why we chose this model as a starting point for our tracking. 
 \paragraph{Audio model}\mbox{} \\
 The Audio Model achieves the main goal of our application by continuously tracking the speaker around the room.
 Unlike the preset model, it can point the camera towards any arbitrary point in the room by performing the calculations described in SECTION ON SOLUTIONS MATH.
 The audio model also keeps track of how much time has passed since someone has last spoken.
 If no one has spoken in some time the camera will zoom out.
-This model’s point method also takes into account how far the speaker is from the camera and zooms in accordingly if this option is enabled.
-Another improvement we implemented is changing the camera speed depending on how much it has to move.
+This model’s point method also takes into account how far the speaker is from the camera and zooms in accordingly.
+Another improvement we implemented in this model is changing the camera speed depending on how much it has to move.
 It helps reduce jittering when following the speaker.
 The model also saves vectors that were added to the calibration and can load data from a supplied file. If any of the fields from that file are non-existent or corrupted, they are replaced with default values.
+\paragraph{Audio model without adaptive zooming}\mbox{} \\
+This model has almost the same functionality as the Audio Model with the only difference that it does not have the ability to adapt the camera zoom depending on the position of the speaker. 
+It also eliminates the possibility for the camera to zoom out when no one is speaking. This means that for the whole period of tracking the zoom is not changed unless the user expressly does that using any mode for controlling the zoom.
+We decided to add this model because in some scenarios the adaptive zooming does not provide a very pleasant flow of the tracking. Sometimes the camera zoomes in or out unexpectedly or too much. 
+Reasons for that inconsistency are the possibility of inaccurate calibration or inaccurate readings provided by the microphone.
 \paragraph{Object-tracking model}\mbox{} \\
 The Object Tracking Model is intended to refine our tracking in situations when the speaker is not audible or the microphone’s direction towards the speaker is not precise enough to accurately center the speaker.
 After having identified all the people in the frame and having created the corresponding bounding boxes around them it has a method to find the box that is most likely to be the one around the speaker.
