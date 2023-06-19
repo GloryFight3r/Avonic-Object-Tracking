@@ -99,7 +99,7 @@ class ObjectModel():
         # calculate current FoV of the camera
         try:
             cam_fov:np.ndarray = self.cam_api.calculate_fov()
-        except:
+        except AssertionError as e:
             print(e)
             return ([20, 20], [0, 0])
 

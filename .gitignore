@@ -23,10 +23,7 @@ public/
 pylint_test/
 run_pylint.sh
 *.pt
-<<<<<<< HEAD
-=======
 *.avi
->>>>>>> dev
 .DS_Store
 src/.DS_Store
 src/avonic_speaker_tracker_system.egg-info/
