@@ -54,7 +54,7 @@ RUN apt-get install -y \
     python3-matplotlib \
     qv4l2 \
     v4l-utils \
-    zlib1g-dev \
+    zlib1g-dev
 RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/4.7.0.zip && \
     wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.7.0.zip && \
     unzip opencv.zip && \
@@ -65,7 +65,7 @@ RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/4.7.0.zip && \
     rm opencv_contrib.zip && \
     cd opencv && \
     mkdir build && \
-    cd build \
+    cd build
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
           -D CMAKE_INSTALL_PREFIX=/usr \
           -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
