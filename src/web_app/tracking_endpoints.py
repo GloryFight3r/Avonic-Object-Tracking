@@ -122,11 +122,3 @@ def track_continuously_without_adaptive_zooming(integration: GeneralController):
     print(integration.preset.value)
     #                        TODO preset?
     return make_response(jsonify({"preset":integration.preset.value}), 200)
-
-def preset_use(integration: GeneralController):
-    if integration.preset.value == 1:
-        integration.preset.value = 0
-    else:
-        integration.preset.value = 1
-    print(integration.preset.value)
-    return make_response(jsonify({"preset":integration.preset.value}), 200)

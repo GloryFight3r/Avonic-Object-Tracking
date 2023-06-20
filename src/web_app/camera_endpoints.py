@@ -1,10 +1,12 @@
 import socket
-import numpy as np
 import json
+import numpy as np
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode
 from avonic_camera_api.converter import vector_angle
+from avonic_speaker_tracker.utils.camera_navigation_utils import get_movement_to_box
+
 
 def responses():
     """ All the possible responses from the cammera.
@@ -86,13 +88,7 @@ def move_absolute_camera_endpoint(integration: GeneralController):
 
 
 def move_relative_camera_endpoint(integration: GeneralController):
-    """ Endpoint that sends a request to the camera to move it in a relative direction
-
-        data:
-            relative-speed-x: Integer from 1 - 24, the pan speed.
-            relative-speed-y: Integer from 1 - 20, the tilt speed.
-            relative-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
-            relative-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+    """ Endpoint that sends a request to try to point the camera in a relative direction.
     """
     data = request.form
     try:
@@ -198,7 +194,7 @@ def navigate_camera(integration: GeneralController):
     
     # calculate the camera_speed and camera_rotation we need to make to center the camera on that pixel
     try:
-        camera_speed, camera_rotation = integration.hybrid_model.get_movement_to_box(np.array([x, y, x, y]))
+        camera_speed, camera_rotation = get_movement_to_box(np.array([x, y, x, y]), integration.cam_api, integration.footage_thread)
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
     
