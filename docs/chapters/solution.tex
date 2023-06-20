@@ -1,70 +1,119 @@
-This chapter aims to present our motivations when developing a solution, a detailed description of the solution that our team picked for the project and other possibilities which we considered, but did not choose, and the reasoning behind why not.
-\section{Challenges that must be overcome}
+This chapter first explains the challenges any proposed solution should attempt
+to solve (\hyperref[sec:solution-challenges]{section 4.1}). Afterwards, we explain the
+solution we implemented (\hyperref[sec:implemented-solution]{section 4.2}) and discuss
+alternative solutions that we did not choose
+(\hyperref[sec:alternative-solutions]{section 4.3}). Finally, we talk about the object
+tracking part of our solution (\hyperref[sec:visual-object-tracking]{section 4.4}) and we
+give an overview of the structure of our application
+(\hyperref[sec:application-overview]{section 4.5}).
+
+\section{Challenges that must be overcome}\label{sec:solution-challenges}
+In this section, we describe two groups of constraints that any solution to the
+problem described in \hyperref{ch:problem-analysis} has to try to solve. The
+first group contains everything related to technology and the second group
+contains everything related to the user.
+
 \subsection{Technical limitations}
-As outlined in the requirements, the system should act as a middleware device that can be put on the same network as the microphone and the camera, which adds a limitation on the amount of available resources.
-We could rely on cloud computing power, but that would lead to a big delay in camera movement and additional risks to security and maintainability.
-Additionally, our project relies on 2 special hardware devices -- a camera, and a microphone, therefore the final product should account for all of those limitations.
-Unfortunately, the microphone does not provide location information, as it is quite a difficult technical challenge\cite{distance-urbana-champaign}.
-So the list of important limitations, that significantly impact the project can be formulated with three limitations:
+As outlined in the requirements, the system should act as a middleware device
+that can be put on the same network as the microphone and the camera. This adds
+a limitation on the amount of available computational resources. We could rely on cloud
+computing power, but that would lead to a big delay in camera movement and
+additional risks to security and maintainability. Additionally, our project
+relies on three special hardware devices -- a camera, and a microphone and a
+single-board computer (SBC). The final product should account for all the inherent
+limitations of these devices. The biggest limitation is the fact that the
+microphone does not provide the exact origin of the detected sound, as it is
+quite a difficult technical challenge to calculate
+this\cite{distance-urbana-champaign}. We formulated
+three limitations that significantly impact the project:
 \begin{itemize}
-    \item The system should run on a single-board computer (SBC)
-    \item The system should be able to run on the same network as a camera and a microphone.
-    \item Microphone does not provide distance information
+    \item The storage and processing power of the SBC.
+    \item The network range and speed.
+    \item The lack of a distance towards the speaker provided by the microphone.
 \end{itemize}
+
 \subsection{User limitations}
-In addition to technical criteria, the main criterion of the solution we were going to implement is based on a certain non-functional requirement which client has emphasized multiple times during our meetings:
-\begin{itemize}
-    \item The system should be easy to install and calibration can be done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
-\end{itemize}
-As this criterion can be interpreted ambiguously, as the difficulty of calibration can vary per person, we needed to reiterate our solutions multiple times and verify them with Avonic.
-Meeting this criterion was difficult, as we spent the first week of our project solely working on different solutions, trying to prove their correctness, while not disrupting their calibration and installation simplicity.
-\section{Implemented solution}
+In addition to technical criteria, the main criterion of the solution we were
+going to implement is based on a certain non-functional requirement which Mr.
+Kahawati has emphasized multiple times during our meetings: the system should be
+easy to install and calibration can be done by teachers or presenters
+themselves. It should not require any technical knowledge or external devices.
+
+As this criterion can be interpreted ambiguously (the difficulty of calibration
+can vary per person) we needed to reiterate our solutions multiple times and
+verify them with Avonic. Because of the difficulty of this criterion, we spent
+the entire first week on figuring out a solution that did not disrupt the
+simplicity of calibration and installation. The solution we came up with is
+presented in the next section.
+
+\section{Implemented solution}\label{sec:implemented-solution}
 In this section we give the motivation and reasoning behind our implemented solution.
 \subsection{Assumptions}
-As described earlier, there are certain challenges that we needed to overcome in order to devise a working solution.
-Having brainstormed different implementation strategies,
-we identified that the most difficult limitation is that the microphone array cannot retrieve distance information.
-This, combined with the fact that the microphone array is in a separate position from
-the camera, meant that generally finding out where the speaker is actually located becomes impossible without
-hacking/reverse-engineering it, since we do not have access to each individual microphone within the array.
-That can be easily shown when one imagines a speaker, who starts off standing directly beneath the microphone array,
-sitting down. Our program will then not be able to discern whether to tilt the camera up or down based solely on
-the information provided by the Ceiling.
-
+As described earlier, there are certain challenges that we needed to overcome
+in order to devise a working solution. Having brainstormed different
+implementation strategies, we identified that the most difficult limitation is
+that the microphone array cannot retrieve distance information. This, combined
+with the fact that the microphone array is in a separate position from the
+camera, meant that generally finding out where the speaker is located becomes
+impossible without hacking the microphone to get access to each individual
+microphone within the array. That can be easily shown when one imagines a
+speaker, who starts off standing directly beneath the microphone array, sitting
+down. Our program will then not be able to discern whether to tilt the camera
+up or down based solely on the information provided by the ceiling microphone.
 This means that we need to make assumptions about the environment of the room:
 
 
 \begin{enumerate}
-    \item Distance between the speaker and the plane of the ceiling, to which the microphone is mounted, is constant.
-    \item If a camera, presenter's plane, or a microphone were moved, the system must be recalibrated.
+    \item The distance between the speaker and the plane of the ceiling, to which the microphone is mounted, is constant.
+    \item If a camera, a microphone or the ``speaker plane'' (the horizontal plane in which the speaker moves) were moved, the system must be recalibrated.
     \item The system is well-calibrated and no components of it are moved during the tracking.
 \end{enumerate}
-Through the process of the research and reiteration of our proposals, with the amount of time we are given, taking in account all the limitations, we have identified these assumptions as minimal.
-While assumptions 2 and 3 are in place to guarantee the intended way of using the system, assumption 3 is formulated to determine the distance from the microphone to the speaker.
-From all of our attempts to come up with the solution, we have identified that the distance of the vector from the microphone to the speaker is crucial.
-But as our system is closed under only 2 devices, and the microphone's API\cite{microphone-manual} does not have a way to retrieve distance, the assumptions are needed to somehow describe the distance function in the environment.
-We have chosen the scenario where we look for an intersection of the ray from the microphone with the ``speaker plane'' as the plane is the most probable scenario for the presenter's environment.
-It is the most probable case of how the available place for the presenter on stage looks; small inconsistencies in not precisely a flat floor can be neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
-The height difference between the speakers can be neglected, due to the expected big distance from the camera to the presenters, and we expect it to be insignificant, especially in scenarios where people are sitting \textbf{(MAYBE PUT REFERENCE HERE)}.
-In the future, it is possible to extend the model to support different shapes and possibly a full 3D scan of the room, but we view it to be infeasible for us in 10 weeks.
+Through the process of the research and reiteration of our proposals, we found
+this set of assumptions to be the smallest set possible given our limited time
+and the limitations mentioned in \hyperref[sec:solution-challenges]{section
+4.1}. While assumptions 2 and 3 are in place to guarantee the intended way of
+using the system, assumption 1 is formulated to determine the distance from the
+microphone to the speaker.
+
+From all of our attempts to come up with the solution, we have identified that
+the distance of the vector from the microphone to the speaker is crucial.
+Since the microphone's API\cite{microphone-manual} does not have a way to
+retrieve this distance, the assumptions are needed to describe the distance
+function in the environment.
+According to our assumptions, the speaker plane represents the set of all
+locations at which the speaker could be. Small deviations from the theoretical
+horizontal speaker plane and the actual places at which people speak can be
+neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
+The height difference between speakers can also be neglected due to the
+expected distance between the camera and the presenters of at least \textbf{(SOME ASSUMED MINIMUM???)}
+meters. Such differences in height have even less of an impact when
+the speakers are sitting \textbf{(MAYBE PUT REFERENCE HERE)}.
+With this in mind, we decided to
+calculate the intersection of the ray from the microphone with the speaker plane
+to find the location of the speaker.
+In the future, it is possible to extend the model to support different shapes and
+possibly a full 3D scan of the room to represent the possible locations of the speaker.
+We view these options to be infeasible for us in 10 weeks.
+
 \subsection{Calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
-We assume the longest one of the horizontal coordinates to be the $z$ one.
-To achieve this, the microphone's height is first set.
-Then, a person is sent into the room, they direct the camera at themselves and speak.
-The direction obtained from the camera and microphone combined with the microphone's height above the so-called speaker plane is enough to calculate all the speaker plane's properties and 3D position.
+(We assume the longest one of the horizontal coordinates to be the $z$ one.)
+To achieve this, the user first sets microphone's height above the speaker plane.
+Then, a person is sent into the room. They direct the camera at themselves and speak.
+The direction obtained from the camera and microphone combined with the microphone's height above the so-called speaker plane is enough to calculate the 3D position of the camera relative to the microphone.
 
-A simplified, 2D image is shown in figure \ref{fig:cal2d}.
+A simplified, 2D image is shown in figure \ref{fig:cal2d}. Since the camera
+points towards the z-axis by default, the horizontal axis in the image is the z-axis.
 \begin{figure}[h]
-    \caption{Demonstration of the calculation of calibration in 2D}
+    \caption{Demonstration of the calculation of calibration in 2D, where $M$ is the microphone, $C$ is the camera and $A$ is the speaker}
     \centering
     \includegraphics[width=0.8\textwidth]{calibration_2d}
     \label{fig:cal2d}
 \end{figure}
-There, we say $M$ is the microphone, $C$ is the camera, and $A$ is the person calibrating the system.
+We define $M$ as the microphone, $C$ as the camera, and $A$ as the person calibrating the system.
 After directing the camera at the speaker, we find out angles $\alpha$, $\beta$ and distance $a$ from the right-angled triangle between the speaker plane, the one perpendicular to it from the microphone, and the speaker.
 Angle $\delta$ is easily calculated from the fact that the primary axes of the camera and microphone are orthogonal, and because we know $\gamma$ from having directed the camera at the microphone in the second stage of the calibration.
-Now that we know 2 angles and one side length of the triangle $CAM$, we can calculate the distance between the camera and microphone -- $d$.
+Now that we know two angles and one side length of the triangle $CAM$, we can calculate the distance between the camera and microphone -- $d$.
 
 After calibration, we can proceed backwards to calculate the angle to point the camera at from $d$.
 Figure \ref{fig:cal3d} contains a visualization of the same approach, but with vectors instead of angles.
@@ -77,39 +126,58 @@ This means that we can find the angles between them and calculate the triangle.
     \includegraphics[width=0.8\textwidth]{calibration_3d}
     \label{fig:cal3d}
 \end{figure}
-\section{Alternative approaches}
+
+\section{Alternative approaches}\label{sec:alternative-approaches}
+Besides the solution using calibration described above, we considered three
+other approaches. We used these as sources of inpsiration to come up with our
+final solution. These three alternatives are explained in this section together
+with a reasoning of why we did not choose them as our final solution.
+
 \subsection{Single coordinate system}
-One of the most obvious solutions that we came up with, is providing the system with coordinates of both microphone and the camera, in coordination with the microphone providing distance to the speaker.
-As you can see, this solution served as inspiration for the final solution, but it has two important problems:
+One of the most obvious solutions that we came up with, was to provide the
+system with coordinates of both microphone and the camera, in coordination with
+the microphone providing distance to the speaker. This solution
+served as inspiration for the final solution, but it has two important
+problems:
 \begin{itemize}
-    \item Distance information from the microphone is not obtainable.
-    \item Manually inputting measures that would describe coordinate system and points of the camera and the microphone, was considered too complex by Avonic.
+    \item The distance information from the microphone is not obtainable.
+    \item Manually inputting measures that would describe a coordinate system
+        with coordinates of the camera and the microphone was considered too complex
+        by Avonic.
 \end{itemize}
 \subsection{Interpolation model}
-One of the solutions we came up with, was inspired by a concept of interpolation, first introduced to us in the Computer Graphics course.
-The proposed solution followed this algorithm for calibration and tracking:
+Another solutions we came up with, was inspired by a concept of interpolation.
+The proposed solution followed the following algorithm for calibration and tracking:
 \begin{enumerate}
-    \item Record three positions by retrieving the beams' directions and the camera's position for each of the recorded placements.
-    \item Depending on the angle of the beam, using angles that describe its direction, translate those angles to angles of the camera and point it towards the derived direction.
+    \item Record three positions by retrieving the microphone's beams and the camera's position for each of the recorded placements.
+    \item Interpolate a new microphone direction using the three recorded beams and use this to calculate the
+            corresponding camera direction.
 \end{enumerate}
 Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
 This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
-Unfortunately, this is not always the case, as the system should work with any arbitrary position of the camera, so we had to leave this solution behind.
+Unfortunately, the camera and microphone are not always in the same or opposite
+positions, as the system should work with any arbitrary position of the camera.
+For this reason, we left this solution behind.
+
 \subsection{Room scan}
-This was one of the more ambitious solutions we considered at the beginning of the project.
-It was somewhat inspired by the solution with preset locations.
-The idea is that we input all the possible planes on which the speaker could be located.
-For example, if there is an elevated scene somewhere at the front of the room we input its size and elevation from the floor.
-Also, there is the possibility to add locations for chairs, stairs, etc.
-This way we have some kind of a room scan with all the objects’ arrangements inside.
-This scan gives us a more precise idea of where the speaker could be actually located.
-However, this solution has two quite major drawbacks.
-First of all, the direction from the microphone could still result in multiple possible locations of the speaker when considering its intersection with all the given planes.
-The other disadvantage of this approach is that it requires a lot of work to set up the system and as we have stated earlier this does not align with our requirements.
+A room scan was one of the more ambitious solutions we considered at the
+beginning of the project. It was somewhat inspired by the solution with preset
+locations. The idea is that we input all the possible planes on which the
+speaker could be located. For example, if there is an elevated scene somewhere
+at the front of the room we input its size and elevation from the floor. Also,
+there is the possibility to add locations for chairs, stairs, etc. This way we
+have some kind of a room scan with all the objects’ arrangements inside. This
+scan gives us a more precise idea of where the speaker could be actually
+located. However, this solution has two major drawbacks. First of all, the
+direction from the microphone could still result in multiple possible locations
+of the speaker when considering its intersection with all the given planes. The
+other disadvantage of this approach is that it requires too much work to set up
+the system. As we have stated earlier, this does not align with our
+requirements.
 
 
-\section{Visual object tracking}
+\section{Visual object tracking}\label{sec:visual-object-tracking}
 This section discusses the addition of visual object tracking to our audio-based speaker tracking
 system. The combination of both visual and audio information can make the movement of the camera
 smoother and more accurate. Audio discriminates between different people to determine who is
@@ -217,7 +285,7 @@ illustrates the possible states we could be in is the depicted in Figure
 \ref{fig:object_strategy}.
 
 
-\section{Application overview}
+\section{Application overview}\label{sec:application-overview}
 In this section, we will discuss our application's structure and our motivations behind it.
 \subsection{Project modules}
 After splitting our project into core domains, we have identified 4 of them:
