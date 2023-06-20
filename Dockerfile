@@ -13,48 +13,49 @@ RUN apt-get install ffmpeg libsm6 libxext6 -y
 
 # install opencv
 RUN apt-get install -y \
-    build-essential \
-    cmake \
-    git \
-    gfortran \
-    libatlas-base-dev \
-    libavcodec-dev \
-    libavformat-dev \
-    libavresample-dev \
-    libcanberra-gtk3-module \
-    libdc1394-22-dev \
-    libeigen3-dev \
-    libglew-dev \
-    libgstreamer-plugins-base1.0-dev \
-    libgstreamer-plugins-good1.0-dev \
-    libgstreamer1.0-dev \
-    libgtk-3-dev \
-    libjpeg-dev \
-    libjpeg8-dev \
-    libjpeg-turbo8-dev \
-    liblapack-dev \
-    liblapacke-dev \
-    libopenblas-dev \
-    libpng-dev \
-    libpostproc-dev \
-    libswscale-dev \
-    libtbb-dev \
-    libtbb2 \
-    libtesseract-dev \
-    libtiff-dev \
-    libv4l-dev \
-    libxine2-dev \
-    libxvidcore-dev \
-    libx264-dev \
-    pkg-config \
-    python-dev \
-    python-numpy \
-    python3-dev \
-    python3-numpy \
-    python3-matplotlib \
-    qv4l2 \
-    v4l-utils \
-    zlib1g-dev
+build-essential \
+cmake \
+git \
+gfortran \
+libatlas-base-dev \
+libavcodec-dev \
+libavformat-dev \
+libavresample-dev \
+libcanberra-gtk3-module \
+libdc1394-22-dev \
+libeigen3-dev \
+libglew-dev \
+libgstreamer-plugins-base1.0-dev \
+libgstreamer-plugins-good1.0-dev \
+libgstreamer1.0-dev \
+libgtk-3-dev \
+libjpeg-dev \
+libjpeg8-dev \
+libjpeg-turbo8-dev \
+liblapack-dev \
+liblapacke-dev \
+libopenblas-dev \
+libpng-dev \
+libpostproc-dev \
+libswscale-dev \
+libtbb-dev \
+libtbb2 \
+libtesseract-dev \
+libtiff-dev \
+libv4l-dev \
+libxine2-dev \
+libxvidcore-dev \
+libx264-dev \
+pkg-config \
+python-dev \
+python-numpy \
+python3-dev \
+python3-numpy \
+python3-matplotlib \
+qv4l2 \
+v4l-utils \
+zlib1g-dev
+
 RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/4.7.0.zip && \
     wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.7.0.zip && \
     unzip opencv.zip && \
@@ -66,6 +67,7 @@ RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/4.7.0.zip && \
     cd opencv && \
     mkdir build && \
     cd build
+
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
           -D CMAKE_INSTALL_PREFIX=/usr \
           -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
