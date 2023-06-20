@@ -2,13 +2,8 @@
 
 if [ "$1" = "jetson" ]
   then
-    export SERVER_ADDRESS=0.0.0.0:8000
     while true
     do
-      python3 -c "\
-from gevent import monkey
-monkey.patch_all()
-      "
       # it is recommended that you apply the monkey patching at the top of your main script, even above your imports.
       uwsgi --http :8000 --gevent 1000 --http-websockets --master --module web_app.wsgi:app
       echo "Restarting app in 1 second"
@@ -32,10 +27,6 @@ elif [ "$1" = "prod" ]
     pip3 install -e '.[prod]'
     while true
     do
-      python3 -c "\
-from gevent import monkey
-monkey.patch_all()
-      "
       # it is recommended that you apply the monkey patching at the top of your main script, even above your imports.
       uwsgi --http :8000 --gevent 1000 --http-websockets --master --module web_app.wsgi:app
       echo "Restarting app in 1 second"
