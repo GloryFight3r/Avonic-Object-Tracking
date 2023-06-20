@@ -2,14 +2,14 @@ This chapter first explains the challenges any proposed solution should attempt
 to solve (\hyperref[sec:solution-challenges]{section 4.1}). Afterwards, we explain the
 solution we implemented (\hyperref[sec:implemented-solution]{section 4.2}) and discuss
 alternative solutions that we did not choose
-(\hyperref[sec:alternative-solutions]{section 4.3}). Finally, we talk about the object
+(\hyperref[sec:alternative-approaches]{section 4.3}). Finally, we talk about the object
 tracking part of our solution (\hyperref[sec:visual-object-tracking]{section 4.4}) and we
 give an overview of the structure of our application
 (\hyperref[sec:application-overview]{section 4.5}).
 
 \section{Challenges that must be overcome}\label{sec:solution-challenges}
 In this section, we describe two groups of constraints that any solution to the
-problem described in \hyperref{ch:problem-analysis} has to try to solve. The
+problem described in \hyperref[the Problem analysis chapter]{ch:problem-analysis} has to try to solve. The
 first group contains everything related to technology and the second group
 contains everything related to the user.
 
@@ -96,6 +96,7 @@ possibly a full 3D scan of the room to represent the possible locations of the s
 We view these options to be infeasible for us in 10 weeks.
 
 \subsection{Calibration}
+\label{sec:calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
 (We assume the longest one of the horizontal coordinates to be the $z$ one.)
 To achieve this, the user first sets microphone's height above the speaker plane.
@@ -338,7 +339,7 @@ Setting up only requires recording a couple of possible locations for the speake
 Exactly the simplicity of the installation and the wide usage are the reason why we chose this model as a starting point for our tracking. 
 \paragraph{Audio model}\mbox{} \\
 The Audio Model achieves the main goal of our application by continuously tracking the speaker around the room.
-Unlike the preset model, it can point the camera towards any arbitrary point in the room by performing the calculations described in SECTION ON SOLUTIONS MATH.
+Unlike the preset model, it can point the camera towards any arbitrary point in the room by performing the calculations described in \hyperref[the section about calibration]{sec:calibration}.
 The audio model also keeps track of how much time has passed since someone has last spoken.
 If no one has spoken in some time the camera will zoom out.
 This model’s point method also takes into account how far the speaker is from the camera and zooms in accordingly.
@@ -355,7 +356,7 @@ The Object Tracking Model is intended to refine our tracking in situations when 
 After having identified all the people in the frame and having created the corresponding bounding boxes around them it has a method to find the box that is most likely to be the one around the speaker.
 Then another method calculates the relative direction in which the camera has to move to center the box.
 It takes into account the zooming and field of view of the camera in order to make the calculations.
-As explained in section [SECTION NUMBER OF OBJECT TRACKING] we chose to use YOLO for our object detection and classification.
+As explained in section about \hyperref[Visual object tracking]{sec:visual-object-tracking} we chose to use YOLO for our object detection and classification.
 Our YOLO implementation extends an abstract class that has methods to calculate and draw bounding boxes.
 Any object detection algorithm can extend this class in order for it to be used in place of the currently implemented algorithm.
 
@@ -369,19 +370,24 @@ Therefore, we decided to use one thread that can run all models.
 
 \subsection{WebUI}\label{subsection:solution_webui}
 In order to support the web user interface for the system, the web application needed to be created.
-The back-end of this app is written in Python using the Flask framework.
-We have decided to use Flask as it is a well-known lightweight framework, that allows for web development.
-It offers some nice features - creating and managing socket connections with a client for automatically updating values of the system and being easily modifiable to support testing of the app.
-Flask is also used by Avonic themselves and was recommended by the client.
+The back-end of this app is written in Python using the Flask framework as it is a well-known lightweight framework, that allows for web development.
+It offers some nice features - creating and managing socket connections with a client and easily modifiable to support testing of the app.
+Flask is also used by Avonic themselves and was recommended by them.
 The front-end is written in HTML, CSS, and JavaScript and includes controls for the camera, controls for the tracking thread, and an editing interface for presets and calibration models.
 The page maintains a WebSocket connection with a server for footage stream and real-time updates of the camera and microphone information, which is used for visualization.
 
-The WebUI was moved from a “should have” to a “must have” section after consultation with our TA, as it provides a clearer, more intuitive, and more pleasant way for the user to interact with a system. It also opened up space for more quality-of-life features, that we have not intended in the original requirements, but found useful for future users and debugging purposes - footage stream, real-time updates of microphone information and camera position, and visualization.
+The WebUI was moved from a “should have” to a “must have” section after consultation with our TA, as it provides a clearer, more intuitive, and more pleasant way for the user to interact with a system.
+It also opened up space for more quality-of-life features, that we have not intended in the original requirements, but found useful for future users and debugging purposes - footage stream, real-time updates of microphone information and camera position, and visualization.
 
-In the first weeks of working on the project, we experienced multiple issues related to sharing access to Camera and Microphone APIs across the endpoints, as we could not find a dependency injection solution that would work with modern versions of Flask. Because, we decided to not use HTTP for main camera communication, as repetitive socket creation and connection is an expensive operation, sacrifice should have been made to the Flask server, as the framework does not support dependency injection by default.
+In the first weeks of working on the project, we experienced multiple issues related to sharing access to Camera and Microphone APIs across the endpoints, as we could not find a dependency injection solution that would work with modern versions of Flask.
+We decided to unite all objects that needed to be shared across the endpoints in a single object and make it accessible for the server application — the \\ \verb|GeneralController| class, also referred to as ``integration’’.
+It contains variables for thread flow control, camera and microphone APIs all of the threads our application uses - update thread, responsible for tracking, microphone and camera info-threads, responsible for sending information updates to the user, footage thread for retrieving frames from the camera.
 
-We decided to unite all objects that needed to be shared across the endpoints in a single object and make it accessible for the server application — the \\ \verb|GeneralController| class, also referred to as ``integration’’. It contains variables for thread flow control, camera and microphone APIs all of the threads our application uses - update thread, responsible for tracking, microphone and camera info-threads, responsible for sending information updates to the user, footage thread for retrieving frames from the camera.
+As it is not possible by default to create global variables in Flask, we have decided to use vanilla Python features.
+All of the definitions of the endpoints were moved to the \verb|__init__.py| file, so integration can be passed to every endpoint’s body function.
+To avoid the bloating of the file, we agreed on the rule that every endpoint definition should contain exactly one line with the call of the respective function with the actual body of the endpoint, which can be found in other files in the WebUI package.
+After consultation with Avonic, they told us that they had similar issues with dependency injection in Flask, and they expect from us a functional, not necessarily clean solution for this issue.
 
-As it is not possible by default to create global variables in Flask, we have decided to use vanilla Python features. All of the definitions of the endpoints were moved to the \verb|__init__.py| file, so integration can be passed to every endpoint’s body function. To avoid the bloating of the file, we agreed on the rule that every endpoint definition should contain exactly one line with the call of the respective function with the actual body of the endpoint, which can be found in other files in the WebUI package. After consultation with Avonic, they told us that they had similar issues with dependency injection in Flask, and they expect from us a functional, not necessarily clean solution for this issue.
-
-By default, Flask applications are run in a development mode, which does not use WebSockets, and single processed. We have decided to pick uWSGI, as it is well documented, fast, compiled, better manages resources, and gets rid of the downsides of the development server. To correctly install packages and run the server in the most used variations, the \verb|run.sh| script was created that supports running tests, the server in development, and production modes.
+By default, Flask applications are run in a development mode, which does not use WebSockets, and single-processed.
+We have decided to pick uWSGI, as it is well documented, fast, compiled, better manages resources, and gets rid of the downsides of the development server.
+The \verb|run.sh| script was created to easily run tests, the server in development, and production modes.
