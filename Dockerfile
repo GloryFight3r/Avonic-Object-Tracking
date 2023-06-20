@@ -17,9 +17,7 @@ ARG OPENCV_VERSION="4.5.1"
 ARG OPENCV_DO_TEST="FALSE"
 # note: 8 jobs will fail on Nano. Try 1 instead.
 ARG OPENCV_BUILD_JOBS="8"
-
-WORKDIR /usr/local/src/build_opencv
-
+RUN touch .dockerenv
 RUN wget -O build_opencv.sh https://github.com/mdegans/nano_build_opencv/raw/docker/build_opencv.sh
 RUN /bin/bash build_opencv.sh
 
