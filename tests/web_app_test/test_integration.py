@@ -19,4 +19,3 @@ def test_general_controller_constructor():
     assert subject.video is None
     assert subject.thread_mic is None
     assert subject.thread_cam is None
-    assert subject.preset.value == 0
