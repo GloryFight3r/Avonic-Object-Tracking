@@ -1,3 +1,5 @@
+# install opencv
+ARG JETPACK_VERSION="r32.5.0"
 FROM registry.hub.docker.com/mdegans/l4t-base:${JETPACK_VERSION}
 
 WORKDIR /usr/app
@@ -8,8 +10,6 @@ COPY README.md .
 COPY pyproject.toml .
 COPY run.sh .
 
-# install opencv
-ARG JETPACK_VERSION="r32.5.0"
 
 ### build argumements ###
 # change these here or with --build-arg FOO="BAR" at build time
