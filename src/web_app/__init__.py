@@ -1,4 +1,5 @@
 import signal
+import logging
 from flask import Flask, jsonify, abort, render_template, make_response
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -7,10 +8,13 @@ import web_app.preset_locations_endpoints
 import web_app.footage
 import web_app.calibration_endpoints
 import web_app.tracking_endpoints
+import web_app.footage
 import web_app.settings_endpoints
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 #import logging
 #log = logging.getLogger('werkzeug')
 #log.setLevel(logging.ERROR)
@@ -195,6 +199,11 @@ def create_app(test_controller=None):
     def preset_tracker():
         return web_app.tracking_endpoints.track_presets(integration)
 
+    @app.get('/hybrid/track')
+    def hybrid_tracker():
+        print("HYBRID TRACKER")
+        return web_app.tracking_endpoints.track_hybrid(integration)
+
     @app.post('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
@@ -293,7 +302,6 @@ def create_app(test_controller=None):
     @app.post('/update/calibration')
     def thread_calibration():
         return web_app.tracking_endpoints.update_calibration(integration)
-
     # Info-thread section
 
     @app.post('/info-thread/start')

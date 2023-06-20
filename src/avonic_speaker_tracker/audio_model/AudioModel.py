@@ -1,4 +1,6 @@
 import math
+from typing_extensions import override
+
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
@@ -26,11 +28,11 @@ class AudioModel(TrackingModel):
         """
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
         self.cam_api = cam_api
+        self.speak_delay: int = 0
         self.mic_api = mic_api
         self.calibration: Calibration = Calibration(filename=filename)
         self.calibration.load()
-        self.speak_delay: int = 0
-
+    
     def set_speak_delay(self, speak_delay: int = 0):
         """ Sets the time elapsed since the last person spoke
 
@@ -39,6 +41,7 @@ class AudioModel(TrackingModel):
         """
         self.speak_delay = speak_delay
 
+    @override
     def point(self):
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone
@@ -108,6 +111,7 @@ class AudioModel(TrackingModel):
             self.cam_api.direct_zoom(direct_np[2])
 
         self.prev_dir = direct_np
+
         return direct_np
 
     def set_filename(self, filename: str):

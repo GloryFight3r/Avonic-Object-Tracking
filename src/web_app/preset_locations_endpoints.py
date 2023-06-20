@@ -2,7 +2,6 @@ import numpy as np
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
 
-
 def success():
     return make_response(jsonify({}), 200)
 

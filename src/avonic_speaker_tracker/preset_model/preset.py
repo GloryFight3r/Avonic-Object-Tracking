@@ -23,6 +23,9 @@ class Preset:
 class PresetCollection:
     """ This class is a container for all the existing presets.
     """
+    preset_locations = {}
+    filename = None
+    
     default_camera_info: list[float] = [0.0, 0.0, 1.0]
     default_mic_info: list[float] = [0.0, 1.0, 0.0]
     def __init__(self, filename: str = ""):

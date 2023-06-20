@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.footage import FootageThread
@@ -55,33 +56,50 @@ class ObjectModel():
         Returns:
             tuple of numpy arrays which represent (camera_speed, camera_angles)
         """
+
+        assert 0 <= current_box[0] <= self.resolution[0]
+        assert 0 <= current_box[2] <= self.resolution[0]
+
+        assert 0 <= current_box[1] <= self.resolution[1]
+        assert 0 <= current_box[3] <= self.resolution[1]
+
+        box_width = current_box[2] - current_box[0]
+        box_height = current_box[3] - current_box[1]
+
+        assert 0 <= box_width <= self.resolution[0]
+        assert 0 <= box_height <= self.resolution[1]
+
         # current_box is in the format [left top right bottom] and want to use the format
         # [left bottom width height] so we change it
         # The height is divided by two so the upper half of the person's body is used
-        current_box = [current_box[0], current_box[1], current_box[2], current_box[3]/2]
+
+        current_box = [current_box[0], current_box[1], current_box[2], current_box[3]+box_height/2]
         bbox:np.ndarray = np.array([current_box[0],\
-                         current_box[3],\
+                         current_box[1],\
                          current_box[2] - current_box[0],\
-                         current_box[1] - current_box[3]
+                         current_box[3] - current_box[1]
         ])
 
         # calculate the middle of the box in the format [x, y]
         box_middles:np.ndarray = (np.array([bbox[2], bbox[3]]) / 2)\
             + np.array([bbox[0], bbox[1]])
 
+        assert 0 <= box_middles[0] <= self.resolution[0]
+        assert 0 <= box_middles[1] <= self.resolution[1]
+
         # calculate the middle of the screen
         screen_middles:np.ndarray = self.resolution / 2.0
 
         # find the distance from the screen middle to the box middle
-        distance_to_middle:np.ndarray = screen_middles - box_middles
+        distance_to_middle:np.ndarray = box_middles - screen_middles
 
         # flip the sign of the x axis distance
-        distance_to_middle[0] = -distance_to_middle[0]
+        distance_to_middle[1] = -distance_to_middle[1]
 
         # calculate current FoV of the camera
         try:
             cam_fov:np.ndarray = self.cam_api.calculate_fov()
-        except TypeError as e:
+        except AssertionError as e:
             print(e)
             return ([20, 20], [0, 0])
 
@@ -92,13 +110,23 @@ class ObjectModel():
         rotate_angle:np.ndarray = angular_resolution * distance_to_middle
 
         # TODO pick a good rotation speed according to the rotation angle it has to make
-        rotate_speed:np.ndarray = self.calculate_speed(angular_resolution)
+        rotate_speed:np.ndarray = self.calculate_speed(rotate_angle)
 
         return (rotate_speed, rotate_angle)
 
+    def calculate_speed(self, rotate_angle):
+        """ Picks a rotation speed depending on the rotation angle
 
-    def calculate_speed(self, rotate_angle: np.ndarray):
-        return [20, 20]
+        Args:
+            rotate_angle (): Current rotation angle
+
+        Returns:
+            Rotation speed for the next camera rotation
+        """
+
+        speedAlpha = math.fabs(rotate_angle[0])/340.0*11.0+13.0
+        speedBeta = math.fabs(rotate_angle[1])/120.0*9.0+11.0
+        return np.array([int(speedAlpha), int(speedBeta)])
 
     def track_object(self):
         pass
