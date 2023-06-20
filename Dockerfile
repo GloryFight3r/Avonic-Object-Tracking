@@ -20,7 +20,6 @@ gfortran \
 libatlas-base-dev \
 libavcodec-dev \
 libavformat-dev \
-libavresample-dev \
 libcanberra-gtk3-module \
 libdc1394-22-dev \
 libeigen3-dev \
@@ -47,8 +46,6 @@ libxine2-dev \
 libxvidcore-dev \
 libx264-dev \
 pkg-config \
-python-dev \
-python-numpy \
 python3-dev \
 python3-numpy \
 python3-matplotlib \
