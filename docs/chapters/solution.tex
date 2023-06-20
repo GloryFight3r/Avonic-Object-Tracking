@@ -287,22 +287,40 @@ illustrates the possible states we could be in is the depicted in Figure
 
 \section{Application overview}\label{sec:application-overview}
 In this section, we will discuss our application's structure and our motivations behind it.
-\subsection{Project modules}
-After splitting our project into core domains, we have identified 4 of them:
-\begin{itemize}
-    \item Camera API - responsible for communication with the camera.
-    \item Microphone API - responsible for communication with the microphone.
-    \item Tracking - contains all the tracking models we came up with, UpdateThread interface which can run any model supplied, and utilities for future development of different tracking strategies.
-    \item WebUI - responsible for providing a user-friendly interface of the system.
-\end{itemize}
-We took a decision to create separate Python modules for each of the identified domains, to make our code base more systematic.
-It also allows us to potentially distribute some modules separately, allowing other people to develop their software using our APIs.
+We go over each of the four modules in our project: the camera API, the microphone api, the tracking
+module and the web interface. Each module is separated in the code in order to make it easier
+for other developers to work on our code.
+
 \subsection{Camera API}
-The Camera API module contains all of the functionality related to communication with the camera. This includes sending commands to move or zoom the camera and get information about the current state of the camera.
+The Camera API module contains all of the functionality related to
+communication with the camera. This includes sending commands to move or zoom
+the camera and get information about the current state of the camera.
+In this section we discuss the communication method with the camera,
+the design pattern used in the code and the way we get the footage
+stream from the camera.
+
 \paragraph{VISCA}\mbox{} \\
-We chose to use VISCA commands to communicate with the camera instead of HTTP requests. We did this first of all because Mr. Kahawati explained to us that it was standard at Avonic. The second reason was that VISCA is faster than HTTP [REFERENCE?!].
-There are two types of VISCA requests: long and short. The difference between these two types is the header. Long VISCA requests have a header in the request telling the receiver how big the request is and what the request counter is. This request counter is also contained in the response, so the request and response can be matched. Short VISCA requests lack this header and therefore do not provide the possibility to match responses to requests.
-We started the project by using short VISCA requests. We had two reasons for this: a) they are easier to implement and b) we had low traffic, so we could assume that the first response we got was the response to the latest request. As we started sending more requests to the camera, we found that many responses got mixed up. For this reason, we switched to long VISCA requests for any request whose response is used by the program. Such requests ask for information about the camera such as its position, so every response has to be matched to the correct request. There are other requests, such as moving the camera, that do not require a response. For these requests, we still use short VISCA requests.
+We chose to use VISCA commands to communicate with the camera instead of HTTP
+requests. We did this first of all because Mr. Kahawati explained to us that it
+was the standard at Avonic. The second reason was that VISCA is faster than
+HTTP [REFERENCE?!]. There are two types of VISCA requests: long and short. The
+difference between these two types is the header. Long VISCA requests have a
+header in the request telling the receiver how big the request is and what the
+request counter is. This request counter is also contained in the response, so
+the request and response can be matched. Short VISCA requests lack this header
+and therefore do not provide the possibility to match responses to requests.
+
+We started the project by using short VISCA requests. We had two reasons for
+this: a) they are easier to implement and b) we had low traffic, so we could
+assume that the first response we got was the response to the latest request.
+As we started sending more requests to the camera, we found that many responses
+got mixed up. For this reason, we switched to long VISCA requests for any
+request whose response is used by the program. Such requests ask for
+information about the camera such as its position, so every response has to be
+matched to the correct request. There are other requests, such as moving the
+camera, that do not require a response. For these requests, we still use short
+VISCA requests.
+
 \paragraph{Adapter pattern}\mbox{} \\
 The implementation of the Camera API uses the adapter design pattern, which is a programming design pattern that allows different interfaces to work together\cite{adapter-pattern}.
 The main advantage of this design pattern in our project is that it makes sure our system still works if the specifics of communication with the camera change; only the adapter itself has to be reimplemented. This makes it easier to adapt our system to other Avonic cameras.
@@ -313,14 +331,17 @@ The final part of the Camera API module is the thread that reads video frames fr
 The Microphone API module contains all of the functionality related to communication with the microphone. The most important requests are the one that gets the direction from the microphone towards the detected sound and the one that gets the peak volume. Like the Camera API, the Microphone API uses an adapter pattern to facilitate the use of other microphones in the future.
 
 \subsection{Tracking}
-All of the functionality related to speaker tracking is separated in this module.
-The most important part of it is the \verb|UpdateThread|.
-It is a class that extends \verb|Thread| and is responsible for continuous calling of the point method to direct the camera.
-The module is structured in a way that every tracking type is maintained in a so-called model.
-Every model is an child of the \verb|TrackingModel| class that ensures that they have a \verb|point| method to perform calculations and point the camera.
-The picked model is instantiated at the beginning of \verb|run| method that is continuously using the model until the stop signal arrives.
-Some of the models rely on data stored in JSON files whose location can be specified in the settings menu in our WebUI.
-We currently have the following tracking models:
+All of the functionality related to speaker tracking is separated in this
+module. The most important part of it is the \verb|UpdateThread|. It is a class
+that extends \verb|Thread| and is responsible for continuous calling of the
+point method to direct the camera. The module is structured in a way that every
+tracking type is maintained in a so-called model. Every model is an child of
+the \verb|TrackingModel| class that ensures that they have a \verb|point|
+method to perform calculations and point the camera. The picked model is
+instantiated at the beginning of the \verb|run| method that is continuously using
+the model until the stop signal arrives. Some of the models rely on data stored
+in JSON files whose location can be specified in the settings menu in our
+WebUI. We currently have the following tracking models:
 \begin{enumerate}
 \item Preset Model
 \item Audio Model
@@ -335,7 +356,7 @@ After finding the closest preset the camera is pointed towards that preset locat
 \verb|PresetCollection| can be edited from the WebUI, as well as it can be loaded from the already specified file.
 This preset model is what is mostly used throughout the industry for streaming web conferences and round-table meetings. The reason it is so widely used is that it is simple to set up for people without technical background and the fact that it is very precise in those scenarios.
 Setting up only requires recording a couple of possible locations for the speaker in the room.
-Exactly the simplicity of the installation and the wide usage are the reason why we chose this model as a starting point for our tracking. 
+Exactly the simplicity of the installation and the wide usage are the reason why we chose this model as a starting point for our tracking.
 \paragraph{Audio model}\mbox{} \\
 The Audio Model achieves the main goal of our application by continuously tracking the speaker around the room.
 Unlike the preset model, it can point the camera towards any arbitrary point in the room by performing the calculations described in SECTION ON SOLUTIONS MATH.
@@ -346,9 +367,9 @@ Another improvement we implemented in this model is changing the camera speed de
 It helps reduce jittering when following the speaker.
 The model also saves vectors that were added to the calibration and can load data from a supplied file. If any of the fields from that file are non-existent or corrupted, they are replaced with default values.
 \paragraph{Audio model without adaptive zooming}\mbox{} \\
-This model has almost the same functionality as the Audio Model with the only difference that it does not have the ability to adapt the camera zoom depending on the position of the speaker. 
+This model has almost the same functionality as the Audio Model with the only difference that it does not have the ability to adapt the camera zoom depending on the position of the speaker.
 It also eliminates the possibility for the camera to zoom out when no one is speaking. This means that for the whole period of tracking the zoom is not changed unless the user expressly does that using any mode for controlling the zoom.
-We decided to add this model because in some scenarios the adaptive zooming does not provide a very pleasant flow of the tracking. Sometimes the camera zoomes in or out unexpectedly or too much. 
+We decided to add this model because in some scenarios the adaptive zooming does not provide a very pleasant flow of the tracking. Sometimes the camera zoomes in or out unexpectedly or too much.
 Reasons for that inconsistency are the possibility of inaccurate calibration or inaccurate readings provided by the microphone.
 \paragraph{Object-tracking model}\mbox{} \\
 The Object Tracking Model is intended to refine our tracking in situations when the speaker is not audible or the microphone’s direction towards the speaker is not precise enough to accurately center the speaker.
@@ -369,7 +390,7 @@ Therefore, we decided to use one thread that can run all models.
 
 \subsection{WebUI}\label{subsection:solution_webui}
 In order to support the web user interface for the system, the web application needed to be created.
-The back-end of this app is written in Python using the Flask framework.
+The back-end of this app was written in Python using the Flask framework.
 We have decided to use Flask as it is a well-known lightweight framework, that allows for web development.
 It offers some nice features - creating and managing socket connections with a client for automatically updating values of the system and being easily modifiable to support testing of the app.
 Flask is also used by Avonic themselves and was recommended by the client.
