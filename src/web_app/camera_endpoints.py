@@ -86,7 +86,13 @@ def move_absolute_camera_endpoint(integration: GeneralController):
 
 
 def move_relative_camera_endpoint(integration: GeneralController):
-    """ Endpoint that sends a request to try to point the camera in a relative direction.
+    """ Endpoint that sends a request to the camera to move it in a relative direction
+
+        data:
+            relative-speed-x: Integer from 1 - 24, the pan speed.
+            relative-speed-y: Integer from 1 - 20, the tilt speed.
+            relative-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
+            relative-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
     """
     data = request.form
     try:
