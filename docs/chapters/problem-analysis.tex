@@ -144,43 +144,27 @@ too little time to fix new bugs, the last two weeks turned out to be enough to
 make everything work on the Jetson Nano.
 
 \subsection{Work space}
-During the project we could visit the office at most three days a week. This meant that we did not always have a place to work together as a
-group. Group meetings required a quiet meeting room, which we were not always able to find.
-On the days that we were not able to go to the office, we tried to find a room on the TU Delft campus. Whenever we were not able to get a
-meeting room, we went to a public place on campus. In such places, we could still have meetings and we could still work closely together.
-All our meetings with Mr. Kahawati happened on days we could visit the office, so those meetings did not suffer from our limited time at the office.
+During the project we could visit the office at most three days a week. This
+meant that we did not always have a place to work together as a group. Group
+meetings required a quiet meeting room, which we were not always able to find.
+On the days that we were not able to go to the office, we tried to find a room
+on the TU Delft campus. Whenever we were not able to get a meeting room, we
+went to a public place on campus. In such places, we could still have meetings
+and we could still work closely together. All our meetings with Mr. Kahawati
+happened on days we could visit the office, so those meetings did not suffer
+from our limited time at the office.
 
 \section{Ethical implications}
-For our project, we are going to make use of video and audio; both can be considered personal data.
-Since personal data can be used with malicious intent, we are cautious and thoughtful with regard to the ethics of the system.
-The ethical implications of the system should be carefully reviewed to disallow any unethical abuse of the system.
-Below we cover five important topics related to ethical use of personal data to give more insight into our system and its potential use cases.
-\subsection*{Processing of personal data}
-Our project revolves around working with a microphone and a camera.
-Both of these process personal data in the forms of audio and video and transmit this so that it can be used by people.
-Our system does not use any personal part of the data because we only utilize the location information from the speaker.
-Therefore, our system does not, in and of itself, process any personal data, but the hardware that we use together with the system does.
-For instance, the microphone, made in Germany by Sennheiser, processes audio from the room.
+We investigated the ethical implications by looking at five categories of
+ethical risks. We discuss all of these categories in
+\hyperref[ch:ethics-appendix]{Appendix A - Ethical implications}. In the current
+section, we summarize our findings.
 
-
-We can not modify the camera or microphone (or otherwise alter their behavior), but what we can do to mitigate the ethical risks of our
-project is to ensure we do not use the transmitted personal information ourselves
-\subsection*{Profiling or systematic monitoring}
-Our tools (a camera and a microphone, conceptually) could technically be used in the surveillance of a room of people who have not consented to have video taken of them.
-We have access to the video camera stream, but we are not planning to store anything on the device after processing it locally.
-Our software alone therefore cannot be used to profile or monitor individuals.
-A person who has access to the microphone and the video stream is able to more accurately identify the speaking person and afterward store this information.
-Those ethical implications do not fall on us as the developers in this scenario.
-\subsection*{Processing of previously collected data}
-We do not have access and are not allowed to use any of the data stored by Avonic.
-The system has been extended with visual tracking that required data from previously recorded people, but that data was sourced from publicly available, previously trained models.
-Apart from the visual tracking feature, there is no part of our system which requires previously stored data.
-\subsection*{Exporting to non-EU countries}
-As explained above, the microphone and camera that we are using can be used to send personal data to any place in the world.
-This data involves video and audio of people.
-We can prevent the data obtained from going abroad by limiting the traffic from the network.
-\subsection*{Importing of personal data}
-We do not plan on importing personal data from anywhere.
-We do not personally need the data obtained using the microphone and camera, so we will surely not import any data from non-EU countries.
-Users of the cameras and microphones can use those devices to create personal data and send it abroad, but they could use any camera to do
-this, and it does not pose any ethical risks besides the ones explained in \hyperref[]{section 2.4.2}. % TODO
+We concluded that our tracker does not have any true ethical risks. Any
+unethical actions for which our tracker can be used, could also be done by using
+a smartphone; often in a more effective way. This includes things like
+surveillance and the spreading of personal data. Though it is possible to use
+our tracker to collect personal data without permission, it will be hard to do
+so: the microphone and the camera are difficult to hide and they need to be
+correctly calibrated. Because of this, we do not expect our tracker to be used
+in any unethical way.
