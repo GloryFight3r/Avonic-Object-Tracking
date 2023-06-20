@@ -1,2 +1,64 @@
-\section{What we did right}
-\section{What we could have done differently}
+In this chapter we reflect on both the process and the result of our project.
+When we discuss the process, we focus on things that could have been done
+better by our team in terms of practices.
+When we discuss technological improvements, we focus on what can be changed in
+order to improve the overall performance of our tracker.
+
+\section{Process reflection}
+Many things went well in the process of creating the speaker tracker. However,
+there are two points of improvement that we want to reflect on. We also
+highlight our testing practice because of how helpful it was during the
+entirety of the project.
+
+\paragraph{Production server} \mbox{} \\
+As discussed in \hyperref[subsection:breaking-production-server]{section 5.5.2}
+we had some problems with the production server. This was because we were
+sometimes using the development server to test our code without realizing that
+it works fundamentally differently from the production server. The production
+server uses multi-processing, while the development server does not. This caused
+problems with sharing data between threads.
+After encountering this issue, we started using the production server for
+everything. If we had done so from the start, we could have avoided many issues
+related to threading.
+
+\paragraph{Access to SBC} \mbox{} \\
+It took eight weeks untill we got access to the NVIDIA Jetson. This meant that we
+had a bit more than one week left to fix the issues that arose from deploying
+our software on the SBC for the first time. For access to the NVIDIA Jetson, we
+had to wait on Avonic to provide us with one. Therefore, the problem was mostly
+out of our control.
+If we had had access to the SBC at an earlier stage of the project, any bugs
+related to the SBC would have been caught earlier in the project.
+
+\paragraph{Testing} \mbox{} \\
+Throughout the project, we always tested our code before merging into the main
+branch on GitLab. We were dedicated to keeping the test coverage above 80\%.
+This high coverage helped us to make sure no other functionality was broken when
+new functionality was added. Many bugs have been caught this way before they
+were werged.
+
+\section{Technological improvements}
+If Avonic wants to continue to work on our tracker, we would advice them to
+focus on two improvements. Both of them are related to the quality of the video
+stream. In this section we discuss how these changes would help to improve
+our speaker tracker.
+
+\paragraph{Tracking with adaptive zoom} \mbox{} \\
+The audio model described in \hyperref[subsection:tracking]{section 4.5.3} uses
+adaptive zooming. However, the constant zooming is not pleasant to look at.
+Sometimes the speaker goes out of view, because the zooming increases the impact
+of inaccurate microphone directions. Even when the speakers stays in view, the
+zooming may be distracting to the viewers, because it can happen too fast and
+too often.
+For future improvements of the audio model, we would suggest to make the zoom
+speed depend on the change of the zoom. Another way to improve the adaptive
+zooming would be to change the zoom less often. This would make the video stream
+more pleasant to watch.
+
+\paragraph{Camera footage} \mbox{} \\
+In our project we use OpenCV to read the camera footage from the camera's RTSP
+stream. This way of reading the stream causes a delay. This delay also impacts
+the object tracking models.
+As Mr. Kahawati told us, Avonic has developed a much faster way of reading the
+camera stream so the delay is negligible. Replacing OpenCV with this faster
+method would make object tracking more responsive.

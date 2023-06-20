@@ -330,7 +330,7 @@ The final part of the Camera API module is the thread that reads video frames fr
 \subsection{Microphone API}
 The Microphone API module contains all of the functionality related to communication with the microphone. The most important requests are the one that gets the direction from the microphone towards the detected sound and the one that gets the peak volume. Like the Camera API, the Microphone API uses an adapter pattern to facilitate the use of other microphones in the future.
 
-\subsection{Tracking}
+\subsection{Tracking}\label{subsection:tracking}
 All of the functionality related to speaker tracking is separated in this
 module. The most important part of it is the \verb|UpdateThread|. It is a class
 that extends \verb|Thread| and is responsible for continuous calling of the

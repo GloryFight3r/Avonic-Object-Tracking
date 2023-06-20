@@ -15,7 +15,7 @@ However, this did not prove to work well immediately, as our overall vision of t
 Our improved became better in later stages of the project.
 
 We also decided to employ TDD (test-driven development) as it has been shown to reduce number of bugs in the code.
-It is also useful to write simple yet reliable code, and motivates a developer to be more conscious of the design decisions and edge cases. 
+It is also useful to write simple yet reliable code, and motivates a developer to be more conscious of the design decisions and edge cases.
 
 \subsection{Requirements for new functionality}
 In order to accept a new functionality we came up with three requirements:
@@ -75,7 +75,8 @@ As described in that meeting, the UI is most probably going to be used by techni
 
 Therefore, the decision was to combine both designs, by adding tabs in addition to a single-page design. By default, a user is presented with a page of the whole system’s functionality, but if they want to isolate certain aspects of it, they can click on a respective tab at the top of the page.
 \textbf{THERE WILL BE AN IMAGE OF THE FINAL UI VERSION}
-\subsection{Breaking production server}
+
+\subsection{Breaking production server}\label{subsection:breaking-production-server}
 As discussed in subsection about the \hyperref[subsection:solution_webui]{WebUI}, we decided to use uWSGI for production mode.
 This decision combined with poor quality assurance later back-fired in the situation below.
 When more features that relied on threads were added, some of them started using mutable variables, in a way that change of it in one of threads, would affect another one.
@@ -83,7 +84,7 @@ But, as we found out, it does not work when the server is run with uWSGI, as it 
 This leads to a lot of problems, as variables are not shared between processes.
 
 We had not noticed it after a few merge requests that were rapidly merged because of the deadline.
-We could not conduct a good quality assurance process of testing, which led to the fact that multiple features, like footage and information updates, that relied on mutability of variables stopped working . 
+We could not conduct a good quality assurance process of testing, which led to the fact that multiple features, like footage and information updates, that relied on mutability of variables stopped working .
 As we did not have enough knowledge back in time, it took us a whole day of debugging to identify the problem.
 
 After the issue was found, it was fixed and did not cause any problems later.
