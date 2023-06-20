@@ -14,6 +14,7 @@ def start_thread_endpoint(integration: GeneralController):
     the corresponding tracking model depending on the user's choice.
     """
     # start (unpause) the thread
+    print("Tracking is: ",integration.tracking.value)
     if (integration.thread is None) or (integration.event.value == 0):
         integration.event.value = 1
         if integration.tracking.value == ModelCode.PRESET:
