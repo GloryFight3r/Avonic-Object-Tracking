@@ -191,8 +191,8 @@ class HybridTracker(ObjectModel, AudioModel):
             to the box centers
 
         Args:
-            current_box: the current bounding box in the format np.array[left top right bottom]
-            all_boxes: list of bounding boxes in the format np.array[left top right bottom]
+            current_box: the current bounding box in the format np.array[left bottom right top]
+            all_boxes: list of bounding boxes in the format np.array[left bottom right top]
 
         Returns:
             The bounding box that has the most surface area in common with current_box - np.array[left top right bottom] or None if
@@ -223,12 +223,12 @@ class HybridTracker(ObjectModel, AudioModel):
         to the pixel
 
         Args:
-            all_boxes: list of numpy arrays in the format [left top right bottom]
+            all_boxes: list of numpy arrays in the format [left bottom right top]
             pixels: numpy array in the format [x, y]
 
         Returns:
             A numpy array that represents the bounding box we have chosen in the format
-            [left top right bottom]
+            [left bottom right top]
         """
         # we pick the one that has its center closest to pixels
         min_dist = float('inf')
