@@ -61,7 +61,8 @@ def wait_for_speaker(integration: GeneralController):
     Args:
         integration: The controller object
 
-    Returns: Direction towards the speaker
+    Returns: 
+        Direction towards the speaker
 
     """
     approaching_limit: int = 0

@@ -16,7 +16,7 @@ def add_calibration_speaker(integration: GeneralController):
     """ Adds a speaker point to the calibration. This includes
         both a camera and a microphone direction.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -49,7 +49,7 @@ def add_calibration_to_mic(integration: GeneralController):
     """ Adds a vector from the camera to the microphone to
         calibration.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -70,7 +70,8 @@ def add_calibration_to_mic(integration: GeneralController):
 
 def reset_calibration(integration: GeneralController):
     """ Resets the current calibration 
-        params:
+        
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -83,7 +84,7 @@ def is_calibrated(integration: GeneralController):
         has the necessary vectors to calculate a vector
         from the microphone to the camera.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -96,7 +97,7 @@ def wait_for_speaker(integration: GeneralController):
     """ Wait for at most five seconds for someone to speak 
         and get a direction from the microphone.
         
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -114,11 +115,11 @@ def get_calibration(integration: GeneralController):
     """ Calls the method in Calibration to calculate the
         vector from the microphone to the camera.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
 
-        returns:
+        Returns:
             camera-coordinates: the coordinates of the camera
                 relative to the microphone.
     """

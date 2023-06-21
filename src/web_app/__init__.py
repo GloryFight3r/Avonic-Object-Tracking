@@ -467,9 +467,9 @@ def create_app(test_controller=None):
         """
         Endpoint that gets the system settings
             Returns: 
-                camera-ip: a string in the form _._._._
+                camera-ip: a string address
                 camera-port: an int value
-                microphone-ip: a string in the form _._._._
+                microphone-ip: a string address
                 microphone-port: an int value
                 microphone-thresh: an int value
                 filepath: a path string
@@ -480,9 +480,9 @@ def create_app(test_controller=None):
     def settings_set():
         """
         Endpoint that sets the following system settings
-            camera-ip: a string in the form _._._._
+            camera-ip: a string address
             camera-port: an int value
-            microphone-ip: a string in the form _._._._
+            microphone-ip: a string address
             microphone-port: an int value
             microphone-thresh: an int value
             filepath: a path string
