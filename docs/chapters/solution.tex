@@ -219,7 +219,7 @@ suppression. This way, RT-DETR manages to achieve a higher speed than YOLO while
 
 Just like YOLO, RT-DETR can be used to track objects in real-time to assist our overall speaker tracking. However,
 despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster
-than the RT-DETR. This is why we ended up using YOLO as our object detector.
+than the RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
 
 
 \subsection{Integration of object tracking into our speaker tracker}
@@ -389,9 +389,9 @@ Moreover, using just one thread avoids code duplication and unnecessary complexi
 Therefore, we decided to use one thread that can run all models.
 
 \paragraph{Model system}\mbox{} \\
-For the tracking structure we settled on using an abstract class \verb|TrackingModel| which all our different tracking models extend and implement. 
-The reason for this is to not duplicate functionality when possible and to allow for the easy development of different tracking models. 
-This structure gives the possibility to future developers to just extend our functionality without having to refactor it. 
+For the tracking structure we settled on using an abstract class \verb|TrackingModel| which all our different tracking models extend and implement.
+The reason for this is to not duplicate functionality when possible and to allow for the easy development of different tracking models.
+This structure gives the possibility to future developers to just extend our functionality without having to refactor it.
 
 
 \subsection{WebUI}\label{subsection:solution_webui}
