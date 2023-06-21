@@ -95,7 +95,7 @@ class GeneralController:
         self.thread_cam = None
 
         # Indicates which model should be used, check UpdateThread
-        self.preset = Value("i", ModelCode.AUDIO, lock=False)
+        self.tracking = Value("i", ModelCode.AUDIO, lock=False)
 
         # Keep in memory, whether a notification about the settings not being set has been sent
         self.no_settings_sent = True
@@ -115,7 +115,7 @@ class GeneralController:
     def load_env(self) -> None:
         """Performs load procedure of all the specified parameters.
         """
-        self.preset = Value("i", ModelCode.AUDIO, lock=False)
+        self.tracking = Value("i", ModelCode.AUDIO, lock=False)
         url = getenv("SERVER_ADDRESS")
         if url is not None:
             self.url = url
@@ -260,7 +260,7 @@ class GeneralController:
     def __del__(self):
         if self.video is not None:
             self.video.release()
-        self.preset.value = 0 # pragma: no mutate
+        self.tracking.value = 0 # pragma: no mutate
 
         self.footage_thread_event.value = 0 # pragma: no mutate
         self.info_threads_break.value = 1 # pragma: no mutate
@@ -308,7 +308,7 @@ class GeneralController:
         
         self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
 
-        self.preset.value = ModelCode.PRESET
+        self.tracking.value = ModelCode.PRESET
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -319,7 +319,7 @@ class GeneralController:
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
-        self.preset.value = new_controller.preset.value
+        self.tracking.value = new_controller.tracking.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
         self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
@@ -407,6 +407,8 @@ class GeneralController:
         print("Closing " + path + " updater thread")
 
 def verify_address(address) -> bool:
+    """ Method that verifies that the given address is valid.
+    """
     try:
         assert 0 <= address[1] <= 65535
         assert isinstance(address[0], str)

@@ -16,7 +16,7 @@ def add_calibration_speaker(integration: GeneralController):
     """ Adds a speaker point to the calibration. This includes
         both a camera and a microphone direction.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -24,6 +24,7 @@ def add_calibration_speaker(integration: GeneralController):
     timeouts = 0
 
     mic_dir = ""
+    # wait for some time until we get a microphone direction
     while isinstance(mic_dir, str):
         mic_dir = wait_for_speaker(integration)
         timeouts += 1
@@ -32,6 +33,7 @@ def add_calibration_speaker(integration: GeneralController):
                 jsonify({"message": "Could not get direction from the microphone!"}, 504))
     timeouts = 0
     cam_dir = ResponseCode.ACK
+    # wait for some time until we get a camera direction
     while isinstance(cam_dir, ResponseCode):
         cam_dir = integration.cam_api.get_direction()
         timeouts += 1
@@ -47,7 +49,7 @@ def add_calibration_to_mic(integration: GeneralController):
     """ Adds a vector from the camera to the microphone to
         calibration.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -67,6 +69,12 @@ def add_calibration_to_mic(integration: GeneralController):
 
 
 def reset_calibration(integration: GeneralController):
+    """ Resets the current calibration 
+        
+        Args:
+            integration: the GeneralController instance that has
+                a Calibration instance.
+    """
     integration.audio_model.calibration.reset_calibration()
     return success()
 
@@ -76,7 +84,7 @@ def is_calibrated(integration: GeneralController):
         has the necessary vectors to calculate a vector
         from the microphone to the camera.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
     """
@@ -86,6 +94,13 @@ def is_calibrated(integration: GeneralController):
 
 
 def wait_for_speaker(integration: GeneralController):
+    """ Wait for at most five seconds for someone to speak 
+        and get a direction from the microphone.
+        
+        Args:
+            integration: the GeneralController instance that has
+                a Calibration instance.
+    """
     waited_for = 0
     while not integration.mic_api.is_speaking():
         sleep(0.1)
@@ -100,11 +115,11 @@ def get_calibration(integration: GeneralController):
     """ Calls the method in Calibration to calculate the
         vector from the microphone to the camera.
 
-        params:
+        Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
 
-        returns:
+        Returns:
             camera-coordinates: the coordinates of the camera
                 relative to the microphone.
     """

@@ -22,9 +22,12 @@ class ImageSize(Enum):
 
 class CameraAPI:
     latest_direction:np.ndarray | None = None
+
+    # The FOV of the camera when fully zoomed in
     latest_fov = 0
 
     MIN_FOV = np.array([3.72, 2.14])
+    # The FOV of the camera when fully zoomed out
     MAX_FOV = np.array([60.38, 35.80])
     MAX_ZOOM_VALUE = 16384
 
@@ -41,6 +44,8 @@ class CameraAPI:
         self.latest_direction = np.array([0, 0, 1], dtype='float')
 
     def set_address(self, new_socket, address=None) -> ResponseCode:
+        """ Sets the camera address and establishes the new connection
+        """
         if address is None:
             print("WARNING: Camera address not specified!")
             return ResponseCode.NO_ADDRESS
