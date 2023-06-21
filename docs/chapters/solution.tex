@@ -6,6 +6,8 @@ alternative solutions that we did not choose
 tracking part of our solution (\hyperref[sec:visual-object-tracking]{section 4.4}) and we
 give an overview of the structure of our application
 (\hyperref[sec:application-overview]{section 4.5}).
+A diagram showing the use cases for each of the four different
+tracking models we created is shown in Figure \ref{fig:model-use-case-diagram}.
 
 \section{Challenges that must be overcome}\label{sec:solution-challenges}
 In this section, we describe two groups of constraints that any solution to the
@@ -222,6 +224,14 @@ despite its claim to improved performance, we noticed that in practice the YOLO 
 than the RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
 
 
+
+\begin{figure}[h]
+    \caption{Use case diagram of the tracking models}
+    \centering
+    \includegraphics[width=0.8\textwidth]{model-diagram}
+    \label{fig:model-use-case-diagram}
+\end{figure}
+
 \subsection{Integration of object tracking into our speaker tracker}
 The problem of combining two systems of tracking a speaker, both object tracking and speaker tracking, is discussed in
 this section. A decision has to be made by the system whether to listen to the speaker tracker or the object tracker.
@@ -325,97 +335,168 @@ VISCA requests.
 \paragraph{Adapter pattern}\mbox{} \\
 The implementation of the Camera API uses the adapter design pattern, which is a programming design pattern that allows different interfaces to work together\cite{adapter-pattern}.
 The main advantage of this design pattern in our project is that it makes sure our system still works if the specifics of communication with the camera change; only the adapter itself has to be reimplemented. This makes it easier to adapt our system to other Avonic cameras.
+
 \paragraph{Footage thread}\mbox{} \\
 The final part of the Camera API module is the thread that reads video frames from the camera stream. This thread is connected to the RTSP stream of Real Time Streaming Protocol (RTSP) stream of the camera that emits one hundred frames per second. These frames are continually read by the thread so that the latest frame is always available. This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
 
 \subsection{Microphone API}
-The Microphone API module contains all of the functionality related to communication with the microphone. The most important requests are the one that gets the direction from the microphone towards the detected sound and the one that gets the peak volume. Like the Camera API, the Microphone API uses an adapter pattern to facilitate the use of other microphones in the future.
+The Microphone API module contains all of the functionality related to
+communication with the microphone. The most important requests are the one that
+gets the direction from the microphone towards the detected sound and the one
+that gets the peak volume. Like the Camera API, the Microphone API uses an
+adapter pattern to facilitate the use of other microphones in the future.
 
 \subsection{Tracking}\label{subsection:tracking}
-All of the functionality related to speaker tracking is separated in this
-module. The most important part of it is the \verb|UpdateThread|. It is a class
-that extends \verb|Thread| and is responsible for continuous calling of the
-point method to direct the camera. The module is structured in a way that every
-tracking type is maintained in a so-called model. Every model is an child of
-the \verb|TrackingModel| class that ensures that they have a \verb|point|
-method to perform calculations and point the camera. The picked model is
-instantiated at the beginning of the \verb|run| method that is continuously using
-the model until the stop signal arrives. Some of the models rely on data stored
-in JSON files whose location can be specified in the settings menu in our
-WebUI. We currently have the following tracking models:
+All of the functionality related to speaker tracking is contained in this
+module. The most important part of it is the \verb|UpdateThread|. It is
+responsible for continuously the method that directs the camera.
+The module is structured in a way that every tracking type is maintained in a
+so-called model. Every model is an child of the \verb|TrackingModel| class that
+ensures that they have the method to point the camera. The user can pick their
+preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
+can be used to find out which model works best for a given scenario.
+The chosen model is instantiated at the beginning of the \verb|run| method that
+is continuously using the model until speaker tracking is stopped by the user.
+Some of the models rely on data stored in JSON files whose location can be
+specified in the settings menu in our WebUI. We currently have the following
+tracking models:
 \begin{enumerate}
 \item Preset Model
 \item Audio Model
-\item Object Tracking Model
+\item Object Tracking Model (wait object-audio model \& quick change object-audio model)
 \end{enumerate}
 
 \paragraph{Preset model}\mbox{} \\
-The Preset Model makes use of a \verb|PresetCollection| which stores all available preset locations.
-\verb|Preset| stores a name, the direction from the microphone, and the direction of the camera towards it.
-When fed a direction from the microphone, the point method in this model finds the preset with the closest microphone direction to the one we have using cosine similarity.
-After finding the closest preset the camera is pointed towards that preset location.
-\verb|PresetCollection| can be edited from the WebUI, as well as it can be loaded from the already specified file.
-This preset model is what is mostly used throughout the industry for streaming web conferences and round-table meetings. The reason it is so widely used is that it is simple to set up for people without technical background and the fact that it is very precise in those scenarios.
-Setting up only requires recording a couple of possible locations for the speaker in the room.
-Exactly the simplicity of the installation and the wide usage are the reason why we chose this model as a starting point for our tracking.
-\paragraph{Audio model}\mbox{} \\
-The Audio Model achieves the main goal of our application by continuously tracking the speaker around the room.
-Unlike the preset model, it can point the camera towards any arbitrary point in the room by performing the calculations described in \hyperref[the section about calibration]{sec:calibration}.
-The audio model also keeps track of how much time has passed since someone has last spoken.
-If no one has spoken in some time the camera will zoom out.
-This model’s point method also takes into account how far the speaker is from the camera and zooms in accordingly.
-Another improvement we implemented in this model is changing the camera speed depending on how much it has to move.
-It helps reduce jittering when following the speaker.
-The model also saves vectors that were added to the calibration and can load data from a supplied file. If any of the fields from that file are non-existent or corrupted, they are replaced with default values.
-\paragraph{Audio model without adaptive zooming}\mbox{} \\
-This model has almost the same functionality as the Audio Model with the only difference that it does not have the ability to adapt the camera zoom depending on the position of the speaker.
-It also eliminates the possibility for the camera to zoom out when no one is speaking. This means that for the whole period of tracking the zoom is not changed unless the user expressly does that using any mode for controlling the zoom.
-We decided to add this model because in some scenarios the adaptive zooming does not provide a very pleasant flow of the tracking. Sometimes the camera zoomes in or out unexpectedly or too much.
-Reasons for that inconsistency are the possibility of inaccurate calibration or inaccurate readings provided by the microphone.
-\paragraph{Object-tracking model}\mbox{} \\
-The Object Tracking Model is intended to refine our tracking in situations when the speaker is not audible or the microphone’s direction towards the speaker is not precise enough to accurately center the speaker.
-After having identified all the people in the frame and having created the corresponding bounding boxes around them it has a method to find the box that is most likely to be the one around the speaker.
-Then another method calculates the relative direction in which the camera has to move to center the box.
-It takes into account the zooming and field of view of the camera in order to make the calculations.
-As explained in section about \hyperref[Visual object tracking]{sec:visual-object-tracking} we chose to use YOLO for our object detection and classification.
-Our YOLO implementation extends an abstract class that has methods to calculate and draw bounding boxes.
-Any object detection algorithm can extend this class in order for it to be used in place of the currently implemented algorithm.
+The Preset Model makes use of a \verb|PresetCollection| which stores all
+available preset locations. A preset location contains a name, the direction from the
+microphone and the direction of the camera towards it. When fed a direction
+from the microphone, the this model finds the preset which is most similar to
+the given microphone direction according to the cosine similarity. This
+similarity metric compares the directions of vectors while ignoring their norm.
+After finding the closest preset, the camera is pointed towards that preset
+location.
 
-The object tracking models are often combined with the audio tracking model, so two input streams (audio and video) have to be analyzed simultaneously.
-It would seem that two threads are necessary in order to process both streams at the same time.
-However, the time it takes to run the necessary calculations is less than the required time to wait between two movement commands to the camera to avoid interruptions.
-This means that running the calculations consecutively does not impact the performance of the thread as a whole.
-Moreover, using just one thread avoids code duplication and unnecessary complexity.
-Therefore, we decided to use one thread that can run all models.
+\verb|PresetCollection| can be edited from the WebUI. This is how new preset
+locations are added or old ones removed. Added preset locations are reloaded
+from a file when the server starts, so there is no need to set preset locations
+every time the server restarts.
+This preset model is what is mostly used throughout the industry for streaming
+web conferences and round-table meetings. The reason it is so widely used is
+that it is simple to set up for people without technical background and the fact
+that it is very precise in those scenarios. Setting up presets only requires
+recording a couple of possible locations for the speaker in the room. Exactly
+the simplicity of the installation and the wide usage are the reason why we
+chose this model as a starting point for our tracking.
+
+\paragraph{Audio model}\mbox{} \\
+The Audio Model achieves the main goal of our application by continuously
+tracking the speaker around the room. Unlike the preset model, it can point the
+camera towards any arbitrary point in the room by performing the calculations
+described in \hyperref[the section about calibration]{sec:calibration}. The
+audio model also keeps track of how much time has passed since someone has last
+spoken. If no one has spoken in some time the camera will zoom out. This model’s
+point method also takes into account how far the speaker is from the camera and
+zooms in accordingly. Another improvement we implemented in this model is
+changing the camera speed depending on how much it has to move. It helps reduce
+jittering when following the speaker. The model also saves vectors that were
+added to the calibration and can load data from a supplied file. If any of the
+fields from that file are non-existent or corrupted, they are replaced with
+default values.
+
+\paragraph{Audio model without adaptive zooming}\mbox{} \\
+This model has almost the same functionality as the Audio Model with the only
+difference that it does not have the ability to adapt the camera zoom depending
+on the position of the speaker. It also eliminates the possibility for the
+camera to zoom out when no one is speaking. This means that for the whole period
+of tracking the zoom is not changed unless the user expressly does that using
+any mode for controlling the zoom. We decided to add this model because in some
+scenarios the adaptive zooming does not provide a very pleasant flow of the
+tracking. Sometimes the camera zoomes in or out unexpectedly or too much.
+Reasons for that inconsistency are the possibility of inaccurate calibration or
+inaccurate readings provided by the microphone.
+
+\paragraph{Object-tracking model}\mbox{} \\
+The Object Tracking Model is intended to refine our tracking in situations when
+the speaker is not audible or the microphone’s direction towards the speaker is
+not precise enough to accurately center the speaker. After having identified all
+the people in the frame and having created the corresponding bounding boxes
+around them it has a method to find the box that is most likely to be the one
+around the speaker. Then another method calculates the relative direction in
+which the camera has to move to center the box. It takes into account the
+zooming and field of view of the camera in order to make the calculations. As
+explained in section about \hyperref[Visual object
+tracking]{sec:visual-object-tracking} we chose to use YOLO for our object
+detection and classification. Our YOLO implementation extends an abstract class
+that has methods to calculate and draw bounding boxes. Any object detection
+algorithm can extend this class in order for it to be used in place of the
+currently implemented algorithm.
+
+The object tracking models are often combined with the audio tracking model, so
+two input streams (audio and video) have to be analyzed simultaneously. It would
+seem that two threads are necessary in order to process both streams at the same
+time. However, the time it takes to run the necessary calculations is less than
+the required time to wait between two movement commands to the camera to avoid
+interruptions. This means that running the calculations consecutively does not
+impact the performance of the thread as a whole. Moreover, using just one thread
+avoids code duplication and unnecessary complexity. Therefore, we decided to use
+one thread that can run all models.
 
 \paragraph{Model system}\mbox{} \\
-For the tracking structure we settled on using an abstract class \verb|TrackingModel| which all our different tracking models extend and implement.
-The reason for this is to not duplicate functionality when possible and to allow for the easy development of different tracking models.
-This structure gives the possibility to future developers to just extend our functionality without having to refactor it.
+For the tracking structure we settled on using an abstract class
+\verb|TrackingModel| which all our different tracking models extend and
+implement. The reason for this is to not duplicate functionality when possible
+and to allow for the easy development of different tracking models. This
+structure gives the possibility to future developers to just extend our
+functionality without having to refactor it.
 
 
-\subsection{WebUI}\label{subsection:solution_webui}
-In order to support the web user interface for the system, the web application needed to be created.
-The back-end of this app is written in Python using the Flask framework as it
-is a well-known lightweight framework, that allows for web development. It
-offers some nice features - creating and managing socket connections with a
-client and easily modifiable to support testing of the app. Flask is also used
-by Avonic themselves and was recommended by them.
-The front-end is written in HTML, CSS, and JavaScript and includes controls for the camera, controls for the tracking thread, and an editing interface for presets and calibration models.
-The page maintains a WebSocket connection with a server for footage stream and real-time updates of the camera and microphone information, which is used for visualization.
+\subsection{Web UI}\label{subsection:solution_webui}
+In order to support the web user interface (UI) for the system, the web application
+needed to be created. The back-end of this app is written in Python using the
+Flask framework as it is a well-known lightweight framework, that allows for web
+development. It offers some nice features - creating and managing socket
+connections with a client and easy modification to support testing of the app.
+Flask is also used by Avonic themselves and was recommended by them.
 
-The WebUI was moved from a “should have” to a “must have” section after consultation with our TA, as it provides a clearer, more intuitive, and more pleasant way for the user to interact with a system.
-It also opened up space for more quality-of-life features, that we have not intended in the original requirements, but found useful for future users and debugging purposes - footage stream, real-time updates of microphone information and camera position, and visualization.
+The front-end is written in HTML, CSS, and JavaScript and includes controls for
+the camera, controls for the tracking thread, and an editing interface for
+presets and calibration models. The page maintains a WebSocket connection with a
+server for footage stream and real-time updates of the camera and microphone
+information, which is used for visualization.
 
-In the first weeks of working on the project, we experienced multiple issues related to sharing access to Camera and Microphone APIs across the endpoints, as we could not find a dependency injection solution that would work with modern versions of Flask.
-We decided to unite all objects that needed to be shared across the endpoints in a single object and make it accessible for the server application — the \\ \verb|GeneralController| class, also referred to as ``integration’’.
-It contains variables for thread flow control, camera and microphone APIs all of the threads our application uses - update thread, responsible for tracking, microphone and camera info-threads, responsible for sending information updates to the user, footage thread for retrieving frames from the camera.
+The WebUI was moved from a “should have” to a “must have” section after
+consultation with our TA, as it provides a clearer, more intuitive, and more
+pleasant way for the user to interact with a system. It also opened up space for
+more quality-of-life features, that we have not intended in the original
+requirements, but found useful for future users and debugging purposes - footage
+stream, real-time updates of microphone information and camera position, and
+visualization.
 
-As it is not possible by default to create global variables in Flask, we have decided to use vanilla Python features.
-All of the definitions of the endpoints were moved to the \verb|__init__.py| file, so integration can be passed to every endpoint’s body function.
-To avoid the bloating of the file, we agreed on the rule that every endpoint definition should contain exactly one line with the call of the respective function with the actual body of the endpoint, which can be found in other files in the WebUI package.
-After consultation with Avonic, they told us that they had similar issues with dependency injection in Flask, and they expect from us a functional, not necessarily clean solution for this issue.
+In the first weeks of working on the project, we experienced multiple issues
+related to sharing access to Camera and Microphone APIs across the endpoints, as
+we could not find a dependency injection solution that would work with modern
+versions of Flask. We decided to unite all objects that needed to be shared
+across the endpoints in a single object and make it accessible for the server
+application — the \\ \verb|GeneralController| object, also referred to as
+``integration’’. It contains variables for thread flow control, camera and
+microphone APIs and all of the threads our application uses - update thread,
+responsible for tracking, microphone and camera info-threads, responsible for
+sending information updates to the user, footage thread for retrieving frames
+from the camera.
 
-By default, Flask applications are run in a development mode, which does not use WebSockets, and single-processed.
-We have decided to pick uWSGI, as it is well documented, fast, compiled, better manages resources, and gets rid of the downsides of the development server.
-The \verb|run.sh| script was created to easily run tests, the server in development, and production modes.
+As it is not possible by default to create global variables in Flask, we have
+decided to use vanilla Python features. All of the definitions of the endpoints
+were moved to the \verb|__init__.py| file, so the integration object can be
+passed to every endpoint’s body function. To avoid the bloating of the file, we
+agreed on the rule that every endpoint definition should contain exactly one
+line with the call of the respective function with the actual body of the
+endpoint, which can be found in other files in the WebUI package. After
+consultation with Avonic, they told us that they had similar issues with
+dependency injection in Flask, and they expect from us a functional, not
+necessarily clean solution for this issue.
+
+By default, Flask applications are run in a single-process development mode,
+which does not use WebSockets. We have decided to pick uWSGI as our production
+server, as it is well documented, fast, compiled, and gets rid of the downsides
+of the development server. A script was created to easily run the server in
+different modes: with tests, development mode and production mode.
