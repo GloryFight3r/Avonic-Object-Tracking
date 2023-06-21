@@ -388,6 +388,11 @@ This means that running the calculations consecutively does not impact the perfo
 Moreover, using just one thread avoids code duplication and unnecessary complexity.
 Therefore, we decided to use one thread that can run all models.
 
+\paragraph{Model system}\mbox{} \\
+For the tracking structure we settled on using an abstract class \verb|TrackingModel| which all our different tracking models extend and implement. 
+The reason for this is to not duplicate functionality when possible and to allow for the easy development of different tracking models. 
+This structure gives the possibility to future developers to just extend our functionality without having to refactor it. 
+
 
 \subsection{WebUI}\label{subsection:solution_webui}
 In order to support the web user interface for the system, the web application needed to be created.
