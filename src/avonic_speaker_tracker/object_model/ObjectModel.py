@@ -28,7 +28,7 @@ class ObjectModel():
         # the thread that reads the footage stream of the camera
         self.stream = stream
 
-    def get_center_box(self, boxes: [np.array]):
+    def get_center_box(self, boxes: np.array):
         """ Gets the box closest to the center of the screen.
 
             params:

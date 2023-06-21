@@ -314,13 +314,13 @@ def test_thread(client):
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
-    web_app.integration.preset.value = ModelCode.AUDIO
+    web_app.integration.tracking.value = ModelCode.AUDIO
     rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
-    web_app.integration.preset.value = ModelCode.OBJECT
+    web_app.integration.tracking.value = ModelCode.OBJECT
     rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
@@ -637,12 +637,12 @@ def test_live_footage(client, url):
 
 def test_calibration_track(client):
     rv = client.get("/calibration/track")
-    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":0}\n", "utf-8")
+    assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":0}\n", "utf-8")
 
 def test_preset_track(client):
     rv = client.get("/preset/track")
-    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":1}\n", "utf-8")
+    assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":1}\n", "utf-8")
 
 def test_object_track(client):
     rv = client.get("/object/track")
-    assert rv.status_code == 200 and rv.data == bytes("{\"preset\":2}\n", "utf-8")
+    assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":2}\n", "utf-8")

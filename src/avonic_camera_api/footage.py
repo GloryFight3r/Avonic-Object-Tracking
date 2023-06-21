@@ -15,7 +15,7 @@ class FootageThread(Thread):
 
             Params:
                 footage: the footage stream from which to read frames
-                event: the even that stops the thread when set to 0
+                event: the event that stops the thread when set to 0
 
         """
         super().__init__()

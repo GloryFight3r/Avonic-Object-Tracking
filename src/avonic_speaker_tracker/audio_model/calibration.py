@@ -110,6 +110,8 @@ class Calibration:
         return self.mic_to_cam
 
     def record(self):
+        """ Saves the calibration information into the corresponding file
+        """
         if self.filename != "":
             with open(self.filename, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps({
@@ -119,6 +121,8 @@ class Calibration:
                     }, indent=4, cls=CustomEncoder))
 
     def load(self):
+        """ Loads the calibration information from the corresponding file
+        """
         if self.filename != "":
             try:
                 with open(self.filename, encoding="utf-8") as f:
@@ -179,6 +183,8 @@ class Calibration:
                 print("Loaded microphone height: ", self.mic_height)
 
     def set_filename(self, filename: str) -> None:
+        """ Setter for the location of the file of the calibration
+        """
         self.filename = filename
         self.load()
 

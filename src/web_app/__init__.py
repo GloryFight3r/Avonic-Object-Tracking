@@ -72,6 +72,11 @@ def create_app(test_controller=None):
 
     @app.post('/camera/address/set')
     def post_set_address():
+        """
+        Endpoint that sets the camera address 
+            camera-ip: a string in the form _._._._
+            camera-port: an int value
+        """
         return web_app.camera_endpoints.address_set_camera_endpoint(integration)
 
     @app.post('/camera/reboot')
@@ -97,18 +102,46 @@ def create_app(test_controller=None):
 
     @app.post('/camera/move/absolute')
     def post_move_absolute():
+        """ 
+        Endpoint that sends a command to the camera to move in an absolute direction.
+            data:
+                absolute-speed-x: Integer from 1 - 24, the pan speed.
+                absolute-speed-y: Integer from 1 - 20, the tilt speed.
+                absolute-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
+                absolute-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+        """
         return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
 
     @app.post('/camera/move/relative')
     def post_move_relative():
+        """ 
+        Endpoint that sends a command to the camera to move in a relative direction.
+            data:
+                relative-speed-x: Integer from 1 - 24, the pan speed.
+                relative-speed-y: Integer from 1 - 20, the tilt speed.
+                relative-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
+                relative-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+        """
         return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
 
     @app.post('/camera/move/vector')
     def post_move_vector():
+        """ 
+        Endpoint that sends a command to the camera to move in a vector direction.
+            data:
+                vector-speed-x: Integer from 1 - 24, the pan speed.
+                vector-speed-y: Integer from 1 - 20, the tilt speed.
+                vector-x: Float representing the x-coordinate of the direction vector.
+                vector-y: Float representing the y-coordinate (height) of the direction vector.
+                vector-z: Float representing the z-coordinate of the direction vector.
+        """
         return web_app.camera_endpoints.move_vector_camera_endpoint(integration)
 
     @app.post('/camera/move/home')
     def post_home():
+        """
+        Endpoint to move the camera to its home direction [0,0,1]
+        """
         return web_app.camera_endpoints.move_home_camera_endpoint(integration)
 
     @app.post('/camera/move/stop')
@@ -173,70 +206,157 @@ def create_app(test_controller=None):
 
     @app.post('/preset/add')
     def add_preset():
+        """ 
+        Endpoint that saves a preset to the preset collection
+            data:
+                camera-direction-alpha: Float from -170 - 170 representing the yaw of the camera
+                camera-direction-beta: Float from -30 - 90 representing the pitch of the camera
+                camera-zoom-value: Integer with the zoom value (0-16384)
+                mic-direction-x: Float representing the x-coordinate of the direction vector.
+                mic-direction-y: Float representing the y-coordinate of the direction vector.
+                mic-direction-z: Float representing the z-coordinate of the direction vector.
+                
+        """
         return web_app.preset_locations_endpoints.add_preset_location(integration)
 
     @app.post('/preset/edit')
     def edit_preset():
+        """ 
+        Endpoint that edits a preset in the preset collection
+            data:
+                camera-direction-alpha: Float from -170 - 170 representing the yaw of the camera
+                camera-direction-beta: Float from -30 - 90 representing the pitch of the camera
+                camera-zoom-value: Integer with the zoom value (0-16384)
+                mic-direction-x: Float representing the x-coordinate of the direction vector.
+                mic-direction-y: Float representing the y-coordinate of the direction vector.
+                mic-direction-z: Float representing the z-coordinate of the direction vector.
+                
+        """
         return web_app.preset_locations_endpoints.edit_preset_location(integration)
 
     @app.post('/preset/remove')
     def remove_preset():
+        """
+        Endpoint that removes the given preset from the preset collection
+            preset-name: a string name for the preset
+        """
         return web_app.preset_locations_endpoints.remove_preset_location(integration)
 
     @app.get('/preset/get_list')
     def get_preset_list():
+        """
+        Endpoint that returns the list of all saved presets
+            Returns:
+                preset-list: list of all presets in a json format
+        """
         return web_app.preset_locations_endpoints.get_preset_list(integration)
 
     @app.get('/preset/info/<preset_name>')
     def get_preset_info(preset_name):
+        """
+        Endpoint that returns the information for a given preset
+            Returns:
+                position-alpha-value: Float from -170 - 170 representing the yaw of the camera
+                position-beta-value: Float from -30 - 90 representing the pitch of the camera
+                zoom-value: Integer with the zoom value (0-16384)
+                microphone-direction: a 3D vector (array) of floats [x, y, z]
+        """
         return web_app.preset_locations_endpoints.get_preset_info(integration, preset_name)
 
     @app.post('/preset/point')
     def point_to_preset():
+        """
+        Endpoint that points the camera to the closest found preset
+        """
         return web_app.preset_locations_endpoints.point_to_closest_preset(integration)
 
     @app.get('/preset/track')
     def preset_tracker():
+        """
+        Endpoint that changes the tracking to use the preset model
+        """
         return web_app.tracking_endpoints.track_presets(integration)
 
     @app.get('/hybrid/track')
     def hybrid_tracker():
-        print("HYBRID TRACKER")
+        """
+        Endpoint that changes the tracking to use the hybrid model
+        """
         return web_app.tracking_endpoints.track_hybrid(integration)
 
     @app.post('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
+        """
+        Endpoint that adds the camera direction towards a new calibration point
+            position-alpha-value: Float from -170 - 170 representing the yaw of the camera
+            position-beta-value: Float from -30 - 90 representing the pitch of the camera
+        """
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
 
     @app.post('/calibration/add_direction_to_mic')
     def add_calibration_mic():
+        """
+        Endpoint that adds the direction from the camera towards the microphone
+            data: a 3D vector (array) of floats [x, y, z]
+        """
         return web_app.calibration_endpoints.add_calibration_to_mic(integration)
 
     @app.post('/calibration/reset')
     def reset_calibration():
+        """
+        Endpoint that resets the calibration to the default values
+        """
         return web_app.calibration_endpoints.reset_calibration(integration)
 
     @app.get('/calibration/is_set')
     def calibration_is_set():
+        """
+        Endpoint that checks whether the calibration is completed and all the needed vectors are calculated
+            Returns: 
+                is_set: boolean value
+        """
         return web_app.calibration_endpoints.is_calibrated(integration)
 
     @app.get('/calibration/camera')
     def calibration_get_cam_coords():
+        """
+        Endpoint that calculates the relative coordinates of the camera in relation to the microphone
+            Returns:    
+                camera-coords: a 3D array of floats [x, y, z]
+        """
         return web_app.calibration_endpoints.get_calibration(integration)
 
     @app.get('/calibration/track')
     def continuous_tracker():
+        """
+        Endpoint that changes the tracking to use the audio model
+        """
         return web_app.tracking_endpoints.track_continuously(integration)
     @app.get('/calibration/track/no/zoom')
-    def continuous_tracker_without_adaprive_zoom():
+    def continuous_tracker_without_adaptive_zoom():
+        """
+        Endpoint that changes the tracking to use the audio model without adaptive zooming
+        """
         return web_app.tracking_endpoints.track_continuously_without_adaptive_zooming(integration)
 
     @app.get('/calibration/number-of-calibrated')
     def number_of_calibrated():
+        """
+        Endpoint that returns the number of calibration points
+            Returns: 
+                speaker-points-length: an int value
+
+        """
         return web_app.calibration_endpoints.get_number_of_speaker_points(integration)
 
     @app.post('/navigate/camera')
     def navigate_camera():
+        """
+        Endpoint that navigates the camera so that the clicked pixel is centered in the frame
+            data:
+                x-pos: a float value in the range [0:1]
+                y-pos: a float value in the range [0:1]
+        """
         return web_app.camera_endpoints.navigate_camera(integration)
 
     # THIS IS FOR DEMO PURPOSES ONLY
@@ -260,28 +380,41 @@ def create_app(test_controller=None):
 
     @app.get('/object/track')
     def object_tracking_start():
+        """
+        Endpoint that changes the tracking to use the object tracking model
+        """
         return web_app.tracking_endpoints.track_object_continuously(integration)
 
     @app.post('/thread/start')
     def thread_start():
+        """
+        Endpoint that starts the tracking endpoint
+        """
         return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():
+        """
+        Endpoint that stops the tracking endpoint
+        """
         return web_app.tracking_endpoints.stop_thread_endpoint(integration)
-
-    @app.post('/thread/preset')
-    def preset_use():
-        return web_app.tracking_endpoints.preset_use(integration)
 
     @app.get('/thread/running')
     def thread_is_running():
-        # checks whether thread is running
+        """
+        Endpoint that checks whether the tracking thread is running
+            Returns:
+                is-running: a boolean value
+        """
         return web_app.tracking_endpoints.is_running_endpoint(integration)
 
     @app.get('/thread/value')
     def thread_value():
-        # Retrieves the thread value (only for demo/debug purposes)
+        """
+        Endpoint that returns the thread value (for testing purposes only)
+            Returns: 
+                value: NONE if the thread is nonexistent or and int value otherwise
+        """
         if integration.thread is None:
             return make_response(jsonify({"value": "NONE"}), 200)
         print(integration.thread.value)
@@ -289,10 +422,16 @@ def create_app(test_controller=None):
 
     @app.post('/update/microphone')
     def thread_microphone():
+        """
+        Endpoint that updates the microphone data in the WebUI
+        """
         return web_app.tracking_endpoints.update_microphone(integration)
 
     @app.post('/update/camera')
     def thread_camera():
+        """
+        Endpoint that updates the camera data in the WebUI
+        """
         return web_app.tracking_endpoints.update_camera(integration)
 
     @integration.ws.on("request-frame")
@@ -301,25 +440,53 @@ def create_app(test_controller=None):
 
     @app.post('/update/calibration')
     def thread_calibration():
+        """
+        Endpoint that updates the calibration data in the WebUI
+        """
         return web_app.tracking_endpoints.update_calibration(integration)
     # Info-thread section
 
     @app.post('/info-thread/start')
     def info_thread_start():
+        """
+        Endpoint that starts the thread that updates all the dynamic data
+        """
         integration.info_threads_event.value = 1
         return make_response(jsonify({}), 200)
 
     @app.post('/info-thread/stop')
     def info_thread_stop():
+        """
+        Endpoint that stops the thread that updates all the dynamic data
+        """
         integration.info_threads_event.value = 0
         return make_response(jsonify({}), 200)
 
     @app.get('/settings/get')
     def settings_get():
+        """
+        Endpoint that gets the system settings
+            Returns: 
+                camera-ip: a string address
+                camera-port: an int value
+                microphone-ip: a string address
+                microphone-port: an int value
+                microphone-thresh: an int value
+                filepath: a path string
+        """
         return web_app.settings_endpoints.get(integration)
 
     @app.post('/settings/set')
     def settings_set():
+        """
+        Endpoint that sets the following system settings
+            camera-ip: a string address
+            camera-port: an int value
+            microphone-ip: a string address
+            microphone-port: an int value
+            microphone-thresh: an int value
+            filepath: a path string
+        """
         return web_app.settings_endpoints.set_settings(integration)
 
     @integration.ws.on("connected")
