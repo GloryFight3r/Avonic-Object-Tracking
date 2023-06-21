@@ -333,7 +333,7 @@ def create_app(test_controller=None):
         """
         return web_app.tracking_endpoints.track_continuously(integration)
     @app.get('/calibration/track/no/zoom')
-    def continuous_tracker_without_adaprive_zoom():
+    def continuous_tracker_without_adaptive_zoom():
         """
         Endpoint that changes the tracking to use the audio model without adaptive zooming
         """
