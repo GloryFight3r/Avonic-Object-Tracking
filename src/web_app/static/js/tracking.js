@@ -20,6 +20,13 @@ function selectTracking() {
                 headers: { "Content-Type": "application/json" }
             });
             break
+        case "hybrid":
+            header.innerText = "Hybrid tracking  🔭"
+            fetch("/hybrid/track", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+            break
         case "object":
             header.innerText = "Continuous object tracking  🔭"
             fetch("/object/track", {

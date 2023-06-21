@@ -13,6 +13,7 @@ try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
 except ImportError:
     from yaml import Loader, Dumper
 import cv2
+import os
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
@@ -21,14 +22,16 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
+from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 
 class ModelCode():
     AUDIO = 0
     PRESET = 1
     OBJECT = 2
+    HYBRID = 3
     AUDIONOZOOM = 4
 
 
@@ -41,6 +44,8 @@ class GeneralController:
         # and indicates whether update should be performed.
         # when 0 - doesn't perform the update, when 1 - performs the update
         self.info_threads_event = Value("i", 0, lock=False)
+
+        self.footage_thread_event = Value("i", 1, lock=False)
 
         # self.info_threads_break used to completely destroy info-thread, and not just pause
         # Used for safe finish of the program, for safe destruction.
@@ -63,16 +68,18 @@ class GeneralController:
         # Secret for cookies and websocket
         self.secret = None
         self.ws = None
-
         # the neural network to use
         self.nn = None
 
         # Filepath for calibration and presets files
         self.filepath: str = ""
+        #self.resolution = np.array([1920.0, 1080.0])
+        self.resolution = np.array([1280.0, 720.0])
 
         # Models, to record all updates onto a disk
         self.audio_model = None
         self.preset_model = None
+        self.hybrid_model = None
         self.object_audio_model = None
         self.audio_no_zoom_model = None
         self.model = None
@@ -80,6 +87,8 @@ class GeneralController:
         # Video related fields
         self.footage_thread: FootageThread | None = None
         self.video = None
+
+        self.object_tracking_thread = None
 
         # Info-threads
         self.thread_mic = None
@@ -95,6 +104,7 @@ class GeneralController:
         self.pid = Value("i", os.getpid())
         self.testing = Value("i", 0, lock=False)
 
+        self.all_models = None
         # Keep in memory, whether a notification about the settings not being set has been sent
         self.no_settings_sent = True
 
@@ -173,28 +183,34 @@ class GeneralController:
         else:
             self.filepath = ""
 
-
         # Initialize footage thread
         if cam_addr is not None:
             self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
                                           + ':554/live/av0')  # pragma: no mutate
             self.footage_thread = FootageThread(self.video,
-                                                self.footage_thread_event)  # pragma: no mutate
+                                                self.footage_thread_event, self.resolution)  # pragma: no mutate
+
             self.footage_thread.start()  # pragma: no mutate
+
+
+        self.nn:YOLOPredict = YOLOPredict()
+        # Initialize models
 
         # Initialize models
         self.object_audio_model = WaitObjectAudioModel(
                 self.cam_api, self.mic_api,
-                np.array([1920.0, 1080.0]),
+                self.resolution,
                 5, self.nn, self.footage_thread,
                 filename=self.filepath + "calibration.json")
+
         self.audio_model = AudioModel(self.cam_api, self.mic_api,
                                       filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
                                         filename = self.filepath + "calibration.json")
-
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn,\
+            self.footage_thread, filename=self.filepath + "calibration.json")
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
@@ -236,6 +252,10 @@ class GeneralController:
             print("Error while writing settings file!")
             print(e)
             return False
+
+        # choose a strategy for tracking
+        self.calibration_tracker:WaitCalibrationTracker = \
+        WaitCalibrationTracker(self.cam_api, self.mic_api, self.footage_thread.resolution, 5)
 
     def __del__(self):
         if self.video is not None:
@@ -280,10 +300,15 @@ class GeneralController:
                 np.array([1920.0, 1080.0]),
                 5, self.nn, self.footage_thread,
                 filename=self.filepath + "calibration.json")
-        self.preset.value = ModelCode.PRESET
-        self.thread = None
+
+
         self.nn = ""
-        self.footage_thread = FootageThread(None, None)
+        self.thread = None
+        self.footage_thread = FootageThread(None, None, np.array([1920.0, 1080.0]))
+        
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
+
+        self.preset.value = ModelCode.PRESET
 
     def copy(self, new_controller):
         self.event = new_controller.event
@@ -297,6 +322,7 @@ class GeneralController:
         self.preset.value = new_controller.preset.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api
@@ -380,7 +406,6 @@ class GeneralController:
             sleep(0.3)
         print("Closing " + path + " updater thread")
 
-
 def verify_address(address) -> bool:
     try:
         assert 0 <= address[1] <= 65535
@@ -389,7 +414,6 @@ def verify_address(address) -> bool:
     except (AssertionError, TypeError):
         print("ERROR: Address " + address + " is invalid!")
         return False
-
 
 def close_running_threads(integration_passed) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""

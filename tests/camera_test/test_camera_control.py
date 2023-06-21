@@ -79,7 +79,7 @@ def test_init(monkeypatch):
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
     cam = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52382)), None)
-    assert cam.counter == 1
+    assert cam.counter.value == 1
     assert cam.video == "on"
     assert (cam.latest_direction == np.array([0,0,1])).all()
 
