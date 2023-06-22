@@ -349,14 +349,14 @@ adapter pattern to facilitate the use of other microphones in the future.
 \subsection{Tracking}\label{subsection:tracking}
 All of the functionality related to speaker tracking is contained in this
 module. The most important part of it is the \verb|UpdateThread|. It is
-responsible for continuously the method that directs the camera.
+responsible for continuously calling the method that directs the camera.
 The module is structured in a way that every tracking type is maintained in a
-so-called model. Every model is an child of the \verb|TrackingModel| class that
-ensures that they have the method to point the camera. The user can pick their
+so-called model. Every model is inherits from the \verb|TrackingModel| and has 
+the appropriate implementation of the point method. The user can pick their
 preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
-The chosen model is instantiated at the beginning of the \verb|run| method that
-is continuously using the model until speaker tracking is stopped by the user.
+The chosen model is instantiated at the beginning of the \verb|run| method and 
+is subsequently used to track the speaker until being explicitely stopped by the user.
 Some of the models rely on data stored in JSON files whose location can be
 specified in the settings menu in our WebUI. We currently have the following
 tracking models:
@@ -370,7 +370,7 @@ tracking models:
 The Preset Model makes use of a \verb|PresetCollection| which stores all
 available preset locations. A preset location contains a name, the direction from the
 microphone and the direction of the camera towards it. When fed a direction
-from the microphone, the this model finds the preset which is most similar to
+from the microphone, this model finds the preset which is the closest to
 the given microphone direction according to the cosine similarity. This
 similarity metric compares the directions of vectors while ignoring their norm.
 After finding the closest preset, the camera is pointed towards that preset
@@ -398,13 +398,13 @@ spoken. If no one has spoken in some time the camera will zoom out. This modelâ€
 point method also takes into account how far the speaker is from the camera and
 zooms in accordingly. Another improvement we implemented in this model is
 changing the camera speed depending on how much it has to move. It helps reduce
-jittering when following the speaker. The model also saves vectors that were
-added to the calibration and can load data from a supplied file. If any of the
+jittering when following the speaker. The model also saves calculated vectors that were
+added to the calibration and can load this data from a supplied file. If any of the
 fields from that file are non-existent or corrupted, they are replaced with
 default values.
 
 \paragraph{Audio model without adaptive zooming}\mbox{} \\
-This model has almost the same functionality as the Audio Model with the only
+This model has almost the same functionality as the Audio Model with the
 difference that it does not have the ability to adapt the camera zoom depending
 on the position of the speaker. It also eliminates the possibility for the
 camera to zoom out when no one is speaking. This means that for the whole period

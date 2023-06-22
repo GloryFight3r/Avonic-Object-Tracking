@@ -23,8 +23,10 @@ to the camera to identify the speaker. A common setup would be to have
 the camera in the back of the room and the microphone in the front above the speaker(s).
 In order to explore this solution, Avonic has asked us to spend
 ten weeks working on a system that tracks a speaker using both a camera and a
-microphone. The camera we have to use is the Avonic CM70 model and the
-microphone is the Sennheiser TeamConnect Ceiling 2. We are not allowed to
+microphone. The camera we have to use is the Avonic CM70 model
+(figure ) and the
+microphone is the Sennheiser TeamConnect Ceiling 2 (figure ).
+We are not allowed to
 reprogram these devices. That is why a single-board computer, the Nvidia Jetson Nano,
 has to be used to communicate with the camera and microphone through application programming
 interfaces (APIs). Moreover, it should be easy for a user to start the system
@@ -33,6 +35,22 @@ and it should not require any technical knowledge.
 To recap:
 using the camera, microphone and single-board computer mentioned above,
 we had to find a way to automatically move to camera to point at a speaker after minimal installation.
+
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+    \centering
+    \includegraphics[width=.7\linewidth]{camera}
+    \captionof{figure}{Avonic CM70 camera}
+    \label{fig:camera}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+    \centering
+    \includegraphics[width=.7\linewidth]{microphone}
+    \captionof{figure}{Sennheiser TeamConnect Ceiling 2 microphone}
+    \label{fig:microphone}
+\end{minipage}
+\end{figure}
 
 \section{Available solutions}\label{sec:available-solutions}
 We now discuss three different solutions that are already available for
@@ -90,32 +108,55 @@ with a new approach: one camera and one microphone. This poses new problems.
 Our devised solution is described in \hyperref[ch:solution]{Chapter 4}.
 
 \section{Stakeholders}\label{sec:stakeholders}
-This section describes who the stakeholders of our project are and how we considered their interests during the ten week process. The
-definition of stakeholder that we are going to use is as follows: “All those who have an interest in the system and who will eventually be
-responsible for its acceptance”\cite{stakeholder-definition}.
-Using this definition, we identified three main types of stakeholders. These people are directly affected by the result of our project.
-The types of stakeholders of our project are as follows:
+This section describes who the stakeholders of our project are and how we
+considered their interests during the ten week process. The definition of
+stakeholder that we are going to use is as follows: “All those who have an
+interest in the system and who will eventually be responsible for its
+acceptance”\cite{stakeholder-definition}. Using this definition, we identified
+four main types of stakeholders. These people are directly affected by the
+result of our project. The types of stakeholders of our project are as follows:
 
-\paragraph{Clients}\mbox{} \\
-Potential clients of Avonic who are going to make use of our software in the future. This includes university staff or conference
-organizers. Anyone who buys the Avonic camera for personal use falls into this category. It is important to these clients that the camera
-tracks speakers accurately and that it is easy to install.
+\paragraph{Presenters}\mbox{} \\
+People who participate in lectures or conferences using MaAT have a high
+interest in the quality of the speaker tracking. They want their activity to be
+well recorded. If the speaker tracking is not correct or not smooth, these
+stakeholders will not be satisfied with the product. The accuracy of the
+tracking and the is most important to them.
+
+\paragraph{IT staff}\mbox{} \\
+The IT people who are going to set up MaAT want the process of setting up the
+system to be quick and easy. It should not require hours of experimenting to
+figure out how to get the tracking started. The setup process should also not
+require any specific technical knowledge. We tested the simplicity of the setup
+process by asking other people like Mr. Van der Voort to try to set up MaAT
+without any guidance.
+
 \paragraph{Developers}\mbox{} \\
-Developers who are going to be building upon our code in the future. Since we write our code for Avonic, we expect this category to include
-only their developers. It is important to the developers that the code is well written and well documented. Some of the criteria we
-use to determine whether code is well written are test coverage, readability and extensibility. These criteria and more are explained in
-\hyperref[ch:workflow-and-teamwork]{Chapter 5} where we talk about the workflow.
+Developers could be building upon our code in the future. Since we write our
+code for Avonic, we expect this category to include only their developers. It is
+important to the developers that the code is well written and well documented.
+Some of the criteria we use to determine whether code is well written are test
+coverage, readability and extensibility. These criteria and more are explained
+in \hyperref[ch:workflow-and-teamwork]{Chapter 5} where we talk about the
+workflow.
+
 \paragraph{Avonic}\mbox{} \\
-Avonic as a company influences the requirements of our project. They have the general picture in mind, considering both the clients and
-the developers. It is important to them that the compromises made in the process are carefully considered and explained. This includes a
-clear and elaborate report that explains precisely what steps have been taken to reach the conclusion. Such a report can be used by Avonic
-to decide whether the experiment is worth doing again.
+Avonic as a company influences the requirements of our project. They have the
+general picture in mind, considering both the clients and the developers. It is
+important to them that the compromises made in the process are carefully
+considered and explained. This includes a clear and elaborate report that
+explains precisely what steps have been taken to reach the conclusion. Such a
+report can be used by Avonic to decide whether the experiment is worth doing
+again.
 
 \paragraph{Satisfaction of all stakeholders}\mbox{} \\
-In order to satisfy every stakeholder as much as possible, we continually talked to people from Avonic. We had weekly meetings with Ali
-Kahawati, one of the software developers at the company, and visited the office three times a week to be able to talk with other employees as well.
-Throughout the project, this helped to stay in touch with the wants of the stakeholders. We had no direct contact with the clients, so this
-group was mainly represented by the Avonic team.
+In order to satisfy every stakeholder as much as possible, we continually
+talked to people from Avonic. We had weekly meetings with Ali Kahawati, one of
+the software developers at the company, and visited the office three times a
+week to be able to talk with other employees as well. Throughout the project,
+this helped to stay in touch with the wants of the stakeholders. We had no
+direct contact with the clients, so this group was mainly represented by the
+Avonic team.
 
 
 \section{Possible pitfalls}\label{sec:possible-pitfalls}
