@@ -77,7 +77,7 @@ def client(camera, monkeypatch):
     def x3(self, a1, a2):
         pass
 
-    def x2(self):
+    def x2(url, arg1, arg2):
         return mock.Mock()
 
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
@@ -90,6 +90,7 @@ def client(camera, monkeypatch):
                         app = web_app.create_app(test_controller=test_controller)
                         app.config['TESTING'] = True
     return app.test_client()
+
 
 def test_load_env(client):
     time.sleep(0.5)
