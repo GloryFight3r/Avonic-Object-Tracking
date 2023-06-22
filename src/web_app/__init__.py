@@ -72,9 +72,16 @@ def create_app(test_controller=None):
     @app.post('/camera/address/set')
     def post_set_address():
         """
-        Endpoint that sets the camera address 
-            camera-ip: a string in the form _._._._
-            camera-port: an int value
+        Endpoint that sets the camera network settings
+            form:
+                camera-ip: a string in the form _._._._
+                camera-port: an int value that represents the port
+                camera-http-port: an int value that represents the HTTP port of the camera
+            return:
+                HTTP code corresponds to the camera response:
+                    message: description of the received response code from the camera
+                Possible HTTP 400 - invalid supplied values
+                     "message" - "Invalid address!"
         """
         return web_app.camera_endpoints.address_set_camera_endpoint(integration)
 
@@ -86,7 +93,7 @@ def create_app(test_controller=None):
                 HTTP 200: success, empty message
                 Other HTTP codes:
                     HTTP code corresponds to the camera response
-                    "message" - description of the received response code from the camera
+                    message: description of the received response code from the camera
         """
         return web_app.camera_endpoints.reboot_camera_endpoint(integration)
 
@@ -98,7 +105,7 @@ def create_app(test_controller=None):
                 HTTP 200: success, empty message
                 Other HTTP codes:
                     HTTP code corresponds to the camera response
-                    "message" - description of the received response code from the camera
+                    message: description of the received response code from the camera
         """
         return web_app.camera_endpoints.turn_on_camera_endpoint(integration)
 
@@ -110,7 +117,7 @@ def create_app(test_controller=None):
                 HTTP 200: success, empty message
                 Other HTTP codes:
                     HTTP code corresponds to the camera response
-                    "message" - description of the received response code from the camera
+                    message: description of the received response code from the camera
         """
         return web_app.camera_endpoints.turn_off_camera_endpoint(integration)
 
@@ -118,14 +125,14 @@ def create_app(test_controller=None):
     def post_move_absolute():
         """
         Endpoint that sends a command to the camera to move in an absolute direction.
-            data:
+            form:
                 absolute-speed-x: Integer from 1 - 24, the pan speed.
                 absolute-speed-y: Integer from 1 - 20, the tilt speed.
                 absolute-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
                 absolute-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
             return:
-                HTTP code corresponds to the camera response
-                "message" - description of the received response code from the camera
+                HTTP code corresponds to the camera response:
+                    message: description of the received response code from the camera
                 Possible HTTP 400 - assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
@@ -134,35 +141,42 @@ def create_app(test_controller=None):
     def post_move_relative():
         """
         Endpoint that sends a command to the camera to move in a relative direction.
-            data:
+            form:
                 relative-speed-x: Integer from 1 - 24, the pan speed.
                 relative-speed-y: Integer from 1 - 20, the tilt speed.
                 relative-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
                 relative-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
             return:
-                HTTP code corresponds to the camera response
-                "message" - description of the received response code from the camera
+                HTTP code corresponds to the camera response:
+                    message: description of the received response code from the camera
                 Possible HTTP 400 - assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
 
     @app.post('/camera/move/vector')
     def post_move_vector():
-        """ 
+        """
         Endpoint that sends a command to the camera to move in a vector direction.
-            data:
+            form:
                 vector-speed-x: Integer from 1 - 24, the pan speed.
                 vector-speed-y: Integer from 1 - 20, the tilt speed.
                 vector-x: Float representing the x-coordinate of the direction vector.
                 vector-y: Float representing the y-coordinate (height) of the direction vector.
                 vector-z: Float representing the z-coordinate of the direction vector.
+            return:
+                HTTP code corresponds to the camera response:
+                    message: description of the received response code from the camera
+                Possible HTTP 400 - assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_vector_camera_endpoint(integration)
 
     @app.post('/camera/move/home')
     def post_home():
         """
-        Endpoint to move the camera to its home direction [0,0,1]
+        Endpoint to move the camera to its home direction [0, 0, 1]
+            return:
+                HTTP code corresponds to the camera response
+                message: description of the received response code from the camera
         """
         return web_app.camera_endpoints.move_home_camera_endpoint(integration)
 
@@ -170,6 +184,9 @@ def create_app(test_controller=None):
     def stop():
         """
         Endpoint to stop the rotation of the camera.
+            return:
+                HTTP code corresponds to the camera response
+                message: description of the received response code from the camera
         """
         return web_app.camera_endpoints.move_stop_camera_endpoint(integration)
 
@@ -178,7 +195,12 @@ def create_app(test_controller=None):
         """
         Endpoint to get the zoom value of the camera.
             return:
-                zoom-value - Integer from 0 - 16384, the zoom-value
+                In case of an error:
+                    HTTP code corresponds to the camera response
+                    message: description of the received response code from the camera
+                In case of success:
+                    HTTP 200
+                    "zoom-value": Integer in range [0, 16384], the value of the zoom
         """
         return web_app.camera_endpoints.zoom_get_camera_endpoint(integration)
 
@@ -186,6 +208,10 @@ def create_app(test_controller=None):
     def set_zoom():
         """
         Endpoint to set the zoom value of the camera.
+            return:
+                HTTP code corresponds to the camera response:
+                    message: description of the received response code from the camera
+                Possible HTTP 400 - assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.zoom_set_camera_endpoint(integration)
 
@@ -193,24 +219,55 @@ def create_app(test_controller=None):
     def get_position():
         """
         Endpoint to get the position value of the camera.
+            return:
+                In case of an error:
+                    HTTP code corresponds to the camera response
+                    message: description of the received response code from the camera
+                In case of success:
+                    HTTP 200
+                    position-alpha-value: pan value of the camera
+                    position-beta-value: tilt value of the camera
         """
         return web_app.camera_endpoints.position_get_camera_endpoint(integration)
 
     @app.post('/microphone/address/set')
     def set_microphone_address():
+        """
+        Endpoint that sets the camera network settings
+            form:
+                microphone-ip: a string in the form _._._._
+                microphone-port: an int value that represents the port
+            return:
+                HTTP 200 or 400:
+                    Text of the return message from the microphone
+                Possible HTTP 400 - not valid supplied IP or port:
+                    message: "Invalid address!"
+        """
         return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
 
     @app.post('/microphone/height/set')
     def set_height():
         """
         Endpoint to set the height of the microphone.
+            form:
+                microphone-height: float representing value to be set
+            return:
+                HTTP 200:
+                    microphone-height: with the value that was set
+                HTTP 504:
+                    message: error message returned from the microphone
         """
         return web_app.microphone_endpoints.height_set_microphone_endpoint(integration)
 
     @app.get('/microphone/direction')
     def get_direction():
         """
-        Endpoint to get the direction of the last speaker.
+        Endpoint to get the direction of the last speaker:
+            return:
+                HTTP 200:
+                    microphone-height: with the value that was set
+                HTTP 504:
+                    message: error message returned from the microphone
         """
         return web_app.microphone_endpoints.direction_get_microphone_endpoint(integration)
 
@@ -244,7 +301,7 @@ def create_app(test_controller=None):
 
     @app.post('/preset/edit')
     def edit_preset():
-        """ 
+        """
         Endpoint that edits a preset in the preset collection
             data:
                 camera-direction-alpha: Float from -170 - 170 representing the yaw of the camera
@@ -253,7 +310,7 @@ def create_app(test_controller=None):
                 mic-direction-x: Float representing the x-coordinate of the direction vector.
                 mic-direction-y: Float representing the y-coordinate of the direction vector.
                 mic-direction-z: Float representing the z-coordinate of the direction vector.
-                
+
         """
         return web_app.preset_locations_endpoints.edit_preset_location(integration)
 
