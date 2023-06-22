@@ -408,10 +408,6 @@ def create_app(test_controller=None):
         """
         Endpoint that adds the camera direction towards a new calibration point
 
-            data:
-                "position-alpha-value": Float from -170 - 170 representing the yaw of the camera
-                "position-beta-value": Float from -30 - 90 representing the pitch of the camera
-
             return:
                 In case of an error:
                     "message": the exact error message
@@ -510,7 +506,7 @@ def create_app(test_controller=None):
     def navigate_camera():
         """
         Endpoint that navigates the camera so that the clicked pixel is centered in the frame
-            data:
+            form:
                 "x-pos": a float value in the range [0:1]
                 "y-pos": a float value in the range [0:1]
 
@@ -671,7 +667,8 @@ def create_app(test_controller=None):
     def settings_set():
         """
         Endpoint that sets the following settings to the ones given.
-            data:
+
+            form:
                 "camera-ip": a string representing the address of the camera to connect to
                 "camera-port": an int representing the port of the camera to connect to
                 "microphone-ip": a string representing the address of the microphone to connect to
