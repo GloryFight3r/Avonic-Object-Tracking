@@ -4,6 +4,8 @@ from web_app.integration import GeneralController, verify_address
 
 
 def address_set_microphone_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to set the address of the microphone.
+    """
     try:
         addr = (request.form["microphone-ip"], int(request.form["microphone-port"]))
         verify_address(addr)
@@ -18,12 +20,16 @@ def address_set_microphone_endpoint(integration: GeneralController):
 
 
 def height_set_microphone_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to set the height of the microphone.
+    """
     integration.audio_model.calibration.set_height(float(request.form["microphone-height"]))
     return make_response(jsonify(
         {"microphone-height": integration.audio_model.calibration.mic_height}), 200)
 
 
 def direction_get_microphone_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to get the current direction from the microphone.
+    """
     ret = integration.mic_api.get_direction()
     if isinstance(ret, str):
         return make_response(jsonify({"message": ret}), 504)
@@ -31,6 +37,8 @@ def direction_get_microphone_endpoint(integration: GeneralController):
 
 
 def speaking_get_microphone_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to get information if someone is currently speaking.
+    """
     ret = integration.mic_api.is_speaking()
     if isinstance(ret, str):
         return make_response(jsonify({"message": ret}), 504)
@@ -38,6 +46,8 @@ def speaking_get_microphone_endpoint(integration: GeneralController):
 
 
 def get_speaker_direction_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to get the current direction from the microphone but waits for someone to speak.
+    """
     ret = wait_for_speaker(integration)
     if isinstance(ret, str):
         return make_response(jsonify({"message": ret}), 504)
@@ -51,7 +61,8 @@ def wait_for_speaker(integration: GeneralController):
     Args:
         integration: The controller object
 
-    Returns: Direction towards the speaker
+    Returns: 
+        Direction towards the speaker
 
     """
     approaching_limit: int = 0

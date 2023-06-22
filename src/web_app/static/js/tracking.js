@@ -15,6 +15,13 @@ async function selectTracking() {
             header.innerText = "Continuous following  with adaptive zooming🔭"
             url = "/calibration/track"
             break
+        case "hybrid":
+            header.innerText = "Hybrid tracking  🔭"
+            fetch("/hybrid/track", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+            break
         case "object":
             header.innerText = "Continuous object tracking  🔭"
             url = "/object/track"

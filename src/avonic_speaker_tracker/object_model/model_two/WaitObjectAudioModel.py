@@ -128,6 +128,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             self.time_without_movement = 0
             start_object_tracking = False
 
+        # Sets the rotation speed depending on how much the camera has to move
         diffX = math.fabs(self.prev_dir[0]-direct_np[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct_np[1])*2
 

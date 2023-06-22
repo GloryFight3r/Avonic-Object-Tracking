@@ -4,7 +4,6 @@ from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 class UpdateThread(Thread):
 
@@ -19,6 +18,7 @@ class UpdateThread(Thread):
         super().__init__()
         self.event: c_int = event
         self.value: int = 0
+
         self.cam_api: CameraAPI = cam_api
         self.mic_api: MicrophoneAPI = mic_api
         self.model: TrackingModel = model
@@ -36,20 +36,11 @@ class UpdateThread(Thread):
         - ObjectModel aka using object detection to figure out where to move
         the camera.
         """
+        prev_dir = [0.0, 0.0]
         speak_delay: int = 0
+        
         while self.event.value != 0:
-            if self.value is None:
-                print("STOPPED BECAUSE CALIBRATION IS NOT SET")
-                sleep(5)
-                continue
-
             self.model.point()
+            sleep(0.3)
 
-            self.value += 1
-            sleep(0.05)
         print("Exiting thread")
-
-    def set_calibration(self, value: int) -> None:
-        """ Sets the calibration value.
-        """
-        self.value = value

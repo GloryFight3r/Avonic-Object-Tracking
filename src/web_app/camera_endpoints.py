@@ -5,10 +5,11 @@ from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 from avonic_camera_api.camera_adapter import ResponseCode
 from avonic_camera_api.converter import vector_angle
-from avonic_speaker_tracker.utils.camera_navigation_utils import get_movement_to_box
 
 
 def responses():
+    """ All the possible responses from the cammera.
+    """
     return {
         ResponseCode.ACK:
             (json.dumps({"message": "Command accepted"}), 200),
@@ -36,6 +37,8 @@ def success():
 
 
 def reboot_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to reboot the camera.
+    """
     if integration.cam_sock is None:
         new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     else:
@@ -45,6 +48,8 @@ def reboot_camera_endpoint(integration: GeneralController):
 
 
 def turn_on_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to turn on the camera.
+    """
     ret = integration.cam_api.turn_on()
     if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "on"})
@@ -53,6 +58,8 @@ def turn_on_camera_endpoint(integration: GeneralController):
 
 
 def turn_off_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to turn off the camera.
+    """
     ret = integration.cam_api.turn_off()
     if ret == ResponseCode.ACK:
         integration.ws.emit('camera-video-update', {"state": "off"})
@@ -61,10 +68,14 @@ def turn_off_camera_endpoint(integration: GeneralController):
 
 
 def move_home_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to point the camera at the home direction.
+    """
     return make_response(responses()[integration.cam_api.home()])
 
 
 def move_absolute_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to point the camera in an absolute direction.
+    """
     data = request.form
     try:
         ret = integration.cam_api.move_absolute(
@@ -76,6 +87,8 @@ def move_absolute_camera_endpoint(integration: GeneralController):
 
 
 def move_relative_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to point the camera in a relative direction.
+    """
     data = request.form
     try:
         ret = integration.cam_api.move_relative(
@@ -87,6 +100,8 @@ def move_relative_camera_endpoint(integration: GeneralController):
 
 
 def move_vector_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to point the camera in a direction given by a vector.
+    """
     data = request.form
     try:
         ret = integration.cam_api.move_vector(int(data["vector-speed-x"]),
@@ -100,10 +115,14 @@ def move_vector_camera_endpoint(integration: GeneralController):
 
 
 def move_stop_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to stop the current movement of the camera.
+    """
     return make_response(responses()[integration.cam_api.stop()])
 
 
 def zoom_get_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to get the zoom value of the camera.
+    """
     zoom = integration.cam_api.get_zoom()
     if isinstance(zoom, ResponseCode):
         return make_response(responses()[zoom])
@@ -111,6 +130,8 @@ def zoom_get_camera_endpoint(integration: GeneralController):
 
 
 def zoom_set_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to set the zoom of the camera.
+    """
     try:
         ret = integration.cam_api.direct_zoom(int(request.form["zoom-value"]))
         return make_response(responses()[ret])
@@ -119,6 +140,8 @@ def zoom_set_camera_endpoint(integration: GeneralController):
 
 
 def position_get_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to get the current direction of the camera.
+    """
     position = integration.cam_api.get_direction()
     if isinstance(position, ResponseCode):
         return make_response(responses()[position])
@@ -128,15 +151,26 @@ def position_get_camera_endpoint(integration: GeneralController):
 
 
 def get_camera_footage(integration: GeneralController):
+    """ Endpoint that sends a request to try to get the current frame.
+    """
     return integration.footage_thread.get_frame()
 
 
 def address_set_camera_endpoint(integration: GeneralController):
+    """ Endpoint that sends a request to try to set the address of the camera.
+    """
     if integration.cam_api is None:
         return make_response(jsonify({"message": "Invalid address!"}), 400)
     try:
         addr = (request.form["camera-ip"], int(request.form["camera-port"]))
+        http_port = int(request.form["camera-http-port"])
+
         verify_address(addr)
+        verify_address((addr[0], http_port))
+
+        # set the address and port for sending http requests
+        integration.cam_api.camera_http.address = (addr[0], http_port)
+
         if integration.cam_sock is None:
             new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         else:
@@ -166,12 +200,12 @@ def navigate_camera(integration: GeneralController):
     
     # calculate the camera_speed and camera_rotation we need to make to center the camera on that pixel
     try:
-        camera_speed, camera_rotation = get_movement_to_box(np.array([x, y, x, y]), integration.cam_api, integration.footage_thread)
+        camera_speed, camera_rotation = integration.hybrid_model.get_movement_to_box(np.array([x, y, x, y]))
     except AssertionError as e:
         return make_response(jsonify({"message": str(e)}), 400)
     
     # relatively move the camera 
-    ret = integration.cam_api.move_relative(int(camera_speed[0]), int(camera_speed[1]),\
+    ret = integration.cam_api.move_relative(int(camera_speed[0]), int(camera_speed[1]),
                                       camera_rotation[0], camera_rotation[1])
 
     return make_response(responses()[ret])

@@ -2,7 +2,6 @@ import numpy as np
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController
 
-
 def success():
     return make_response(jsonify({}), 200)
 
@@ -95,6 +94,16 @@ def get_preset_list(integration: GeneralController):
 
 
 def get_preset_info(integration: GeneralController, preset_name: str):
+    """ Gets information about a specific preset
+
+        Args: 
+            integration: The controller containing all the dependencies
+            preset_name: The name of the preset we are looking for
+
+        Returns: A http response that returns success(200) and the preset information if 
+        it finds it in the collection or failure(400) otherwise
+
+    """
     try:
         info = integration.preset_model.preset_locations.get_preset_info(preset_name)
         return make_response(jsonify({
@@ -108,5 +117,10 @@ def get_preset_info(integration: GeneralController, preset_name: str):
 
 
 def point_to_closest_preset(integration: GeneralController):
+    """ Endpoint that makes the camera point towards the found preset
+    
+        Args: 
+            integration: The controller containing all the dependencies
+    """
     integration.preset_model.point()
     return make_response(jsonify({}), 200)
