@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from unittest import mock
 from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
+from avonic_camera_api.camera_adapter import ResponseCode
 
 @pytest.fixture()
 def obj_tracker():
@@ -137,3 +138,36 @@ def test_no_speaker_talking_no_new_box(obj_tracker: HybridTracker):
 
         obj_tracker.cam_api.move_relative.side_effect = mocked_move
         obj_tracker.point()
+
+def test_bad_mic():
+    cam_api = mock.Mock()
+    mic_api = mock.Mock()
+    nn_mock = mock.Mock()
+    stream_mock = mock.Mock()
+
+    mic_api.is_speaking.return_value = True 
+
+    mic_api.get_direction.return_value = "string"
+
+    obj_tracker = HybridTracker(cam_api, mic_api, nn_mock, stream_mock, "")
+
+    obj_tracker.point()
+
+    assert cam_api.get_direction.call_count == 0
+
+def test_bad_cam():
+    cam_api = mock.Mock()
+    mic_api = mock.Mock()
+    nn_mock = mock.Mock()
+    stream_mock = mock.Mock()
+
+    mic_api.is_speaking.return_value = True 
+    mic_api.get_direction.return_value = np.array([1, 2, 3])
+    cam_api.get_direction.return_value = ResponseCode.CANCELED
+
+    obj_tracker = HybridTracker(cam_api, mic_api, nn_mock, stream_mock, "")
+
+    obj_tracker.point()
+
+    assert cam_api.move_relative.call_count == 0
+    assert cam_api.move_absolute.call_count == 0
