@@ -305,14 +305,14 @@ class GeneralController:
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
         self.object_audio_model = WaitObjectAudioModel(
             self.cam_api, self.mic_api,
-            np.array([1920.0, 1080.0]),
+            self.resolution,
             5, self.nn, self.footage_thread,
             filename=self.filepath + "calibration.json")
         self.tracking.value = ModelCode.PRESET
         self.thread = None
         self.nn = ""
         self.thread = None
-        self.footage_thread = FootageThread(None, None, np.array([1920.0, 1080.0]), None)
+        self.footage_thread = FootageThread(None, None, self.resolution, None)
 
         self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
 
