@@ -9,6 +9,7 @@ if [ "$1" = "jetson" ]
       echo "Restarting app in 1 second"
       sleep 1
     done
+    exit
 fi
 
 python3 -m venv venv
