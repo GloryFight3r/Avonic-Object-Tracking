@@ -74,4 +74,3 @@ class FootageThread(Thread):
     def draw_prediction(self, img, label, left, top, right, bottom, clr):
         cv2.rectangle(img, (left, top), (right, bottom), clr, 2)
         cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, clr, 2)
-    

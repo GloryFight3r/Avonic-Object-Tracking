@@ -3,7 +3,9 @@ import socket
 import json
 import pytest
 import numpy as np
+
 from web_app.integration import GeneralController, ModelCode
+from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -37,7 +39,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "recv", mocked_recv)
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=cam_sock, address=('0.0.0.1', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=cam_sock, address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
 
     def mocked_get_zoom():
         return 128
@@ -86,7 +88,8 @@ def test_fail(client):
 def test_set_address_camera(client):
     data = {
         "camera-ip": "0.0.0.1",
-        "camera-port": 1234
+        "camera-port": 1234,
+        "camera-http-port": 80
     }
     rv = client.post('/camera/address/set', data=data)
     assert rv.status_code == 200
@@ -557,6 +560,7 @@ def test_settings(client):
         original = {
             "camera-ip": "0.0.0.1",
             "camera-port": 52381,
+            "camera-http-port": 80,
             "microphone-ip": "0.0.0.1",
             "microphone-port": 45,
             "microphone-thresh": -55,
@@ -566,6 +570,7 @@ def test_settings(client):
         expected = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
+            "camera-http-port": 72,
             "microphone-ip": "2.2.2.2",
             "microphone-port": 456,
             "microphone-thresh": -5,
@@ -589,6 +594,7 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": 123,
             "camera-port": "asdf",
+            "camera-http-port": "AS",
             "microphone-ip": "2.2.2.2",
             "microphone-port": 456,
             "microphone-thresh": -5,
@@ -599,6 +605,7 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
+            "camera-http-port":80,
             "microphone-ip": 34,
             "microphone-port": "asd",
             "microphone-thresh": -5,
@@ -609,6 +616,7 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
+            "camera-http-port":80,
             "microphone-ip": "gugu",
             "microphone-port": 456,
             "microphone-thresh": "asdf",

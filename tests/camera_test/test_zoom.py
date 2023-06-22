@@ -3,13 +3,14 @@ import numpy as np
 from CameraMock import CameraMock
 from avonic_camera_api.camera_control_api import CameraAPI, insert_zoom_in_hex
 from avonic_camera_api.camera_adapter import ResponseCode
+from avonic_camera_api.camera_http_request import CameraHTTP
 
 
 def test_get_zoom():
     """
     Test to get the zoom from the Camera.
     """
-    api = CameraAPI(CameraMock())
+    api = CameraAPI(CameraMock(), CameraHTTP(("", 1)))
     ret = api.get_zoom()
     assert ret == api.camera.zoom
     assert api.camera.call_count == 1
@@ -18,7 +19,7 @@ def test_direct_zoom():
     """
     Test to set the zoom of the camera.
     """
-    api = CameraAPI(CameraMock())
+    api = CameraAPI(CameraMock(), CameraHTTP(("", 1)))
 
     # Value of the zoom to set Camera to
     test_zoom = 100
@@ -66,7 +67,7 @@ def test_insert_zoom_wrong_size_hex():
 
 
 def test_timeout():
-    api = CameraAPI(CameraMock(True))
+    api = CameraAPI(CameraMock(True), CameraHTTP(("", 1)))
     api.latest_fov = np.array([10, 10])
     ret = api.get_zoom()
     assert (ret == np.array([10, 10])).all()
@@ -74,11 +75,11 @@ def test_timeout():
 
 def generate_fov():
     return [
-        (1000, 
+        (1000,
         [60.38 - ((60.38 - 3.72) * (1000 / 16384)), 35.80 - ((35.80 - 2.14) * (1000 / 16384))]),
-        (0, 
+        (0,
         [60.38 - ((60.38 - 3.72) * (0 / 16384)), 35.80 - ((35.80 - 2.14) * (0 / 16384))]),
-        (16384, 
+        (16384,
         [60.38 - ((60.38 - 3.72) * (16384 / 16384)), 35.80 - ((35.80 - 2.14) * (16384 / 16384))]),
     ]
 
@@ -90,7 +91,7 @@ def generate_incorrect_fov():
 
 @pytest.mark.parametrize("zoom, expected", generate_fov())
 def test_calculate_fov(monkeypatch, zoom, expected):
-    api = CameraAPI(None)
+    api = CameraAPI(None, None)
 
     def mocked_get_zoom():
         return zoom
@@ -101,7 +102,7 @@ def test_calculate_fov(monkeypatch, zoom, expected):
 
 @pytest.mark.parametrize("zoom", generate_incorrect_fov())
 def test_calculate_fov_bad_weather(monkeypatch, zoom):
-    api = CameraAPI(None)
+    api = CameraAPI(None, None)
 
     def mocked_get_zoom():
         return zoom

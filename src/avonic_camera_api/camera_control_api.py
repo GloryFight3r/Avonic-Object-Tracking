@@ -1,17 +1,29 @@
 import math
 import numpy as np
+from enum import Enum
+
 import re
 from multiprocessing import Value
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
+from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api import converter
 
 PAN_STEP = 341/(2448+2448)
 TILT_STEP = 121/(1296+443)
 
-class CameraAPI:
-    latest_direction = None
-    # The FOV of the camera when fully zoomed in
+class CompressedFormat(Enum):
+    MJPEG = 0
+    H264 = 1
+    H265 = 2
 
+class ImageSize(Enum):
+    P1920_1080 = 0
+    P1280_720 = 1
+
+class CameraAPI:
+    latest_direction:np.ndarray | None = None
+
+    # The FOV of the camera when fully zoomed in
     latest_fov = 0
 
     MIN_FOV = np.array([3.72, 2.14])
@@ -19,13 +31,14 @@ class CameraAPI:
     MAX_FOV = np.array([60.38, 35.80])
     MAX_ZOOM_VALUE = 16384
 
-    def __init__(self, camera: CameraSocket):
+    def __init__(self, camera: CameraSocket, camera_http: CameraHTTP):
         """ Constructor for cameraAPI
 
         Args:
             camera: object of type Camera
         """
         self.camera = camera
+        self.camera_http = camera_http
         self.counter = Value('i', 1)
         self.video = "on"
         self.latest_direction = np.array([0, 0, 1], dtype='float')
@@ -59,9 +72,15 @@ class CameraAPI:
         self.camera.send_no_response('01 00 00 06 00 00 00' + hx,
                                      '81 0A 01 06 01 FF')
 
-        return self.camera.reconnect(new_socket)
+        response = self.camera.reconnect(new_socket)
 
-    def stop(self) -> ResponseCode:
+        if response == ResponseCode.COMPLETION:
+            self.set_camera_codec(CompressedFormat.MJPEG)
+            return response
+        else:
+            return response
+
+    def stop(self) -> ResponseCode | bytes:
         """ Stops the camera from rotating
 
         Returns:
@@ -71,7 +90,7 @@ class CameraAPI:
         return self.camera.send('01 00 00 09 00 00 00' + hx,
                                 '81 01 06 01 05 05 03 03 FF', cnt)
 
-    def turn_on(self) -> ResponseCode:
+    def turn_on(self) -> ResponseCode | bytes:
         """ Turns on the camera
 
         Returns:
@@ -84,7 +103,7 @@ class CameraAPI:
             self.video = "on"
         return res
 
-    def turn_off(self) -> ResponseCode:
+    def turn_off(self) -> ResponseCode | bytes:
         """ Turns off the camera - the camera continues receiving and responding to requests
 
         Returns:
@@ -97,7 +116,7 @@ class CameraAPI:
             self.video = "off"
         return res
 
-    def home(self) -> ResponseCode:
+    def home(self) -> ResponseCode | bytes:
         """ Points the camera towards the 'home' direction
         This means that the vector will be [0, 0, 1], the angles (0, 0)
 
@@ -109,7 +128,7 @@ class CameraAPI:
                                 '81 01 06 04 FF', cnt)
 
     def move_relative(self, speed_x: int, speed_y: int,
-                      degrees_x: float, degrees_y: float) -> ResponseCode:
+                      degrees_x: float, degrees_y: float) -> ResponseCode | bytes:
         """ Rotates the camera relative to the current rotation degree
 
         Args:
@@ -134,7 +153,7 @@ class CameraAPI:
                                 degrees_to_command(degrees_y, TILT_STEP) + " FF", cnt)
 
     def move_absolute(self, speed_x: int, speed_y: int,
-                      degrees_x: float, degrees_y: float) -> ResponseCode:
+                      degrees_x: float, degrees_y: float) -> ResponseCode | bytes:
         """ Rotates the camera in absolute position (current position does not matter)
 
         Args:
@@ -158,7 +177,7 @@ class CameraAPI:
                                 " " + degrees_to_command(degrees_x, PAN_STEP) + " " +
                                 degrees_to_command(degrees_y, TILT_STEP) + " FF", cnt)
 
-    def move_vector(self, speed_x: int, speed_y: int, vec: [float]) -> ResponseCode:
+    def move_vector(self, speed_x: int, speed_y: int, vec: list[float]) -> ResponseCode | bytes:
         """ Rotates the camera in the direction of a vector (with home position being [0, 0, 1]
 
         Args:
@@ -172,7 +191,7 @@ class CameraAPI:
         angle_x, angle_y = converter.vector_angle(np.array(vec))
         return self.move_absolute(speed_x, speed_y, np.rad2deg(angle_x), np.rad2deg(angle_y))
 
-    def get_zoom(self):
+    def get_zoom(self) -> ResponseCode | int:
         """ Get the camera zoom as an int between 0x0000 and 0x0400.
 
             Returns:
@@ -189,7 +208,7 @@ class CameraAPI:
         self.latest_fov = int(hex_res, 16)
         return self.latest_fov
 
-    def direct_zoom(self, zoom: int) -> ResponseCode:
+    def direct_zoom(self, zoom: int) -> ResponseCode | bytes:
         """ Change the value of the zoom to the specified value.
 
             Parameters:
@@ -202,7 +221,7 @@ class CameraAPI:
         return self.camera.send('01 00 00 09 00 00 00' + hx,
                                 final_message, cnt)
 
-    def get_saved_direction(self) -> np.array:
+    def get_saved_direction(self) -> np.ndarray:
         """ Get the last direction the camera pointed to.
 
         Returns:
@@ -252,6 +271,31 @@ class CameraAPI:
         direction = converter.angle_vector(pan_rad, tilt_rad)
         self.latest_direction = direction
         return direction
+
+    def set_camera_codec(self, selected: CompressedFormat):
+
+        if (selected == CompressedFormat.MJPEG):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}')
+        elif (selected == CompressedFormat.H264):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":5},"nChannel":0}]}}')
+        elif (selected == CompressedFormat.H265):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
+        else:
+            raise AssertionError("No such compression exists")
+
+    def set_image_size(self, selected: ImageSize):
+        if (selected == ImageSize.P1280_720):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}')
+        elif (selected == ImageSize.P1920_1080):
+            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}')
+
+    def set_frame_rate(self, selected: int):
+        assert 5 <= selected <= 60
+        self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":%d},"nChannel":0}]}}' % (selected))
+
+    def set_l_frame_rate(self, selected: int):
+        assert 1 <= selected <= 300
+        self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":%d},"nChannel":0}]}}' % (selected))
 
     def calculate_fov(self) -> ResponseCode | int:
         """ Calculate the current FoV based on the current zoom

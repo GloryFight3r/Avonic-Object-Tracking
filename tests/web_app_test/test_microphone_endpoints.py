@@ -1,5 +1,6 @@
 from unittest import mock
 import socket
+from avonic_camera_api.camera_http_request import CameraHTTP
 import pytest
 import numpy as np
 from flask import jsonify
@@ -10,8 +11,14 @@ import web_app
 
 sock = mock.Mock()
 
+@pytest.fixture
+def mocked_cam_http():
+    mocked_cam_http = CameraHTTP(("", 1))
+
+    return mocked_cam_http
+
 @pytest.fixture()
-def camera(monkeypatch):
+def camera(monkeypatch, mocked_cam_http):
     def mocked_connect(addr, self=None):
         pass
 
@@ -34,7 +41,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), mocked_cam_http)
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():

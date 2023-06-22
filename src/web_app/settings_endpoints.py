@@ -13,11 +13,13 @@ def get(integration: GeneralController):
         The current settings in json format
     """
     cam_addr = integration.cam_api.camera.address
+    cam_http_port = integration.cam_api.camera_http.address[1]
     mic_addr = integration.mic_api.sock.address
 
     ret = {
         "camera-ip": cam_addr[0],
         "camera-port": cam_addr[1],
+        "camera-http-port": cam_http_port,
         "microphone-ip": mic_addr[0],
         "microphone-port": mic_addr[1],
         "microphone-thresh": integration.mic_api.threshold,

@@ -34,6 +34,7 @@ const openSettings = () => {
         const d = await response.json()
         document.getElementById("settings-camera-ip").value = d["camera-ip"]
         document.getElementById("settings-camera-port").value = d["camera-port"]
+        document.getElementById("settings-camera-http-port").value = d["camera-http-port"]
         document.getElementById("settings-microphone-ip").value = d["microphone-ip"]
         document.getElementById("settings-microphone-port").value = d["microphone-port"]
         document.getElementById("settings-microphone-thresh").value = d["microphone-thresh"]

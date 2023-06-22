@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
@@ -40,7 +41,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "recv", mocked_recv)
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)))
+    cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)), CameraHTTP(("", 1)))
     def mocked_camera_reconnect():
         pass
     def mocked_get_zoom():

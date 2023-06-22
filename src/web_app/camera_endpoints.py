@@ -163,7 +163,14 @@ def address_set_camera_endpoint(integration: GeneralController):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
     try:
         addr = (request.form["camera-ip"], int(request.form["camera-port"]))
+        http_port = int(request.form["camera-http-port"])
+
         verify_address(addr)
+        verify_address((addr[0], http_port))
+
+        # set the address and port for sending http requests
+        integration.cam_api.camera_http.address = (addr[0], http_port)
+
         if integration.cam_sock is None:
             new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         else:

@@ -34,7 +34,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), None)
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():

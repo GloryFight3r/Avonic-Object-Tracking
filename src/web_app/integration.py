@@ -6,6 +6,8 @@ from multiprocessing import Value
 
 import requests
 from yaml import load, dump
+
+from avonic_camera_api.camera_http_request import CameraHTTP
 try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
@@ -13,8 +15,8 @@ except ImportError:
 import cv2
 import os
 import numpy as np
+from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
-from avonic_camera_api.camera_control_api import CameraAPI, converter, ResponseCode
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
@@ -128,6 +130,7 @@ class GeneralController:
             settings = {
                 "camera-ip": "0.0.0.0",
                 "camera-port": 52381,
+                "camera-http-port": 80,
                 "microphone-ip": "0.0.0.0",
                 "microphone-port": 45,
                 "microphone-thresh": -55,
@@ -139,10 +142,23 @@ class GeneralController:
         # Setup camera API
         cam_addr = None
         cam_port = settings["camera-port"]
-        if cam_port is not None:
+        cam_http_port = settings["camera-http-port"]
+        if cam_port and cam_http_port is not None:
             cam_addr = (settings["camera-ip"], int(cam_port))
             if cam_addr is not None and verify_address(cam_addr):
-                self.cam_api = CameraAPI(CameraSocket(address=cam_addr))
+                self.cam_api = CameraAPI(CameraSocket(address=cam_addr), CameraHTTP((cam_addr[0], cam_http_port)))
+
+                # set codec to MJPEG
+                self.cam_api.set_camera_codec(CompressedFormat.MJPEG)
+
+                # set resolution
+                self.cam_api.set_image_size(ImageSize.P1280_720)
+
+                # set frame rate
+                self.cam_api.set_frame_rate(30)
+
+                #set frame interval
+                self.cam_api.set_l_frame_rate(60)
 
         # Setup microphone API
         mic_addr = None
@@ -218,10 +234,12 @@ class GeneralController:
         try:
             with open("settings.yaml", "w", encoding="utf-8") as f:
                 cam_addr = self.cam_api.camera.address
+                cam_http_port = self.cam_api.camera_http.address[1]
                 mic_addr = self.mic_api.sock.address
                 data = {
                     "camera-ip": cam_addr[0],
                     "camera-port": cam_addr[1],
+                    "camera-http-port": cam_http_port,
                     "microphone-ip": mic_addr[0],
                     "microphone-port": mic_addr[1],
                     "microphone-thresh": self.mic_api.threshold,
@@ -272,7 +290,7 @@ class GeneralController:
         # This function is used to initialize integration in testing.
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
-        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr))
+        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr), CameraHTTP((cam_addr[0], 80)))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
