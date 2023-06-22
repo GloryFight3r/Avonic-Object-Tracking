@@ -1,7 +1,7 @@
 import os
 from threading import Thread
 from os import getenv
-from time import sleep
+import time
 from multiprocessing import Value
 
 import requests
@@ -403,7 +403,7 @@ class GeneralController:
                 response = requests.post('http://' + self.url + path, json=d)
                 if response.status_code != 200:
                     print("Could not update flask at path " + path)
-            sleep(0.3)
+            time.sleep(0.3)
         print("Closing " + path + " updater thread")
 
 def verify_address(address) -> bool:

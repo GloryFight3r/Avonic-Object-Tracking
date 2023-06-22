@@ -1,4 +1,5 @@
 import math
+import time
 import cv2
 import numpy as np
 
@@ -122,7 +123,8 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             direct_np = self.prev_dir
 
 
-        avg_angle = ((direct_np[0] - self.prev_dir[0])**2 + (direct_np[1] - self.prev_dir[1])**2)**0.5
+        avg_angle = ((direct_np[0] - self.prev_dir[0])**2 \
+            + (direct_np[1] - self.prev_dir[1])**2)**0.5
         if avg_angle >= self.threshold:
             # reset the time_without_movement if we move above the threshold
             self.time_without_movement = 0
@@ -158,3 +160,6 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         self.prev_dir = direct_np
         self.is_object_tracking = start_object_tracking
+
+    def sleep(self):
+        time.sleep(1)

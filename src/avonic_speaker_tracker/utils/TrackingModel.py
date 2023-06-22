@@ -9,3 +9,7 @@ class TrackingModel(ABC):
 
     def set_speak_delay(self, speak_delay: int) -> None:
         pass
+
+    @abstractmethod
+    def sleep(self):
+        pass

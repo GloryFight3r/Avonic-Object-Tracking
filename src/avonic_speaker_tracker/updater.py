@@ -1,4 +1,4 @@
-from time import sleep
+import time
 from threading import Thread
 from multiprocessing import Value
 from ctypes import c_int
@@ -43,6 +43,6 @@ class UpdateThread(Thread):
         
         while self.event.value != 0:
             self.model.point()
-            sleep(0.3)
+            time.sleep(0.3)
 
         print("Exiting thread")

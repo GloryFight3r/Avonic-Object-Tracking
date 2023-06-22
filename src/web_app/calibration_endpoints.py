@@ -1,4 +1,4 @@
-from time import sleep
+import time
 from flask import make_response, jsonify
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_adapter import ResponseCode
@@ -103,7 +103,7 @@ def wait_for_speaker(integration: GeneralController):
     """
     waited_for = 0
     while not integration.mic_api.is_speaking():
-        sleep(0.1)
+        time.sleep(0.1)
         waited_for += 1
         if waited_for > 50:
             print("Nobody spoke for 5 seconds. Skipping.")

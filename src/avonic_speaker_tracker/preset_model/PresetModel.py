@@ -1,4 +1,5 @@
 import math
+import time
 from typing_extensions import override
 import numpy as np
 
@@ -75,3 +76,6 @@ class PresetModel(TrackingModel):
 
     def set_filename(self, filename: str):
         self.preset_locations.set_filename(filename)
+
+    def sleep(self):
+        time.sleep(0.05)
