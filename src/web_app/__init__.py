@@ -598,7 +598,7 @@ def create_app(test_controller=None):
         Endpoint that updates the microphone data in the WebUI
 
             return:
-                HTTP 200: successfully updated the camera coordinates
+                HTTP 200: successfully updated the microphone coordinates
         """
         return web_app.tracking_endpoints.update_microphone(integration)
 
@@ -606,6 +606,9 @@ def create_app(test_controller=None):
     def thread_camera():
         """
         Endpoint that updates the camera data in the WebUI
+
+            return:
+                HTTP 200: successfully updated the camera coordinates
         """
         return web_app.tracking_endpoints.update_camera(integration)
 
@@ -615,17 +618,6 @@ def create_app(test_controller=None):
         Websocket endpoint that sends a new frame in base64 to the web interface
         """
         web_app.footage.emit_frame(integration)
-
-    @app.post('/update/calibration')
-    def thread_calibration():
-        """
-        Endpoint that updates the camera coordinates in the WebUI.
-
-            return:
-                HTTP 200: successfully updated the camera coordinates
-        """
-        return web_app.tracking_endpoints.update_calibration(integration)
-
 
     # Info-thread section
 
