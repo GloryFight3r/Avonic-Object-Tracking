@@ -1,5 +1,5 @@
-import numpy as np
 import math
+import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.footage import FootageThread
@@ -109,7 +109,7 @@ class ObjectModel():
         # find the relative angle the camera must rotate so that it centers on the bounding box
         rotate_angle:np.ndarray = angular_resolution * distance_to_middle
 
-        # TODO pick a good rotation speed according to the rotation angle it has to make
+        # pick a good rotation speed according to the rotation angle it has to make
         rotate_speed:np.ndarray = self.calculate_speed(rotate_angle)
 
         return (rotate_speed, rotate_angle)

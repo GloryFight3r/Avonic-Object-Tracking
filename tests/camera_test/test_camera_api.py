@@ -1,6 +1,6 @@
 import numpy as np
-import pytest
 from unittest import mock
+import pytest
 from avonic_camera_api.converter import angle_vector, vector_angle
 from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize
 
@@ -73,9 +73,12 @@ def cam_api():
 
 def generate_codec_tests():
     return [
-        (CompressedFormat.MJPEG, '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}'),
-        (CompressedFormat.H264, '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":5},"nChannel":0}]}}'),
-        (CompressedFormat.H265, '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
+        (CompressedFormat.MJPEG, 
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}'),
+        (CompressedFormat.H264, 
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":5},"nChannel":0}]}}'),
+        (CompressedFormat.H265, 
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
     ]
 
 @pytest.mark.parametrize("format, expected", generate_codec_tests())
@@ -88,8 +91,10 @@ def test_camera_codec(cam_api, format, expected, monkeypatch):
 
 def generate_format_tests():
     return [
-        (ImageSize.P1280_720, '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}'),
-        (ImageSize.P1920_1080, '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}'),
+        (ImageSize.P1280_720,
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}'),
+        (ImageSize.P1920_1080,
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}'),
     ]
 
 @pytest.mark.parametrize("format, expected", generate_format_tests())

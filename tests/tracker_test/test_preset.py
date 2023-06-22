@@ -1,8 +1,8 @@
 import os
 from unittest import mock
+import json
 import pytest
 import numpy as np
-import json
 from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
 
 
@@ -72,7 +72,8 @@ def test_get_preset_info(preset_collection: PresetCollection):
 
 def test_presets_with_file_system(preset_collection_with_file: PresetCollection):
     preset_collection_with_file = PresetCollection(filename="test.json")
-    preset_collection_with_file.add_preset("preset-to-add", np.array([0, 0, 0]), np.array([0, 0, 0]))
+    preset_collection_with_file.add_preset("preset-to-add",
+        np.array([0, 0, 0]), np.array([0, 0, 0]))
     assert "preset-to-add" in preset_collection_with_file.preset_locations
     new_preset_collection = PresetCollection(filename="test.json")
     assert "preset-to-add" in new_preset_collection.preset_locations

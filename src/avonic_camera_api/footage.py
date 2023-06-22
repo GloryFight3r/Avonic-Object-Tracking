@@ -62,7 +62,8 @@ class FootageThread(Thread):
             self.draw_prediction(cur_frame, "person", x, y, x2, y2, [0, 0, 0])
         if self.pixel is not None:
             print(self.pixel)
-            self.draw_prediction(cur_frame, "pixel", self.pixel[0], self.pixel[1], self.pixel[0], self.pixel[1], [255, 0, 0])
+            self.draw_prediction(cur_frame, "pixel", self.pixel[0],
+            self.pixel[1], self.pixel[0], self.pixel[1], [255, 0, 0])
         if self.focused_box is not None:
             (x, y, x2, y2) = self.focused_box
             self.draw_prediction(cur_frame, "person", x, y, x2, y2, [0, 0, 255])

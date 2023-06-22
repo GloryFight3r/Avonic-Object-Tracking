@@ -1,19 +1,19 @@
-from typing_extensions import override
+import time
 import numpy as np
-import math
+from typing_extensions import override
 import cv2
 
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_camera_api.footage import FootageThread
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
-from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import ResponseCode
-from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.utils.coordinate_translation\
     import translate_microphone_to_camera_vector
-from avonic_camera_api.converter import vector_angle
+from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_camera_api.footage import FootageThread
+from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_adapter import ResponseCode
+from avonic_camera_api.converter import vector_angle
+from microphone_api.microphone_control_api import MicrophoneAPI
 
 class HybridTracker(ObjectModel, AudioModel):
     # last bounding box we were tracking
@@ -87,9 +87,10 @@ class HybridTracker(ObjectModel, AudioModel):
 
             # if the point that the camera has to turn to is on the screen, we need to choose
             # the bounding box of the most likely speaker
-            if  cam_angles[0] - (cur_fov[0] / 2) <= cur_angle[0] <= cam_angles[0] + (cur_fov[0] / 2) \
-                and \
-                cam_angles[1] - (cur_fov[1] / 2) <= cur_angle[1] <= cam_angles[1] + (cur_fov[1] / 2):
+            if  cam_angles[0] - (cur_fov[0] / 2) <= cur_angle[0] \
+                and cur_angle[0] <= cam_angles[0] + (cur_fov[0] / 2) \
+                and cam_angles[1] - (cur_fov[1] / 2) <= cur_angle[1] \
+                and cur_angle[1] <= cam_angles[1] + (cur_fov[1] / 2):
 
                 # get all the bounding boxes from the current frame
                 all_boxes = self.nn.get_bounding_boxes(self.safely_get_frame())
@@ -186,17 +187,18 @@ class HybridTracker(ObjectModel, AudioModel):
 
         return frame
 
-    def find_next_box(self, current_box: np.ndarray, all_boxes: list[np.ndarray])-> np.ndarray | None:
-        """ Finds the box that is most likely to be the same box from the previous frame by comparing distances
-            to the box centers
+    def find_next_box(self, current_box: np.ndarray,
+        all_boxes: list[np.ndarray]) -> np.ndarray | None:
+        """ Finds the box that is most likely to be the same box
+        from the previous frame by comparing distances to the box centers
 
         Args:
             current_box: the current bounding box in the format np.array[left bottom right top]
             all_boxes: list of bounding boxes in the format np.array[left bottom right top]
 
         Returns:
-            The bounding box that has the most surface area in common with current_box - np.array[left top right bottom] or None if
-            all_boxes is empty
+            The bounding box that has the most surface area in common
+            with current_box - np.array[left top right bottom] or None if all_boxes is empty
         """
         # if there are no bounding boxes in the list, return None
         if len(all_boxes) == 0 or current_box is None:
@@ -205,7 +207,8 @@ class HybridTracker(ObjectModel, AudioModel):
         answer_box:np.ndarray | None = None
         closest_distance:float = float('inf')
 
-        cur_box_midde:np.ndarray = np.array([(current_box[0] + current_box[2]) / 2, (current_box[1] + current_box[3]) / 2])
+        cur_box_midde:np.ndarray = np.array([(current_box[0] + current_box[2]) / 2,
+            (current_box[1] + current_box[3]) / 2])
 
         for bbox in all_boxes:
             # calculate the middle pixel of the current box
@@ -245,3 +248,5 @@ class HybridTracker(ObjectModel, AudioModel):
 
         return best_box
 
+    def sleep(self):
+        time.sleep(1.3)

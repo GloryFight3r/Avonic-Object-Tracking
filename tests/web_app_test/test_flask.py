@@ -39,7 +39,8 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "recv", mocked_recv)
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=cam_sock, address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
+    cam_api = CameraAPI(CameraSocket(sock=cam_sock,
+        address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
 
     def mocked_get_zoom():
         return 128
@@ -529,7 +530,8 @@ def test_get_preset_list(client):
                                            + "\"mic-direction-x\":0," \
                                            + "\"mic-direction-y\":1," \
                                            + "\"mic-direction-z\":0," \
-                                           + "\"preset-name\":\"test-another-preset-name\"}\n", "utf-8")
+                                           + "\"preset-name\":\"test-another-preset-name\"}\n",
+                                           "utf-8")
     rv = client.post("preset/remove",
                      data={"preset-name": "test-non-existent-preset-name"})
     assert rv.status_code == 400

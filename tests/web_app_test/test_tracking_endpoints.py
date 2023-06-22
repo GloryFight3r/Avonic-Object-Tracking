@@ -82,5 +82,5 @@ def test_track_continuously(client):
 
 def test_track_continuously_without_adaptive_zooming(client):
     rv = client.get('calibration/track/no/zoom')
-    assert rv.status_code == 200 
+    assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":4}\n', "utf-8")

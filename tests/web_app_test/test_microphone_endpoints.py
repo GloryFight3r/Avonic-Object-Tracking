@@ -1,12 +1,11 @@
 from unittest import mock
 import socket
-from avonic_camera_api.camera_http_request import CameraHTTP
 import pytest
 import numpy as np
-from flask import jsonify
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
+from avonic_camera_api.camera_http_request import CameraHTTP
 import web_app
 
 sock = mock.Mock()

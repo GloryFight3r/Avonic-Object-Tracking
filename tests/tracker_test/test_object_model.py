@@ -27,8 +27,10 @@ def test_calculate_speed():
 
 def generate_box_with_movement():
     return [
-            (np.array([0, 0, 10, 10]), np.array([10, 10]), (np.array([13, 12]), np.array([0, -25]))),
-            (np.array([5, 5, 10, 10]), np.array([10, 10]), (np.array([13, 13]), np.array([25, -37.5])))
+            (np.array([0, 0, 10, 10]), np.array([10, 10]),
+                (np.array([13, 12]), np.array([0, -25]))),
+            (np.array([5, 5, 10, 10]), np.array([10, 10]),
+                (np.array([13, 13]), np.array([25, -37.5])))
     ]
 
 @pytest.mark.parametrize("box, resolution, movement", generate_box_with_movement())
@@ -84,6 +86,7 @@ def test_track_object(monkeypatch):
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(),
                                               None, np.array([100, 100]), 0,
                                               nn, stream)
+    object_audio_model.sleep()
     object_audio_model.is_object_tracking = True
     object_audio_model.object_tracking_counter = 40
     object_audio_model.track_object()
