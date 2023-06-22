@@ -80,7 +80,7 @@ def create_app(test_controller=None):
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
-                Possible HTTP 400 - invalid supplied values
+                Possible HTTP 400: invalid supplied values
                     "message": "Invalid address!"
         """
         return web_app.camera_endpoints.address_set_camera_endpoint(integration)
@@ -126,14 +126,14 @@ def create_app(test_controller=None):
         """
         Endpoint that sends a command to the camera to move in an absolute direction.
             form:
-                absolute-speed-x: Integer from 1 - 24, the pan speed.
-                absolute-speed-y: Integer from 1 - 20, the tilt speed.
-                absolute-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
-                absolute-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+                "absolute-speed-x": Integer from 1 - 24, the pan speed.
+                "absolute-speed-y": Integer from 1 - 20, the tilt speed.
+                "absolute-degrees-x": Float from -170 - 170, the amount of degrees to pan by.
+                "absolute-degrees-y": Float from -30 - 90, the amount of degrees to tilt by.
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
-                Possible HTTP 400 - assertion error of validity of supplied values
+                Possible HTTP 400: assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
 
@@ -142,14 +142,14 @@ def create_app(test_controller=None):
         """
         Endpoint that sends a command to the camera to move in a relative direction.
             form:
-                relative-speed-x: Integer from 1 - 24, the pan speed.
-                relative-speed-y: Integer from 1 - 20, the tilt speed.
-                relative-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
-                relative-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+                "relative-speed-x": Integer from 1 - 24, the pan speed.
+                "relative-speed-y": Integer from 1 - 20, the tilt speed.
+                "relative-degrees-x": Float from -170 - 170, the amount of degrees to pan by.
+                "relative-degrees-y": Float from -30 - 90, the amount of degrees to tilt by.
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
-                Possible HTTP 400 - assertion error of validity of supplied values
+                Possible HTTP 400: assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
 
@@ -166,7 +166,7 @@ def create_app(test_controller=None):
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
-                Possible HTTP 400 - assertion error of validity of supplied values
+                Possible HTTP 400: assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_vector_camera_endpoint(integration)
 
@@ -211,7 +211,7 @@ def create_app(test_controller=None):
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
-                Possible HTTP 400 - assertion error of validity of supplied values
+                Possible HTTP 400: assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.zoom_set_camera_endpoint(integration)
 
@@ -240,7 +240,7 @@ def create_app(test_controller=None):
             return:
                 HTTP 200 or 400:
                     Text of the return message from the microphone
-                Possible HTTP 400 - not valid supplied IP or port:
+                Possible HTTP 400: not valid supplied IP or port:
                     "message": "Invalid address!"
         """
         return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
@@ -310,8 +310,8 @@ def create_app(test_controller=None):
                 "mic-direction-y": Float representing the y-coordinate of the direction vector.
                 "mic-direction-z": Float representing the z-coordinate of the direction vector.
             return:
-                HTTP 200 - success, empty message
-                HTTP 400 - invalid supplied values, empty message
+                HTTP 200: success, empty message
+                HTTP 400: invalid supplied values, empty message
 
         """
         return web_app.preset_locations_endpoints.add_preset_location(integration)
@@ -329,8 +329,8 @@ def create_app(test_controller=None):
                 "mic-direction-y": Float representing the y-coordinate of the direction vector.
                 "mic-direction-z": Float representing the z-coordinate of the direction vector.
             return:
-                HTTP 200 - success, empty message
-                HTTP 400 - invalid supplied values, empty message
+                HTTP 200: success, empty message
+                HTTP 400: invalid supplied values, empty message
 
         """
         return web_app.preset_locations_endpoints.edit_preset_location(integration)
@@ -342,8 +342,8 @@ def create_app(test_controller=None):
             form:
                 "preset-name": a string name for the preset
             return:
-                HTTP 200 - success, empty message
-                HTTP 400 - invalid supplied values, empty message
+                HTTP 200: success, empty message
+                HTTP 400: invalid supplied values, empty message
         """
         return web_app.preset_locations_endpoints.remove_preset_location(integration)
 
