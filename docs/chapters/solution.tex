@@ -267,16 +267,18 @@ simultaneously with speaker tracking. This helps to centralize the speaker on th
 
 \paragraph{Switch strategy} \mbox{}
 \begin{figure}[h]
-    \caption{Possible states diagram}
+    \caption{States diagram of the switch strategy, which combines object detection with audio information}
     \centering
     \includegraphics[width=0.5\textwidth]{tree}
     \label{fig:object_strategy}
 \end{figure}
 \\
-The last approach we consider is always relying on microphone coordinations
-when there is an active speaker, but furthermore adjust the camera based on
-camera footage and bounding boxes. When there is an active speaker, we first
-search for his location using the microphone information. If he is in the FoV
+The last approach we consider is always relying on microphone coordinates
+when there is an active speaker(by active speaker we understand a person, who is 
+currently speaking and the Sennheiser microphone is able to detect his voice and is 
+greater than the speak threshold), but furthermore, adjust the camera based on
+camera footage and bounding boxes we get from it. When there is an active speaker, we first
+search for his location using the microphone information. If he is in the FoV(Field of View)
 of the camera, we get the bounding speaker boxes from the current frame.
 After translating the microphone direction to a camera direction and finding
 its position on the screen as a pixel, we search which bounding box’s center is
