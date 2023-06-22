@@ -9,7 +9,7 @@ from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 from web_app.integration import GeneralController, ModelCode
 
 def start_thread_endpoint(integration: GeneralController):
-    """ This method starts the thread that controlls the actual tracking and calls 
+    """ This method starts the thread that controlls the actual tracking and calls
     the corresponding tracking model depending on the user's choice.
     """
     # start (unpause) the thread
@@ -53,7 +53,7 @@ def start_thread_endpoint(integration: GeneralController):
 
 
 def stop_thread_endpoint(integration: GeneralController):
-    """ Stops(pauses) the thread that controlls the tracking 
+    """ Stops(pauses) the thread that controlls the tracking
     """
     integration.event.value = 0
     integration.info_threads_event.value = 0

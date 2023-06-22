@@ -72,7 +72,7 @@ def create_app(test_controller=None):
     @app.post('/camera/address/set')
     def post_set_address():
         """
-        Endpoint that sets the camera address 
+        Endpoint that sets the camera address
             camera-ip: a string in the form _._._._
             camera-port: an int value
         """
@@ -148,7 +148,7 @@ def create_app(test_controller=None):
 
     @app.post('/camera/move/vector')
     def post_move_vector():
-        """ 
+        """
         Endpoint that sends a command to the camera to move in a vector direction.
             data:
                 vector-speed-x: Integer from 1 - 24, the pan speed.
@@ -244,7 +244,7 @@ def create_app(test_controller=None):
 
     @app.post('/preset/edit')
     def edit_preset():
-        """ 
+        """
         Endpoint that edits a preset in the preset collection
             data:
                 camera-direction-alpha: Float from -170 - 170 representing the yaw of the camera
@@ -253,7 +253,7 @@ def create_app(test_controller=None):
                 mic-direction-x: Float representing the x-coordinate of the direction vector.
                 mic-direction-y: Float representing the y-coordinate of the direction vector.
                 mic-direction-z: Float representing the z-coordinate of the direction vector.
-                
+
         """
         return web_app.preset_locations_endpoints.edit_preset_location(integration)
 
@@ -368,7 +368,7 @@ def create_app(test_controller=None):
     def number_of_calibrated():
         """
         Endpoint that returns the number of calibration points
-            Returns: 
+            Returns:
                 speaker-points-length: an int value
 
         """
@@ -437,7 +437,7 @@ def create_app(test_controller=None):
     def thread_value():
         """
         Endpoint that returns the thread value (for testing purposes only)
-            Returns: 
+            Returns:
                 value: NONE if the thread is nonexistent or and int value otherwise
         """
         if integration.thread is None:
@@ -461,20 +461,35 @@ def create_app(test_controller=None):
 
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
+        """
+        Endpoint that sends a new frame in base64 to the web interface
+
+            return:
+                HTTP 200 - successfully updated the camera coordinates
+        """
         web_app.footage.emit_frame(integration)
+        return make_response({jsonify{}, 200})
 
     @app.post('/update/calibration')
     def thread_calibration():
         """
-        Endpoint that updates the calibration data in the WebUI
+        Endpoint that updates the camera coordinates in the WebUI.
+
+            return:
+                HTTP 200 - successfully updated the camera coordinates
         """
         return web_app.tracking_endpoints.update_calibration(integration)
+
+
     # Info-thread section
 
     @app.post('/info-thread/start')
     def info_thread_start():
         """
         Endpoint that starts the thread that updates all the dynamic data
+
+            return:
+                HTTP 200 - successfully started the info thread
         """
         integration.info_threads_event.value = 1
         return make_response(jsonify({}), 200)
@@ -483,6 +498,9 @@ def create_app(test_controller=None):
     def info_thread_stop():
         """
         Endpoint that stops the thread that updates all the dynamic data
+
+            return:
+                HTTP 200 - successfully stopped the info thread
         """
         integration.info_threads_event.value = 0
         return make_response(jsonify({}), 200)
@@ -491,29 +509,52 @@ def create_app(test_controller=None):
     def settings_get():
         """
         Endpoint that gets the system settings
-            Returns: 
-                camera-ip: a string address
-                camera-port: an int value
-                microphone-ip: a string address
-                microphone-port: an int value
-                microphone-thresh: an int value
-                filepath: a path string
+            return:
+                "camera-ip": a string representing the address of the connected camera
+                "camera-port": an int representing the port of the connected camera
+                "microphone-ip": a string representing the address of the connected microphone
+                "microphone-port": an int representing the port of the connected microphone
+                "microphone-thresh": an int value between -90 and 0 representing the preferred
+                    volume threshold
+                "filepath": a string representing the folder in which the settings file is stored
+                HTTP 200 - succesfully gotten the settings
         """
         return web_app.settings_endpoints.get(integration)
 
     @app.post('/settings/set')
     def settings_set():
         """
-        Endpoint that sets the following system settings
-            camera-ip: a string address
-            camera-port: an int value
-            microphone-ip: a string address
-            microphone-port: an int value
-            microphone-thresh: an int value
-            filepath: a path string
+        Endpoint that sets the following settings to the ones given.
+            data:
+                "camera-ip": a string representing the address of the camera to connect to
+                "camera-port": an int representing the port of the camera to connect to
+                "microphone-ip": a string representing the address of the microphone to connect to
+                "microphone-port": an int representing the port of the microphone to connect to
+                "microphone-thresh": an int value between -90 and 0 representing the preferred
+                    volume threshold
+                "filepath": a string representing the folder in which to store the settings file
+
+            return:
+                Possible "message" - description of the error that was caught
+                Possible HTTP codes:
+                    200 - success code
+                    400 - either the threshold or the filepath were not given correctly
+                    500 - an error occured while writing to the settings file
         """
         return web_app.settings_endpoints.set_settings(integration)
 
+        """
+        Endpoint that sends a command to the camera to move in an absolute direction.
+            data:
+                absolute-speed-x: Integer from 1 - 24, the pan speed.
+                absolute-speed-y: Integer from 1 - 20, the tilt speed.
+                absolute-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
+                absolute-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+            return:
+                HTTP code corresponds to the camera response
+                "message" - description of the received response code from the camera
+                Possible HTTP 400 - assertion error of validity of supplied values
+        """
     @integration.ws.on("connected")
     def settings_not_set(data):
         if not integration.no_settings_sent:  # prompt user to set up if no settings file found
