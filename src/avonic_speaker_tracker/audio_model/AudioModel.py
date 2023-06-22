@@ -122,5 +122,5 @@ class AudioModel(TrackingModel):
         self.calibration.set_filename(filename)
 
     def sleep(self):
-        time.sleep(0.2)
+        time.sleep(0.05)
         

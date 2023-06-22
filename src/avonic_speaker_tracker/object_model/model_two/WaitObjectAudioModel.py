@@ -162,4 +162,4 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         self.is_object_tracking = start_object_tracking
 
     def sleep(self):
-        time.sleep(1)
+        time.sleep(0.05)

@@ -9,15 +9,15 @@ from avonic_speaker_tracker.preset_model.preset_control import find_most_similar
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
-    """ Class that finds the location of the speaker in a set of 
-    recorded preset locations or the closest one in that set 
+    """ Class that finds the location of the speaker in a set of
+    recorded preset locations or the closest one in that set
     and points the camera towards that location.
     """
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
-        """ Default constructor 
+        """ Default constructor
             Args:
-                cam_api: Controller for the camera 
-                mic_api: Controller for the microphone 
+                cam_api: Controller for the camera
+                mic_api: Controller for the microphone
                 filename: location of the file that contains the preset information
         """
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
