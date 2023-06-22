@@ -407,16 +407,34 @@ def create_app(test_controller=None):
     def add_calibration_speaker():
         """
         Endpoint that adds the camera direction towards a new calibration point
-            position-alpha-value: Float from -170 - 170 representing the yaw of the camera
-            position-beta-value: Float from -30 - 90 representing the pitch of the camera
+
+            data:
+                "position-alpha-value": Float from -170 - 170 representing the yaw of the camera
+                "position-beta-value": Float from -30 - 90 representing the pitch of the camera
+
+            return:
+                In case of an error:
+                    "message": the exact error message
+                    HTTP 504: the error code if no direction could be gotten from either the camer
+                        or the microphone
+
+                In case of a success:
+                    HTTP 200: success code
         """
         return web_app.calibration_endpoints.add_calibration_speaker(integration)
 
     @app.post('/calibration/add_direction_to_mic')
     def add_calibration_mic():
         """
-        Endpoint that adds the direction from the camera towards the microphone
-            data: a 3D vector (array) of floats [x, y, z]
+        Endpoint that adds the direction from the camera towards the microphone to the calibration
+
+            return:
+                In case of a success:
+                    HTTP 200: success code
+
+                In case of an error:
+                    "message": the exact error message
+                    HTTP 504: the error code if no direction could be gotten from the camera
         """
         return web_app.calibration_endpoints.add_calibration_to_mic(integration)
 
@@ -424,26 +442,33 @@ def create_app(test_controller=None):
     def reset_calibration():
         """
         Endpoint that resets the calibration to the default values
+
+            return:
+                HTTP 200: success code
         """
         return web_app.calibration_endpoints.reset_calibration(integration)
 
     @app.get('/calibration/is_set')
     def calibration_is_set():
         """
-        Endpoint that checks whether the calibration is
-        completed and all the needed vectors are calculated
-            Returns:
-                is_set: boolean value
+        Endpoint that checks whether the calibration is completed and all the
+        needed vectors are calculated
+
+            return:
+                "is_set": boolean indicating whether or not calibration has been completed
+                HTTP 200: success code
         """
         return web_app.calibration_endpoints.is_calibrated(integration)
 
     @app.get('/calibration/camera')
     def calibration_get_cam_coords():
         """
-        Endpoint that calculates the relative coordinates
-        of the camera in relation to the microphone
-            Returns:
-                camera-coords: a 3D array of floats [x, y, z]
+        Endpoint that calculates the relative coordinates of the camera in
+        relation to the microphone
+
+            return:
+                "camera-coords": a 3D array of floats [x, y, z]
+                HTTP 200: successfully
         """
         return web_app.calibration_endpoints.get_calibration(integration)
 
@@ -451,6 +476,10 @@ def create_app(test_controller=None):
     def continuous_tracker():
         """
         Endpoint that changes the tracking to use the audio model
+
+            return:
+                "tracking": the enum corresponding to the AudioModel
+                HTTP 200: the model has successfully been set to the AudioModel
         """
         return web_app.tracking_endpoints.track_continuously(integration)
 
@@ -458,9 +487,10 @@ def create_app(test_controller=None):
     def continuous_tracker_without_adaptive_zoom():
         """
         Endpoint that changes the tracking to use the audio model without adaptive zooming
+
             return:
-                "tracking" - the enum corresponding to the AudioModelNoAdaptiveZoom
-                http 200 - the model has successfully been set to the waitobjectaudiomodel
+                "tracking": the enum corresponding to the AudioModelNoAdaptiveZoom
+                HTTP 200: the model has successfully been set to the AudioModelNoAdaptiveZoom
         """
         return web_app.tracking_endpoints.track_continuously_without_adaptive_zooming(integration)
 
@@ -470,8 +500,8 @@ def create_app(test_controller=None):
         Endpoint that returns the number of calibration points
 
             return:
-                "speaker-points-length" - the amount of speaker points that have been set [0 : 3]
-                HTTP 200 - success code
+                "speaker-points-length": the amount of speaker points that have been set [0 : 3]
+                HTTP 200: success code
 
         """
         return web_app.calibration_endpoints.get_number_of_speaker_points(integration)
@@ -481,19 +511,19 @@ def create_app(test_controller=None):
         """
         Endpoint that navigates the camera so that the clicked pixel is centered in the frame
             data:
-                "x-pos" - a float value in the range [0:1]
-                "y-pos" - a float value in the range [0:1]
+                "x-pos": a float value in the range [0:1]
+                "y-pos": a float value in the range [0:1]
 
             return:
                 In case of an error:
-                    "message" - the error that was thrown
-                    HTTP 400 - bad request, "see message" for more details
-                    HTTP 409 - conflict, in case the command to the camera got cancelled
-                    HTTP 504 - time out in the camera
+                    "message": the error that was thrown
+                    HTTP 400: bad request, see "message" for more details
+                    HTTP 409: conflict, in case the command to the camera got cancelled
+                    HTTP 504: time out in the camera
 
                 In case of a success:
-                    "message" - success message
-                    HTTP 200 - success code
+                    "message": success message
+                    HTTP 200: success code
 
         """
         return web_app.camera_endpoints.navigate_camera(integration)
@@ -523,8 +553,8 @@ def create_app(test_controller=None):
         Endpoint that changes the tracking to use the object tracking model
 
             return:
-                "tracking" - the enum corresponding to the WaitObjectAudioModel
-                HTTP 200 - the model has successfully been set to the WaitObjectAudioModel
+                "tracking": the enum corresponding to the WaitObjectAudioModel
+                HTTP 200: the model has successfully been set to the WaitObjectAudioModel
         """
         return web_app.tracking_endpoints.track_object_continuously(integration)
 
@@ -535,9 +565,9 @@ def create_app(test_controller=None):
 
             return:
                 In case of an error:
-                    HTTP 403 - the thread has already been started before
+                    HTTP 403: the thread has already been started before
                 In case of success:
-                    HTTP 200 - the thread has successfully been started
+                    HTTP 200: the thread has successfully been started
         """
         return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
@@ -547,7 +577,7 @@ def create_app(test_controller=None):
         Endpoint that stops the tracking thread
 
             return:
-                HTTP 200 - successfully stopped the tracking thread
+                HTTP 200: successfully stopped the tracking thread
         """
         return web_app.tracking_endpoints.stop_thread_endpoint(integration)
 
@@ -568,7 +598,7 @@ def create_app(test_controller=None):
         Endpoint that updates the microphone data in the WebUI
 
             return:
-                HTTP 200 - successfully updated the camera coordinates
+                HTTP 200: successfully updated the camera coordinates
         """
         return web_app.tracking_endpoints.update_microphone(integration)
 
@@ -592,7 +622,7 @@ def create_app(test_controller=None):
         Endpoint that updates the camera coordinates in the WebUI.
 
             return:
-                HTTP 200 - successfully updated the camera coordinates
+                HTTP 200: successfully updated the camera coordinates
         """
         return web_app.tracking_endpoints.update_calibration(integration)
 
@@ -605,7 +635,7 @@ def create_app(test_controller=None):
         Endpoint that starts the thread that updates all the dynamic data
 
             return:
-                HTTP 200 - successfully started the info thread
+                HTTP 200: successfully started the info thread
         """
         integration.info_threads_event.value = 1
         return make_response(jsonify({}), 200)
@@ -616,7 +646,7 @@ def create_app(test_controller=None):
         Endpoint that stops the thread that updates all the dynamic data
 
             return:
-                HTTP 200 - successfully stopped the info thread
+                HTTP 200: successfully stopped the info thread
         """
         integration.info_threads_event.value = 0
         return make_response(jsonify({}), 200)
@@ -633,7 +663,7 @@ def create_app(test_controller=None):
                 "microphone-thresh": an int value between -90 and 0 representing the preferred
                     volume threshold
                 "filepath": a string representing the folder in which the settings file is stored
-                HTTP 200 - successfully gotten the settings
+                HTTP 200: successfully gotten the settings
         """
         return web_app.settings_endpoints.get(integration)
 
@@ -652,11 +682,11 @@ def create_app(test_controller=None):
 
             return:
                 In case of an error:
-                    "message" - description of the error that was caught
-                    HTTP 400 - either the threshold or the filepath were not given correctly
-                    HTTP 500 - an error occured while writing to the settings file
+                    "message": description of the error that was caught
+                    HTTP 400: either the threshold or the filepath were not given correctly
+                    HTTP 500: an error occured while writing to the settings file
                 In case of success:
-                    HTTP 200 - success code
+                    HTTP 200: success code
         """
         return web_app.settings_endpoints.set_settings(integration)
 
