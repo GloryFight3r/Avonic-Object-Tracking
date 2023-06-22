@@ -1,5 +1,6 @@
 import os
 import signal
+import time
 from flask import make_response, jsonify, request
 import web_app.camera_endpoints
 from web_app.integration import GeneralController
@@ -67,4 +68,10 @@ def set_settings(integration: GeneralController):
     finally:
         if saved and integration.testing.value == 0:  # do not exit when testing
             print("Restarting server...")
-            os.kill(integration.pid.value, signal.SIGINT)
+            integration.footage_thread_event.value = 0
+            time.sleep(1)
+            try:
+                os.kill(integration.footage_pid.value, signal.SIGINT)  # pragma: no mutate
+            except ProcessLookupError:
+                pass  # don't care mate
+            os.kill(integration.pid.value, signal.SIGINT)  # pragma: no mutate

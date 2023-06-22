@@ -1,5 +1,4 @@
 import signal
-import logging
 from flask import Flask, jsonify, abort, render_template, make_response
 from flask_socketio import SocketIO
 import web_app.camera_endpoints
@@ -13,8 +12,6 @@ import web_app.settings_endpoints
 from web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
 #import logging
 #log = logging.getLogger('werkzeug')
 #log.setLevel(logging.ERROR)

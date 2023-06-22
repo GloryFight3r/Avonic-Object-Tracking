@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 from os import getenv
 from time import sleep
@@ -102,8 +103,10 @@ class GeneralController:
         # Keep in memory, whether a notification about the settings not being set has been sent
         self.no_settings_sent = True
 
-        # PID of master process
+        # PIDs of master and footage processes
         self.pid = Value("i", os.getpid())
+        self.footage_pid = Value("i", -1)
+
         self.testing = Value("i", 0, lock=False)
 
         self.all_models = None
@@ -193,7 +196,7 @@ class GeneralController:
                                           [cv2.CAP_PROP_N_THREADS, 4])  # pragma: no mutate
             self.footage_thread = FootageThread(self.video,
                                                 self.footage_thread_event,
-                                                self.resolution)  # pragma: no mutate
+                                                self.resolution, self.footage_pid)  # pragma: no mutate
 
             self.footage_process = Process(target=self.footage_thread.run)
             if self.video is not None and self.video.isOpened():
@@ -204,21 +207,20 @@ class GeneralController:
 
         self.nn:YOLOPredict = YOLOPredict()
         # Initialize models
-        self.object_audio_model = WaitObjectAudioModel(
-                self.cam_api, self.mic_api,
-                self.resolution,
-                5, self.nn, self.footage_thread,
-                filename=self.filepath + "calibration.json")
-
         self.audio_model = AudioModel(self.cam_api, self.mic_api,
                                       filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
                                         filename=self.filepath + "calibration.json")
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn,
-                                          self.footage_thread,
-                                          filename=self.filepath + "calibration.json")
+        if self.footage_thread_event.value == 1:
+            self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn,
+                                              self.footage_thread,
+                                              filename=self.filepath + "calibration.json")
+            self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api,
+                                                           self.resolution,
+                                                           5, self.nn, self.footage_thread,
+                                                           filename=self.filepath + "calibration.json")
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0  # THIS IS ONLY FOR DESTROYING THREADS
@@ -278,6 +280,8 @@ class GeneralController:
         except:  # pragma: no mutate
             print("Trying to destruct None thread for camera")  # pragma: no mutate
         try:  # pragma: no mutate
+            self.footage_process.terminate()  # pragma: no mutate
+            time.sleep(0.1)  # pragma: no mutate
             self.footage_process.join()  # pragma: no mutate
         except:  # pragma: no mutate
             print("Trying to destruct None thread for footage")  # pragma: no mutate
@@ -308,7 +312,7 @@ class GeneralController:
         self.thread = None
         self.nn = ""
         self.thread = None
-        self.footage_thread = FootageThread(None, None, np.array([1920.0, 1080.0]))
+        self.footage_thread = FootageThread(None, None, np.array([1920.0, 1080.0]), None)
 
         self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
 
@@ -408,7 +412,8 @@ class GeneralController:
                 if response.status_code != 200:
                     print("Could not update flask at path " + path)
             sleep(0.3)
-        print("Closing " + path + " updater thread")
+        print("Closed " + path + " updater thread")
+        return
 
 def verify_address(address) -> bool:
     """ Method that verifies that the given address' form is valid.
@@ -421,14 +426,21 @@ def verify_address(address) -> bool:
         print("ERROR: Address " + address + " is invalid!")
         return False
 
-def close_running_threads(integration_passed) -> None:
+def close_running_threads(integration_passed, timeout_seconds: int = 1) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""
     integration_passed.footage_thread_event.value = 0  # pragma: no mutate
     integration_passed.info_threads_break.value = 1  # pragma: no mutate
-
+    for i in range(timeout_seconds * 10):
+        print("Killing footage thread")
+        integration_passed.footage_process.terminate()  # pragma: no mutate
+        time.sleep(0.1)  # pragma: no mutate
+        if not integration_passed.footage_process.is_alive():
+            print("Killed footage thread")
+            integration_passed.footage_process.join()  # pragma: no mutate
+            break
     integration_passed.thread_mic.join()  # pragma: no mutate
     integration_passed.thread_cam.join()  # pragma: no mutate
-    integration_passed.footage_process.join()  # pragma: no mutate
+
     cv2.destroyAllWindows()  # pragma: no mutate
     integration_passed.video.release()  # pragma: no mutate
     raise SystemExit  # pragma: no mutate
