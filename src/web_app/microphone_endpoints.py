@@ -46,7 +46,8 @@ def speaking_get_microphone_endpoint(integration: GeneralController):
 
 
 def get_speaker_direction_endpoint(integration: GeneralController):
-    """ Endpoint that sends a request to get the current direction from the microphone but waits for someone to speak.
+    """ Endpoint that sends a request to get the current direction 
+        from the microphone but waits for someone to speak.
     """
     ret = wait_for_speaker(integration)
     if isinstance(ret, str):
@@ -61,7 +62,7 @@ def wait_for_speaker(integration: GeneralController):
     Args:
         integration: The controller object
 
-    Returns: 
+    Returns:
         Direction towards the speaker
 
     """

@@ -1,21 +1,20 @@
 import os
+from multiprocessing import Value
 from threading import Thread
 from os import getenv
 import time
-from multiprocessing import Value
-
+import cv2
+import numpy as np
 import requests
-from yaml import load, dump
-
-from avonic_camera_api.camera_http_request import CameraHTTP
 try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
-import cv2
-import os
-import numpy as np
-from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize, converter, ResponseCode
+from yaml import load, dump
+
+from avonic_camera_api.camera_http_request import CameraHTTP
+from avonic_camera_api.camera_control_api import CameraAPI, \
+    CompressedFormat, ImageSize, converter, ResponseCode
 from avonic_camera_api.footage import FootageThread
 from avonic_camera_api.camera_adapter import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
@@ -146,7 +145,8 @@ class GeneralController:
         if cam_port and cam_http_port is not None:
             cam_addr = (settings["camera-ip"], int(cam_port))
             if cam_addr is not None and verify_address(cam_addr):
-                self.cam_api = CameraAPI(CameraSocket(address=cam_addr), CameraHTTP((cam_addr[0], cam_http_port)))
+                self.cam_api = CameraAPI(CameraSocket(address=cam_addr),
+                    CameraHTTP((cam_addr[0], cam_http_port)))
 
                 # set codec to MJPEG
                 self.cam_api.set_camera_codec(CompressedFormat.MJPEG)
@@ -188,7 +188,7 @@ class GeneralController:
             self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
                                           + ':554/live/av0')  # pragma: no mutate
             self.footage_thread = FootageThread(self.video,
-                                                self.footage_thread_event, self.resolution)  # pragma: no mutate
+                self.footage_thread_event, self.resolution)  # pragma: no mutate
 
             self.footage_thread.start()  # pragma: no mutate
 
@@ -253,10 +253,6 @@ class GeneralController:
             print(e)
             return False
 
-        # choose a strategy for tracking
-        self.calibration_tracker:WaitCalibrationTracker = \
-        WaitCalibrationTracker(self.cam_api, self.mic_api, self.footage_thread.resolution, 5)
-
     def __del__(self):
         if self.video is not None:
             self.video.release()
@@ -290,7 +286,8 @@ class GeneralController:
         # This function is used to initialize integration in testing.
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
-        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr), CameraHTTP((cam_addr[0], 80)))
+        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr),
+            CameraHTTP((cam_addr[0], 80)))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
@@ -305,8 +302,9 @@ class GeneralController:
         self.nn = ""
         self.thread = None
         self.footage_thread = FootageThread(None, None, np.array([1920.0, 1080.0]))
-        
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
+
+        self.hybrid_model = HybridTracker(
+            self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
 
         self.tracking.value = ModelCode.PRESET
 
@@ -322,7 +320,8 @@ class GeneralController:
         self.tracking.value = new_controller.tracking.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
+        self.hybrid_model = HybridTracker(self.cam_api,
+            self.mic_api, self.nn, self.footage_thread, "")
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api

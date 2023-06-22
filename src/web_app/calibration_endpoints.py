@@ -69,8 +69,8 @@ def add_calibration_to_mic(integration: GeneralController):
 
 
 def reset_calibration(integration: GeneralController):
-    """ Resets the current calibration 
-        
+    """ Resets the current calibration
+
         Args:
             integration: the GeneralController instance that has
                 a Calibration instance.
@@ -94,9 +94,9 @@ def is_calibrated(integration: GeneralController):
 
 
 def wait_for_speaker(integration: GeneralController):
-    """ Wait for at most five seconds for someone to speak 
+    """ Wait for at most five seconds for someone to speak
         and get a direction from the microphone.
-        
+
         Args:
             integration: the GeneralController instance that has
                 a Calibration instance.

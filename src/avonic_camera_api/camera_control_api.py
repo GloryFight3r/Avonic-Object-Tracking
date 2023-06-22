@@ -1,9 +1,9 @@
 import math
-import numpy as np
 from enum import Enum
-
 import re
 from multiprocessing import Value
+import numpy as np
+
 from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
 from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api import converter
@@ -274,28 +274,37 @@ class CameraAPI:
 
     def set_camera_codec(self, selected: CompressedFormat):
 
-        if (selected == CompressedFormat.MJPEG):
-            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}')
-        elif (selected == CompressedFormat.H264):
-            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":5},"nChannel":0}]}}')
-        elif (selected == CompressedFormat.H265):
-            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
+        if selected == CompressedFormat.MJPEG:
+            self.camera_http.send(
+                '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}')
+        elif selected == CompressedFormat.H264:
+            self.camera_http.send(
+                '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":5},"nChannel":0}]}}')
+        elif selected == CompressedFormat.H265:
+            self.camera_http.send(
+                '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
         else:
             raise AssertionError("No such compression exists")
 
     def set_image_size(self, selected: ImageSize):
-        if (selected == ImageSize.P1280_720):
-            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}')
-        elif (selected == ImageSize.P1920_1080):
-            self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}')
+        if selected == ImageSize.P1280_720:
+            self.camera_http.send(
+                '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":4},"nChannel":0}]}}')
+        elif selected == ImageSize.P1920_1080:
+            self.camera_http.send(
+                '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}')
 
     def set_frame_rate(self, selected: int):
         assert 5 <= selected <= 60
-        self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":%d},"nChannel":0}]}}' % (selected))
+        self.camera_http.send(
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":%d},"nChannel":0}]}}' 
+            % (selected))
 
     def set_l_frame_rate(self, selected: int):
         assert 1 <= selected <= 300
-        self.camera_http.send('{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":%d},"nChannel":0}]}}' % (selected))
+        self.camera_http.send(
+            '{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":%d},"nChannel":0}]}}'
+            % (selected))
 
     def calculate_fov(self) -> ResponseCode | int:
         """ Calculate the current FoV based on the current zoom

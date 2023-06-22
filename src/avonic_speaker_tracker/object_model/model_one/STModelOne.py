@@ -4,16 +4,16 @@ from typing_extensions import override
 import cv2
 
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_camera_api.footage import FootageThread
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
-from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_adapter import ResponseCode
-from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.utils.coordinate_translation\
     import translate_microphone_to_camera_vector
-from avonic_camera_api.converter import vector_angle
+from avonic_speaker_tracker.audio_model.calibration import Calibration
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
+from avonic_camera_api.footage import FootageThread
+from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_adapter import ResponseCode
+from avonic_camera_api.converter import vector_angle
+from microphone_api.microphone_control_api import MicrophoneAPI
 
 class HybridTracker(ObjectModel, AudioModel):
     # last bounding box we were tracking
@@ -187,7 +187,7 @@ class HybridTracker(ObjectModel, AudioModel):
 
         return frame
 
-    def find_next_box(self, current_box: np.ndarray, 
+    def find_next_box(self, current_box: np.ndarray,
         all_boxes: list[np.ndarray]) -> np.ndarray | None:
         """ Finds the box that is most likely to be the same box
         from the previous frame by comparing distances to the box centers

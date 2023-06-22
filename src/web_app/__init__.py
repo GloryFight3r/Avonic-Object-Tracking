@@ -311,8 +311,9 @@ def create_app(test_controller=None):
     @app.get('/calibration/is_set')
     def calibration_is_set():
         """
-        Endpoint that checks whether the calibration is completed and all the needed vectors are calculated
-            Returns: 
+        Endpoint that checks whether the calibration is
+        completed and all the needed vectors are calculated
+            Returns:
                 is_set: boolean value
         """
         return web_app.calibration_endpoints.is_calibrated(integration)
@@ -320,8 +321,9 @@ def create_app(test_controller=None):
     @app.get('/calibration/camera')
     def calibration_get_cam_coords():
         """
-        Endpoint that calculates the relative coordinates of the camera in relation to the microphone
-            Returns:    
+        Endpoint that calculates the relative coordinates
+        of the camera in relation to the microphone
+            Returns:
                 camera-coords: a 3D array of floats [x, y, z]
         """
         return web_app.calibration_endpoints.get_calibration(integration)

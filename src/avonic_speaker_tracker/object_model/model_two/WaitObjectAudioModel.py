@@ -83,7 +83,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
 
-    def point(self) -> bool:
+    def point(self) -> None:
         """ Points the camera towards the calculated direction from either:
         the presets or the continuous follower.
             Args:
@@ -101,7 +101,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         if isinstance(mic_direction, str):
             print(mic_direction)
-            return start_object_tracking
+            return
 
         try:
             cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
@@ -141,7 +141,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         speedY = min(speedY,20)
 
         if direct_np is None:
-            return start_object_tracking
+            return
 
         # Only move the camera if there has been a big movement lately. Otherwise
         # track_object will move the camera.

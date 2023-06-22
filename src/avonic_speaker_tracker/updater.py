@@ -5,7 +5,6 @@ from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
-from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 class UpdateThread(Thread):
 
@@ -38,9 +37,6 @@ class UpdateThread(Thread):
         - ObjectModel aka using object detection to figure out where to move
         the camera.
         """
-        prev_dir = [0.0, 0.0]
-        speak_delay: int = 0
-        
         while self.event.value != 0:
             self.model.point()
             time.sleep(0.3)

@@ -1,4 +1,3 @@
-import math
 import time
 from typing_extensions import override
 import numpy as np
@@ -52,9 +51,11 @@ class PresetModel(TrackingModel):
         # Find the closest preset and the direction of the camera towards that
         preset = self.preset_locations.get_preset_info(
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
-        direct = np.array([int(np.rad2deg(preset[0][0]))%360, int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
+        direct = np.array([int(np.rad2deg(preset[0][0])) % 360,
+        int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
 
-        # If either pitch an yaw is more than 180 degrees camera should rotate in the opposite direction
+        # If either pitch an yaw is more than 180 degrees
+        # camera should rotate in the opposite direction
         if direct[0]>180:
             direct[0] = direct[0]-360
         if direct[1]>180:
