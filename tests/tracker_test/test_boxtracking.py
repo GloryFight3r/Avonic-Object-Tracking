@@ -1,10 +1,9 @@
 import pytest
 import numpy as np
 
-from avonic_camera_api.footage import FootageThread
-from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.footage import FootageThread
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 def generate_tests():

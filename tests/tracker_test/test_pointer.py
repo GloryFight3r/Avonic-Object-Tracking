@@ -188,11 +188,16 @@ def test_preset_more():
 
     pm = PresetModel(cam_api, mic_api)
     #pm.prev_dir = np.array([22,-29,5000])
-    pm.preset_locations.add_preset("pre", np.array([np.deg2rad(-160), np.deg2rad(-29), 5000]), np.array([7, 7, 7]))
-    pm.preset_locations.add_preset("preset", np.array([np.deg2rad(-160), np.deg2rad(88), 5000]), np.array([1, 2, 3]))
-    pm.preset_locations.add_preset("preset1", np.array([np.deg2rad(170), np.deg2rad(88), 5000]), np.array([6, 8, 9]))
-    pm.preset_locations.add_preset("preset2", np.array([np.deg2rad(100), np.deg2rad(88), 5000]), np.array([11, 12, 13]))
-    pm.preset_locations.add_preset("preset3", np.array([np.deg2rad(100), np.deg2rad(40), 5000]), np.array([14, 15, 16]))
+    pm.preset_locations.add_preset("pre", np.array([np.deg2rad(-160),
+        np.deg2rad(-29), 5000]), np.array([7, 7, 7]))
+    pm.preset_locations.add_preset("preset", np.array([np.deg2rad(-160),
+        np.deg2rad(88), 5000]), np.array([1, 2, 3]))
+    pm.preset_locations.add_preset("preset1", np.array([np.deg2rad(170),
+        np.deg2rad(88), 5000]), np.array([6, 8, 9]))
+    pm.preset_locations.add_preset("preset2", np.array([np.deg2rad(100),
+        np.deg2rad(88), 5000]), np.array([11, 12, 13]))
+    pm.preset_locations.add_preset("preset3", np.array([np.deg2rad(100),
+        np.deg2rad(40), 5000]), np.array([14, 15, 16]))
 
     pm2 = PresetModel(cam_api, mic2_api)
     pm2.preset_locations = pm.preset_locations

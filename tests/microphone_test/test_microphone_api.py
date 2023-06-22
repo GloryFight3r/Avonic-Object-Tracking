@@ -19,7 +19,8 @@ def test_init():
 def test_elevation():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":90}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":90}}}\r\n',
+        "ascii"), ("0.0.0.1", 45))
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
@@ -30,7 +31,8 @@ def test_elevation():
 def test_azimuth():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":46}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":46}}}\r\n',
+        "ascii"), ("0.0.0.1", 45))
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
@@ -44,7 +46,8 @@ def test_elevation_recv_error():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), ("0.0.0.1", 45))
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+            "ascii"), ("0.0.0.1", 45))
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
@@ -58,7 +61,8 @@ def test_azimuth_recv_error():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), ("0.0.0.1", 45))
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+            "ascii"), ("0.0.0.1", 45))
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
@@ -72,7 +76,8 @@ def test_direction_recv_error():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), ("0.0.0.1", 45))
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+            "ascii"), ("0.0.0.1", 45))
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
@@ -85,7 +90,8 @@ def test_speaking_recv_error():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), ("0.0.0.1", 45))
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+             "ascii"), ("0.0.0.1", 45))
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
@@ -102,7 +108,8 @@ def test_direction_recv_invalid_json():
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
-    assert api.get_direction() == "Unable to get direction from microphone, response was: {\"not\":\"a microphone\"}"
+    assert api.get_direction() == "Unable to get direction from microphone,"\
+        + " response was: {\"not\":\"a microphone\"}"
 
 
 def test_speaking_recv_invalid_json():
@@ -115,7 +122,8 @@ def test_speaking_recv_invalid_json():
     mic_sock = MicrophoneSocket(sock=sock)
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
-    assert api.is_speaking() == "Unable to get peak loudness, response was: {\"i am a\":\"rocket launcher\"}"
+    assert api.is_speaking() == "Unable to get peak loudness,"\
+        + " response was: {\"i am a\":\"rocket launcher\"}"
 
 
 def test_direction_recv_gibberish():
@@ -129,7 +137,8 @@ def test_direction_recv_gibberish():
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
     assert api.get_direction() == "Did not receive a valid JSON," \
-                                  " are you sure you are communicating with the microphone? Received: asdf"
+                                  " are you sure you are communicating with the microphone?"\
+                                    + " Received: asdf"
 
 
 def test_speaking_recv_gibberish():
@@ -143,7 +152,8 @@ def test_speaking_recv_gibberish():
     mic_sock.address = ("0.0.0.1", 45)
     api = MicrophoneAPI(mic_sock)
     assert api.is_speaking() == "Did not receive a valid JSON," \
-                                " are you sure you are communicating with the microphone? Received: gugu gaga"
+                                " are you sure you are communicating with the microphone?"\
+                                + " Received: gugu gaga"
 
 
 def test_elevation_sendto_error():
