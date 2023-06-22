@@ -364,6 +364,9 @@ def create_app(test_controller=None):
         """
         return web_app.tracking_endpoints.track_hybrid(integration)
 
+
+    -----------------------------------------------------------------------------------
+
     @app.post('/calibration/add_directions_to_speaker')
     def add_calibration_speaker():
         """
@@ -414,10 +417,14 @@ def create_app(test_controller=None):
         Endpoint that changes the tracking to use the audio model
         """
         return web_app.tracking_endpoints.track_continuously(integration)
+
     @app.get('/calibration/track/no/zoom')
     def continuous_tracker_without_adaptive_zoom():
         """
         Endpoint that changes the tracking to use the audio model without adaptive zooming
+            return:
+                "tracking" - the enum corresponding to the AudioModelNoAdaptiveZoom
+                http 200 - the model has successfully been set to the waitobjectaudiomodel
         """
         return web_app.tracking_endpoints.track_continuously_without_adaptive_zooming(integration)
 
@@ -425,8 +432,10 @@ def create_app(test_controller=None):
     def number_of_calibrated():
         """
         Endpoint that returns the number of calibration points
-            Returns:
-                speaker-points-length: an int value
+
+            return:
+                "speaker-points-length" - the amount of speaker points that have been set [0 : 3]
+                HTTP 200 - success code
 
         """
         return web_app.calibration_endpoints.get_number_of_speaker_points(integration)
@@ -436,8 +445,20 @@ def create_app(test_controller=None):
         """
         Endpoint that navigates the camera so that the clicked pixel is centered in the frame
             data:
-                x-pos: a float value in the range [0:1]
-                y-pos: a float value in the range [0:1]
+                "x-pos" - a float value in the range [0:1]
+                "y-pos" - a float value in the range [0:1]
+
+            return:
+                In case of an error:
+                    "message" - the error that was thrown
+                    HTTP 400 - bad request, "see message" for more details
+                    HTTP 409 - conflict, in case the command to the camera got cancelled
+                    HTTP 504 - time out in the camera
+
+                In case of a success:
+                    "message" - success message
+                    HTTP 200 - success code
+
         """
         return web_app.camera_endpoints.navigate_camera(integration)
 
@@ -464,6 +485,10 @@ def create_app(test_controller=None):
     def object_tracking_start():
         """
         Endpoint that changes the tracking to use the object tracking model
+
+            return:
+                "tracking" - the enum corresponding to the WaitObjectAudioModel
+                HTTP 200 - the model has successfully been set to the WaitObjectAudioModel
         """
         return web_app.tracking_endpoints.track_object_continuously(integration)
 
@@ -471,41 +496,43 @@ def create_app(test_controller=None):
     def thread_start():
         """
         Endpoint that starts the tracking endpoint
+
+            return:
+                In case of an error:
+                    HTTP 403 - the thread has already been started before
+                In case of success:
+                    HTTP 200 - the thread has successfully been started
         """
         return web_app.tracking_endpoints.start_thread_endpoint(integration)
 
     @app.post('/thread/stop')
     def thread_stop():
         """
-        Endpoint that stops the tracking endpoint
+        Endpoint that stops the tracking thread
+
+            return:
+                HTTP 200 - successfully stopped the tracking thread
         """
         return web_app.tracking_endpoints.stop_thread_endpoint(integration)
 
     @app.get('/thread/running')
     def thread_is_running():
         """
-        Endpoint that checks whether the tracking thread is running
-            Returns:
-                is-running: a boolean value
+        Endpoint that checks whether the tracking thread is running. This means that the thread is
+        not None and that it is alive
+
+            return:
+                "is-running": a boolean value indicating whether the thread is running or not
         """
         return web_app.tracking_endpoints.is_running_endpoint(integration)
-
-    @app.get('/thread/value')
-    def thread_value():
-        """
-        Endpoint that returns the thread value (for testing purposes only)
-            Returns:
-                value: NONE if the thread is nonexistent or and int value otherwise
-        """
-        if integration.thread is None:
-            return make_response(jsonify({"value": "NONE"}), 200)
-        print(integration.thread.value)
-        return make_response(jsonify({"value": integration.thread.value}), 200)
 
     @app.post('/update/microphone')
     def thread_microphone():
         """
         Endpoint that updates the microphone data in the WebUI
+
+            return:
+                HTTP 200 - successfully updated the camera coordinates
         """
         return web_app.tracking_endpoints.update_microphone(integration)
 
@@ -519,13 +546,9 @@ def create_app(test_controller=None):
     @integration.ws.on("request-frame")
     def camera_frame_requested(message):
         """
-        Endpoint that sends a new frame in base64 to the web interface
-
-            return:
-                HTTP 200 - successfully updated the camera coordinates
+        Websocket endpoint that sends a new frame in base64 to the web interface
         """
         web_app.footage.emit_frame(integration)
-        return make_response({jsonify{}, 200})
 
     @app.post('/update/calibration')
     def thread_calibration():
@@ -592,11 +615,12 @@ def create_app(test_controller=None):
                 "filepath": a string representing the folder in which to store the settings file
 
             return:
-                Possible "message" - description of the error that was caught
-                Possible HTTP codes:
-                    200 - success code
-                    400 - either the threshold or the filepath were not given correctly
-                    500 - an error occured while writing to the settings file
+                In case of an error:
+                    "message" - description of the error that was caught
+                    HTTP 400 - either the threshold or the filepath were not given correctly
+                    HTTP 500 - an error occured while writing to the settings file
+                In case of success:
+                    HTTP 200 - success code
         """
         return web_app.settings_endpoints.set_settings(integration)
 
