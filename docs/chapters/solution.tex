@@ -159,6 +159,7 @@ The proposed solution followed the following algorithm for calibration and track
 Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
 This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
+<<<<<<< Updated upstream
 Unfortunately, the camera and microphone are not always in the same or opposite
 positions, as the system should work with any arbitrary position of the camera.
 For this reason, we left this solution behind.
@@ -302,6 +303,21 @@ We go over each of the four modules in our project: the camera API, the micropho
 module and the web interface. Each module is separated in the code in order to make it easier
 for other developers to work on our code.
 
+=======
+Unfortunately, this is not always the case, as the system should work with any arbitrary position of the camera, we had to leave this solution behind.
+\section{Application overview}
+In this section, we will discuss our application's structure and out motivations behind it.
+\subsection{Project modules}
+After splitting our project in core domains, we have identified 4 of them:
+\begin{itemize}
+    \item Camera API - responsible for a simplifying communication with the camera.
+    \item Microphone API - responsible for a simplifying communication with the microphone.
+    \item Tracking - responsible for all of the tracking related function. For example, calculating direction of the camera, performing communication with camera and the microphone via API.
+    \item WebUI - responsible for providing a user-friendly interface for a user.
+\end{itemize}
+We took a decision to create separate Python modules for each of the identified domains, to make our code base more systematic.
+It also allows to potentially distribute some of the modules separately, allowing other people develop their software using our APIs.
+>>>>>>> Stashed changes
 \subsection{Camera API}
 The Camera API module contains all of the functionality related to
 communication with the camera. This includes sending commands to move or zoom
@@ -351,11 +367,11 @@ All of the functionality related to speaker tracking is contained in this
 module. The most important part of it is the \verb|UpdateThread|. It is
 responsible for continuously calling the method that directs the camera.
 The module is structured in a way that every tracking type is maintained in a
-so-called model. Every model is inherits from the \verb|TrackingModel| and has 
+so-called model. Every model is inherits from the \verb|TrackingModel| and has
 the appropriate implementation of the point method. The user can pick their
 preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
-The chosen model is instantiated at the beginning of the \verb|run| method and 
+The chosen model is instantiated at the beginning of the \verb|run| method and
 is subsequently used to track the speaker until being explicitely stopped by the user.
 Some of the models rely on data stored in JSON files whose location can be
 specified in the settings menu in our WebUI. We currently have the following
@@ -464,7 +480,8 @@ presets and calibration models. The page maintains a WebSocket connection with a
 server for footage stream and real-time updates of the camera and microphone
 information, which is used for visualization.
 
-The WebUI was moved from a “should have” to a “must have” section after
+\paragraph{Web UI requirement}\mbox{} \\
+The web UI was moved from a “should have” to a “must have” section after
 consultation with our TA, as it provides a clearer, more intuitive, and more
 pleasant way for the user to interact with a system. It also opened up space for
 more quality-of-life features, that we have not intended in the original
@@ -472,12 +489,33 @@ requirements, but found useful for future users and debugging purposes - footage
 stream, real-time updates of microphone information and camera position, and
 visualization.
 
+\paragraph{Calibration interface}\mbox{} \\
+The part of our web interface that guides users through the process of
+calibration is shown in figure \ref{fig:calibration-ui}. As is shown, there are
+at most three calibration points that can be set. After at least one point is
+set, the camera direction towards the microphone can be submitted. The reason we
+decided to have a maximum of three points is to give a reasonable guideline to
+the user. Adding more than three points to calibration does not make it more
+accurate. One calibration point also gives good accuracy, which is why we allow
+the user to end the process after recording one point. The main advantage of
+recording more than one point is to reduce the impact of inaccurate microphone
+directions.
+
+
+\begin{figure}[h]
+    \caption{Part of the web interface responsible for calibration}
+    \centering
+    \includegraphics[width=0.8\textwidth]{calibration_ui}
+    \label{fig:calibration-ui}
+\end{figure}
+
+\paragraph{Integration object}\mbox{} \\
 In the first weeks of working on the project, we experienced multiple issues
 related to sharing access to Camera and Microphone APIs across the endpoints, as
 we could not find a dependency injection solution that would work with modern
 versions of Flask. We decided to unite all objects that needed to be shared
 across the endpoints in a single object and make it accessible for the server
-application — the \\ \verb|GeneralController| object, also referred to as
+application — the \verb|GeneralController| object, also referred to as
 ``integration’’. It contains variables for thread flow control, camera and
 microphone APIs and all of the threads our application uses - update thread,
 responsible for tracking, microphone and camera info-threads, responsible for
@@ -495,6 +533,7 @@ consultation with Avonic, they told us that they had similar issues with
 dependency injection in Flask, and they expect from us a functional, not
 necessarily clean solution for this issue.
 
+\paragraph{Production server}\mbox{} \\
 By default, Flask applications are run in a single-process development mode,
 which does not use WebSockets. We have decided to pick uWSGI as our production
 server, as it is well documented, fast, compiled, and gets rid of the downsides
