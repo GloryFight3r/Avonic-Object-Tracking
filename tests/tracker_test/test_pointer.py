@@ -17,6 +17,7 @@ def test_preset_pointer_good_weather():
     mic2_api.is_speaking.return_value = True
     pm = PresetModel(cam_api, mic_api)
     pm2 = PresetModel(cam_api, mic2_api)
+    pm.sleep()
     mic_api.get_direction.return_value = "some error"
     dir0 = pm.point()
     assert (dir0 == pm.prev_dir).all()
@@ -66,6 +67,7 @@ def test_continuous_pointer():
     mic2_api.is_speaking.return_value = True
 
     am = AudioModel(cam_api, mic_api)
+    am.sleep()
     am2 = AudioModel(cam_api, mic2_api)
     calibration = mock.Mock()
     calibration.mic_to_cam = -np.array([0.0,-0.5,1.2])
