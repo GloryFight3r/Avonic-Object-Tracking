@@ -1,10 +1,9 @@
 import math
 import os
 from unittest import mock
-
+import json
 import pytest
 import numpy as np
-import json
 
 from avonic_speaker_tracker.audio_model.calibration import Calibration, angle_between_vectors
 

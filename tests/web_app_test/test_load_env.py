@@ -84,7 +84,8 @@ def client(camera, monkeypatch):
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
          with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
              with mock.patch("builtins.open", x):
-                with mock.patch("avonic_speaker_tracker.object_model.yolov8.YOLOPredict.__init__", x3):
+                with mock.patch(
+                        "avonic_speaker_tracker.object_model.yolov8.YOLOPredict.__init__", x3):
                     with mock.patch("cv2.VideoCapture", x2):
                         test_controller.load_env()
                         test_controller.ws = mock.Mock()

@@ -1,4 +1,7 @@
+import time
+from typing_extensions import override
 import numpy as np
+
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.preset_model.preset import PresetCollection
@@ -6,15 +9,15 @@ from avonic_speaker_tracker.preset_model.preset_control import find_most_similar
 from microphone_api.microphone_control_api import MicrophoneAPI
 
 class PresetModel(TrackingModel):
-    """ Class that finds the location of the speaker in a set of 
-    recorded preset locations or the closest one in that set 
+    """ Class that finds the location of the speaker in a set of
+    recorded preset locations or the closest one in that set
     and points the camera towards that location.
     """
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
-        """ Default constructor 
+        """ Default constructor
             Args:
-                cam_api: Controller for the camera 
-                mic_api: Controller for the microphone 
+                cam_api: Controller for the camera
+                mic_api: Controller for the microphone
                 filename: location of the file that contains the preset information
         """
         self.prev_dir: np.ndarray = np.array([0, 0, 1])
@@ -22,6 +25,7 @@ class PresetModel(TrackingModel):
         self.cam_api = cam_api
         self.mic_api = mic_api
 
+    @override
     def point(self) -> np.ndarray:
         """ Calculates the direction to which the camera should point so that
             it is the closest to an existing preset.
@@ -47,9 +51,11 @@ class PresetModel(TrackingModel):
         # Find the closest preset and the direction of the camera towards that
         preset = self.preset_locations.get_preset_info(
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
-        direct = np.array([int(np.rad2deg(preset[0][0]))%360, int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
+        direct = np.array([int(np.rad2deg(preset[0][0])) % 360,
+        int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
 
-        # If either pitch an yaw is more than 180 degrees camera should rotate in the opposite direction
+        # If either pitch an yaw is more than 180 degrees
+        # camera should rotate in the opposite direction
         if direct[0]>180:
             direct[0] = direct[0]-360
         if direct[1]>180:
@@ -71,3 +77,6 @@ class PresetModel(TrackingModel):
 
     def set_filename(self, filename: str):
         self.preset_locations.set_filename(filename)
+
+    def sleep(self):
+        time.sleep(0.05)

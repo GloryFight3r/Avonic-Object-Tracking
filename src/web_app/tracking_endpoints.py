@@ -1,12 +1,13 @@
+from flask import make_response, jsonify, request
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
 from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
-from flask import make_response, jsonify, request
 from avonic_speaker_tracker.updater import UpdateThread
-from web_app.integration import GeneralController, ModelCode
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from web_app.integration import GeneralController, ModelCode
+
 
 def start_thread_endpoint(integration: GeneralController):
     """ This method starts the thread that controlls the actual tracking and calls
@@ -25,7 +26,8 @@ def start_thread_endpoint(integration: GeneralController):
             model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
                                     filename=integration.filepath + "calibration.json")
         elif integration.tracking.value == ModelCode.HYBRID:
-            model = HybridTracker(integration.cam_api, integration.mic_api, integration.nn, integration.footage_thread,
+            model = HybridTracker(integration.cam_api, integration.mic_api,
+                                  integration.nn, integration.footage_thread,
                                   integration.filepath + "calibration.json")
         else:
             if integration.nn is None:

@@ -4,9 +4,9 @@ from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 
 class Preset:
-    """ This class contains all the information about a given preset. 
-    This information is the camera direction towards the speaker and 
-    the direction from the microphone towards the speaker. 
+    """ This class contains all the information about a given preset.
+    This information is the camera direction towards the speaker and
+    the direction from the microphone towards the speaker.
     """
     def __init__(self, camera_info: np.ndarray, microphone_direction: np.ndarray):
         """ Constructor for the preset
@@ -25,7 +25,7 @@ class PresetCollection:
     """
     preset_locations = {}
     filename = None
-    
+
     default_camera_info: list[float] = [0.0, 0.0, 1.0]
     default_mic_info: list[float] = [0.0, 1.0, 0.0]
     def __init__(self, filename: str = ""):
@@ -71,7 +71,8 @@ class PresetCollection:
         """
         assert to_edit in self.preset_locations
         assert isinstance(new_cam_info, np.ndarray) and len(new_cam_info) == 3
-        assert isinstance(new_microphone_direction, np.ndarray) and len(new_microphone_direction) == 3
+        assert isinstance(new_microphone_direction, np.ndarray) \
+            and len(new_microphone_direction) == 3
         self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
@@ -97,7 +98,7 @@ class PresetCollection:
                 self.preset_locations[to_get].microphone_direction)
 
     def record(self) -> None:
-        """ Records the existing presets in the corresponfing file
+        """ Records the existing presets in the corresponding file
         """
         if self.filename != "":
             with open(self.filename, "w", encoding="utf-8") as outfile:

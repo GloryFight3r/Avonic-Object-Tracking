@@ -118,8 +118,8 @@ def get_preset_info(integration: GeneralController, preset_name: str):
 
 def point_to_closest_preset(integration: GeneralController):
     """ Endpoint that makes the camera point towards the found preset
-    
-        Args: 
+
+        Args:
             integration: The controller containing all the dependencies
     """
     integration.preset_model.point()

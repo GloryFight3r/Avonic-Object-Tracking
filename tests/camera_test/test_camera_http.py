@@ -1,5 +1,5 @@
-import pytest
 from unittest import mock
+import pytest
 
 from avonic_camera_api.camera_http_request import ResponseCodeHTTP
 from avonic_camera_api.camera_http_request import CameraHTTP

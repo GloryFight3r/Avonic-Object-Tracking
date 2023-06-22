@@ -1,5 +1,6 @@
 import math
-
+import time
+from typing_extensions import override
 import numpy as np
 
 from avonic_camera_api.camera_control_api import CameraAPI
@@ -13,12 +14,12 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 class AudioModel(TrackingModel):
     """ Class for tracking a speaker using the audio information from the microphone.
     Given that information it calculates the direction to which to point the camera
-    having an existing calibration information and subsequently points it there. 
-    This class implements adaptive zooming for the camera 
+    having an existing calibration information and subsequently points it there.
+    This class implements adaptive zooming for the camera
     depending on the distance of the speaker to it.
     """
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
-        """ Constructor for the AudioModel 
+        """ Constructor for the AudioModel
 
             Args:
                 cam_api: Controller for the camera
@@ -31,15 +32,16 @@ class AudioModel(TrackingModel):
         self.mic_api = mic_api
         self.calibration: Calibration = Calibration(filename=filename)
         self.calibration.load()
-    
+
     def set_speak_delay(self, speak_delay: int = 0):
         """ Sets the time elapsed since the last person spoke
 
             Args:
-                speak_delay: integer in range[0:100] 
+                speak_delay: integer in range[0:100]
         """
         self.speak_delay = speak_delay
 
+    @override
     def point(self):
         """ Calculates the direction of the camera, so it point to the speaker.
             Based on so-called audio model that relies ONLY on microphone
@@ -79,9 +81,11 @@ class AudioModel(TrackingModel):
         zoom_val = (int)((vec_len/10.0)*16000)
 
         direct = vector_angle(cam_vec)
-        direct_np = np.array([int(np.rad2deg(direct[0]))%360, int(np.rad2deg(direct[1]))%360, zoom_val])
+        direct_np = np.array([int(np.rad2deg(direct[0]))%360,
+            int(np.rad2deg(direct[1]))%360, zoom_val])
 
-        # If either pitch an yaw is more than 180 degrees camera should rotate in the opposite direction
+        # If either pitch an yaw is more than 180 degrees
+        # camera should rotate in the opposite direction
         if direct_np[0]>180:
             direct_np[0] = direct_np[0]-360
         if direct_np[1]>180:
@@ -116,3 +120,7 @@ class AudioModel(TrackingModel):
         """ Setter for the location of the file containing the calibration info
         """
         self.calibration.set_filename(filename)
+
+    def sleep(self):
+        time.sleep(0.05)
+        

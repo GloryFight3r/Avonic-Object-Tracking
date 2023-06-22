@@ -1,4 +1,4 @@
-from time import sleep
+import time
 from threading import Thread
 from ctypes import c_int
 from avonic_camera_api.camera_control_api import CameraAPI
@@ -36,11 +36,8 @@ class UpdateThread(Thread):
         - ObjectModel aka using object detection to figure out where to move
         the camera.
         """
-        prev_dir = [0.0, 0.0]
-        speak_delay: int = 0
-        
         while self.event.value != 0:
             self.model.point()
-            sleep(0.3)
+            self.model.sleep()
 
         print("Exiting thread")

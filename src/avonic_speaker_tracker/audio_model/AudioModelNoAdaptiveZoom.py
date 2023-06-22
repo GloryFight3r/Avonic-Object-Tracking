@@ -1,4 +1,5 @@
 import math
+import time
 import numpy as np
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.converter import vector_angle
@@ -19,7 +20,7 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
     """
     def __init__(self, cam_api: CameraAPI, mic_api: MicrophoneAPI, filename: str = ""):
         """ Constructor for the AudioModelNoAdaptiveZoom
-        
+
             Args:
                 cam_api: Controller for the camera
                 mic_api: Controller for the microphone
@@ -62,7 +63,8 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
         direct_np = np.array([int(np.rad2deg(direct[0]))%360,
                 int(np.rad2deg(direct[1]))%360, self.prev_dir[2]])
 
-        # If either pitch an yaw is more than 180 degrees camera should rotate in the opposite direction
+        # If either pitch an yaw is more than 180 degrees
+        # camera should rotate in the opposite direction
         if direct_np[0]>180:
             direct_np[0] = direct_np[0]-360
         if direct_np[1]>180:
@@ -96,3 +98,6 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
         """ Setter for the location of the file containing the calibration info
         """
         self.calibration.set_filename(filename)
+
+    def sleep(self):
+        time.sleep(0.2)

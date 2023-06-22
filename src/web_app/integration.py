@@ -147,7 +147,8 @@ class GeneralController:
         if cam_port and cam_http_port is not None:
             cam_addr = (settings["camera-ip"], int(cam_port))
             if cam_addr is not None and verify_address(cam_addr):
-                self.cam_api = CameraAPI(CameraSocket(address=cam_addr), CameraHTTP((cam_addr[0], cam_http_port)))
+                self.cam_api = CameraAPI(CameraSocket(address=cam_addr),
+                                         CameraHTTP((cam_addr[0], cam_http_port)))
 
                 # set codec to MJPEG
                 self.cam_api.set_camera_codec(CompressedFormat.MJPEG)
@@ -298,7 +299,8 @@ class GeneralController:
         # This function is used to initialize integration in testing.
         cam_addr = ('0.0.0.0', 52381)
         mic_addr = ('0.0.0.0', 45)
-        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr), CameraHTTP((cam_addr[0], 80)))
+        self.cam_api = CameraAPI(CameraSocket(sock=self.cam_sock, address=cam_addr),
+                                 CameraHTTP((cam_addr[0], 80)))
         self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr), -55)
         self.audio_model = AudioModel(self.cam_api, self.mic_api)
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
@@ -314,7 +316,8 @@ class GeneralController:
         self.thread = None
         self.footage_thread = FootageThread(None, None, self.resolution, None)
 
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api,
+                                          self.nn, self.footage_thread, "")
 
         self.tracking.value = ModelCode.PRESET
 
@@ -330,7 +333,8 @@ class GeneralController:
         self.tracking.value = new_controller.tracking.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn, self.footage_thread, "")
+        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api,
+                                          self.nn, self.footage_thread, "")
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api
@@ -416,7 +420,7 @@ class GeneralController:
         return
 
 def verify_address(address) -> bool:
-    """ Method that verifies that the given address' form is valid.
+    """ Method that verifies that the given address' format is valid.
     """
     try:
         assert 0 <= address[1] <= 65535

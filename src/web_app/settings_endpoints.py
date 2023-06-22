@@ -61,7 +61,8 @@ def set_settings(integration: GeneralController):
         if saved:
             return make_response(jsonify({}), 200)
         return make_response(jsonify(
-            {"message": "Something went wrong while saving settings file! Check application output!"}),
+            {"message": "Something went wrong while saving "\
+                 + "settings file! Check application output!"}),
             500)
     except (ValueError, KeyError):
         return make_response(jsonify({"message": "Invalid threshold or filepath."}), 400)
@@ -71,7 +72,8 @@ def set_settings(integration: GeneralController):
             integration.footage_thread_event.value = 0
             time.sleep(1)
             try:
-                os.kill(integration.footage_pid.value, signal.SIGINT)  # pragma: no mutate
+                if integration.footage_pid.value > 1:
+                    os.kill(integration.footage_pid.value, signal.SIGINT)  # pragma: no mutate
             except ProcessLookupError:
                 pass  # don't care mate
             os.kill(integration.pid.value, signal.SIGINT)  # pragma: no mutate

@@ -1,4 +1,4 @@
-from time import sleep
+import time
 from flask import make_response, jsonify, request
 from web_app.integration import GeneralController, verify_address
 
@@ -46,7 +46,8 @@ def speaking_get_microphone_endpoint(integration: GeneralController):
 
 
 def get_speaker_direction_endpoint(integration: GeneralController):
-    """ Endpoint that sends a request to get the current direction from the microphone but waits for someone to speak.
+    """ Endpoint that sends a request to get the current direction 
+        from the microphone but waits for someone to speak.
     """
     ret = wait_for_speaker(integration)
     if isinstance(ret, str):
@@ -61,12 +62,12 @@ def wait_for_speaker(integration: GeneralController):
     Args:
         integration: The controller object
 
-    Returns: 
+    Returns:
         Direction towards the speaker
 
     """
     approaching_limit: int = 0
     while not integration.mic_api.is_speaking() and approaching_limit < 10:
         approaching_limit += 1
-        sleep(0.1)
+        time.sleep(0.1)
     return integration.mic_api.get_direction()
