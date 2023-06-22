@@ -1,7 +1,6 @@
 import numpy as np
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 from flask import make_response, jsonify, request
@@ -91,6 +90,11 @@ def track_continuously(integration: GeneralController):
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 
 def track_object_continuously(integration: GeneralController):
+    if integration.footage_thread_event.value == 0:
+        return make_response(jsonify({"message": "Object tracking requires footage to be on. " +
+                                                 "Please enable it before launching the program. " +
+                                                 "To do this, make sure the NO_FOOTAGE environment " +
+                                                 "variable is not set to \"true\"."}), 503)
     integration.preset.value = ModelCode.OBJECT
     return make_response(jsonify({"preset":integration.preset.value}), 200)
 

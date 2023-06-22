@@ -320,6 +320,8 @@ def create_app(test_controller=None):
             integration.ws.emit("no-settings", data)
         else:
             integration.ws.emit("yes-settings", {})
+        if integration.footage_thread_event.value == 0:
+            integration.ws.emit("no-footage")
 
     def sigterm_handler(_signo, _stack_frame):
         close_running_threads(integration)

@@ -5,7 +5,6 @@ import base64
 import cv2 # type: ignore
 import numpy as np
 import time
-from avonic_camera_api.camera_control_api import CameraAPI
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
@@ -34,7 +33,7 @@ class FootageThread(Thread):
                 buffer = cv2.imencode('.jpg', self.frame)[1]
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
-            time.sleep(0.05)
+            time.sleep(0.001)
         print("Close footage thread")
 
     def get_frame(self):

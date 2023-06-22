@@ -3,9 +3,9 @@ from threading import Thread
 from os import getenv
 from time import sleep
 from multiprocessing import Value, Process
-
 import requests
 from yaml import load, dump
+
 try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
@@ -19,9 +19,9 @@ from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.utils.TrackingModel import TrackingModel
 from avonic_speaker_tracker.object_model.WaitObjectAudioModel import WaitObjectAudioModel
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
+
 
 class ModelCode():
     AUDIO = 0
@@ -43,7 +43,7 @@ class GeneralController:
         # self.info_threads_break used to completely destroy info-thread, and not just pause
         # Used for safe finish of the program, for safe destruction.
         # When 1 - finishes the thread ASAP.
-        self.info_threads_break = Value("i", 0, lock=False) # THIS IS ONLY FOR DESTROYING THREADS
+        self.info_threads_break = Value("i", 0, lock=False)  # THIS IS ONLY FOR DESTROYING THREADS
 
         self.footage_thread_event = Value("i", 1, lock=False)
 
@@ -77,6 +77,7 @@ class GeneralController:
 
         # Video related fields
         self.footage_thread: FootageThread | None = None
+        self.footage_process: Process | None = None
         self.video = None
 
         # Info-threads
@@ -95,10 +96,6 @@ class GeneralController:
 
         # Keep in memory, whether a notification about the settings not being set has been sent
         self.no_settings_sent = True
-
-        # PID of master process
-        self.pid = Value("i", os.getpid())
-        self.testing = Value("i", 0, lock=False)
 
     def load_env(self) -> None:
         """Performs load procedure of all the specified parameters.
@@ -157,42 +154,48 @@ class GeneralController:
         else:
             self.filepath = ""
 
+        # Check if footage is disabled, if so, prevent the process from starting
+        no_footage = getenv("NO_FOOTAGE") == "true"
+        if no_footage:
+            self.footage_thread_event.value = 0
 
-        # Initialize footage thread
-        if cam_addr is not None:
+        # Initialize footage thread and process
+        if self.footage_thread_event.value == 1 and cam_addr is not None:
             self.video = cv2.VideoCapture('rtsp://' + settings["camera-ip"]
-                                          + ':554/live/av0')  # pragma: no mutate
-            self.video.set(cv2.CAP_PROP_FPS, 15)
+                                          + ':554/live/av0', cv2.CAP_FFMPEG,
+                                          [cv2.CAP_PROP_N_THREADS, 4])  # pragma: no mutate
             self.footage_thread = FootageThread(self.video,
                                                 self.footage_thread_event)  # pragma: no mutate
 
             self.footage_process = Process(target=self.footage_thread.run)
-
-            self.footage_process.start()  # pragma: no mutate
+            if self.video is not None and self.video.isOpened():
+                self.footage_process.start()  # pragma: no mutate
+            else:
+                self.footage_thread_event.value = 0
 
         # Initialize models
         self.object_audio_model = WaitObjectAudioModel(
-                self.cam_api, self.mic_api,
-                np.array([1920.0, 1080.0]),
-                5, self.nn, self.footage_thread,
-                filename=self.filepath + "calibration.json")
+            self.cam_api, self.mic_api,
+            np.array([1920.0, 1080.0]),
+            5, self.nn, self.footage_thread,
+            filename=self.filepath + "calibration.json")
         self.audio_model = AudioModel(self.cam_api, self.mic_api,
                                       filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
-                                        filename = self.filepath + "calibration.json")
+                                                            filename=self.filepath + "calibration.json")
 
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
-        self.info_threads_break.value = 0 # THIS IS ONLY FOR DESTROYING THREADS
+        self.info_threads_break.value = 0  # THIS IS ONLY FOR DESTROYING THREADS
         if mic_addr is not None:
             self.thread_mic = Thread(target=self.send_update,
-                args=(self.get_mic_info, '/update/microphone'))
+                                     args=(self.get_mic_info, '/update/microphone'))
             self.thread_mic.start()
         if cam_addr is not None:
             self.thread_cam = Thread(target=self.send_update,
-                args=(self.get_cam_info, '/update/camera'))
+                                     args=(self.get_cam_info, '/update/camera'))
             self.thread_cam.start()
 
     def save(self):
@@ -226,31 +229,31 @@ class GeneralController:
     def __del__(self):
         if self.video is not None:
             self.video.release()
-        self.preset.value = 0 # pragma: no mutate
+        self.preset.value = 0  # pragma: no mutate
 
-        self.footage_thread_event.value = 0 # pragma: no mutate
-        self.info_threads_break.value = 1 # pragma: no mutate
+        self.footage_thread_event.value = 0  # pragma: no mutate
+        self.info_threads_break.value = 1  # pragma: no mutate
 
-        try: # pragma: no mutate
-            self.thread_mic.join() # pragma: no mutate
-        except: # pragma: no mutate
-            print("Trying to destruct None thread for microphone") # pragma: no mutate
-        try: # pragma: no mutate
-            self.thread_cam.join() # pragma: no mutate
-        except: # pragma: no mutate
-            print("Trying to destruct None thread for camera") # pragma: no mutate
-        try: # pragma: no mutate
-            self.footage_process.join() # pragma: no mutate
-        except: # pragma: no mutate
-            print("Trying to destruct None thread for footage") # pragma: no mutate
-        try: # pragma: no mutate
-            self.video.release() # pragma: no mutate
-        except: # pragma: no mutate
-            print("Trying to destruct None thread for video") # pragma: no mutate
-        try: # pragma: no mutate
-            cv2.destroyAllWindows() # pragma: no mutate
-        except: # pragma: no mutate
-            print("Trying to destruct None thread for cv2") # pragma: no mutate
+        try:  # pragma: no mutate
+            self.thread_mic.join()  # pragma: no mutate
+        except:  # pragma: no mutate
+            print("Trying to destruct None thread for microphone")  # pragma: no mutate
+        try:  # pragma: no mutate
+            self.thread_cam.join()  # pragma: no mutate
+        except:  # pragma: no mutate
+            print("Trying to destruct None thread for camera")  # pragma: no mutate
+        try:  # pragma: no mutate
+            self.footage_process.join()  # pragma: no mutate
+        except:  # pragma: no mutate
+            print("Trying to destruct None thread for footage")  # pragma: no mutate
+        try:  # pragma: no mutate
+            self.video.release()  # pragma: no mutate
+        except:  # pragma: no mutate
+            print("Trying to destruct None thread for video")  # pragma: no mutate
+        try:  # pragma: no mutate
+            cv2.destroyAllWindows()  # pragma: no mutate
+        except:  # pragma: no mutate
+            print("Trying to destruct None thread for cv2")  # pragma: no mutate
 
     def load_mock(self):
         # This function is used to initialize integration in testing.
@@ -262,10 +265,10 @@ class GeneralController:
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api)
         self.preset_model = PresetModel(self.cam_api, self.mic_api)
         self.object_audio_model = WaitObjectAudioModel(
-                self.cam_api, self.mic_api,
-                np.array([1920.0, 1080.0]),
-                5, self.nn, self.footage_thread,
-                filename=self.filepath + "calibration.json")
+            self.cam_api, self.mic_api,
+            np.array([1920.0, 1080.0]),
+            5, self.nn, self.footage_thread,
+            filename=self.filepath + "calibration.json")
         self.preset.value = ModelCode.PRESET
         self.thread = None
         self.nn = ""
@@ -299,9 +302,9 @@ class GeneralController:
         mic_direction = self.mic_api.get_direction()
         if isinstance(mic_direction, str):
             return {
-            "microphone-direction": list(np.array([0,0,0])),
-            "microphone-speaking": self.mic_api.is_speaking()
-        }
+                "microphone-direction": list(np.array([0, 0, 0])),
+                "microphone-speaking": self.mic_api.is_speaking()
+            }
         else:
             return {
                 "microphone-direction": list(mic_direction),
@@ -379,12 +382,12 @@ def verify_address(address) -> bool:
 
 def close_running_threads(integration_passed) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""
-    integration_passed.footage_thread_event.value = 0 # pragma: no mutate
-    integration_passed.info_threads_break.value = 1 # pragma: no mutate
+    integration_passed.footage_thread_event.value = 0  # pragma: no mutate
+    integration_passed.info_threads_break.value = 1  # pragma: no mutate
 
-    integration_passed.thread_mic.join() # pragma: no mutate
-    integration_passed.thread_cam.join() # pragma: no mutate
-    integration_passed.footage_process.join() # pragma: no mutate
-    cv2.destroyAllWindows() # pragma: no mutate
-    integration_passed.video.release() # pragma: no mutate
-    raise SystemExit # pragma: no mutate
+    integration_passed.thread_mic.join()  # pragma: no mutate
+    integration_passed.thread_cam.join()  # pragma: no mutate
+    integration_passed.footage_process.join()  # pragma: no mutate
+    cv2.destroyAllWindows()  # pragma: no mutate
+    integration_passed.video.release()  # pragma: no mutate
+    raise SystemExit  # pragma: no mutate
