@@ -415,7 +415,7 @@ def create_app(test_controller=None):
             return:
                 In case of an error:
                     "message": the exact error message
-                    HTTP 504: the error code if no direction could be gotten from either the camer
+                    HTTP 504: the error code if no direction could be gotten from either the camera
                         or the microphone
 
                 In case of a success:
@@ -684,7 +684,7 @@ def create_app(test_controller=None):
                 In case of an error:
                     "message": description of the error that was caught
                     HTTP 400: either the threshold or the filepath were not given correctly
-                    HTTP 500: an error occured while writing to the settings file
+                    HTTP 500: an error occurred while writing to the settings file
                 In case of success:
                     HTTP 200: success code
         """
