@@ -82,6 +82,11 @@ def create_app(test_controller=None):
     def post_reboot():
         """
         Endpoint triggers reboot procedure at the camera.
+            return:
+                HTTP 200: success, empty message
+                Other HTTP codes:
+                    HTTP code corresponds to the camera response
+                    "message" - description of the received response code from the camera
         """
         return web_app.camera_endpoints.reboot_camera_endpoint(integration)
 
@@ -89,6 +94,11 @@ def create_app(test_controller=None):
     def post_turn_on_camera():
         """
         Endpoint triggers turn on procedure at the camera.
+            return:
+                HTTP 200: success, empty message
+                Other HTTP codes:
+                    HTTP code corresponds to the camera response
+                    "message" - description of the received response code from the camera
         """
         return web_app.camera_endpoints.turn_on_camera_endpoint(integration)
 
@@ -96,30 +106,43 @@ def create_app(test_controller=None):
     def post_off():
         """
         Endpoint triggers turn off at the camera.
+            return:
+                HTTP 200: success, empty message
+                Other HTTP codes:
+                    HTTP code corresponds to the camera response
+                    "message" - description of the received response code from the camera
         """
         return web_app.camera_endpoints.turn_off_camera_endpoint(integration)
 
     @app.post('/camera/move/absolute')
     def post_move_absolute():
-        """ 
+        """
         Endpoint that sends a command to the camera to move in an absolute direction.
             data:
                 absolute-speed-x: Integer from 1 - 24, the pan speed.
                 absolute-speed-y: Integer from 1 - 20, the tilt speed.
                 absolute-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
                 absolute-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+            return:
+                HTTP code corresponds to the camera response
+                "message" - description of the received response code from the camera
+                Possible HTTP 400 - assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_absolute_camera_endpoint(integration)
 
     @app.post('/camera/move/relative')
     def post_move_relative():
-        """ 
+        """
         Endpoint that sends a command to the camera to move in a relative direction.
             data:
                 relative-speed-x: Integer from 1 - 24, the pan speed.
                 relative-speed-y: Integer from 1 - 20, the tilt speed.
                 relative-degrees-x: Float from -170 - 170, the amount of degrees to pan by.
                 relative-degrees-y: Float from -30 - 90, the amount of degrees to tilt by.
+            return:
+                HTTP code corresponds to the camera response
+                "message" - description of the received response code from the camera
+                Possible HTTP 400 - assertion error of validity of supplied values
         """
         return web_app.camera_endpoints.move_relative_camera_endpoint(integration)
 
@@ -154,6 +177,8 @@ def create_app(test_controller=None):
     def get_zoom():
         """
         Endpoint to get the zoom value of the camera.
+            return:
+                zoom-value - Integer from 0 - 16384, the zoom-value
         """
         return web_app.camera_endpoints.zoom_get_camera_endpoint(integration)
 
@@ -205,7 +230,7 @@ def create_app(test_controller=None):
 
     @app.post('/preset/add')
     def add_preset():
-        """ 
+        """
         Endpoint that saves a preset to the preset collection
             data:
                 camera-direction-alpha: Float from -170 - 170 representing the yaw of the camera
@@ -214,7 +239,6 @@ def create_app(test_controller=None):
                 mic-direction-x: Float representing the x-coordinate of the direction vector.
                 mic-direction-y: Float representing the y-coordinate of the direction vector.
                 mic-direction-z: Float representing the z-coordinate of the direction vector.
-                
         """
         return web_app.preset_locations_endpoints.add_preset_location(integration)
 
