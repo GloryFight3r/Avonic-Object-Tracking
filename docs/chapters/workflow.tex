@@ -4,7 +4,12 @@ Our team has very specific values which we always aim to follow no matter the ci
 The most important values we appreciate are hard work and authority. It goes without saying that we value hard work since we all aim to complete our project in the best possible way.
 Authority is important to us because we should always respect Avonic and the university staff since they are the people who evaluate our work.
 Another crucial value in our team is humor. It is always better when working becomes a pleasure and not a boresome duty.
+
 \section{Workflow practices}
+In this section, we discuss the practices we used to improve our teamwork and
+our product. The first three sections are related to practices that improve the
+code, while \hyperref[subsection:communication]{section 5.2.4} discusses our methods of communication.
+
 \subsection{Approaches}
 To ensure a good workflow we decided to use Agile and more specifically -- Scrum.
 Scrum gives teams the ability to cope with dynamic priorities and requirements by introducing sprint planning, retrospectives, and reviews.
@@ -17,14 +22,6 @@ Our improved became better in later stages of the project.
 We also decided to employ TDD (test-driven development) as it has been shown to reduce number of bugs in the code.
 It is also useful to write simple yet reliable code, and motivates a developer to be more conscious of the design decisions and edge cases.
 
-\subsection{Requirements for new functionality}
-In order to accept a new functionality we came up with three requirements:
-\begin{enumerate}
-	\item Has to have a test coverage of at least 80\%
-	\item Has to have a clear description of the functionality
-	\item Must not break any other functionality
-\end{enumerate}
-
 \subsection{Definition of done}
 At the start of our project, we decided that the minimal viable product would be
 one that has all the must-have requirements. The should-haves would be good to aim
@@ -32,7 +29,17 @@ for and the could-haves would be a bonus if they were fulfilled. For individual 
 we also defined a definition of done in Gitlab so it would be clear when one was
 completed. We only accepted functionality after this definition of done was satisfied.
 
+Apart from the definition of done, we came up with three other requirements to accept
+new functionality:
+\begin{enumerate}
+	\item Has to have a test coverage of at least 80\%
+	\item Has to have a clear description of the functionality
+	\item Must not break any other functionality
+\end{enumerate}
+
+
 \subsection{Additional tools}
+In order to ensure the quality of our code, we used five additional tools:
 \begin{itemize}
 	\item \verb|pylint| for styling purposes
 	\item \verb|pytest| for basic testing, \verb|pytest-cov| to calculate coverage
@@ -41,36 +48,47 @@ completed. We only accepted functionality after this definition of done was sati
 	\item CI (continuous integration) for quality assurance - runs on GitLab after each change
 \end{itemize}
 
-\subsection{Communication}
-We make sure all work is done on time and in an upstanding way by meeting every day. This happens either on campus, in Avonic's office, or on Discord as a backup. We discuss our progress and help each other. If any problem arises we brainstorm and come up with solutions together.
-Mattermost serves as a communication channel with our TA.
-WhatsApp is our backup if everything else fails.
+\subsection{Communication}\label{subsection:communication}
+We made sure all work is done on time and in an upstanding way by meeting every
+day. This happened either on campus, in Avonic's office, or on Discord as a
+backup. We discussed our progress and helped each other. If any problem arose, we
+brainstormed and came up with solutions together. Mattermost served as a
+communication channel with our TA. WhatsApp was our backup if everything else
+failed.
 
 \section{Collaboration with Avonic}
 Avonic was open to collaboration and in this section, we give some insights into how it went:
 
-Every week we met with Mr. Kahawati to discuss the progress we are had since our last meeting.
-During those meetings, we would discuss feedback on implemented features and their possible extensions.
+Every week we met with Mr. Kahawati to discuss the progress since our last
+meeting. During those meetings, we would discuss feedback on implemented
+features and their possible extensions. As discussed in
+\hyperref[sec:possible-pitfalls]{possible pitfalls}, we could work in the
+office only a limited amount of time. Avonic gave us a camera and set up VPN
+for us, so we could continue work on project even when were not in the office.
 
-As discussed in \hyperref[sec:possible-pitfalls]{possible pitfalls}. we could work in the office only a limited amount of time. Avonic gave us a camera and set up VPN for us, so we could continue work on project even when were not in the office.
-
-In the beginning of the project, we experienced some problems with time outs of the camera connection over the network, but people in Avonic helped us figure out that it was caused by network settings and not us.
+In the beginning of the project, we experienced some problems with time outs of
+the camera connection over the network, but people at Avonic helped us figure
+out that it was caused by network settings and not us.
 
 \section{Testing}
-In this section we elaborate more on our testing experience and process throughout the development process.
-As mentioned earlier we encouraged TDD in our process, but it was not enforced, as it is a personal preference.
-This approach once more proved to be a very good practice because we managed to find many bugs and unexpected behavior early in development without breaking the functionality of our project.
+In this section we elaborate more on our testing experience and process
+throughout the development process. As mentioned earlier we encouraged TDD in
+our process, but it was not enforced, as it is a personal preference. This
+approach once more proved to be a very good practice because we managed to find
+many bugs and unexpected behavior early in development without breaking the
+functionality of our project.
 
-One of our non-functional requirements was reaching at least 80\% test coverage of the code. 
-We kept this number up throughout the whole development process.
-During the midterm we were exactly at 80\% coverage with the vision that we would increase that number by the end of the project.
-We indeed met that goal by reaching 92\% total coverage.
+One of our non-functional requirements was reaching at least 80\% test coverage
+of the code. We kept this number up throughout the whole development process.
+During the midterm we were exactly at 80\% coverage with the vision that we
+would increase that number by the end of the project. We indeed met that goal
+by reaching 92\% total coverage.
 
-In order to make sure the quality of the tests we used mutation testing tool \verb|mutmut|.  
-During this process we managed to locate bugs throughout the code as well as improve the tests themselves. 
-Overall we made sure all our tests cover and capture all aspects of the functionality we have. 
-Running this tool, however, posed a difficulty as our system tests take quite a lot of time to run because of the multithreaded nature of the project. 
-That led to one run of \verb|mutmut| taking a couple of hours which meant we could not do it that often. 
+In order to make sure the quality of the tests we used mutation testing tool \verb|mutmut|.
+During this process we managed to locate bugs throughout the code as well as improve the tests themselves.
+Overall we made sure all our tests cover and capture all aspects of the functionality we have.
+Running this tool, however, posed a difficulty as our system tests take quite a lot of time to run because of the multithreaded nature of the project.
+That led to one run of \verb|mutmut| taking a couple of hours which meant we could not do it that often.
 At the midterm our mutation score was 56\% and we focused on improving that until the end of the project and reached 62\% in the end.
 
 \section{Challenges}
