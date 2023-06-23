@@ -298,8 +298,21 @@ closest to his new bounding box in the new frame. Relying on that fact, we get
 all of the new bounding boxes from the new frame and choose to track the one
 that has its center the closest to the previous bounding box. A diagram that
 illustrates the possible states we could be in is the depicted in Figure
-\ref{fig:object_strategy}.
+\ref{fig:object_strategy}. A visualization of this process can be seen in Figure \ref{fig:obj_detection_image}
 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{obj_detection_image}
+    \fbox{\begin{tabular}{ll}
+      \textcolor{red}{$\blacksquare$} & Currently tracked box \\
+      $\blacksquare$ & Detected object boxes \\
+      \textcolor{blue}{$\blacksquare$} & The microphone direction translated to camera direction 
+    \end{tabular}}
+
+    \caption{A frame recorded while running switch strategy object detection}
+    \label{fig:obj_detection_image}
+\end{figure}
 
 \section{Application overview}\label{sec:application-overview}
 In this section, we will discuss our application's structure and our motivations behind it.
