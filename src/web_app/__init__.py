@@ -92,9 +92,9 @@ def create_app(test_controller=None):
         """
         Endpoint that sets the camera network settings.
             form:
-                "camera-ip": a string indicating the camera's address
-                "camera-port": an int value that represents the port
-                "camera-http-port": an int value that represents the HTTP port of the camera
+                "camera-ip": the address of the connected camera
+                "camera-port": the camera port
+                "camera-http-port": the HTTP port of the camera
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
@@ -256,7 +256,7 @@ def create_app(test_controller=None):
         Endpoint that sets the camera network settings.
             form:
                 "microphone-ip": a string, the address of the microphone
-                "microphone-port": an int value that represents the port
+                "microphone-port": the microphone port
             return:
                 HTTP 200 or 400:
                     Text of the return message from the microphone
@@ -644,10 +644,10 @@ def create_app(test_controller=None):
         """
         Endpoint that gets the system settings
             return:
-                "camera-ip": a string representing the address of the connected camera
-                "camera-port": an int representing the port of the connected camera
-                "microphone-ip": a string representing the address of the connected microphone
-                "microphone-port": an int representing the port of the connected microphone
+                "camera-ip": the address of the connected camera
+                "camera-port": the port of the connected camera
+                "microphone-ip": the address of the connected microphone
+                "microphone-port": the port of the connected microphone
                 "microphone-thresh": an int value between -90 and 0 representing the preferred
                     volume threshold
                 "filepath": a string representing the folder in which the settings file is stored
@@ -661,10 +661,10 @@ def create_app(test_controller=None):
         Endpoint that sets the following settings to the ones given.
 
             form:
-                "camera-ip": a string representing the address of the camera to connect to
-                "camera-port": an int representing the port of the camera to connect to
-                "microphone-ip": a string representing the address of the microphone to connect to
-                "microphone-port": an int representing the port of the microphone to connect to
+                "camera-ip": the address of the camera to connect to
+                "camera-port": the port of the camera to connect to
+                "microphone-ip": the address of the microphone to connect to
+                "microphone-port": the port of the microphone to connect to
                 "microphone-thresh": an int value between -90 and 0 representing the preferred
                     volume threshold
                 "filepath": a string representing the folder in which to store the settings file
