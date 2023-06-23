@@ -113,9 +113,9 @@ The direction obtained from the camera and microphone combined with the micropho
 A simplified, 2D image is shown in figure \ref{fig:cal2d}. Since the camera
 points towards the z-axis by default, the horizontal axis in the image is the z-axis.
 \begin{figure}[h]
-    \caption{Demonstration of the calculation of calibration in 2D, where $M$ is the microphone, $C$ is the camera and $A$ is the speaker}
     \centering
     \includegraphics[width=0.8\textwidth]{calibration_2d}
+    \caption{Demonstration of the calculation of calibration in 2D, where $M$ is the microphone, $C$ is the camera and $A$ is the speaker}
     \label{fig:cal2d}
 \end{figure}
 We define $M$ as the microphone, $C$ as the camera, and $A$ as the person calibrating the system.
@@ -129,9 +129,9 @@ We can calculate distance $|MA|$ by intersecting the microphone's direction vect
 Afterwards, we can use analogous calculations to get the length $|CM|$, since we have all the directions we need.
 This means that we can find the angles between them and calculate the triangle.
 \begin{figure}[h]
-    \caption{Calculation of calibration in 3D}
     \centering
     \includegraphics[width=0.8\textwidth]{calibration_3d}
+    \caption{Calculation of calibration in 3D}
     \label{fig:cal3d}
 \end{figure}
 
@@ -228,12 +228,10 @@ Just like YOLO, RT-DETR can be used to track objects in real-time to assist our 
 despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster
 than the RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
 
-
-
 \begin{figure}[h]
-    \caption{Use case diagram of the tracking models}
     \centering
     \includegraphics[width=0.8\textwidth]{model-diagram}
+    \caption{Use case diagram of the tracking models}
     \label{fig:model-use-case-diagram}
 \end{figure}
 
@@ -269,12 +267,11 @@ the microphone detects a sound louder than the defined threshold.
 This means that object tracking is used when someone is not moving a lot, but it will never be used
 simultaneously with speaker tracking. This helps to centralize the speaker on the screen.
 
-
 \paragraph{Switch strategy} \mbox{}
 \begin{figure}[h]
-    \caption{Possible states diagram}
     \centering
     \includegraphics[width=0.5\textwidth]{tree}
+    \caption{Possible states diagram}
     \label{fig:object_strategy}
 \end{figure}
 \\
@@ -464,7 +461,7 @@ functionality without having to refactor it.
 In order to support the web user interface (UI) for the system, the web application
 needed to be created. The back-end of this app is written in Python using the
 Flask framework as it is a well-known lightweight framework, that allows for web
-development. It offers some nice features - creating and managing socket
+development. It offers some nice features -- creating and managing socket
 connections with a client and easy modification to support testing of the app.
 Flask is also used by Avonic themselves and was recommended by them.
 
@@ -479,7 +476,7 @@ The web UI was moved from a “should have” to a “must have” section after
 consultation with our TA, as it provides a clearer, more intuitive, and more
 pleasant way for the user to interact with a system. It also opened up space for
 more quality-of-life features, that we have not intended in the original
-requirements, but found useful for future users and debugging purposes - footage
+requirements, but found useful for future users and debugging purposes -- footage
 stream, real-time updates of microphone information and camera position, and
 visualization.
 
@@ -510,7 +507,7 @@ versions of Flask. We decided to unite all objects that needed to be shared
 across the endpoints in a single object and make it accessible for the server
 application — the \verb|GeneralController| object, also referred to as
 ``integration’’. It contains variables for thread flow control, camera and
-microphone APIs and all of the threads our application uses - update thread,
+microphone APIs and all of the threads our application uses -- update thread,
 responsible for tracking, microphone and camera info-threads, responsible for
 sending information updates to the user, footage thread for retrieving frames
 from the camera.
