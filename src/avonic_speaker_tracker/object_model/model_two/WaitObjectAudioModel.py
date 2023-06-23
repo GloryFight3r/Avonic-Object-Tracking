@@ -1,4 +1,5 @@
 import math
+import time
 import cv2
 import numpy as np
 
@@ -82,7 +83,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             self.cam_api.move_relative(speed[0], speed[1],\
                                 angle[0], angle[1])
 
-    def point(self) -> bool:
+    def point(self) -> None:
         """ Points the camera towards the calculated direction from either:
         the presets or the continuous follower.
             Args:
@@ -100,7 +101,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         if isinstance(mic_direction, str):
             print(mic_direction)
-            return start_object_tracking
+            return
 
         try:
             cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
@@ -122,12 +123,14 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             direct_np = self.prev_dir
 
 
-        avg_angle = ((direct_np[0] - self.prev_dir[0])**2 + (direct_np[1] - self.prev_dir[1])**2)**0.5
+        avg_angle = ((direct_np[0] - self.prev_dir[0])**2 \
+            + (direct_np[1] - self.prev_dir[1])**2)**0.5
         if avg_angle >= self.threshold:
             # reset the time_without_movement if we move above the threshold
             self.time_without_movement = 0
             start_object_tracking = False
 
+        # Sets the rotation speed depending on how much the camera has to move
         diffX = math.fabs(self.prev_dir[0]-direct_np[0])*2
         diffY = math.fabs(self.prev_dir[1]-direct_np[1])*2
 
@@ -138,7 +141,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         speedY = min(speedY,20)
 
         if direct_np is None:
-            return start_object_tracking
+            return
 
         # Only move the camera if there has been a big movement lately. Otherwise
         # track_object will move the camera.
@@ -157,3 +160,6 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
 
         self.prev_dir = direct_np
         self.is_object_tracking = start_object_tracking
+
+    def sleep(self):
+        time.sleep(0.05)

@@ -15,7 +15,7 @@ class FootageThread(Thread):
 
             Params:
                 footage: the footage stream from which to read frames
-                event: the even that stops the thread when set to 0
+                event: the event that stops the thread when set to 0
 
         """
         super().__init__()
@@ -62,7 +62,8 @@ class FootageThread(Thread):
             self.draw_prediction(cur_frame, "person", x, y, x2, y2, [0, 0, 0])
         if self.pixel is not None:
             print(self.pixel)
-            self.draw_prediction(cur_frame, "pixel", self.pixel[0], self.pixel[1], self.pixel[0], self.pixel[1], [255, 0, 0])
+            self.draw_prediction(cur_frame, "pixel", self.pixel[0],
+            self.pixel[1], self.pixel[0], self.pixel[1], [255, 0, 0])
         if self.focused_box is not None:
             (x, y, x2, y2) = self.focused_box
             self.draw_prediction(cur_frame, "person", x, y, x2, y2, [0, 0, 255])
@@ -74,4 +75,3 @@ class FootageThread(Thread):
     def draw_prediction(self, img, label, left, top, right, bottom, clr):
         cv2.rectangle(img, (left, top), (right, bottom), clr, 2)
         cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, clr, 2)
-    

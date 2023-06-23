@@ -5,7 +5,7 @@ from enum import Enum
 
 class ResponseCode(Enum):
     """
-    This enum contains the 8 possible camera response codes.
+    This enum contains the 9 possible camera response codes.
     """
     ACK = 0
     COMPLETION = 1
@@ -22,7 +22,7 @@ class CameraSocket:
     """
     This class contains camera information and methods to interact directly with the camera.
     """
-    sock = None
+    sock = None  # low-level C socket
     address = None
     message_dict: dict[int, str] = {}
     response_codes = {
@@ -36,7 +36,7 @@ class CameraSocket:
     }
 
     def __init__(self, sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM), address=None):
-        """ Constructor for Camera
+        """ Constructor for CameraSocket
 
         Args:
             sock: a UDP socket
@@ -56,8 +56,8 @@ class CameraSocket:
         """
         try:
             self.sock.close()
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     def reconnect(self, sock, address=None):
         """ Re-connect to camera after a reboot
@@ -94,7 +94,7 @@ class CameraSocket:
 
         self.sock.sendall(message)
 
-    def send(self, header: str, command: str, message_counter: int) -> ResponseCode | bytes:
+    def send(self, header: str, command: str, message_counter: int) -> ResponseCode | str:
         """ Sends the current command to the camera using the VISCA protocol
 
         Args:
@@ -113,7 +113,6 @@ class CameraSocket:
         message = header + command
 
         self.sock.sendall(message)
-
         self.sock.settimeout(2)
         try:
             data = binascii.hexlify(self.sock.recv(2048)).upper()

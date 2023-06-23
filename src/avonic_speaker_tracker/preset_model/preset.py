@@ -4,7 +4,16 @@ from avonic_speaker_tracker.utils.persistency_utils import CustomEncoder
 
 
 class Preset:
+    """ This class contains all the information about a given preset.
+    This information is the camera direction towards the speaker and
+    the direction from the microphone towards the speaker.
+    """
     def __init__(self, camera_info: np.ndarray, microphone_direction: np.ndarray):
+        """ Constructor for the preset
+            Args:
+                camera_info: the direction from the camera towards the speaker and the zoom
+                microphone_direction: the direction from the microphone towards the speaker
+        """
         self.camera_info: np.ndarray = camera_info
         self.microphone_direction: np.ndarray = microphone_direction
 
@@ -12,12 +21,16 @@ class Preset:
         return f"Preset({self.camera_info}, {self.microphone_direction})"
 
 class PresetCollection:
+    """ This class is a container for all the existing presets.
+    """
     preset_locations = {}
     filename = None
-    
+
     default_camera_info: list[float] = [0.0, 0.0, 1.0]
     default_mic_info: list[float] = [0.0, 1.0, 0.0]
     def __init__(self, filename: str = ""):
+        """ Constructor which loads an existing file containing presets.
+        """
         self.filename: str = filename
         self.preset_locations: dict[str, Preset] = {}
         self.load()
@@ -58,7 +71,8 @@ class PresetCollection:
         """
         assert to_edit in self.preset_locations
         assert isinstance(new_cam_info, np.ndarray) and len(new_cam_info) == 3
-        assert isinstance(new_microphone_direction, np.ndarray) and len(new_microphone_direction) == 3
+        assert isinstance(new_microphone_direction, np.ndarray) \
+            and len(new_microphone_direction) == 3
         self.preset_locations[to_edit] = Preset(new_cam_info, new_microphone_direction)
         self.record()
 
@@ -84,11 +98,15 @@ class PresetCollection:
                 self.preset_locations[to_get].microphone_direction)
 
     def record(self) -> None:
+        """ Records the existing presets in the corresponding file
+        """
         if self.filename != "":
             with open(self.filename, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps(self.preset_locations, indent=4, cls=CustomEncoder))
 
     def load(self) -> None:
+        """ Loads existing presets from the corresponding file
+        """
         if self.filename != "":
             try:
                 with open(self.filename, encoding="utf-8") as f:
@@ -123,5 +141,7 @@ class PresetCollection:
             self.record()
 
     def set_filename(self, filename: str):
+        """ Setter for the location of the file containing the presets
+        """
         self.filename = filename
         self.load()

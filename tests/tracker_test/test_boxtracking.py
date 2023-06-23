@@ -1,27 +1,28 @@
 import pytest
 import numpy as np
 
-from avonic_camera_api.footage import FootageThread
-from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 from microphone_api.microphone_control_api import MicrophoneAPI
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.footage import FootageThread
 from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
 
 def generate_tests():
     return [
-        ([40.0, 15.0], [0, 0, 20, 30], np.array([20, 20, (40.0 / 1920) * (-950), (15.0/1080) * (525)])),
-        ([34.0, 15.0], [100, 0, 500, 50], np.array([20, 20, (34.0 / 1920) * (-660), (15.0/1080) * (525)])),
-        ([43.0, 17.0], [3, 950, 20, 1000], np.array([20, 20, (43.0 / 1920) * (-960 + (23/2)), (17.0/1080) * (540 - (1950/2))]))
-    ]
+        ([40.0, 15.0], [0, 0, 20, 30],
+         np.array([20, 20, (40.0 / 1920) * (-950), (15.0/1080) * (525)])),
+        ([34.0, 15.0], [100, 0, 500, 50],
+         np.array([20, 20, (34.0 / 1920) * (-660), (15.0/1080) * (525)])),
+        ([43.0, 17.0], [3, 950, 20, 1000],
+         np.array([20, 20, (43.0 / 1920) * (-960 + (23/2)), (17.0/1080) * (540 - (1950/2))]))
+]
 
 @pytest.fixture
 def obj_model():
-    cam_api = CameraAPI(None)
+    cam_api = CameraAPI(None, None)
     mic_api = MicrophoneAPI(None)
     stream = FootageThread(None, None, np.array([1920.0, 1080.0]))
-    nn = YOLOPredict()
 
-    obj_model = ObjectModel(cam_api, mic_api, stream, nn, np.array([1920.0, 1080.0]))
+    obj_model = ObjectModel(cam_api, mic_api, stream, None, np.array([1920.0, 1080.0]))
 
     return obj_model
 

@@ -2,8 +2,8 @@ import json
 from unittest import mock
 import socket
 import pytest
-import web_app
 import numpy as np
+import web_app
 from web_app.camera_endpoints import responses
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
@@ -35,7 +35,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), None)
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():
@@ -87,9 +87,10 @@ def client(camera, monkeypatch):
 
 def test_get_camera_direction(client):
     rv = client.get('camera/position/get')
-    assert rv.status_code == 200 
-    assert rv.data == bytes('{"position-alpha-value":-0.3805063771123649,"position-beta-value":0.5082672461712843}\n','utf-8')
-    
+    assert rv.status_code == 200
+    assert rv.data == bytes('{"position-alpha-value":-0.3805063771123649,'\
+        + '"position-beta-value":0.5082672461712843}\n','utf-8')
+
 def test_camera_turn_on_bad_weather(client):
     rv = client.post('camera/on')
     assert rv.status_code == 409

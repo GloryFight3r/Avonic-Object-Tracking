@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
+from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api.camera_control_api import CameraSocket
 from microphone_api.microphone_control_api import MicrophoneAPI
 from microphone_api.microphone_adapter import MicrophoneSocket
@@ -40,7 +41,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "recv", mocked_recv)
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)))
+    cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)), CameraHTTP(("", 1)))
     def mocked_camera_reconnect():
         pass
     def mocked_get_zoom():
@@ -76,13 +77,11 @@ def client(camera, monkeypatch):
     def x2(self):
         pass
 
-    def x2(self):
-        pass
-
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
          with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
              with mock.patch("builtins.open", x):
-                with mock.patch("avonic_speaker_tracker.object_model.yolov8.YOLOPredict.__init__", x2):
+                with mock.patch("avonic_speaker_tracker.object_model" \
+                + ".yolov8.YOLOPredict.__init__", x2):
                     with mock.patch("cv2.VideoCapture", x2):
                         test_controller.load_env()
                         test_controller.ws = mock.Mock()

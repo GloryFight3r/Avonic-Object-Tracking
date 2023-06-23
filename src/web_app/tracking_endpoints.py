@@ -1,30 +1,34 @@
-from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
-import numpy as np
+from flask import make_response, jsonify, request
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
 from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
-from flask import make_response, jsonify, request
+from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
 from avonic_speaker_tracker.updater import UpdateThread
-from web_app.integration import GeneralController, ModelCode
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from web_app.integration import GeneralController, ModelCode
 
 def start_thread_endpoint(integration: GeneralController):
+    """ This method starts the thread that controlls the actual tracking and calls 
+    the corresponding tracking model depending on the user's choice.
+    """
     # start (unpause) the thread
+    print("Tracking is: ",integration.tracking.value)
     if (integration.thread is None) or (integration.event.value == 0):
         integration.event.value = 1
-        if integration.preset.value == ModelCode.PRESET:
+        if integration.tracking.value == ModelCode.PRESET:
             model = PresetModel(integration.cam_api, integration.mic_api,
                                     filename=integration.filepath + "presets.json")
-        elif integration.preset.value == ModelCode.AUDIO:
+        elif integration.tracking.value == ModelCode.AUDIO:
             model = AudioModel(integration.cam_api, integration.mic_api,
                                     filename=integration.filepath + "calibration.json")
-        elif integration.preset.value == ModelCode.AUDIONOZOOM:
+        elif integration.tracking.value == ModelCode.AUDIONOZOOM:
             model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
                                     filename = integration.filepath + "calibration.json")
-        elif integration.preset.value == ModelCode.HYBRID:
-            model = HybridTracker(integration.cam_api, integration.mic_api, integration.nn, integration.footage_thread,
-                                  integration.filepath + "calibration.json")
+        elif integration.tracking.value == ModelCode.HYBRID:
+            model = HybridTracker(integration.cam_api, integration.mic_api, \
+                integration.nn, integration.footage_thread, \
+                    integration.filepath + "calibration.json")
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
@@ -49,7 +53,8 @@ def start_thread_endpoint(integration: GeneralController):
 
 
 def stop_thread_endpoint(integration: GeneralController):
-    # stop (pause) the thread
+    """ Stops(pauses) the thread that controlls the tracking 
+    """
     integration.event.value = 0
     integration.info_threads_event.value = 0
 
@@ -59,54 +64,59 @@ def stop_thread_endpoint(integration: GeneralController):
 
 
 def update_microphone(integration: GeneralController):
+    """ Updates the new microphone data in the corresponding field in the WebUI
+    """
     data = request.get_json()
     integration.ws.emit('microphone-update', data)
     return make_response(jsonify({}), 200)
 
 
 def update_camera(integration: GeneralController):
+    """ Updates the new camera data in the corresponding field in the WebUI
+    """
     data = request.get_json()
     integration.ws.emit('camera-update', data)
     return make_response(jsonify({}), 200)
 
 
 def update_calibration(integration: GeneralController):
+    """ Updates the new calibration data in the corresponding field in the WebUI
+    """
     data = request.get_json()
     integration.ws.emit('calibration-update', data)
     return make_response(jsonify({}), 200)
 
 
 def is_running_endpoint(integration: GeneralController):
+    """ Returns: Whether the thread that controlls the tracking is currently running
+    """
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
 def track_presets(integration: GeneralController):
-    integration.preset.value = ModelCode.PRESET
-    return make_response(jsonify({"preset":integration.preset.value}), 200)
+    """ Sets the current tracking model to PresetModel
+    """
+    integration.tracking.value = ModelCode.PRESET
+    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
 def track_hybrid(integration: GeneralController):
-    integration.preset.value = ModelCode.HYBRID
-    print(integration.preset.value)
-    return make_response(jsonify({"hybrid":integration.preset.value}), 200)
+    integration.tracking.value = ModelCode.HYBRID
+    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
 def track_continuously(integration: GeneralController):
-    integration.preset.value = ModelCode.AUDIO
-    return make_response(jsonify({"preset":integration.preset.value}), 200)
+    """ Sets the current tracking model to the AudioModel
+    """
+    integration.tracking.value = ModelCode.AUDIO
+    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
 def track_object_continuously(integration: GeneralController):
-    integration.preset.value = ModelCode.OBJECT
-    return make_response(jsonify({"preset":integration.preset.value}), 200)
+    """ Sets the current tracking model to ObjectModel
+    """
+    integration.tracking.value = ModelCode.OBJECT
+    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
 def track_continuously_without_adaptive_zooming(integration: GeneralController):
-    integration.preset.value = ModelCode.AUDIONOZOOM
-    print(integration.preset.value)
-    #                        TODO preset?
-    return make_response(jsonify({"preset":integration.preset.value}), 200)
-
-def preset_use(integration: GeneralController):
-    if integration.preset.value == 1:
-        integration.preset.value = 0
-    else:
-        integration.preset.value = 1
-    print(integration.preset.value)
-    return make_response(jsonify({"preset":integration.preset.value}), 200)
+    """ Sets the current tracking model to AudioModelNoAdaptiveZoom
+    """
+    integration.tracking.value = ModelCode.AUDIONOZOOM
+    return make_response(jsonify({"tracking":integration.tracking.value}), 200)

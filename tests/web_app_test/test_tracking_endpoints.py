@@ -6,7 +6,7 @@ from web_app.integration import GeneralController
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_control_api import CameraSocket
 import web_app
-from web_app.tracking_endpoints import track_presets, track_continuously, preset_use
+from web_app.tracking_endpoints import track_presets, track_continuously
 
 sock = mock.Mock()
 
@@ -34,7 +34,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "recv", mocked_recv)
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
-    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)))
+    cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), None)
     def mocked_get_zoom():
         return 128
     def mocked_get_direction():
@@ -73,24 +73,14 @@ def client(camera, monkeypatch):
 def test_track_presets(client):
     rv = client.get('preset/track')
     assert rv.status_code == 200
-    assert rv.data == bytes('{"preset":1}\n', "utf-8")
+    assert rv.data == bytes('{"tracking":1}\n', "utf-8")
 
 def test_track_continuously(client):
     rv = client.get('calibration/track')
     assert rv.status_code == 200
-    assert rv.data == bytes('{"preset":0}\n', "utf-8")
+    assert rv.data == bytes('{"tracking":0}\n', "utf-8")
 
 def test_track_continuously_without_adaptive_zooming(client):
     rv = client.get('calibration/track/no/zoom')
-    assert rv.status_code == 200 
-    assert rv.data == bytes('{"preset":4}\n', "utf-8")
-
-def test_preset_use(client):
-    rv = client.get('preset/track')
-    rv = client.post('thread/preset')
     assert rv.status_code == 200
-    assert rv.data == bytes('{"preset":0}\n', "utf-8")
-
-    rv = client.post('thread/preset')
-    assert rv.status_code == 200
-    assert rv.data == bytes('{"preset":1}\n', "utf-8")
+    assert rv.data == bytes('{"tracking":4}\n', "utf-8")

@@ -13,11 +13,13 @@ def get(integration: GeneralController):
         The current settings in json format
     """
     cam_addr = integration.cam_api.camera.address
+    cam_http_port = integration.cam_api.camera_http.address[1]
     mic_addr = integration.mic_api.sock.address
 
     ret = {
         "camera-ip": cam_addr[0],
         "camera-port": cam_addr[1],
+        "camera-http-port": cam_http_port,
         "microphone-ip": mic_addr[0],
         "microphone-port": mic_addr[1],
         "microphone-thresh": integration.mic_api.threshold,
@@ -58,7 +60,8 @@ def set_settings(integration: GeneralController):
         if saved:
             return make_response(jsonify({}), 200)
         return make_response(jsonify(
-            {"message": "Something went wrong while saving settings file! Check application output!"}),
+            {"message": "Something went wrong while saving "\
+                 + "settings file! Check application output!"}),
             500)
     except (ValueError, KeyError):
         return make_response(jsonify({"message": "Invalid threshold or filepath."}), 400)
