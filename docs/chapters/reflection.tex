@@ -22,7 +22,7 @@ everything. If we had done so from the start, we could have avoided many issues
 related to threading.
 
 \paragraph{Access to SBC} \mbox{} \\
-It took eight weeks untill we got access to the NVIDIA Jetson. This meant that we
+It took eight weeks until we got access to the NVIDIA Jetson. This meant that we
 had a bit more than one week left to fix the issues that arose from deploying
 our software on the SBC for the first time. For access to the NVIDIA Jetson, we
 had to wait on Avonic to provide us with one. Therefore, the problem was mostly
@@ -43,6 +43,13 @@ focus on two improvements. Both of them are related to the quality of the video
 stream. In this section we discuss how these changes would help to improve
 our speaker tracker.
 
+\paragraph{Dependency injection} \mbox{} \\
+As described in subsection \ref{subsection:solution_webui} on WebUI,
+we struggled with dependency injection for our Flask application.
+In the next iteration of the project, this problem should be addressed 
+by a different choice of the framework for the WebUI or by a proper
+implementation of the dependency injection.
+
 \paragraph{Tracking with adaptive zoom} \mbox{} \\
 The audio model described in \hyperref[subsection:tracking]{section 4.5.3} uses
 adaptive zooming. However, the constant zooming is not pleasant to look at.
@@ -55,10 +62,8 @@ speed depend on the change of the zoom. Another way to improve the adaptive
 zooming would be to change the zoom less often. This would make the video stream
 more pleasant to watch.
 
-\paragraph{Camera footage} \mbox{} \\
-In our project we use OpenCV to read the camera footage from the camera's RTSP
-stream. This way of reading the stream causes a delay. This delay also impacts
-the object tracking models.
-As Mr. Kahawati told us, Avonic has developed a much faster way of reading the
-camera stream so the delay is negligible. Replacing OpenCV with this faster
-method would make object tracking more responsive.
+\paragraph{Porting YOLO} \mbox{} \\
+When discussing object detecting models with Avonic, we discovered that they use
+in-house version of YOLO ported to TensorRT, which allows for better performance
+of the model. This would reduce load of the system, allowing for more features,
+and deployment on platforms with less powerful hardware.
