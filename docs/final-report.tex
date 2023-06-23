@@ -14,10 +14,12 @@
 \usepackage{array}
 \usepackage{amssymb}
 \usepackage{caption}
+\usepackage{xcolor}
+
 \pagestyle{fancy}
 \graphicspath{ {./images/} }
-\fancyfoot[LE,RO]{Avonic camera-microphone integration}
-\fancyfoot[LO,RE]{Group 11C}
+\fancyfoot[LE,RO]{\slshape Avonic camera-microphone integration}
+\fancyfoot[LO,RE]{\slshape Group 11C}
 
 % Document
 \begin{document}
@@ -79,6 +81,9 @@
     \chapter{Conclusion}\label{ch:conclusion}
     \input{chapters/conclusion}
 
+    \printbibliography
+    \addcontentsline{toc}{chapter}{References}
+
     \appendix
     \chapter{Ethical implications}\label{ch:ethics-appendix}
     \input{chapters/appendix-a}
@@ -91,7 +96,4 @@
 
     \chapter{MoSCoW methodology}\label{ch:moscow-methodology}
     \input{chapters/appendix-d}
-
-    \printbibliography
-    \addcontentsline{toc}{chapter}{References}
 \end{document}

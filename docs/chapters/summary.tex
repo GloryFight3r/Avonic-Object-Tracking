@@ -1,9 +1,25 @@
-As online conferences and lectures are becoming more prominent, the demand for speaker tracking cameras has increased. Many companies have tried to do this using techniques such as object tracking and facial recognition. However, such cameras do not work as well for conferences and lectures of a larger scale. Once there are multiple people that may be the speaker, using only visual information to track them is not enough. For this reason, Avonic has asked us to try to use the Sennheiser TeamConnect Ceiling 2 microphone together with the Avonic CM70 camera to track speakers. This Sennheiser microphone can detect the direction from itself towards the speaker, though it can not detect the distance. The main problem we had to solve was translating the microphone to speaker directions to directions from the camera towards the speaker.
+As online conferences and lectures are becoming more prominent, the demand for
+speaker tracking cameras has increased. Many companies have tried to do this
+using techniques such as object tracking and facial recognition. However, such
+methods do not work as well for conferences and lectures of a larger scale.
+Once there are multiple people that may be the speaker, using only visual
+information to track them is not enough. For this reason, Avonic has asked us
+to try to use the Sennheiser TeamConnect Ceiling 2 microphone together with the
+Avonic CM70 camera to track speakers. This Sennheiser microphone can detect the
+direction from itself towards the speaker, though it can not detect the
+distance. The main problem we had to solve was translating the microphone to
+speaker directions to directions from the camera towards the speaker.
 
 In this report, we explain three solutions to this problem and discuss their results and implementations. The first solution is the preset model. A preset is a predefined position relative to the microphone and the camera. Such presets are created by pointing the camera towards your face and then speaking. The result of this procedure is a mapping of microphone directions to camera directions. Once the presets are created, the microphone can match every direction to the most similar direction in the presets and find the corresponding camera direction. The preset model is the best model when speakers are only present in a few locations.
 
 The second solution is to use audio tracking. To set this up, a user has to follow the same process as for setting up presets, but at the end, the camera has to be pointed towards the microphone. The audio tracking model also requires the user to input the height of the microphone above the speaker. Using this information, the system calculates the relative position of the camera to the microphone. Once the coordinates of this position are known, every microphone direction can be translated into a camera direction. The audio tracking model is the best model when the height at which people are speaking does not change.
 
-The third solution is audio tracking in combination with object tracking. The same process as in the second solution is used to set up the system. Once the system starts, it will also run a neural network to detect persons based on the video stream. Such detections are used to center the camera on the speaker more accurately than when using merely audio tracking. The audio and object tracking model is the best model in cases where there are little to no restrictions on how speakers can move.
+The third solution is audio tracking in combination with object tracking. The
+same process as in the second solution is used to set up the system. Once the
+system starts, it will also run a neural network to detect persons based on the
+video stream. Such detections are used to center the camera on the speaker more
+accurately than when using merely audio tracking. The object-audio tracking
+model is the best model in cases where there are little to no restrictions on
+how speakers can move.
 
 We would recommend Avonic to use each model in situations where it fits best as described above. This way, it can be seen how well the Sennheiser TeamConnect Ceiling 2 microphone and the Avonic CM70 camera can cooperate to track a speaker in different scenarios. In order to start using our system to record lectures or conferences, the movement of the camera has to be made a bit smoother to improve the video quality. Yet, our system shows what the possibilities are for speaker tracking.

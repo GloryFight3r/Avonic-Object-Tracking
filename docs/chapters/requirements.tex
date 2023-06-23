@@ -1,13 +1,16 @@
 This chapter presents an overview of the required functionality of the speaker tracking camera.
 These requirements dictate the design of our system.
-We have ordered them using the MoSCoW method\cite{moscow} which we will describe in \hyperref[ch:moscow-methodology]{Appendix D - MoSCoW methodology}.
+We have ordered them using the MoSCoW method\cite{moscow} which we describe in \hyperref[ch:moscow-methodology]{Appendix D - MoSCoW methodology}.
 All of the requirements fall under one of the following categories ‘Must-have’,
 ‘Should-have’, ‘Could-have’, ‘Won't-have’. Furthermore, we also list some non-functional requirements we have for our system.
 Final requirements are listed in \hyperref[section:final-requirements]{(3.1)}.
 Finally, we also go through the evolution of the requirements in \hyperref[section:evolution-of-requirements]{(3.2)}.
 \hyperref[ch:requirements-appendix]{Appendix B - Requirements table} shows for each requirement
 whether it has been completed or not.
+
 \section{Final requirements}\label{section:final-requirements}
+This section lists the requirements for the development of MaAT.
+
 \subsection{Must have}
 Role: The \textbf{user} must
 \begin{itemize}
@@ -25,15 +28,15 @@ Role: The \textbf{system} must
   \item Have a web interface for easy use of the camera’s API.
 \end{itemize}
 \subsection{Should have}
+Role: The \textbf{user} should
+\begin{itemize}
+  \item Be able to calibrate the system with data such as specifying the height of the microphone above the speaker plane.
+\end{itemize}
 Role: The \textbf{system} should
 \begin{itemize}
   \item Be able to find the relative position between the camera and the microphone provided only
     the height of the microphone and the speaker plane.
   \item Translate the calculated coordinates relative to the microphone to coordinates the camera can point to.
-\end{itemize}
-Role: The \textbf{user} should
-\begin{itemize}
-  \item Be able to calibrate the system with data such as specifying the height of the microphone above the speaker plane.
 \end{itemize}
 \subsection{Could have}
 Role: The \textbf{system} could
@@ -59,7 +62,7 @@ Role: The \textbf{system} won't
     done by teachers or presenters themselves, it should not require any technical knowledge or external devices.
 \end{itemize}
 \section{Evolution of requirements}\label{section:evolution-of-requirements}
-Since the beginning of the project we have come up with few new requirements and have got rid of others we have deemed unnecessary.
+Since the beginning of the project we have come up with few new requirements and have removed others we have deemed unnecessary.
 A short list of the changes we have made is:
 \begin{itemize}
   \item Added WebUI as a must requirement.

@@ -11,7 +11,7 @@ tracking models we created is shown in Figure \ref{fig:model-use-case-diagram}.
 
 \section{Challenges that must be overcome}\label{sec:solution-challenges}
 In this section, we describe two groups of constraints that any solution to the
-problem described in \hyperref[the Problem analysis chapter]{ch:problem-analysis} has to try to solve. The
+problem described in \hyperref[ch:problem-analysis]{chapter 2} has to try to solve. The
 first group contains everything related to technology and the second group
 contains everything related to the user.
 
@@ -23,11 +23,17 @@ computing power, but that would lead to a big delay in camera movement and
 additional risks to security and maintainability. Additionally, our project
 relies on three special hardware devices -- a camera, and a microphone and a
 single-board computer (SBC). The final product should account for all the inherent
-limitations of these devices. The biggest limitation is the fact that the
+limitations of these devices.
+
+It is important to understand that microphone allows
+us to only retrieve information provided by the Sennheiser which is limited to
+direction toward the speaker and peak loudness level, since we do not have access to each individual microphone
+within the array. The biggest limitation is the fact that the
 microphone does not provide the exact origin of the detected sound, as it is
 quite a difficult technical challenge to calculate
-this\cite{distance-urbana-champaign}. We formulated
-three limitations that significantly impact the project:
+this\cite{distance-urbana-champaign}.
+
+We formulated three limitations that significantly impact the project:
 \begin{itemize}
     \item The storage and processing power of the SBC.
     \item The network range and speed.
@@ -83,34 +89,31 @@ Since the microphone's API\cite{microphone-manual} does not have a way to
 retrieve this distance, the assumptions are needed to describe the distance
 function in the environment.
 According to our assumptions, the speaker plane represents the set of all
-locations at which the speaker could be. Small deviations from the theoretical
-horizontal speaker plane and the actual places at which people speak can be
-neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
-The height difference between speakers can also be neglected due to the
-expected distance between the camera and the presenters of at least \textbf{(SOME ASSUMED MINIMUM???)}
-meters. Such differences in height have even less of an impact when
-the speakers are sitting \textbf{(MAYBE PUT REFERENCE HERE)}.
-With this in mind, we decided to
-calculate the intersection of the ray from the microphone with the speaker plane
-to find the location of the speaker.
-In the future, it is possible to extend the model to support different shapes and
-possibly a full 3D scan of the room to represent the possible locations of the speaker.
-We view these options to be infeasible for us in 10 weeks.
+locations at which the speaker could be. As was shown by our experiments, small
+deviations from the horizontal speaker plane can be neglected due to their
+small magnitude. Differences in the height of speakers are the most common
+example of this. Such differences in height have even less of an impact when
+the speakers are sitting. With this in mind, we decided to calculate the
+intersection of the ray from the microphone with the speaker plane to find the
+location of the speaker. In the future, it is possible to extend the model to
+support different shapes and possibly a full 3D scan of the room to represent
+the possible locations of the speaker. We view these options to be infeasible
+for us in 10 weeks.
 
-\subsection{Calibration}
-\label{sec:calibration}
+\subsection{Calibration}\label{subsec:calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
-(We assume the longest one of the horizontal coordinates to be the $z$ one.)
 To achieve this, the user first sets microphone's height above the speaker plane.
 Then, a person is sent into the room. They direct the camera at themselves and speak.
-The direction obtained from the camera and microphone combined with the microphone's height above the so-called speaker plane is enough to calculate the 3D position of the camera relative to the microphone.
+The direction obtained from the camera and microphone combined with the
+microphone's height above the so-called speaker plane is enough to calculate
+the 3D position of the camera relative to the microphone.
 
 A simplified, 2D image is shown in figure \ref{fig:cal2d}. Since the camera
 points towards the z-axis by default, the horizontal axis in the image is the z-axis.
 \begin{figure}[h]
-    \caption{Demonstration of the calculation of calibration in 2D, where $M$ is the microphone, $C$ is the camera and $A$ is the speaker}
     \centering
     \includegraphics[width=0.8\textwidth]{calibration_2d}
+    \caption{Demonstration of the calculation of calibration in 2D, where $M$ is the microphone, $C$ is the camera and $A$ is the speaker}
     \label{fig:cal2d}
 \end{figure}
 We define $M$ as the microphone, $C$ as the camera, and $A$ as the person calibrating the system.
@@ -124,9 +127,9 @@ We can calculate distance $|MA|$ by intersecting the microphone's direction vect
 Afterwards, we can use analogous calculations to get the length $|CM|$, since we have all the directions we need.
 This means that we can find the angles between them and calculate the triangle.
 \begin{figure}[h]
-    \caption{Calculation of calibration in 3D}
     \centering
     \includegraphics[width=0.8\textwidth]{calibration_3d}
+    \caption{Calculation of calibration in 3D}
     \label{fig:cal3d}
 \end{figure}
 
@@ -158,7 +161,7 @@ The proposed solution followed the following algorithm for calibration and track
 \end{enumerate}
 Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
-This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
+This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\footnote{geogebra.org}\cite{geogebra}.
 Unfortunately, the camera and microphone are not always in the same or opposite
 positions, as the system should work with any arbitrary position of the camera.
 For this reason, we left this solution behind.
@@ -223,12 +226,10 @@ Just like YOLO, RT-DETR can be used to track objects in real-time to assist our 
 despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster
 than the RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
 
-
-
 \begin{figure}[h]
-    \caption{Use case diagram of the tracking models}
     \centering
     \includegraphics[width=0.8\textwidth]{model-diagram}
+    \caption{Use case diagram of the tracking models}
     \label{fig:model-use-case-diagram}
 \end{figure}
 
@@ -265,12 +266,13 @@ This means that object tracking is used when someone is not moving a lot, but it
 simultaneously with speaker tracking. This helps to centralize the speaker on the screen.
 
 
-\paragraph{Switch strategy} \mbox{}
+\paragraph{Quick change object-audio strategy} \mbox{}
 \begin{figure}[h]
-    \caption{Possible states diagram}
     \centering
     \includegraphics[width=0.5\textwidth]{tree}
+    \caption{Possible states diagram}
     \label{fig:object_strategy}
+    \caption{Possible states diagram}
 \end{figure}
 \\
 The last approach we consider is always relying on microphone coordinations
@@ -293,8 +295,21 @@ closest to his new bounding box in the new frame. Relying on that fact, we get
 all of the new bounding boxes from the new frame and choose to track the one
 that has its center the closest to the previous bounding box. A diagram that
 illustrates the possible states we could be in is the depicted in Figure
-\ref{fig:object_strategy}.
+\ref{fig:object_strategy}. A visualization of this process can be seen in Figure \ref{fig:obj_detection_image}
 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{obj_detection_image}
+    \fbox{\begin{tabular}{ll}
+      \textcolor{red}{$\blacksquare$} & Currently tracked box \\
+      $\blacksquare$ & Detected object boxes \\
+      \textcolor{blue}{$\blacksquare$} & The microphone direction translated to camera direction
+    \end{tabular}}
+
+    \caption{A frame recorded with quick change object-audio strategy}
+    \label{fig:obj_detection_image}
+\end{figure}
 
 \section{Application overview}\label{sec:application-overview}
 In this section, we will discuss our application's structure and our motivations behind it.
@@ -313,8 +328,9 @@ stream from the camera.
 \paragraph{VISCA}\mbox{} \\
 We chose to use VISCA commands to communicate with the camera instead of HTTP
 requests. We did this first of all because Mr. Kahawati explained to us that it
-was the standard at Avonic. The second reason was that VISCA is faster than
-HTTP [REFERENCE?!]. There are two types of VISCA requests: long and short. The
+was the standard at Avonic. The second reason was that VISCA was specifically
+made for communication with PTZ cameras and therefore suits our purposes better
+than HTTP. There are two types of VISCA requests: long and short. The
 difference between these two types is the header. Long VISCA requests have a
 header in the request telling the receiver how big the request is and what the
 request counter is. This request counter is also contained in the response, so
@@ -337,7 +353,11 @@ The implementation of the Camera API uses the adapter design pattern, which is a
 The main advantage of this design pattern in our project is that it makes sure our system still works if the specifics of communication with the camera change; only the adapter itself has to be reimplemented. This makes it easier to adapt our system to other Avonic cameras.
 
 \paragraph{Footage thread}\mbox{} \\
-The final part of the Camera API module is the thread that reads video frames from the camera stream. This thread is connected to the RTSP stream of Real Time Streaming Protocol (RTSP) stream of the camera that emits one hundred frames per second. These frames are continually read by the thread so that the latest frame is always available. This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
+The final part of the Camera API module is the thread that reads video frames from the camera stream.
+This thread retrieves footage from Real Time Streaming Protocol (RTSP) stream of the camera using \verb|OpenCV|.
+The frames are continually read by the thread so that the latest frame is always available in the buffer.
+This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
+
 
 \subsection{Microphone API}
 The Microphone API module contains all of the functionality related to
@@ -351,12 +371,12 @@ All of the functionality related to speaker tracking is contained in this
 module. The most important part of it is the \verb|UpdateThread|. It is
 responsible for continuously calling the method that directs the camera.
 The module is structured in a way that every tracking type is maintained in a
-so-called model. Every model is inherits from the \verb|TrackingModel| and has 
+so-called model. Every model is inherits from the \verb|TrackingModel| and has
 the appropriate implementation of the point method. The user can pick their
 preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
-The chosen model is instantiated at the beginning of the \verb|run| method and 
-is subsequently used to track the speaker until being explicitely stopped by the user.
+The chosen model is instantiated at the beginning of the \verb|run| method and
+is subsequently used to track the speaker until being explicitly stopped by the user.
 Some of the models rely on data stored in JSON files whose location can be
 specified in the settings menu in our WebUI. We currently have the following
 tracking models:
@@ -392,7 +412,7 @@ chose this model as a starting point for our tracking.
 The Audio Model achieves the main goal of our application by continuously
 tracking the speaker around the room. Unlike the preset model, it can point the
 camera towards any arbitrary point in the room by performing the calculations
-described in \hyperref[the section about calibration]{sec:calibration}. The
+described in the subsection \ref{subsec:calibration} about calibration. The
 audio model also keeps track of how much time has passed since someone has last
 spoken. If no one has spoken in some time the camera will zoom out. This model’s
 point method also takes into account how far the speaker is from the camera and
@@ -411,7 +431,7 @@ camera to zoom out when no one is speaking. This means that for the whole period
 of tracking the zoom is not changed unless the user expressly does that using
 any mode for controlling the zoom. We decided to add this model because in some
 scenarios the adaptive zooming does not provide a very pleasant flow of the
-tracking. Sometimes the camera zoomes in or out unexpectedly or too much.
+tracking. Sometimes the camera zooms in or out unexpectedly or too much.
 Reasons for that inconsistency are the possibility of inaccurate calibration or
 inaccurate readings provided by the microphone.
 
@@ -424,8 +444,8 @@ around them it has a method to find the box that is most likely to be the one
 around the speaker. Then another method calculates the relative direction in
 which the camera has to move to center the box. It takes into account the
 zooming and field of view of the camera in order to make the calculations. As
-explained in section about \hyperref[Visual object
-tracking]{sec:visual-object-tracking} we chose to use YOLO for our object
+explained in section \ref{sec:visual-object-tracking} about Visual object
+tracking, we chose to use YOLO for our object
 detection and classification. Our YOLO implementation extends an abstract class
 that has methods to calculate and draw bounding boxes. Any object detection
 algorithm can extend this class in order for it to be used in place of the
@@ -454,7 +474,7 @@ functionality without having to refactor it.
 In order to support the web user interface (UI) for the system, the web application
 needed to be created. The back-end of this app is written in Python using the
 Flask framework as it is a well-known lightweight framework, that allows for web
-development. It offers some nice features - creating and managing socket
+development. It offers some nice features -- creating and managing socket
 connections with a client and easy modification to support testing of the app.
 Flask is also used by Avonic themselves and was recommended by them.
 
@@ -462,24 +482,53 @@ The front-end is written in HTML, CSS, and JavaScript and includes controls for
 the camera, controls for the tracking thread, and an editing interface for
 presets and calibration models. The page maintains a WebSocket connection with a
 server for footage stream and real-time updates of the camera and microphone
-information, which is used for visualization.
+information, which is used for visualization. The front page of the UI, which
+contains most of the UI's functionality, is shown in figure \ref{fig:main-ui}.
 
-The WebUI was moved from a “should have” to a “must have” section after
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{main-page-ui}
+    \caption{The main page of the web interface}
+    \label{fig:main-ui}
+\end{figure}
+
+\paragraph{Web UI requirement}\mbox{} \\
+The web UI was moved from a “should have” to a “must have” section after
 consultation with our TA, as it provides a clearer, more intuitive, and more
 pleasant way for the user to interact with a system. It also opened up space for
 more quality-of-life features, that we have not intended in the original
-requirements, but found useful for future users and debugging purposes - footage
+requirements, but found useful for future users and debugging purposes -- footage
 stream, real-time updates of microphone information and camera position, and
 visualization.
 
+\paragraph{Calibration interface}\mbox{} \\
+The part of our web interface that guides users through the process of
+calibration is shown in figure \ref{fig:calibration-ui}. As is shown, there are
+at most three calibration points that can be set. After at least one point is
+set, the camera direction towards the microphone can be submitted. The reason we
+decided to have a maximum of three points is to give a reasonable guideline to
+the user. From experiments that we have conducted, adding more than three points to calibration does not make it more
+accurate. We found that one calibration point gives good accuracy, which is why we allow
+the user to end the process after recording one point. The main advantage of
+recording more than one point is to reduce the impact of inaccurate microphone
+directions.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{calibration_ui}
+    \caption{Part of the web interface responsible for calibration}
+    \label{fig:calibration-ui}
+\end{figure}
+
+\paragraph{Integration object}\mbox{} \\
 In the first weeks of working on the project, we experienced multiple issues
 related to sharing access to Camera and Microphone APIs across the endpoints, as
 we could not find a dependency injection solution that would work with modern
 versions of Flask. We decided to unite all objects that needed to be shared
 across the endpoints in a single object and make it accessible for the server
-application — the \\ \verb|GeneralController| object, also referred to as
+application — the \verb|GeneralController| object, also referred to as
 ``integration’’. It contains variables for thread flow control, camera and
-microphone APIs and all of the threads our application uses - update thread,
+microphone APIs and all of the threads our application uses -- update thread,
 responsible for tracking, microphone and camera info-threads, responsible for
 sending information updates to the user, footage thread for retrieving frames
 from the camera.
@@ -495,8 +544,11 @@ consultation with Avonic, they told us that they had similar issues with
 dependency injection in Flask, and they expect from us a functional, not
 necessarily clean solution for this issue.
 
+\paragraph{Production server}\mbox{} \\
 By default, Flask applications are run in a single-process development mode,
 which does not use WebSockets. We have decided to pick uWSGI as our production
 server, as it is well documented, fast, compiled, and gets rid of the downsides
 of the development server. A script was created to easily run the server in
 different modes: with tests, development mode and production mode.
+The script also allows to run the project without footage stream, by supplying
+\verb|NO_FOOTAGE=true| as the environment variable.
