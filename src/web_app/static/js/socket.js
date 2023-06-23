@@ -62,3 +62,7 @@ socket.on("yes-settings", () => {
     }
     requestPresetList().then()
 })
+
+socket.on("no-footage", () =>
+    document.querySelectorAll(".tracking-requires-footage")
+        .forEach(e => e.style.display = "None"))

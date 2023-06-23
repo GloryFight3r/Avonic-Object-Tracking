@@ -2,48 +2,41 @@ onSuccess = Object.assign({}, onSuccess, {
     "tracking-select": selectTracking,
 })
 
-function selectTracking() {
+async function selectTracking() {
     const selected = document.getElementById("tracking-select").value
     const header = document.getElementById("tracking-title")
+    let url
     switch(selected) {
         case "preset":
             header.innerText = "Following using presets 🔭"
-            fetch("/preset/track", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            url = "/preset/track"
             break
         case "calib":
             header.innerText = "Continuous following  with adaptive zooming🔭"
-            fetch("/calibration/track", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            url = "/calibration/track"
             break
         case "hybrid":
             header.innerText = "Hybrid tracking  🔭"
-            fetch("/hybrid/track", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            url = "/hybrid/track"
             break
         case "object":
             header.innerText = "Continuous object tracking  🔭"
-            fetch("/object/track", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            url = "/object/track"
             break;
         case "calibnozoom":
             header.innerText = "Continuous following  without adaptive zooming🔭"
-            fetch("/calibration/track/no/zoom", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            url = "/calibration/track/no/zoom"
             break
         default:
             header.innerText = "Tracking 🔭"
             break
+    }
+     const response = await fetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+    })
+    if (response.status !== 200) {
+        alert((await response.json())["message"])
     }
 }
 

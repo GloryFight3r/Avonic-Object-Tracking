@@ -20,7 +20,7 @@ def generate_tests():
 def obj_model():
     cam_api = CameraAPI(None, None)
     mic_api = MicrophoneAPI(None)
-    stream = FootageThread(None, None, np.array([1920.0, 1080.0]))
+    stream = FootageThread(None, None, np.array([1920.0, 1080.0]), None)
 
     obj_model = ObjectModel(cam_api, mic_api, stream, None, np.array([1920.0, 1080.0]))
 

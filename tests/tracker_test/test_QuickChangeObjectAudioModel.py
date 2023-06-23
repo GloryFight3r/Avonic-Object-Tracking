@@ -37,7 +37,7 @@ def footage_thread():
     mocked_box_tracker = MockedBoxTracker()
     mocked_yolo = MockedYoloPredict()
     event = Value("i", 1, lock=False)
-    thread = FootageThread(mocked_cam_footage, event, np.array([1920.0, 1080.0]))
+    thread = FootageThread(mocked_cam_footage, event, np.array([1920.0, 1080.0]), Value("i", -1))
 
     return thread
 
