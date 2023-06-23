@@ -13,11 +13,27 @@
 \usepackage{float}
 \usepackage{array}
 \usepackage{amssymb}
+\usepackage{glossaries}
 \usepackage{caption}
 \pagestyle{fancy}
 \graphicspath{ {./images/} }
 \fancyfoot[LE,RO]{Avonic camera-microphone integration}
 \fancyfoot[LO,RE]{Group 11C}
+
+\makeglossaries
+
+\newglossaryentry{latex}
+{
+    name=latex,
+    description={Is a markup language specially suited 
+    for scientific documents}
+}
+
+\newglossaryentry{maths}
+{
+    name=mathematics,
+    description={Mathematics is what mathematicians do}
+}
 
 % Document
 \begin{document}
@@ -79,6 +95,14 @@
     \chapter{Conclusion}\label{ch:conclusion}
     \input{chapters/conclusion}
 
+    \printbibliography
+    \addcontentsline{toc}{chapter}{References}
+
+    \clearpage
+
+    \printglossaries
+    \addcontentsline{toc}{chapter}{Glossaries}
+
     \appendix
     \chapter{Ethical implications}\label{ch:ethics-appendix}
     \input{chapters/appendix-a}
@@ -92,6 +116,5 @@
     \chapter{MoSCoW explanation}\label{ch:moscow-appendix}
     \input{chapters/appendix-d}
 
-    \printbibliography
-    \addcontentsline{toc}{chapter}{References}
+
 \end{document}
