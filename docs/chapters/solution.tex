@@ -267,12 +267,14 @@ the microphone detects a sound louder than the defined threshold.
 This means that object tracking is used when someone is not moving a lot, but it will never be used
 simultaneously with speaker tracking. This helps to centralize the speaker on the screen.
 
-\paragraph{Switch strategy} \mbox{}
+
+\paragraph{Quick change object-audio strategy} \mbox{}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{tree}
     \caption{Possible states diagram}
     \label{fig:object_strategy}
+    \caption{Possible states diagram}
 \end{figure}
 \\
 The last approach we consider is always relying on microphone coordinations
@@ -295,8 +297,21 @@ closest to his new bounding box in the new frame. Relying on that fact, we get
 all of the new bounding boxes from the new frame and choose to track the one
 that has its center the closest to the previous bounding box. A diagram that
 illustrates the possible states we could be in is the depicted in Figure
-\ref{fig:object_strategy}.
+\ref{fig:object_strategy}. A visualization of this process can be seen in Figure \ref{fig:obj_detection_image}
 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{obj_detection_image}
+    \fbox{\begin{tabular}{ll}
+      \textcolor{red}{$\blacksquare$} & Currently tracked box \\
+      $\blacksquare$ & Detected object boxes \\
+      \textcolor{blue}{$\blacksquare$} & The microphone direction translated to camera direction 
+    \end{tabular}}
+
+    \caption{A frame recorded with quick change object-audio strategy}
+    \label{fig:obj_detection_image}
+\end{figure}
 
 \section{Application overview}\label{sec:application-overview}
 In this section, we will discuss our application's structure and our motivations behind it.
