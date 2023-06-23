@@ -271,11 +271,6 @@ def test_update_camera(client):
     assert rv.status_code == 200
 
 
-def test_update_calibration(client):
-    rv = client.post('/update/calibration', json=json.dumps({"test": "testington"}))
-    assert rv.status_code == 200
-
-
 def test_thread(client):
     rv = client.post("preset/add",
                      data={

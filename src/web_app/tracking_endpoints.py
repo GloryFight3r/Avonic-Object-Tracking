@@ -79,25 +79,19 @@ def update_camera(integration: GeneralController):
     return make_response(jsonify({}), 200)
 
 
-def update_calibration(integration: GeneralController):
-    """ Updates the new calibration data in the corresponding field in the WebUI
-    """
-    data = request.get_json()
-    integration.ws.emit('calibration-update', data)
-    return make_response(jsonify({}), 200)
-
-
 def is_running_endpoint(integration: GeneralController):
     """ Returns: Whether the thread that controlls the tracking is currently running
     """
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
 
+
 def track_presets(integration: GeneralController):
     """ Sets the current tracking model to PresetModel
     """
     integration.tracking.value = ModelCode.PRESET
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+
 
 def track_hybrid(integration: GeneralController):
     if integration.footage_thread_event.value == 0:
@@ -108,11 +102,13 @@ def track_hybrid(integration: GeneralController):
     integration.tracking.value = ModelCode.HYBRID
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
+
 def track_continuously(integration: GeneralController):
     """ Sets the current tracking model to the AudioModel
     """
     integration.tracking.value = ModelCode.AUDIO
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+
 
 def track_object_continuously(integration: GeneralController):
     """ Sets the current tracking model to ObjectModel
@@ -124,6 +120,7 @@ def track_object_continuously(integration: GeneralController):
                                                  "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.OBJECT
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+
 
 def track_continuously_without_adaptive_zooming(integration: GeneralController):
     """ Sets the current tracking model to AudioModelNoAdaptiveZoom
