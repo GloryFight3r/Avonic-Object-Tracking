@@ -41,30 +41,48 @@ def create_app(test_controller=None):
 
     @app.get('/')
     def view():
+        """
+        Render the main page of the WebUI.
+        This page includes everything our application has to offer in one neatly organised package
+        """
         to_import = ["main", "footage-vis", "camera", "microphone", "presets", "calibration",
                      "footage", "thread", "scene", "socket", "settings", "tracking"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
     @app.get('/camera_control')
     def camera_view():
+        """
+        Render a page that includes only the camera controls.
+        """
         to_import = ["main", "camera", "socket", "settings"]
         return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
 
     @app.get('/microphone_control')
     def microphone_view():
+        """
+        Render a page that includes only the microphone information.
+        That means the buttons to get its direction and whether someone is currently speaking.
+        """
         to_import = ["main", "microphone", "socket", "settings"]
         return render_template('single_page.html', name="microphone", to_import=to_import,
                                page_name="Microphone View")
 
     @app.get('/presets_and_calibration')
     def presets_and_calibration_view():
+        """
+        Render a page that includes only set-up for presets and calibration.
+        """
         to_import = ["main", "socket", "camera", "microphone", "presets", "calibration", "settings"]
         return render_template('single_page.html', name="presets_and_calibration",
                                to_import=to_import, page_name="Presets & Calibration View")
 
     @app.get('/live_footage')
     def live_footage_view():
+        """
+        Render a page that includes only the video stream from the camera.
+        :return:
+        """
         to_import = ["main", "footage", "socket", "settings"]
         return render_template('single_page.html', name="live_footage", to_import=to_import,
                                page_name="Live Footage")
@@ -74,7 +92,7 @@ def create_app(test_controller=None):
         """
         Endpoint that sets the camera network settings.
             form:
-                "camera-ip": a string in the form _._._._
+                "camera-ip": a string indicating the camera's address
                 "camera-port": an int value that represents the port
                 "camera-http-port": an int value that represents the HTTP port of the camera
             return:
@@ -88,7 +106,7 @@ def create_app(test_controller=None):
     @app.post('/camera/reboot')
     def post_reboot():
         """
-        Endpoint triggers reboot procedure at the camera.
+        Endpoint that reboots the camera.
             return:
                 HTTP 200: success, empty message
                 Other HTTP codes:
@@ -100,7 +118,7 @@ def create_app(test_controller=None):
     @app.post('/camera/on')
     def post_turn_on_camera():
         """
-        Endpoint triggers turn on procedure at the camera.
+        Endpoint that turns the camera's video on.
             return:
                 HTTP 200: success, empty message
                 Other HTTP codes:
@@ -112,7 +130,7 @@ def create_app(test_controller=None):
     @app.post('/camera/off')
     def post_off():
         """
-        Endpoint triggers turn off at the camera.
+        Endpoint that turns the camera's video off.
             return:
                 HTTP 200: success, empty message
                 Other HTTP codes:
@@ -124,7 +142,7 @@ def create_app(test_controller=None):
     @app.post('/camera/move/absolute')
     def post_move_absolute():
         """
-        Endpoint that sends a command to the camera to move in an absolute direction.
+        Endpoint that sends a command to the camera to point in a direction relative to the home one.
             form:
                 "absolute-speed-x": Integer from 1 - 24, the pan speed.
                 "absolute-speed-y": Integer from 1 - 20, the tilt speed.
@@ -140,7 +158,7 @@ def create_app(test_controller=None):
     @app.post('/camera/move/relative')
     def post_move_relative():
         """
-        Endpoint that sends a command to the camera to move in a relative direction.
+        Endpoint that sends a command to the camera to point in a direction relative to the current one.
             form:
                 "relative-speed-x": Integer from 1 - 24, the pan speed.
                 "relative-speed-y": Integer from 1 - 20, the tilt speed.
@@ -156,7 +174,7 @@ def create_app(test_controller=None):
     @app.post('/camera/move/vector')
     def post_move_vector():
         """
-        Endpoint that sends a command to the camera to move in a vector direction.
+        Same as `/camera/move/absolute` but a vector is used as a direction instead of two angles.
             form:
                 "vector-speed-x": Integer from 1 - 24, the pan speed.
                 "vector-speed-y": Integer from 1 - 20, the tilt speed.
@@ -173,7 +191,7 @@ def create_app(test_controller=None):
     @app.post('/camera/move/home')
     def post_home():
         """
-        Endpoint to move the camera to its home direction [0, 0, 1]
+        Endpoint to move the camera to its home direction `[0, 0, 1]`.
             return:
                 HTTP code corresponds to the camera response
                 "message": description of the received response code from the camera
@@ -183,7 +201,7 @@ def create_app(test_controller=None):
     @app.post('/camera/move/stop')
     def stop():
         """
-        Endpoint to stop the rotation of the camera.
+        Endpoint to stop all the camera's movement.
             return:
                 HTTP code corresponds to the camera response
                 "message": description of the received response code from the camera
@@ -208,6 +226,8 @@ def create_app(test_controller=None):
     def set_zoom():
         """
         Endpoint to set the zoom value of the camera.
+            form:
+                "zoom-value": Integer in range [0, 16384], the value of the zoom
             return:
                 HTTP code corresponds to the camera response:
                     "message": description of the received response code from the camera
@@ -218,7 +238,7 @@ def create_app(test_controller=None):
     @app.get('/camera/position/get')
     def get_position():
         """
-        Endpoint to get the position value of the camera.
+        Endpoint to get the current pan and tilt values of the camera.
             return:
                 In case of an error:
                     HTTP code corresponds to the camera response
@@ -235,12 +255,12 @@ def create_app(test_controller=None):
         """
         Endpoint that sets the camera network settings.
             form:
-                "microphone-ip": a string in the form _._._._
+                "microphone-ip": a string, the address of the microphone
                 "microphone-port": an int value that represents the port
             return:
                 HTTP 200 or 400:
                     Text of the return message from the microphone
-                Possible HTTP 400: not valid supplied IP or port:
+                Possible HTTP 400: not valid supplied address or port:
                     "message": "Invalid address!"
         """
         return web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
@@ -248,7 +268,7 @@ def create_app(test_controller=None):
     @app.post('/microphone/height/set')
     def set_height():
         """
-        Endpoint to set the height of the microphone.
+        Endpoint to set the height of the microphone above the speaker plane.
             form:
                 "microphone-height": float representing value to be set
             return:
@@ -262,7 +282,7 @@ def create_app(test_controller=None):
     @app.get('/microphone/direction')
     def get_direction():
         """
-        Endpoint to get the direction of the last speaker.
+        Endpoint to get the current direction to the loudest noise in the room from the microphone
             return:
                 HTTP 200:
                     "microphone-direction": list with 3 float values representing direction of the speaker
@@ -274,9 +294,9 @@ def create_app(test_controller=None):
     @app.get('/microphone/speaker/direction')
     def get_speaker_direction():
         """
-        Endpoint to get the direction of the active speaker.
-        Actively loops polling data from the microphone, blocks the worker for 5 seconds if nobody speaks.
-        If nobody have spoken in 5 seconds - returns last direction from the microphone.
+        Endpoint to get the direction of the active speaker. Used for setting up presets and calibrating.
+        Actively loops polling data from the microphone, waits for 5 seconds.
+        If nobody has spoken in 5 seconds - returns current direction from the microphone.
             return:
                 HTTP 200:
                     "microphone-direction": list with 3 float values representing direction of the speaker
@@ -302,7 +322,7 @@ def create_app(test_controller=None):
         """
         Endpoint that saves a preset to the preset collection.
             form:
-                "preset-name": String representing the name of the preset.
+                "preset-name": Unique string representing the name of the preset.
                 "camera-direction-alpha": Float from -170 - 170 representing the yaw of the camera
                 "camera-direction-beta": Float from -30 - 90 representing the pitch of the camera
                 "camera-zoom-value": Integer with the zoom value (0-16384)
@@ -340,7 +360,7 @@ def create_app(test_controller=None):
         """
         Endpoint that removes the given preset from the preset collection.
             form:
-                "preset-name": a string name for the preset
+                "preset-name": string name for the preset
             return:
                 HTTP 200: success, empty message
                 HTTP 400: invalid supplied values, empty message
@@ -359,7 +379,7 @@ def create_app(test_controller=None):
     @app.get('/preset/info/<preset_name>')
     def get_preset_info(preset_name):
         """
-        Endpoint that returns the information for a given preset.
+        Endpoint that returns information about a given preset.
             return:
                 In case of success:
                     HTTP 200
@@ -375,7 +395,7 @@ def create_app(test_controller=None):
     @app.post('/preset/point')
     def point_to_preset():
         """
-        Endpoint that points the camera to the closest found preset.
+        Endpoint that points the camera to the closest preset available.
         Performs movement.
             return:
                 HTTP 200, empty message
@@ -451,7 +471,7 @@ def create_app(test_controller=None):
         needed vectors are calculated
 
             return:
-                "is_set": boolean indicating whether or not calibration has been completed
+                "is_set": boolean indicating whether calibration has been completed
                 HTTP 200: success code
         """
         return web_app.calibration_endpoints.is_calibrated(integration)
@@ -524,25 +544,6 @@ def create_app(test_controller=None):
         """
         return web_app.camera_endpoints.navigate_camera(integration)
 
-    # THIS IS FOR DEMO PURPOSES ONLY
-    # SHOULD BE CHANGED WHEN BASIC PRESET FUNCTIONALITY ADDED
-
-    # This part of app is responsible for running a thread for tracking.
-    # # Please refer to wiki, if needed.
-
-    # event - acts as a flag for the created thread.
-    # When false (cleared) - the execution of thread is locked
-    # When true (set) - the execution of the thread is allowed
-    # Set to false by default. Respective endpoints set/clear it.
-
-    # <CustomThread> (should pick a better name) contains all code for the actual tracking.
-    # Use set calibration to set the calibration parameters that are going to be used when tracking
-
-    # The thread is started at the start of the program to avoid
-    # python's "global" identifier and because threads can't be paused
-
-    # create the event and start the thread
-
     @app.get('/object/track')
     def object_tracking_start():
         """
@@ -557,7 +558,7 @@ def create_app(test_controller=None):
     @app.post('/thread/start')
     def thread_start():
         """
-        Endpoint that starts the tracking endpoint
+        Endpoint that starts the tracking thread
 
             return:
                 In case of an error:
@@ -615,15 +616,14 @@ def create_app(test_controller=None):
         """
         web_app.footage.emit_frame(integration)
 
-    # Info-thread section
-
     @app.post('/info-thread/start')
     def info_thread_start():
         """
         Endpoint that starts the thread that updates all the dynamic data
+        This means the current directions and more for both the camera and microphone
 
-            return:
-                HTTP 200: successfully started the info thread
+        return:
+            HTTP 200: successfully started the info thread
         """
         integration.info_threads_event.value = 1
         return make_response(jsonify({}), 200)
@@ -681,6 +681,10 @@ def create_app(test_controller=None):
 
     @integration.ws.on("connected")
     def settings_not_set(data):
+        """
+        WebSocket endpoint that, on a client's connection,
+        causes it to open the settings menu when none are set.
+        """
         if not integration.no_settings_sent:  # prompt user to set up if no settings file found
             integration.ws.emit("no-settings", data)
         else:
