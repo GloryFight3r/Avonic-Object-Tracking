@@ -1,4 +1,3 @@
-from asyncio import sleep
 from unittest import mock
 from multiprocessing import Value
 import numpy as np

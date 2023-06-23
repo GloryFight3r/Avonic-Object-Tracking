@@ -1,3 +1,4 @@
+import os
 from threading import Thread
 from multiprocessing import Value, Array
 from ctypes import c_int
@@ -5,12 +6,13 @@ import base64
 import copy
 import numpy as np
 import cv2 # type: ignore
+import time
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
 
-    def __init__(self, footage: cv2.VideoCapture, event: c_int, resolution:np.ndarray):
+    def __init__(self, footage: cv2.VideoCapture, event: c_int, resolution:np.ndarray, pid: c_int):
         """ Constructor for the footage thread
 
             Params:
@@ -22,6 +24,7 @@ class FootageThread(Thread):
         self.footage = footage
         self.frame = None
         self.event = event
+        self.pid = pid
         self.show_bounding_boxes = False
         self.resolution = resolution
 
@@ -31,6 +34,7 @@ class FootageThread(Thread):
         self.focused_box:np.ndarray | None = None
 
     def run(self):
+        self.pid.value = os.getpid()
         while self.event.value != 0:
             success, self.frame = self.footage.read()
 
@@ -38,6 +42,7 @@ class FootageThread(Thread):
                 buffer = cv2.imencode('.jpg', self.frame)[1]
                 self.buffer.raw = buffer
                 self.buflen.value = len(buffer)
+            time.sleep(0.001)
         print("Close footage thread")
 
     def set_bbxes(self, bbxes):

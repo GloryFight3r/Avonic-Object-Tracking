@@ -74,20 +74,25 @@ def client(camera, monkeypatch):
     def x(self, method=None, encoding=None):
         if encoding == "utf-8":
             raise IOError("testing")
-    def x2(self):
+
+    def x2(url, arg1, arg2):
+        return mock.Mock()
+
+    def x3(self):
         pass
 
     with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
          with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
              with mock.patch("builtins.open", x):
-                with mock.patch("avonic_speaker_tracker.object_model" \
-                + ".yolov8.YOLOPredict.__init__", x2):
+                with mock.patch(
+                        "avonic_speaker_tracker.object_model.yolov8.YOLOPredict.__init__", x3):
                     with mock.patch("cv2.VideoCapture", x2):
                         test_controller.load_env()
                         test_controller.ws = mock.Mock()
                         app = web_app.create_app(test_controller=test_controller)
                         app.config['TESTING'] = True
     return app.test_client()
+
 
 def test_load_env(client):
     time.sleep(0.5)

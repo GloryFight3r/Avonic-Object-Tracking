@@ -1,19 +1,19 @@
 from flask import make_response, jsonify, request
 from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
 from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
+from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 from avonic_speaker_tracker.updater import UpdateThread
 from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
 from web_app.integration import GeneralController, ModelCode
 
+
 def start_thread_endpoint(integration: GeneralController):
-    """ This method starts the thread that controlls the actual tracking and calls 
+    """ This method starts the thread that controlls the actual tracking and calls
     the corresponding tracking model depending on the user's choice.
     """
     # start (unpause) the thread
-    print("Tracking is: ",integration.tracking.value)
     if (integration.thread is None) or (integration.event.value == 0):
         integration.event.value = 1
         if integration.tracking.value == ModelCode.PRESET:
@@ -24,11 +24,11 @@ def start_thread_endpoint(integration: GeneralController):
                                     filename=integration.filepath + "calibration.json")
         elif integration.tracking.value == ModelCode.AUDIONOZOOM:
             model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
-                                    filename = integration.filepath + "calibration.json")
+                                    filename=integration.filepath + "calibration.json")
         elif integration.tracking.value == ModelCode.HYBRID:
-            model = HybridTracker(integration.cam_api, integration.mic_api, \
-                integration.nn, integration.footage_thread, \
-                    integration.filepath + "calibration.json")
+            model = HybridTracker(integration.cam_api, integration.mic_api,
+                                  integration.nn, integration.footage_thread,
+                                  integration.filepath + "calibration.json")
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
@@ -53,7 +53,7 @@ def start_thread_endpoint(integration: GeneralController):
 
 
 def stop_thread_endpoint(integration: GeneralController):
-    """ Stops(pauses) the thread that controlls the tracking 
+    """ Stops(pauses) the thread that controlls the tracking
     """
     integration.event.value = 0
     integration.info_threads_event.value = 0
@@ -100,6 +100,11 @@ def track_presets(integration: GeneralController):
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
 def track_hybrid(integration: GeneralController):
+    if integration.footage_thread_event.value == 0:
+        return make_response(jsonify({"message": "Object tracking requires footage to be on. " +
+                                                 "Please enable it before launching the program. " +
+                                                 "To do this, make sure the NO_FOOTAGE environment " +
+                                                 "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.HYBRID
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
@@ -112,6 +117,11 @@ def track_continuously(integration: GeneralController):
 def track_object_continuously(integration: GeneralController):
     """ Sets the current tracking model to ObjectModel
     """
+    if integration.footage_thread_event.value == 0:
+        return make_response(jsonify({"message": "Object tracking requires footage to be on. " +
+                                                 "Please enable it before launching the program. " +
+                                                 "To do this, make sure the NO_FOOTAGE environment " +
+                                                 "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.OBJECT
     return make_response(jsonify({"tracking":integration.tracking.value}), 200)
 
