@@ -343,7 +343,11 @@ The implementation of the Camera API uses the adapter design pattern, which is a
 The main advantage of this design pattern in our project is that it makes sure our system still works if the specifics of communication with the camera change; only the adapter itself has to be reimplemented. This makes it easier to adapt our system to other Avonic cameras.
 
 \paragraph{Footage thread}\mbox{} \\
-The final part of the Camera API module is the thread that reads video frames from the camera stream. This thread is connected to the RTSP stream of Real Time Streaming Protocol (RTSP) stream of the camera that emits one hundred frames per second. These frames are continually read by the thread so that the latest frame is always available. This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
+The final part of the Camera API module is the thread that reads video frames from the camera stream. 
+This thread retrieves footage from Real Time Streaming Protocol (RTSP) stream of the camera using \verb|OpenCV|.
+The frames are continually read by the thread so that the latest frame is always available in the buffer.
+This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
+
 
 \subsection{Microphone API}
 The Microphone API module contains all of the functionality related to
@@ -485,8 +489,8 @@ calibration is shown in figure \ref{fig:calibration-ui}. As is shown, there are
 at most three calibration points that can be set. After at least one point is
 set, the camera direction towards the microphone can be submitted. The reason we
 decided to have a maximum of three points is to give a reasonable guideline to
-the user. Adding more than three points to calibration does not make it more
-accurate. One calibration point also gives good accuracy, which is why we allow
+the user. From experiments that we have conducted, adding more than three points to calibration does not make it more
+accurate. We found that one calibration point gives good accuracy, which is why we allow
 the user to end the process after recording one point. The main advantage of
 recording more than one point is to reduce the impact of inaccurate microphone
 directions.
