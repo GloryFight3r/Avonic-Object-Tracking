@@ -352,7 +352,7 @@ class GeneralController:
         mic_direction = self.mic_api.get_direction()
         if isinstance(mic_direction, str):
             return {
-                "microphone-direction": list(np.array([0, 0, 0])),
+                "microphone-direction": list(np.array([0.0, 0.0, 0.0])),
                 "microphone-speaking": self.mic_api.is_speaking()
             }
         else:

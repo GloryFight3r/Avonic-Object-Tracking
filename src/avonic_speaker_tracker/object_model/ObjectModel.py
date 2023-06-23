@@ -73,7 +73,7 @@ class ObjectModel():
         # [left bottom width height] so we change it
         # The height is divided by two so the upper half of the person's body is used
 
-        current_box = [current_box[0], current_box[1], current_box[2], current_box[3]+box_height/2]
+        current_box = [current_box[0], current_box[1], current_box[2], current_box[3]-box_height/2]
         bbox:np.ndarray = np.array([current_box[0],\
                          current_box[1],\
                          current_box[2] - current_box[0],\
@@ -126,7 +126,7 @@ class ObjectModel():
 
         speedAlpha = math.fabs(rotate_angle[0])/340.0*11.0+13.0
         speedBeta = math.fabs(rotate_angle[1])/120.0*9.0+11.0
-        return np.array([int(speedAlpha), int(speedBeta)])
+        return [int(speedAlpha), int(speedBeta)]
 
     def track_object(self):
         pass
