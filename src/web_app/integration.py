@@ -2,7 +2,8 @@ import time
 from threading import Thread
 from os import getenv
 from time import sleep
-from multiprocessing import Value, Process
+from multiprocessing import Value
+from multiprocess import Process
 import requests
 import cv2
 import numpy as np
