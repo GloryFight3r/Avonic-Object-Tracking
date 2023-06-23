@@ -126,7 +126,7 @@ class ObjectModel():
 
         speedAlpha = math.fabs(rotate_angle[0])/340.0*11.0+13.0
         speedBeta = math.fabs(rotate_angle[1])/120.0*9.0+11.0
-        return np.array([int(speedAlpha), int(speedBeta)])
+        return [int(speedAlpha), int(speedBeta)]
 
     def track_object(self):
         pass
