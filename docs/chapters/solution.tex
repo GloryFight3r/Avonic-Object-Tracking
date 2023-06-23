@@ -23,11 +23,17 @@ computing power, but that would lead to a big delay in camera movement and
 additional risks to security and maintainability. Additionally, our project
 relies on three special hardware devices -- a camera, and a microphone and a
 single-board computer (SBC). The final product should account for all the inherent
-limitations of these devices. The biggest limitation is the fact that the
+limitations of these devices. 
+
+It is important to understand that microphone allows 
+us to only retrieve information provided by the Sennheiser which is limited to 
+direction toward the speaker and peak loudness level, since we do not have access to each individual microphone
+within the array. The biggest limitation is the fact that the
 microphone does not provide the exact origin of the detected sound, as it is
 quite a difficult technical challenge to calculate
-this\cite{distance-urbana-champaign}. We formulated
-three limitations that significantly impact the project:
+this\cite{distance-urbana-champaign}. 
+
+We formulated three limitations that significantly impact the project:
 \begin{itemize}
     \item The storage and processing power of the SBC.
     \item The network range and speed.
@@ -97,8 +103,7 @@ In the future, it is possible to extend the model to support different shapes an
 possibly a full 3D scan of the room to represent the possible locations of the speaker.
 We view these options to be infeasible for us in 10 weeks.
 
-\subsection{Calibration}
-\label{sec:calibration}
+\subsection{Calibration}\label{subsec:calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
 (We assume the longest one of the horizontal coordinates to be the $z$ one.)
 To achieve this, the user first sets microphone's height above the speaker plane.
@@ -357,7 +362,7 @@ the appropriate implementation of the point method. The user can pick their
 preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
 The chosen model is instantiated at the beginning of the \verb|run| method and
-is subsequently used to track the speaker until being explicitely stopped by the user.
+is subsequently used to track the speaker until being explicitly stopped by the user.
 Some of the models rely on data stored in JSON files whose location can be
 specified in the settings menu in our WebUI. We currently have the following
 tracking models:
@@ -393,7 +398,7 @@ chose this model as a starting point for our tracking.
 The Audio Model achieves the main goal of our application by continuously
 tracking the speaker around the room. Unlike the preset model, it can point the
 camera towards any arbitrary point in the room by performing the calculations
-described in \hyperref[the section about calibration]{sec:calibration}. The
+described in the subsection about \hyperref[calibration]{subsec:calibration}. The
 audio model also keeps track of how much time has passed since someone has last
 spoken. If no one has spoken in some time the camera will zoom out. This model’s
 point method also takes into account how far the speaker is from the camera and
@@ -412,7 +417,7 @@ camera to zoom out when no one is speaking. This means that for the whole period
 of tracking the zoom is not changed unless the user expressly does that using
 any mode for controlling the zoom. We decided to add this model because in some
 scenarios the adaptive zooming does not provide a very pleasant flow of the
-tracking. Sometimes the camera zoomes in or out unexpectedly or too much.
+tracking. Sometimes the camera zooms in or out unexpectedly or too much.
 Reasons for that inconsistency are the possibility of inaccurate calibration or
 inaccurate readings provided by the microphone.
 
