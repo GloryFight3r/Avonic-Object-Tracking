@@ -24,8 +24,8 @@ the camera in the back of the room and the microphone in the front above the spe
 In order to explore this solution, Avonic has asked us to spend
 ten weeks working on a system that tracks a speaker using both a camera and a
 microphone. The camera we have to use is the Avonic CM70 model
-(figure ) and the
-microphone is the Sennheiser TeamConnect Ceiling 2 (figure ).
+(figure \ref{fig:camera}) and the
+microphone is the Sennheiser TeamConnect Ceiling 2 (figure \ref{fig:microphone}).
 We are not allowed to
 reprogram these devices. That is why a single-board computer, the Nvidia Jetson Nano,
 has to be used to communicate with the camera and microphone through application programming
@@ -101,7 +101,7 @@ The overall problem is in this way made less complex. Avonic wants to use only
 one camera and one microphone and try to track speakers as well as companies
 like Cisco do with two or more cameras.
 
-
+\medskip
 As we can see, the most common approach to the speaker localization problem is
 to use a dual-lens or dual-camera design. On behalf of Avonic, we experimented
 with a new approach: one camera and one microphone. This poses new problems.
@@ -121,7 +121,7 @@ People who participate in lectures or conferences using MaAT have a high
 interest in the quality of the speaker tracking. They want their activity to be
 well recorded. If the speaker tracking is not correct or not smooth, these
 stakeholders will not be satisfied with the product. The accuracy of the
-tracking and the is most important to them.
+tracking is most important to them.
 
 \paragraph{IT staff}\mbox{} \\
 The IT people who are going to set up MaAT want the process of setting up the
@@ -135,19 +135,19 @@ without any guidance.
 Developers could be building upon our code in the future. Since we write our
 code for Avonic, we expect this category to include only their developers. It is
 important to the developers that the code is well written and well documented.
-Some of the criteria we use to determine whether code is well written are test
+Some of the criteria we used to determine whether code is well written are test
 coverage, readability and extensibility. These criteria and more are explained
-in \hyperref[ch:workflow-and-teamwork]{Chapter 5} where we talk about the
+in \hyperref[ch:workflow]{chapter 5} where we talk about the
 workflow.
 
 \paragraph{Avonic}\mbox{} \\
-Avonic as a company influences the requirements of our project. They have the
+Avonic as a company has a say in the requirements of our project. They have the
 general picture in mind, considering both the clients and the developers. It is
 important to them that the compromises made in the process are carefully
 considered and explained. This includes a clear and elaborate report that
 explains precisely what steps have been taken to reach the conclusion. Such a
-report can be used by Avonic to decide whether the experiment is worth doing
-again.
+report can be used by Avonic to decide whether they want to continue to build on
+our product.
 
 \paragraph{Satisfaction of all stakeholders}\mbox{} \\
 In order to satisfy every stakeholder as much as possible, we continually
@@ -160,29 +160,30 @@ Avonic team.
 
 
 \section{Possible pitfalls}\label{sec:possible-pitfalls}
-At the start of the project, we identified two possible risks which we needed to decide on how to avert.
-As these risks threatened to slow down our progress, we tried to reduce their impact as much as possible.
-Below are the issues listed in order of severity.
+At the start of the project, we identified two possible risks which we needed to
+decide on how to avert. As these risks threatened to slow down our progress, we
+tried to reduce their impact as much as possible. We list these risks below.
+
 \subsection{Access to hardware}
 The largest risk was access to the hardware (or lack thereof). Since our
 project relies on the availability of both the camera and microphone, we would
 have been unable to work on it without them. The contact person from Avonic --
 Mr. Kahawati -- informed us that we would only be able to come to the office
-three days a week, which would have prevented us from working on the project
-sometimes.
+three days a week, which could have prevented us from working on the project
+on the other days.
 
-We were allowed to bring a camera home to test, but that was not an option with
-the expensive and large ceiling microphone. We mitigated this by using a
+We were allowed to bring a camera home to test, but that was not an option for
+the large and expensive ceiling microphone. We mitigated this by using a
 virtual private network (VPN) connection to the office. This way we had a way
 to access the microphone remotely, although we could not test it very well when
 nobody from the group was at the office.
 
-Apart from the camera, we also needed an NVIDIA Jetson Nano to run our software.
-This device became available during the eighth week of the project, which caused
-some new problems to appear in our code. Up untill that point we had used our own
-computers to simulate the production environment. Despite the risk of having
-too little time to fix new bugs, the last two weeks turned out to be enough to
-make everything work on the Jetson Nano.
+Apart from the camera and the microphone, we also needed an NVIDIA Jetson Nano
+to run our software. This device became available during the eighth week of the
+project, which caused some new problems to appear in our code. Up untill that
+point we had used our own computers to simulate the production environment.
+Despite the risk of having too little time to fix new bugs, the last two weeks
+turned out to be enough to make the core of MaAT work on the Jetson Nano.
 
 \subsection{Work space}
 During the project we could visit the office at most three days a week. This
