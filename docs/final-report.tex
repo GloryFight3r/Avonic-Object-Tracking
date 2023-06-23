@@ -21,19 +21,7 @@
 \fancyfoot[LO,RE]{Group 11C}
 
 \makeglossaries
-
-\newglossaryentry{latex}
-{
-    name=latex,
-    description={Is a markup language specially suited 
-    for scientific documents}
-}
-
-\newglossaryentry{maths}
-{
-    name=mathematics,
-    description={Mathematics is what mathematicians do}
-}
+\input{glossary}
 
 % Document
 \begin{document}
@@ -101,7 +89,7 @@
     \clearpage
 
     \printglossaries
-    \addcontentsline{toc}{chapter}{Glossaries}
+\addcontentsline{toc}{chapter}{Glossaries}
 
     \appendix
     \chapter{Ethical implications}\label{ch:ethics-appendix}
