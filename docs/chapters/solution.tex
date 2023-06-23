@@ -23,15 +23,15 @@ computing power, but that would lead to a big delay in camera movement and
 additional risks to security and maintainability. Additionally, our project
 relies on three special hardware devices -- a camera, and a microphone and a
 single-board computer (SBC). The final product should account for all the inherent
-limitations of these devices. 
+limitations of these devices.
 
-It is important to understand that microphone allows 
-us to only retrieve information provided by the Sennheiser which is limited to 
+It is important to understand that microphone allows
+us to only retrieve information provided by the Sennheiser which is limited to
 direction toward the speaker and peak loudness level, since we do not have access to each individual microphone
 within the array. The biggest limitation is the fact that the
 microphone does not provide the exact origin of the detected sound, as it is
 quite a difficult technical challenge to calculate
-this\cite{distance-urbana-champaign}. 
+this\cite{distance-urbana-champaign}.
 
 We formulated three limitations that significantly impact the project:
 \begin{itemize}
@@ -89,26 +89,24 @@ Since the microphone's API\cite{microphone-manual} does not have a way to
 retrieve this distance, the assumptions are needed to describe the distance
 function in the environment.
 According to our assumptions, the speaker plane represents the set of all
-locations at which the speaker could be. Small deviations from the theoretical
-horizontal speaker plane and the actual places at which people speak can be
-neglected due to their small magnitude \textbf{(MAYBE PUT REFERENCE HERE)}.
-The height difference between speakers can also be neglected due to the
-expected distance between the camera and the presenters of at least \textbf{(SOME ASSUMED MINIMUM???)}
-meters. Such differences in height have even less of an impact when
-the speakers are sitting \textbf{(MAYBE PUT REFERENCE HERE)}.
-With this in mind, we decided to
-calculate the intersection of the ray from the microphone with the speaker plane
-to find the location of the speaker.
-In the future, it is possible to extend the model to support different shapes and
-possibly a full 3D scan of the room to represent the possible locations of the speaker.
-We view these options to be infeasible for us in 10 weeks.
+locations at which the speaker could be. As was shown by our experiments, small
+deviations from the horizontal speaker plane can be neglected due to their
+small magnitude. Differences in the height of speakers are the most common
+example of this. Such differences in height have even less of an impact when
+the speakers are sitting. With this in mind, we decided to calculate the
+intersection of the ray from the microphone with the speaker plane to find the
+location of the speaker. In the future, it is possible to extend the model to
+support different shapes and possibly a full 3D scan of the room to represent
+the possible locations of the speaker. We view these options to be infeasible
+for us in 10 weeks.
 
 \subsection{Calibration}\label{subsec:calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
-(We assume the longest one of the horizontal coordinates to be the $z$ one.)
 To achieve this, the user first sets microphone's height above the speaker plane.
 Then, a person is sent into the room. They direct the camera at themselves and speak.
-The direction obtained from the camera and microphone combined with the microphone's height above the so-called speaker plane is enough to calculate the 3D position of the camera relative to the microphone.
+The direction obtained from the camera and microphone combined with the
+microphone's height above the so-called speaker plane is enough to calculate
+the 3D position of the camera relative to the microphone.
 
 A simplified, 2D image is shown in figure \ref{fig:cal2d}. Since the camera
 points towards the z-axis by default, the horizontal axis in the image is the z-axis.
@@ -163,7 +161,7 @@ The proposed solution followed the following algorithm for calibration and track
 \end{enumerate}
 Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
-This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
+This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\footnote{geogebra.org}\cite{geogebra}.
 Unfortunately, the camera and microphone are not always in the same or opposite
 positions, as the system should work with any arbitrary position of the camera.
 For this reason, we left this solution behind.
@@ -306,7 +304,7 @@ illustrates the possible states we could be in is the depicted in Figure
     \fbox{\begin{tabular}{ll}
       \textcolor{red}{$\blacksquare$} & Currently tracked box \\
       $\blacksquare$ & Detected object boxes \\
-      \textcolor{blue}{$\blacksquare$} & The microphone direction translated to camera direction 
+      \textcolor{blue}{$\blacksquare$} & The microphone direction translated to camera direction
     \end{tabular}}
 
     \caption{A frame recorded with quick change object-audio strategy}
@@ -355,7 +353,7 @@ The implementation of the Camera API uses the adapter design pattern, which is a
 The main advantage of this design pattern in our project is that it makes sure our system still works if the specifics of communication with the camera change; only the adapter itself has to be reimplemented. This makes it easier to adapt our system to other Avonic cameras.
 
 \paragraph{Footage thread}\mbox{} \\
-The final part of the Camera API module is the thread that reads video frames from the camera stream. 
+The final part of the Camera API module is the thread that reads video frames from the camera stream.
 This thread retrieves footage from Real Time Streaming Protocol (RTSP) stream of the camera using \verb|OpenCV|.
 The frames are continually read by the thread so that the latest frame is always available in the buffer.
 This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
@@ -484,7 +482,15 @@ The front-end is written in HTML, CSS, and JavaScript and includes controls for
 the camera, controls for the tracking thread, and an editing interface for
 presets and calibration models. The page maintains a WebSocket connection with a
 server for footage stream and real-time updates of the camera and microphone
-information, which is used for visualization.
+information, which is used for visualization. The front page of the UI, which
+contains most of the UI's functionality, is shown in figure \ref{fig:main-ui}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{main-page-ui}
+    \caption{The main page of the web interface}
+    \label{fig:main-ui}
+\end{figure}
 
 \paragraph{Web UI requirement}\mbox{} \\
 The web UI was moved from a “should have” to a “must have” section after
@@ -544,5 +550,5 @@ which does not use WebSockets. We have decided to pick uWSGI as our production
 server, as it is well documented, fast, compiled, and gets rid of the downsides
 of the development server. A script was created to easily run the server in
 different modes: with tests, development mode and production mode.
-The script also allows to run the project without footage stream, by supplying 
+The script also allows to run the project without footage stream, by supplying
 \verb|NO_FOOTAGE=true| as the environment variable.

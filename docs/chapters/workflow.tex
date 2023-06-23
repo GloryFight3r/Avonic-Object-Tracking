@@ -34,7 +34,7 @@ In order to accept a new functionality we came up with three requirements:
 As described in the project plan, at the start of our project, we decided that the minimal viable product would be
 one that has all the must-have requirements. The should-haves would be good to aim
 for and the could-haves would be a bonus if they were fulfilled. For individual requirements
-we also defined a definition of done in Gitlab so it would be clear when one was
+we also defined a definition of done in Gitlab\footnote{gitlab.ewi.tudelft.nl} so it would be clear when one was
 completed. We only accepted functionality after this definition of done was satisfied.
 
 Apart from the definition of done, we came up with three other requirements to accept
@@ -60,7 +60,7 @@ In order to ensure the quality of our code, we used five additional tools:
 We made sure all work is done on time and in an upstanding way by meeting every
 day. This happened either on campus, in Avonic's office, or on Discord as a
 backup. We discussed our progress and helped each other. If any problem arose, we
-brainstormed and came up with solutions together. Mattermost served as a
+brainstormed and came up with solutions together. Mattermost\footnote{mattermost.tudelft.nl} served as a
 communication channel with our TA. WhatsApp was our backup if everything else
 failed.
 
@@ -116,7 +116,6 @@ As we could not reach the decision ourselves, we have decided to ask Mr. Kahawat
 As described in that meeting, the UI is going to be used by technicians, so having everything on the same page is more practical for them, but it can also be used by people with little knowledge about cameras and a big menu can overwhelm them.
 
 Therefore, the decision was to combine both designs. By default, a user is presented with a page with the whole functionality, but if they want to isolate certain aspects of it, they can click on a respective tab at the top of the page.
-\textbf{THERE WILL BE AN IMAGE OF THE FINAL UI VERSION}
 
 \subsection{Breaking production server}\label{subsection:breaking-production-server}
 As discussed in subsection about the \hyperref[subsection:solution_webui]{WebUI}, we decided to use uWSGI for production mode.
@@ -131,7 +130,7 @@ As we did not have enough knowledge back in time, it took us a whole day of debu
 Since then, the quality assurance procedure was strengthened, to make sure that features work both in production and development modes.
 
 \subsection{Deployment to Jetson Nano}
-At the beginning of the project it was outlined, that the system should be capable of running on NVIDIA Jetson Nano \textbf{(reference)}.
+At the beginning of the project it was outlined, that the system should be capable of running on NVIDIA Jetson Nano.
 Throughout duration of the project we did not have access to the development kit, and as outlined in the possible pitfalls section \ref{sec:possible-pitfalls},
 it added to the difficulty of satisfying this requirement. When we first tried, the project did not launch because of the footage thread.
 It was running fine on our computers, but failed to run on the Jetson, as OpenCV did not take advantage of multiple cores for video capturing and a single platform's
