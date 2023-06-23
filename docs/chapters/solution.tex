@@ -495,11 +495,10 @@ the user to end the process after recording one point. The main advantage of
 recording more than one point is to reduce the impact of inaccurate microphone
 directions.
 
-
 \begin{figure}[h]
-    \caption{Part of the web interface responsible for calibration}
     \centering
     \includegraphics[width=0.8\textwidth]{calibration_ui}
+    \caption{Part of the web interface responsible for calibration}
     \label{fig:calibration-ui}
 \end{figure}
 
@@ -533,3 +532,5 @@ which does not use WebSockets. We have decided to pick uWSGI as our production
 server, as it is well documented, fast, compiled, and gets rid of the downsides
 of the development server. A script was created to easily run the server in
 different modes: with tests, development mode and production mode.
+The script also allows to run the project without footage stream, by supplying 
+\verb|NO_FOOTAGE=true| as the environment variable.
