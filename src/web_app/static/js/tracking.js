@@ -38,6 +38,7 @@ async function selectTracking() {
         method: "GET",
         headers: { "Content-Type": "application/json" }
     })
+    console.log(await response)
     if (response.status !== 200) {
         alert((await response.json())["message"])
     }
