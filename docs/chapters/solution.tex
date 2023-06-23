@@ -11,7 +11,7 @@ tracking models we created is shown in Figure \ref{fig:model-use-case-diagram}.
 
 \section{Challenges that must be overcome}\label{sec:solution-challenges}
 In this section, we describe two groups of constraints that any solution to the
-problem described in \hyperref[the Problem analysis chapter]{ch:problem-analysis} has to try to solve. The
+problem described in \hyperref[ch:problem-analysis]{chapter 2} has to try to solve. The
 first group contains everything related to technology and the second group
 contains everything related to the user.
 
@@ -159,7 +159,6 @@ The proposed solution followed the following algorithm for calibration and track
 Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
 This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\cite{geogebra}.
-<<<<<<< Updated upstream
 Unfortunately, the camera and microphone are not always in the same or opposite
 positions, as the system should work with any arbitrary position of the camera.
 For this reason, we left this solution behind.
@@ -303,21 +302,6 @@ We go over each of the four modules in our project: the camera API, the micropho
 module and the web interface. Each module is separated in the code in order to make it easier
 for other developers to work on our code.
 
-=======
-Unfortunately, this is not always the case, as the system should work with any arbitrary position of the camera, we had to leave this solution behind.
-\section{Application overview}
-In this section, we will discuss our application's structure and out motivations behind it.
-\subsection{Project modules}
-After splitting our project in core domains, we have identified 4 of them:
-\begin{itemize}
-    \item Camera API - responsible for a simplifying communication with the camera.
-    \item Microphone API - responsible for a simplifying communication with the microphone.
-    \item Tracking - responsible for all of the tracking related function. For example, calculating direction of the camera, performing communication with camera and the microphone via API.
-    \item WebUI - responsible for providing a user-friendly interface for a user.
-\end{itemize}
-We took a decision to create separate Python modules for each of the identified domains, to make our code base more systematic.
-It also allows to potentially distribute some of the modules separately, allowing other people develop their software using our APIs.
->>>>>>> Stashed changes
 \subsection{Camera API}
 The Camera API module contains all of the functionality related to
 communication with the camera. This includes sending commands to move or zoom
@@ -329,8 +313,9 @@ stream from the camera.
 \paragraph{VISCA}\mbox{} \\
 We chose to use VISCA commands to communicate with the camera instead of HTTP
 requests. We did this first of all because Mr. Kahawati explained to us that it
-was the standard at Avonic. The second reason was that VISCA is faster than
-HTTP [REFERENCE?!]. There are two types of VISCA requests: long and short. The
+was the standard at Avonic. The second reason was that VISCA was specifically
+made for communication with PTZ cameras and therefore suits our purposes better
+than HTTP. There are two types of VISCA requests: long and short. The
 difference between these two types is the header. Long VISCA requests have a
 header in the request telling the receiver how big the request is and what the
 request counter is. This request counter is also contained in the response, so
