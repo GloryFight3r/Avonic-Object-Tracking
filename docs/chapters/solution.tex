@@ -402,7 +402,7 @@ chose this model as a starting point for our tracking.
 The Audio Model achieves the main goal of our application by continuously
 tracking the speaker around the room. Unlike the preset model, it can point the
 camera towards any arbitrary point in the room by performing the calculations
-described in the subsection about \hyperref[calibration]{subsec:calibration}. The
+described in the subsection \ref{subsec:calibration} about calibration. The
 audio model also keeps track of how much time has passed since someone has last
 spoken. If no one has spoken in some time the camera will zoom out. This model’s
 point method also takes into account how far the speaker is from the camera and
@@ -434,8 +434,8 @@ around them it has a method to find the box that is most likely to be the one
 around the speaker. Then another method calculates the relative direction in
 which the camera has to move to center the box. It takes into account the
 zooming and field of view of the camera in order to make the calculations. As
-explained in section about \hyperref[Visual object
-tracking]{sec:visual-object-tracking} we chose to use YOLO for our object
+explained in section \ref{sec:visual-object-tracking} about Visual object
+tracking, we chose to use YOLO for our object
 detection and classification. Our YOLO implementation extends an abstract class
 that has methods to calculate and draw bounding boxes. Any object detection
 algorithm can extend this class in order for it to be used in place of the
