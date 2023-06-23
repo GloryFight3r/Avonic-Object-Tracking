@@ -4,7 +4,12 @@ Our team has very specific values which we always aim to follow no matter the ci
 The most important values we appreciate are hard work and authority. It goes without saying that we value hard work since we all aim to complete our project in the best possible way.
 Authority is important to us because we should always respect Avonic and the university staff since they are the people who evaluate our work.
 Another crucial value in our team is humor. It is always better when working becomes a pleasure and not a boresome duty.
+
 \section{Workflow practices}
+In this section, we discuss the practices we used to improve our teamwork and
+our product. The first three sections are related to practices that improve the
+code, while \hyperref[subsection:communication]{section 5.2.4} discusses our methods of communication.
+
 \subsection{Approaches}
 To ensure a good workflow we decided to use Agile and more specifically -- Scrum.
 Scrum gives teams the ability to cope with dynamic priorities and requirements by introducing sprint planning, retrospectives, and reviews.
@@ -25,57 +30,74 @@ In order to accept a new functionality we came up with three requirements:
 	\item Must not break any other functionality
 \end{enumerate}
 
-\subsection{Definition of done}
-At the start of our project, we decided that the minimal viable product would be
+\subsection{Definition of done}\label{subsec:definition-of-done}
+As described in the project plan, at the start of our project, we decided that the minimal viable product would be
 one that has all the must-have requirements. The should-haves would be good to aim
 for and the could-haves would be a bonus if they were fulfilled. For individual requirements
 we also defined a definition of done in Gitlab so it would be clear when one was
 completed. We only accepted functionality after this definition of done was satisfied.
 
+Apart from the definition of done, we came up with three other requirements to accept
+new functionality:
+\begin{enumerate}
+	\item Has to have a test coverage of at least 80\%
+	\item Has to have a clear description of the functionality
+	\item Must not break any other functionality
+\end{enumerate}
+
+
 \subsection{Additional tools}
+In order to ensure the quality of our code, we used five additional tools:
 \begin{itemize}
 	\item \verb|pylint| for styling purposes
 	\item \verb|pytest| for basic testing, \verb|pytest-cov| to calculate coverage
 	\item \verb|mutmut| for mutation testing
 	\item \verb|git| for version control using GitLab as the server
-	\item CI (continuous integration) for quality assurance - runs on GitLab after each change
+	\item CI (continuous integration) for quality assurance -- runs on GitLab after each change
 \end{itemize}
 
-\subsection{Communication}
-We make sure all work is done on time and in an upstanding way by meeting every day. This happens either on campus, in Avonic's office, or on Discord as a backup. We discuss our progress and help each other. If any problem arises we brainstorm and come up with solutions together.
-Mattermost serves as a communication channel with our TA.
-WhatsApp is our backup if everything else fails.
+\subsection{Communication}\label{subsection:communication}
+We made sure all work is done on time and in an upstanding way by meeting every
+day. This happened either on campus, in Avonic's office, or on Discord as a
+backup. We discussed our progress and helped each other. If any problem arose, we
+brainstormed and came up with solutions together. Mattermost served as a
+communication channel with our TA. WhatsApp was our backup if everything else
+failed.
 
 \section{Collaboration with Avonic}
 Avonic was open to collaboration and in this section, we give some insights into how it went:
 
-Every week we met with Mr. Kahawati to discuss the progress we are had since our last meeting.
-During those meetings, we would discuss feedback on implemented features and their possible extensions.
+Every week we met with Mr. Kahawati to discuss the progress since our last
+meeting. During those meetings, we would discuss feedback on implemented
+features and their possible extensions. As discussed in
+\hyperref[sec:possible-pitfalls]{possible pitfalls}, we could work in the
+office only a limited amount of time. Avonic gave us a camera and set up VPN
+for us, so we could continue work on project even when were not in the office.
 
-As discussed in \hyperref[sec:possible-pitfalls]{possible pitfalls}. we could work in the office only a limited amount of time. Avonic gave us a camera and set up VPN for us, so we could continue work on project even when were not in the office.
-
-In the beginning of the project, we experienced some problems with time outs of the camera connection over the network, but people in Avonic helped us figure out that it was caused by network settings and not us.
+In the beginning of the project, we experienced some problems with time outs of
+the camera connection over the network, but people at Avonic helped us figure
+out that it was caused by network settings and not us.
 
 \section{Testing}
-In this section we elaborate more on our testing experience and process throughout the development process.
-As mentioned earlier we integrated TDD (test-driven development) in our process but with slight modifications. 
-We wrote the tests in parallel with the actual code and not before. 
-The reason for this is that most of our features were very dynamic depending on the stage of development and very integrated with each other. 
-That meant that we would have to rewrite the tests every time the feature evolves which could be very time-consuming. 
-Still, no merge to the main branch was made without having proper tests. 
-This apporach once more proved to be a very good practice because we managed to find many bugs and unexpected behavior early in development without breaking the functionality of our project. \paragraph
-One of our non-functional requirements was reaching at least 80\% test coverage of the code we write. 
-We kept this number up throughout the whole development process. 
-During the midterm we were exactly at 80\% coverage with the vision that we would increase that number by the end of the project.
- We indeed met that goal by reaching 92\% total coverage. This high number ensures us that the code written is of high quality and free of many potential bugs. \paragraph
-In order to make sure that the tests we wrote were of high quality as well we used mutmut. 
-It helped us improve the test suite against possible mutations. 
-During this process we managed to locate some bugs throughout the code as well as improving the tests themselves. 
-Overall we made sure all our tests cover and capture all aspects of the functionality we have. 
-Running this tool, however, posed a difficulty as our system tests take quite a lot of time to run. 
-That led to one run of mutmut taking a couple of hours which meant we could not do it that often. 
-At the midterm our mutation score was 56\% and we focused on improving that until the end of the project and reached more than 60\%(MORE SPECIFIC?) in the end.\paragraph 
+In this section we elaborate more on our testing experience and process
+throughout the development process. As mentioned earlier we encouraged TDD in
+our process, but it was not enforced, as it is a personal preference. This
+approach once more proved to be a very good practice because we managed to find
+many bugs and unexpected behavior early in development without breaking the
+functionality of our project.
 
+One of our non-functional requirements was reaching at least 80\% test coverage
+of the code. We kept this number up throughout the whole development process.
+During the midterm we were exactly at 80\% coverage with the vision that we
+would increase that number by the end of the project. We indeed met that goal
+by reaching 92\% total coverage.
+
+In order to make sure the quality of the tests we used mutation testing tool \verb|mutmut|.
+During this process we managed to locate bugs throughout the code as well as improve the tests themselves.
+Overall we made sure all our tests cover and capture all aspects of the functionality we have.
+Running this tool, however, posed a difficulty as our system tests take quite a lot of time to run because of the multithreaded nature of the project.
+That led to one run of \verb|mutmut| taking a couple of hours which meant we could not do it that often.
+At the midterm our mutation score was 56\% and we focused on improving that until the end of the project and reached 62\% in the end.
 
 \section{Challenges}
 In this section, we discuss the challenges we faced as a group and how we solved them.
@@ -83,11 +105,11 @@ In this section, we discuss the challenges we faced as a group and how we solved
 From the beginning of the project, the user interface was growing on a single page.
 As the size of the application grew, a new vision for the UI’s pages developed among a part of the team.
 
-The changes introduced a multiple-tab design instead - each section would have own page.
+The changes introduced a multiple-tab design instead -- each section would have own page.
 You would need to switch to a different tab via the menu at the top of the page, to go to a different section.
 
 When a team member presented their changes in the UI design before merging, opinions were divided, as it was not discussed prior to implementation.
-Justification of both sides was centered around the comfort of using the WebUI - one part thought the previous solution was cluttered, while the other considered the new version to require more effort to use.
+Justification of both sides was centered around the comfort of using the WebUI -- one part thought the previous solution was cluttered, while the other considered the new version to require more effort to use.
 
 All of the steps from the Code of conduct were taken to reach a consensus, but the group was still divided after 2 rounds of discussions.
 As we could not reach the decision ourselves, we have decided to ask Mr. Kahawati.
@@ -107,3 +129,18 @@ We could not conduct a good quality assurance process and testing, which led to 
 As we did not have enough knowledge back in time, it took us a whole day of debugging to identify and fix the problem.
 
 Since then, the quality assurance procedure was strengthened, to make sure that features work both in production and development modes.
+
+\subsection{Deployment to Jetson Nano}
+At the beginning of the project it was outlined, that the system should be capable of running on NVIDIA Jetson Nano \textbf{(reference)}.
+Throughout duration of the project we did not have access to the development kit, and as outlined in the possible pitfalls section \ref{sec:possible-pitfalls},
+it added to the difficulty of satisfying this requirement. When we first tried, the project did not launch because of the footage thread.
+It was running fine on our computers, but failed to run on the Jetson, as OpenCV did not take advantage of multiple cores for video capturing and a single platform's
+CPU core was not enough.
+
+We thought that OpenCV with CUDA might resolve it, but it did not help.
+As OpenCV lacks flexibility in video capture, we tried to to add custom FFMPEG frame capturing with hardware-accelerated decoder.
+We managed to compile and patch FFMPEG with necessary codecs, but on Jetson itself, as it was impossible to install all of the packages in a Docker container --
+FFMPEG works only on Bionic Ubuntu 18.04, and Python 3.10 is not supported there.
+Therefore, we have identified the video streaming as impossible on Jetson Nano.
+In order to still be able to deploy the project on Jetson, we have modified the project to support launching without camera footage stream and features that rely on it,
+as camera footage and visual tracking methods are part of could-have requirements, and were not included in teh original Definition of done of the project, described in \ref{subsec:definition-of-done}.
