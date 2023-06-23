@@ -17,10 +17,7 @@ async function selectTracking() {
             break
         case "hybrid":
             header.innerText = "Hybrid tracking  🔭"
-            fetch("/hybrid/track", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
+            url = "/hybrid/track"
             break
         case "object":
             header.innerText = "Continuous object tracking  🔭"
@@ -38,7 +35,6 @@ async function selectTracking() {
         method: "GET",
         headers: { "Content-Type": "application/json" }
     })
-    console.log(await response)
     if (response.status !== 200) {
         alert((await response.json())["message"])
     }
