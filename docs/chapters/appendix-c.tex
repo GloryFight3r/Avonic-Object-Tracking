@@ -15,35 +15,35 @@ IS = Ivan Smilenov \\
     \hline
     The user must be able to send requests and receive acknowledgments from the Sennheiser
 TeamConnect Ceiling 2 microphone.
-        & {} \\
+        & {PK} \\
     \hline
     The user must be able to get the direction to the speaker’s location from the microphone API.
-        & {} \\
+        & {PK} \\
     \hline
     The user must be able to send requests to the Avonic CM-70 camera.
-        & {BS} \\
+        & {BS/PK} \\
     \hline
     The user must be able to point the camera in a certain direction.
-        & {IG/BS} \\
+        & {BS/IG/PK} \\
     \hline
     The user must be able to point the camera to specific pre-set locations,
         choosing the closest one to where the microphone is currently pointing.
-        & {IS/YK/BS} \\
+        & {BS/IS/YK} \\
     \hline
     The system must be able to follow the speakers, knowing the camera’s and
         microphone’s defined position, assuming that all speakers are located
         in the same plane
-        & {IG/IS/YK/BS} \\
+        & {BS/IG/IS/YK} \\
     \hline
     The system must have a web interface for easy use of the camera’s API.
-        & {IG/IS/YK/BS} \\
+        & {BS/IG/IS/PK/YK} \\
 
     \hline \hline
     \multicolumn{2}{|c|}{\textbf{Should have}} \\
     \hline
     The user should be able to calibrate the system with data such as
         specifying the height of the microphone above the speaker plane.
-        & {IG/YK} \\
+        & {IG/PK/YK} \\
     \hline
     The system should be able to find the relative position between the camera
         and the microphone provided only the height of the microphone and the
@@ -62,7 +62,7 @@ TeamConnect Ceiling 2 microphone.
         & {IS/BS} \\
     \hline
     The system could have visual tracking to improve the positioning of the camera.
-        & {IG/YK/BS} \\
+        & {BS/IG/PK/YK} \\
 
     \hline
     The system could enable the camera to zoom in appropriately depending on the speaker’s
