@@ -23,7 +23,7 @@ def test_get_center_box(boxes, resolution, center):
 
 def test_calculate_speed():
     obj_model = ObjectModel(None, None, None, None, np.array([100, 80]))
-    assert (obj_model.calculate_speed(np.array([0, 0])) == [13, 11]).all()
+    assert obj_model.calculate_speed(np.array([0, 0])) == [13, 11]
 
 def generate_box_with_movement():
     return [
