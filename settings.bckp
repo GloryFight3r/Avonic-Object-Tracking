@@ -1,0 +1,8 @@
+camera-ip: 172.26.61.107
+camera-port: 52381
+camera-http-port: 80
+filepath: ''
+microphone-ip: 172.26.61.50
+microphone-port: 45
+microphone-thresh: -90
+secret-key: test

@@ -96,7 +96,7 @@ def get_preset_list(integration: GeneralController):
 def get_preset_info(integration: GeneralController, preset_name: str):
     """ Gets information about a specific preset
 
-        Args: 
+        Args:
             integration: The controller containing all the dependencies
             preset_name: The name of the preset we are looking for
 

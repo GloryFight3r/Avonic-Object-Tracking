@@ -184,7 +184,7 @@ def navigate_camera(integration: GeneralController):
     """ Navigates the camera so that the pixel on which the user has clicked is now in the center
 
     Args:
-        integration: GeneralController containing all the dependencies 
+        integration: GeneralController containing all the dependencies
 
     Returns:
         Success if camera has successfully moved
