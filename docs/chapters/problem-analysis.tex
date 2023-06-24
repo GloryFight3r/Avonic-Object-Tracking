@@ -11,7 +11,7 @@ Finally, we take a look at some potential bottlenecks we could have run into.
 During our first meeting with Mr. Kahawati from Avonic, we have identified the problem statement as follows:
 
 Avonic would like to make it easier to record educational sessions by creating
-a camera that follows the speaker as they move around in a room. The way they want to do
+a camera system that follows the speaker as they move around in a room. The way they want to do
 this is by using a camera at the back of the room that automatically tracks the speaker.
 Avonic has already tried to do this using just the visual information of the camera, but
 it turned out not to be enough to accurately track speakers in all cases:
@@ -20,7 +20,7 @@ while only one person is actually speaking.
 
 To solve this problem, Avonic wants to try to use a microphone in addition
 to the camera to identify the speaker. A common setup would be to have
-the camera in the back of the room and the microphone in the front above the speaker(s).
+the camera in the back of the room and the microphone in the front, above the speaker(s).
 In order to explore this solution, Avonic has asked us to spend
 ten weeks working on a system that tracks a speaker using both a camera and a
 microphone. The camera we have to use is the Avonic CM70 model
@@ -34,7 +34,7 @@ and it should not require any technical knowledge.
 
 To recap:
 using the camera, microphone and single-board computer mentioned above,
-we had to find a way to automatically move to camera to point at a speaker after minimal installation.
+we had to find a way to automatically move the camera to point at a speaker after minimal installation effort.
 
 \begin{figure}
 \centering
@@ -57,7 +57,7 @@ We now discuss three different solutions that are already available for
 customers. These products were created by companies other than Avonic to solve
 a similar problem to the one described in
 \hyperref[sec:problem-statement]{Section 2.1}. Looking at such products helps to get a
-better idea of the state of the art. For every case below, we contrast the
+better idea of the state of the art solutions in this industry. For every case below, we contrast the
 solution with Avonic’s vision and explain how it relates to the project we
 worked on.
 
@@ -72,7 +72,7 @@ the zoomed in lens.
 Though Avonic has tried to use a dual-lens design before, our project is about
 using a single camera with a single lens. To make up for the lack of multiple
 lenses, we have to use a microphone. This way it is still possible to detect
-new speakers that are not in view of the camera. The video processing
+new speakers that are not in the view of the camera. The video processing
 techniques used by AVer may be similar to the ones employed by Avonic, but
 since the microphone was an essential part of our project, the AVer camera
 could not serve as a good source of inspiration.
@@ -97,7 +97,7 @@ AVer and Yealink; all these products have an option to search for a new speaker
 while recording the active speaker.
 
 The use of two cameras thus makes it easier for Cisco to localize the speaker.
-The overall problem is in this way made less complex. Avonic wants to use only
+The overall problem is made less complex using this approach. Avonic wants to use only
 one camera and one microphone and try to track speakers as well as companies
 like Cisco do with two or more cameras.
 
@@ -137,7 +137,7 @@ code for Avonic, we expect this category to include only their developers. It is
 important to the developers that the code is well written and well documented.
 Some of the criteria we used to determine whether code is well written are test
 coverage, readability and extensibility. These criteria and more are explained
-in \hyperref[ch:workflow]{chapter 5} where we talk about the
+in \hyperref[ch:workflow]{Chapter 5} where we talk about the
 workflow.
 
 \paragraph{Avonic}\mbox{} \\
