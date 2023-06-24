@@ -3,7 +3,7 @@ import socket
 import time
 import pytest
 import numpy as np
-from web_app.integration import GeneralController
+from web_app.integration import GeneralController, close_running_threads
 from avonic_camera_api.camera_control_api import CameraAPI
 from avonic_camera_api.camera_http_request import CameraHTTP
 from avonic_camera_api.camera_control_api import CameraSocket
@@ -97,4 +97,12 @@ def client(camera, monkeypatch):
 def test_load_env(client):
     time.sleep(0.5)
     test_controller.footage_thread_event.value = 0
-    test_controller.info_threads_break.value = 1
+    #test_controller.info_threads_break.value = 1
+
+    rv = client.post("/info-thread/start")
+    assert rv.status_code == 200
+    time.sleep(1)
+    rv = client.post("/info-thread/stop")
+    assert rv.status_code == 200
+
+    close_running_threads(test_controller, 1, False)

@@ -431,7 +431,7 @@ def verify_address(address) -> bool:
         print("ERROR: Address " + address + " is invalid!")
         return False
 
-def close_running_threads(integration_passed, timeout_seconds: int = 1) -> None:
+def close_running_threads(integration_passed, timeout_seconds: int = 1, raise_exit= True) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""
     integration_passed.footage_thread_event.value = 0  # pragma: no mutate
     integration_passed.info_threads_break.value = 1  # pragma: no mutate
@@ -448,4 +448,5 @@ def close_running_threads(integration_passed, timeout_seconds: int = 1) -> None:
 
     cv2.destroyAllWindows()  # pragma: no mutate
     integration_passed.video.release()  # pragma: no mutate
-    raise SystemExit  # pragma: no mutate
+    if raise_exit:
+        raise SystemExit  # pragma: no mutate
