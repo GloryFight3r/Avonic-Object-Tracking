@@ -1,17 +1,17 @@
 This chapter first explains the challenges any proposed solution should attempt
-to solve (\hyperref[sec:solution-challenges]{section 4.1}). Afterwards, we explain the
-solution we implemented (\hyperref[sec:implemented-solution]{section 4.2}) and discuss
+to solve (\hyperref[sec:solution-challenges]{Section 4.1}). Afterwards, we explain the
+solution we implemented (\hyperref[sec:implemented-solution]{Section 4.2}) and discuss
 alternative solutions that we did not choose
-(\hyperref[sec:alternative-approaches]{section 4.3}). Finally, we talk about the object
-tracking part of our solution (\hyperref[sec:visual-object-tracking]{section 4.4}) and we
+(\hyperref[sec:alternative-approaches]{Section 4.3}). Finally, we talk about the object
+tracking part of our solution (\hyperref[sec:visual-object-tracking]{Section 4.4}) and we
 give an overview of the structure of our application
-(\hyperref[sec:application-overview]{section 4.5}).
+(\hyperref[sec:application-overview]{Section 4.5}).
 A diagram showing the use cases for each of the four different
 tracking models we created is shown in Figure \ref{fig:model-use-case-diagram}.
 
 \section{Challenges that must be overcome}\label{sec:solution-challenges}
 In this section, we describe two groups of constraints that any solution to the
-problem described in \hyperref[ch:problem-analysis]{chapter 2} has to try to solve. The
+problem described in \hyperref[ch:problem-analysis]{Chapter 2} has to try to solve. The
 first group contains everything related to technology and the second group
 contains everything related to the user.
 
@@ -21,13 +21,13 @@ that can be put on the same network as the microphone and the camera. This adds
 a limitation on the amount of available computational resources. We could rely on cloud
 computing power, but that would lead to a big delay in camera movement and
 additional risks to security and maintainability. Additionally, our project
-relies on three special hardware devices -- a camera, and a microphone and a
+relies on three special hardware devices -- a camera, a microphone and a
 single-board computer (SBC). The final product should account for all the inherent
 limitations of these devices.
 
-It is important to understand that microphone allows
+It is important to understand that the microphone allows
 us to only retrieve information provided by the Sennheiser which is limited to
-direction toward the speaker and peak loudness level, since we do not have access to each individual microphone
+the direction toward the speaker and the peak loudness level, since we do not have access to each individual microphone
 within the array. The biggest limitation is the fact that the
 microphone does not provide the exact origin of the detected sound, as it is
 quite a difficult technical challenge to calculate
@@ -68,7 +68,7 @@ microphone within the array. That can be easily shown when one imagines a
 speaker, who starts off standing directly beneath the microphone array, sitting
 down. Our program will then not be able to discern whether to tilt the camera
 up or down based solely on the information provided by the ceiling microphone.
-This means that we need to make assumptions about the environment of the room:
+This means that we needed to make assumptions about the environment of the room:
 
 
 \begin{enumerate}
@@ -78,7 +78,7 @@ This means that we need to make assumptions about the environment of the room:
 \end{enumerate}
 Through the process of the research and reiteration of our proposals, we found
 this set of assumptions to be the smallest set possible given our limited time
-and the limitations mentioned in \hyperref[sec:solution-challenges]{section
+and the limitations mentioned in \hyperref[sec:solution-challenges]{Section
 4.1}. While assumptions 2 and 3 are in place to guarantee the intended way of
 using the system, assumption 1 is formulated to determine the distance from the
 microphone to the speaker.
@@ -102,7 +102,7 @@ for us in 10 weeks.
 
 \subsection{Calibration}\label{subsec:calibration}
 During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
-To achieve this, the user first sets microphone's height above the speaker plane.
+To achieve this, the user first sets the microphone's height above the speaker plane.
 Then, a person is sent into the room. They direct the camera at themselves and speak.
 The direction obtained from the camera and microphone combined with the
 microphone's height above the so-called speaker plane is enough to calculate
@@ -161,7 +161,7 @@ The proposed solution followed the following algorithm for calibration and track
 \end{enumerate}
 Although this solution might sound fascinating and simple, it does not work in reality.
 This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
-This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\footnote{geogebra.org}\cite{geogebra}.
+This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\footnote{www.geogebra.org/apps}.
 Unfortunately, the camera and microphone are not always in the same or opposite
 positions, as the system should work with any arbitrary position of the camera.
 For this reason, we left this solution behind.
@@ -236,7 +236,7 @@ than the RT-DETR. This is why we ended up using the latest available version of 
 \subsection{Integration of object tracking into our speaker tracker}
 The problem of combining two systems of tracking a speaker, both object tracking and speaker tracking, is discussed in
 this section. A decision has to be made by the system whether to listen to the speaker tracker or the object tracker.
-There are three strategies we implemented in our system to deal with this problem. We review each of them and explain in what kind of situation the strategies work best. Avonic has asked us to give audio-based speaker tracking priority over object detection using video frames. Because of this, all strategies we tried to use audio to determine the location of the speaker for the most important (i.e. biggest) movements.
+There are three strategies we experimented with to deal with this problem. We review each of them and explain in what kind of situation the strategies work best. Avonic has asked us to give audio-based speaker tracking priority over object detection using video frames. Because of this, all strategies we tried use audio to determine the location of the speaker for the most important (i.e. biggest) movements.
 Since the last two strategies both improve speaker tracking in different ways, the web UI gives users the option to choose between these methods.
 
 \paragraph{Thresholding of camera movements}\mbox{} \\
@@ -259,7 +259,7 @@ For this reason, we do not consider the thresholding strategy to be a good strat
 \paragraph{Waiting for small movements}\mbox{} \\
 In order to avoid the problem of sending different signals at the same time, we considered disabling
 object tracking when speaker tracking was running and vice versa. Since the speaker tracking should
-still, be responsible for big movements in the system, we decided to wait till the speaker tracker
+still be responsible for big movements in the system, we decided to wait till the speaker tracker
 points to the same direction for a variable amount of iterations; one iteration means one time the
 the microphone detects a sound louder than the defined threshold.
 This means that object tracking is used when someone is not moving a lot, but it will never be used
@@ -312,7 +312,7 @@ illustrates the possible states we could be in is the depicted in Figure
 
 \section{Application overview}\label{sec:application-overview}
 In this section, we will discuss our application's structure and our motivations behind it.
-We go over each of the four modules in our project: the camera API, the microphone api, the tracking
+We go over each of the four modules in our project: the camera API, the microphone API, the tracking
 module and the web interface. Each module is separated in the code in order to make it easier
 for other developers to work on our code.
 
@@ -353,7 +353,7 @@ The main advantage of this design pattern in our project is that it makes sure o
 
 \paragraph{Footage thread}\mbox{} \\
 The final part of the Camera API module is the thread that reads video frames from the camera stream.
-This thread retrieves footage from Real Time Streaming Protocol (RTSP) stream of the camera using \verb|OpenCV|.
+This thread retrieves footage from the Real Time Streaming Protocol (RTSP) stream of the camera using \verb|OpenCV|.
 The frames are continually read by the thread so that the latest frame is always available in the buffer.
 This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
 
@@ -373,7 +373,7 @@ All of the functionality related to speaker tracking is contained in this
 module. The most important part of it is the \verb|UpdateThread|. It is
 responsible for continuously calling the method that directs the camera.
 The module is structured in a way that every tracking type is maintained in a
-so-called model. Every model is inherits from the \verb|TrackingModel| and has
+so-called model. Every model inherits from the \verb|TrackingModel| and has
 the appropriate implementation of the point method. The user can pick their
 preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
@@ -422,7 +422,7 @@ zooms in accordingly. Another improvement we implemented in this model is
 changing the camera speed depending on how much it has to move. It helps reduce
 jittering when following the speaker. The model also saves calculated vectors that were
 added to the calibration and can load this data from a supplied file. If any of the
-fields from that file are non-existent or corrupted, they are replaced with
+fields from that file are non-existent or corrupted, they are replaced by
 default values.
 
 \paragraph{Audio model without adaptive zooming}\mbox{} \\
@@ -442,7 +442,7 @@ The Object Tracking Model is intended to refine our tracking in situations when
 the speaker is not audible or the microphone’s direction towards the speaker is
 not precise enough to accurately center the speaker. After having identified all
 the people in the frame and having created the corresponding bounding boxes
-around them it has a method to find the box that is most likely to be the one
+around them, it has a method to find the box that is most likely to be the one
 around the speaker. Then another method calculates the relative direction in
 which the camera has to move to center the box. It takes into account the
 zooming and field of view of the camera in order to make the calculations. As
