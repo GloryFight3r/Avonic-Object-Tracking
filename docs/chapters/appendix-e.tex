@@ -1,0 +1,64 @@
+Below you find documentation of all of the endpoints provided
+by our application.
+
+\section{Page rendering}
+
+\paragraph{GET /} \mbox{} \\
+Render the main page of the WebUI.
+This page includes everything our application has to offer in one neatly organised package
+
+\paragraph{GET /camera-control} \mbox{} \\
+Render a page that includes only the camera controls.
+
+\paragraph{GET /microphone-control} \mbox{} \\
+Render a page that includes only the microphone information.
+That means the buttons to get its direction and whether someone is currently speaking.
+
+\paragraph{GET /presets-and-calibration} \mbox{} \\
+Render a page that includes only set-up for presets and calibration.
+
+\paragraph{GET /live-footage} \mbox{} \\
+Render a page that includes only the video stream from the camera.
+
+\section{Camera endpoints}
+
+\paragraph{POST /camera/address/set} \mbox{} \\
+Endpoint that sets the camera network settings.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|camera-ip|: the address of the connected camera
+    \item \verb|camera-port|: the camera port
+    \item \verb|camera-http-port|: the HTTP port of the camera
+\end{itemize}
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP code corresponds to the camera response:
+        \begin{itemize}
+            \item \verb|message|: description of the received response code from the camera
+        \end{itemize}
+    }
+    \item{
+        Possible HTTP 400: invalid supplied values
+        \begin{itemize}
+            \item \verb|message|: ``Invalid address!''
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/reboot} \mbox{} \\
+
+Endpoint that reboots the camera.
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item{
+    Other HTTP codes: HTTP code corresponds to the camera response
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera
+    \end{itemize}
+    }
+\end{itemize}
+
