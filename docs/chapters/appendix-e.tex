@@ -414,3 +414,165 @@ Endpoint that returns the list of all saved presets.
 \begin{itemize}
     \item \verb|"preset-list"|: list of all presets in a JSON format
 \end{itemize}
+
+\section{Tracking endpoints}
+
+\paragraph{GET /preset/track} \mbox{}
+Endpoint that changes the tracking to use the preset model.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item \verb|"tracking"|: value representing preset model
+\end{itemize}
+
+\paragraph{GET /hybrid/track} \mbox{}
+Endpoint that changes the tracking to use the hybrid model
+
+\verb|return:|
+\begin{itemize}
+    \item \verb|"tracking"|: value representing quick change object-audio model
+\end{itemize}
+
+\paragraph{GET /calibration/track} \mbox{}
+Endpoint that changes the tracking to use the audio model
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: the model has successfully been set to the AudioModel}
+    \item \verb|"tracking"|: the enum corresponding to the AudioModel
+\end{itemize}
+
+\paragraph{GET /calibration/track/no/zoom} \mbox{}
+Endpoint that changes the tracking to use the audio model without adaptive zooming
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: the model has successfully been set to the AudioModelNoAdaptiveZoom}
+    \item \verb|"tracking"|: the enum corresponding to the AudioModelNoAdaptiveZoom
+\end{itemize}
+
+\paragraph{GET /object/track} \mbox{}
+Endpoint that changes the tracking to use the object tracking model
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: the model has successfully been set to the WaitObjectAudioModel}
+    \item \verb|"tracking"|: the enum corresponding to the WaitObjectAudioModel
+\end{itemize}
+
+\section{Thread endpoints}
+
+\paragraph{POST /thread/start} \mbox{} \\
+Endpoint that starts the tracking thread
+\begin{itemize}
+  \item{HTTP 200: the thread has successfully been started}
+  \item{HTTP 403: the thread has already been started before}
+\end{itemize}
+
+\paragraph{POST /thread/stop} \mbox{} \\
+Endpoint that stops the tracking thread
+
+\begin{itemize}
+  \item{HTTP 200: successfully stopped the tracking thread}
+\end{itemize}
+
+\paragraph{GET /thread/running} \mbox{} \\
+Endpoint that checks whether the tracking thread is running. This means that the thread is
+        not None and that it is alive.
+
+\verb|return:|
+\begin{itemize}
+  \item {\verb|"is-running"|: a boolean value indicating whether the thread is running or not}
+\end{itemize}
+
+\section{Info-thread and update endpoints}
+
+\paragraph{GET /update/microphone}
+Endpoint that updates the microphone data in the WebUI
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully updated the microphone coordinates}
+\end{itemize}
+
+\paragraph{GET /update/camera}
+Endpoint that updates the camera data in the WebUI
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully updated the camera coordinates}
+\end{itemize}
+
+\paragraph{POST /info-thread/start} \mbox{} \\
+Endpoint that starts the thread that updates all the dynamic data.
+This means the current directions and more for both the camera and microphone.
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully started the info thread.}
+\end{itemize}
+
+\paragraph{POST /info-thread/stop} \mbox{} \\
+Endpoint that stops the thread that updates all the dynamic data.
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully stopped the info thread.}
+\end{itemize}
+
+\section{Settings endpoints}
+\paragraph{GET /settings/get} \mbox{} \\
+
+Endpoint that returns the settings that are currently active.
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: success and data}
+  \begin{itemize}
+    \item \verb|"camera-ip"|: the address of the connected camera
+    \item \verb|"camera-port"|: the port of the connected camera
+    \item \verb|"camera-http-port"|: the HTTP port of the connected camera
+    \item \verb|"microphone-ip"|: the address of the connected microphone
+    \item \verb|"microphone-port"|: the port of the connected microphone
+    \item \verb|"microphone-tresh"|: an int value between -90 and 0 representing the preferred
+    volume threshold
+    \item \verb|"filepath"|: a string representing the folder in which the settings file is stored
+  \end{itemize}
+\end{itemize}
+
+\paragraph{POST /settings/set} \mbox{} \\
+Endpoint that returns the settings that are currently active.
+
+\verb|form:|
+\begin{itemize}
+  \item \verb|"camera-ip"|: the address of the camera to connect to
+  \item \verb|"camera-port"|: the port of the camera to connect to
+  \item \verb|"camera-http-port"|: the new port for HTTP requests to the camera
+  \item \verb|"microphone-ip"|: the address of the microphone to connect to
+  \item \verb|"microphone-port"|: the port of the microphone to connect to
+  \item \verb|"microphone-tresh"|: an int value between -90 and 0 representing the preferred volume threshold.
+  \item \verb|"filepath"|: a string representing the folder in which to store the settings file.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 400: either the threshold or the filepath were not given correctly
+            \item HTTP 500: an error occurred while writing to the settings file
+        \end{itemize}
+        \verb|"message"|: description of the error that was caught
+    }
+    \item{
+        In case of success:
+        \begin{itemize}
+            \item HTTP 200: success code
+        \end{itemize}
+    }
+\end{itemize}
+
+\section{WebSocket}
+\section{Camera frame endpoints}
+Websocket endpoint that sends a new frame in base64 to the web interface
+\verb|return:|
+\begin{itemize}
+  \item {\verb|"new-frame"|: {\verb|"base64"|: Camera frame in base64}}
+\end{itemize}
