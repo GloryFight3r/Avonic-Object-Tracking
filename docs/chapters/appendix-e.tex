@@ -21,23 +21,21 @@ Render a page that includes only set-up for presets and calibration.
 Render a page that includes only the video stream from the camera.
 
 \section{Camera endpoints}
-
 \paragraph{POST /camera/address/set} \mbox{} \\
 Endpoint that sets the camera network settings.
 
 \verb|form:|
 \begin{itemize}
-    \item \verb|camera-ip|: the address of the connected camera
-    \item \verb|camera-port|: the camera port
-    \item \verb|camera-http-port|: the HTTP port of the camera
+    \item \verb|camera-ip|: the address of the connected camera.
+    \item \verb|camera-port|: the camera port.
+    \item \verb|camera-http-port|: the HTTP port of the camera.
 \end{itemize}
-
 \verb|return:|
 \begin{itemize}
     \item{
         HTTP code corresponds to the camera response:
         \begin{itemize}
-            \item \verb|message|: description of the received response code from the camera
+            \item \verb|message|: description of the received response code from the camera.
         \end{itemize}
     }
     \item{
@@ -49,16 +47,193 @@ Endpoint that sets the camera network settings.
 \end{itemize}
 
 \paragraph{POST /camera/reboot} \mbox{} \\
-
 Endpoint that reboots the camera.
+
 \verb|return:|
 \begin{itemize}
     \item{HTTP 200: success, empty message}
     \item{
     Other HTTP codes: HTTP code corresponds to the camera response
     \begin{itemize}
-        \item \verb|"message"|: description of the received response code from the camera
+        \item \verb|"message"|: description of the received response code from the camera.
     \end{itemize}
     }
 \end{itemize}
 
+\paragraph{POST /camera/on} \mbox{} \\
+Endpoint that turns the camera's video on.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item{
+    Other HTTP codes: HTTP code corresponds to the camera response
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/off} \mbox{} \\
+Endpoint that turns the camera's video off.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item{
+    Other HTTP codes: HTTP code corresponds to the camera response
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/move/absolute} \mbox{} \\
+Endpoint that sends a command to the camera to point in a direction relative to the home one.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"absolute-speed-x"|: Integer from 1 -- 24, the pan speed.
+    \item \verb|"absolute-speed-y"|: Integer from 1 -- 20, the tilt speed.
+    \item \verb|"absolute-degrees-x"|: Float from -170 -- 170, the amount of degrees to pan by.
+    \item \verb|"absolute-degrees-y"|: Float from -30 -- 90, the amount of degrees to tilt by.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+    \item{Possible HTTP 400: assertion error of validity of supplied values}
+\end{itemize}
+
+\paragraph{POST /camera/move/relative} \mbox{} \\
+Endpoint that sends a command to the camera to point in a direction relative to the current one.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"relative-speed-x"|: Integer from 1 -- 24, the pan speed.
+    \item \verb|"relative-speed-y"|: Integer from 1 -- 20, the tilt speed.
+    \item \verb|"relative-degrees-x"|: Float from -170 -- 170, the amount of degrees to pan by.
+    \item \verb|"relative-degrees-y"|: Float from -30 -- 90, the amount of degrees to tilt by.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+    \item{Possible HTTP 400: assertion error of validity of supplied values}
+\end{itemize}
+
+\paragraph{POST /camera/move/vector} \mbox{} \\
+Same as \verb|/camera/move/absolute| but a vector is used as a direction instead of two angles.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"vector-speed-x"|: Integer from 1 -- 24, the pan speed.
+    \item \verb|"vector-speed-y"|: Integer from 1 -- 20, the tilt speed.
+    \item \verb|"vector-x"|: Float representing the x-coordinate of the direction vector.
+    \item \verb|"vector-y"|: Float representing the y-coordinate (height) of the direction vector.
+    \item \verb|"vector-y"|: Float representing the z-coordinate of the direction vector.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+    \item{Possible HTTP 400: assertion error of validity of supplied values}
+\end{itemize}
+
+\paragraph{POST /camera/move/home} \mbox{} \\
+Endpoint to move the camera to its home direction $[0, 0, 1]$.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/move/stop} \mbox{} \\
+Endpoint to stop all the camera's movement.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /camera/zoom/get} \mbox{} \\
+Endpoint to get the zoom value of the camera.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        In case of an error: HTTP code corresponds to the camera response.
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        In case of success: HTTP 200
+        \begin{itemize}
+            \item \verb|"zoom-value"|: Integer in range $[0, 16384]$, the value of the zoom.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/zoom/set} \mbox{} \\
+Endpoint to set the zoom value of the camera.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"zoom-value"|: Integer in range $[0, 16384]$, the value of the zoom
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        In case of an error: HTTP code corresponds to the camera response.
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        Possible HTTP 400: assertion error of validity of supplied values
+    }
+\end{itemize}
+
+\paragraph{GET /camera/position/get} \mbox{} \\
+Endpoint to get the current pan and tilt values of the camera.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        In case of an error: HTTP code corresponds to the camera response.
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        In case of success: HTTP 200
+        \begin{itemize}
+            \item \verb|"position-alpha-value"|: pan value of the camera
+            \item \verb|"position-beta-value"|: tilt value of the camera
+        \end{itemize}
+
+    }
+\end{itemize}
