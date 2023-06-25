@@ -26,22 +26,22 @@ Endpoint that sets the camera network settings.
 
 \verb|form:|
 \begin{itemize}
-    \item \verb|camera-ip|: the address of the connected camera.
-    \item \verb|camera-port|: the camera port.
-    \item \verb|camera-http-port|: the HTTP port of the camera.
+    \item \verb|"camera-ip"|: the address of the connected camera.
+    \item \verb|"camera-port"|: the camera port.
+    \item \verb|"camera-http-port"|: the HTTP port of the camera.
 \end{itemize}
 \verb|return:|
 \begin{itemize}
     \item{
         HTTP code corresponds to the camera response:
         \begin{itemize}
-            \item \verb|message|: description of the received response code from the camera.
+            \item \verb|"message"|: description of the received response code from the camera.
         \end{itemize}
     }
     \item{
         Possible HTTP 400: invalid supplied values
         \begin{itemize}
-            \item \verb|message|: ``Invalid address!''
+            \item \verb|"message"|: ``Invalid address!''
         \end{itemize}
     }
 \end{itemize}
@@ -236,4 +236,181 @@ Endpoint to get the current pan and tilt values of the camera.
         \end{itemize}
 
     }
+\end{itemize}
+
+\section{Microphone endpoints}
+\paragraph{POST /microphone/address/set} \mbox{} \\
+Endpoint that sets the microphone network settings.
+\verb|form:|
+\begin{itemize}
+    \item \verb|"microphone-ip"|: a string, the address of the microphone.
+    \item \verb|"microphone-port"|: the microphone port.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200 or 400: Text of the return message from the microphone.
+
+    }
+    \item{
+        Possible HTTP 400: not valid supplied address or port
+        \begin{itemize}
+            \item \verb|"message"|: ``Invalid address!''
+        \end{itemize}
+
+    }
+\end{itemize}
+
+\paragraph{POST /microphone/height/set} \mbox{} \\
+Endpoint to set the height of the microphone above the speaker plane.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"microphone-height"|: float representing value to be set.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-height"|: with the value that was set.
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /microphone/direction} \mbox{} \\
+Endpoint to get the current direction to the loudest noise in the room from the microphone.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-direction"|: list with 3 float values representing direction of the speaker.
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /microphone/speaker/direction} \mbox{} \\
+Endpoint to get the direction of the active speaker. Used for setting up presets and calibrating.
+Actively loops polling data from the microphone, waits for 5 seconds.
+If nobody has spoken in 5 seconds - returns current direction from the microphone.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-direction"|: list with 3 float values representing direction of the speaker.
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /microphone/speaking} \mbox{} \\
+Endpoint to inquire whether anyone is speaking.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-speaking"|: boolean representing is some someone speaking at the moment
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\section{Preset endpoints}
+\paragraph{POST /preset/add} \mbox{} \\
+Endpoint that saves a preset to the preset collection.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"preset-name"|: Unique string representing the name of the preset.
+    \item \verb|"camera-direction-alpha"|: Float from -170 -- 170 representing the yaw of the camera
+    \item \verb|"camera-direction-beta"|: Float from -30 -- 90 representing the pitch of the camera
+    \item \verb|"camera-zoom-value"|: Integer with the zoom value $[0, 16384]$
+    \item \verb|"mic-direction-x"|: Float representing the x-coordinate of the direction vector.
+    \item \verb|"mic-direction-y"|: Float representing the y-coordinate of the direction vector.
+    \item \verb|"mic-direction-z"|: Float representing the z-coordinate of the direction vector.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: success, empty message
+    }
+    \item{
+        HTTP 400: invalid supplied values, empty message
+    }
+\end{itemize}
+
+\paragraph{POST /preset/edit} \mbox{} \\
+Endpoint that edits a preset in the preset collection.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"preset-name"|: String representing the name of the preset.
+    \item \verb|"camera-direction-alpha"|: Float from -170 -- 170 representing the yaw of the camera
+    \item \verb|"camera-direction-beta"|: Float from -30 -- 90 representing the pitch of the camera
+    \item \verb|"camera-zoom-value"|: Integer with the zoom value $[0, 16384]$
+    \item \verb|"mic-direction-x"|: Float representing the x-coordinate of the direction vector.
+    \item \verb|"mic-direction-y"|: Float representing the y-coordinate of the direction vector.
+    \item \verb|"mic-direction-z"|: Float representing the z-coordinate of the direction vector.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: success, empty message
+    }
+    \item{
+        HTTP 400: invalid supplied values, empty message
+    }
+\end{itemize}
+
+\paragraph{POST /preset/remove} \mbox{} \\
+Endpoint that removes the given preset from the preset collection.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"preset-name"|: string name for the preset.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: success, empty message
+    }
+    \item{
+        HTTP 400: invalid supplied values, empty message
+    }
+\end{itemize}
+
+\paragraph{GET /preset/get-list} \mbox{} \\
+Endpoint that returns the list of all saved presets.
+
+\verb|return:|
+\begin{itemize}
+    \item \verb|"preset-list"|: list of all presets in a JSON format
 \end{itemize}
