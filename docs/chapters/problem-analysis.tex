@@ -1,10 +1,11 @@
 The goal of this chapter is to give a clear idea of why the project was needed,
 who is impacted by the project and how it stands in relation to other projects.
-First, we look at the user story.
+First, we look at the user story in \ref{sec:problem-statement}.
 Secondly, we consider three cases of other companies that have solved
-a similar problem and explain how they relate to our own project. % add links to relevant parts
-Then we describe the stakeholders and assess the ethical implications of our project.
-Finally, we take a look at some potential bottlenecks we could have run into.
+a similar problem and explain how they relate to our own project in \ref{sec:available-solutions}
+Then we describe the stakeholders in \ref{sec:stakeholders} and assess potential bottlenecks
+we could have run into inside \ref{sec:possible-pitfalls}.
+Finally, in \ref{sec:ethical-implications} we take a look at the ethical implications of our project.
 
 
 \section{Problem statement}\label{sec:problem-statement}
@@ -18,22 +19,22 @@ it turned out not to be enough to accurately track speakers in all cases:
 multiple people may look like the speaker by moving or opening their mouths,
 while only one person is actually speaking.
 
-To solve this problem, Avonic wants to try to use a microphone in addition
+To solve this problem, Avonic wants to try to use a microphone array in addition
 to the camera to identify the speaker. A common setup would be to have
 the camera in the back of the room and the microphone in the front, above the speaker(s).
 In order to explore this solution, Avonic has asked us to spend
 ten weeks working on a system that tracks a speaker using both a camera and a
-microphone. The camera we have to use is the Avonic CM70 model
+\gls{microphone}. The camera we have to use is the Avonic CM70 model
 (figure \ref{fig:camera}) and the
 microphone is the Sennheiser TeamConnect Ceiling 2 (figure \ref{fig:microphone}).
 We are not allowed to
-reprogram these devices. That is why a single-board computer, the Nvidia Jetson Nano,
+reprogram these devices. That is why a single-board computer, the Nvidia Jetson Nano in our case,
 has to be used to communicate with the camera and microphone through application programming
 interfaces (APIs). Moreover, it should be easy for a user to start the system
 and it should not require any technical knowledge.
 
 To recap:
-using the camera, microphone and single-board computer mentioned above,
+using the camera, \gls{microphone} and single-board computer mentioned above,
 we had to find a way to automatically move the camera to point at a speaker after minimal installation effort.
 
 \begin{figure}
@@ -55,26 +56,26 @@ we had to find a way to automatically move the camera to point at a speaker afte
 \section{Available solutions}\label{sec:available-solutions}
 We now discuss three different solutions that are already available for
 customers. These products were created by companies other than Avonic to solve
-a similar problem to the one described in
-\hyperref[sec:problem-statement]{Section 2.1}. Looking at such products helps to get a
+a similar problem to the one described in Section \ref{sec:problem-statement}.
+Looking at such products helps to get a
 better idea of the state-of-the-art solutions in this industry. For every case below, we contrast the
 solution with Avonic’s vision and explain how it relates to the project we
 worked on.
 
 \paragraph{AVer}\mbox{} \\
-AVer created a camera that can ``automatically track a presenter’s face and
+AVer created a camera that can ``automatically track a presenter's face and
 movements''\cite{aver-camera}. The camera stands alone and is not helped by an
 external microphone. Instead, it has a so-called ``dual-lens design'' that
 allows to keep a secondary panorama view while zooming in on the speaker. In
 this way, new speakers can still be recognized when they are not recorded by
 the zoomed-in lens.
 
-Though Avonic has tried to use a dual-lens design before, our project is about
+Avonic has tried to use a dual-lens design before, but our project is about
 using a single camera with a single lens. To make up for the lack of multiple
-lenses, we have to use a microphone. This way it is still possible to detect
+lenses, we have to use a \gls{microphone}. This way it is still possible to detect
 new speakers that are not in the view of the camera. The video processing
 techniques used by AVer may be similar to the ones employed by Avonic, but
-since the microphone was an essential part of our project, the AVer camera
+since the \gls{microphone} was an essential part of our project, the AVer camera
 could not serve as a good source of inspiration.
 
 \paragraph{Yealink}\mbox{} \\
@@ -93,30 +94,30 @@ Using one camera, Cisco locates the speaker and zooms in on them, while
 another camera is watching the entire room to look for the next possible
 speaker\cite{cisco-camera}. This dual-camera approach helps to switch quickly
 between different speakers. It can be compared to the dual-lens design used by
-AVer and Yealink; all these products have an option to search for a new speaker
-while recording the active speaker.
+AVer and Yealink: all these products have an option to search for a new speaker
+while recording the current one.
 
 The use of two cameras thus makes it easier for Cisco to locate the speaker.
 The overall problem is simplified using this approach. We were assigned by Avonic to use only
-one camera and one microphone and try to track speakers as well as companies
+one camera and one microphone array and try to track speakers as well as companies
 like Cisco do with two or more cameras.
 \\ \\
-As we can see, the most common approach to pinpointing the speaker problem is
+As we can see, the most common approach to the problem of pinpointing the speaker is
 to use a dual-lens or dual-camera design. On behalf of Avonic, we experimented
-with a new approach: one camera and one microphone. This poses new problems.
+with a new approach: one camera and one microphone array. This poses new problems.
 Our devised solution is described in \hyperref[ch:solution]{Chapter 4}.
 
 \section{Stakeholders}\label{sec:stakeholders}
-This section describes who the stakeholders of our project are and how we
+This section describes who the stakeholders of our project are and how we have
 considered their interests during the ten-week process. The definition of
 stakeholder that we are going to use is as follows: ``All those who have an
 interest in the system and who will eventually be responsible for its
 acceptance''\cite{stakeholder-definition}. Using this definition, we identified
-four main types of stakeholders. These people are directly affected by the
+four main types of stakeholders. These people and companies are directly affected by the
 result of our project. The types of stakeholders of our project are as follows:
 
 \paragraph{Presenters}\mbox{} \\
-People who participate in lectures or conferences using MaAT have a high
+People who participate in conferences or giving lectures using MaAT have a high
 interest in the quality of the speaker tracking. They want their activity to be
 well recorded. If the speaker tracking is not correct or not smooth, these
 stakeholders will not be satisfied with the product. The accuracy of the
@@ -133,7 +134,7 @@ without any guidance.
 \paragraph{Developers}\mbox{} \\
 Developers could be building upon our code in the future. Since we write our
 code for Avonic, we expect this category to include only their developers. It is
-important to the developers that the code is well written and well documented.
+important to the developers that the code is well written and especially well documented.
 Some of the criteria we used to determine whether code is well written are test
 coverage, readability and extensibility. These criteria and more are explained
 in \hyperref[ch:workflow]{Chapter 5} where we talk about the
@@ -165,19 +166,19 @@ tried to reduce their impact as much as possible. We list these risks below.
 
 \subsection{Access to hardware}
 The largest risk was access to the hardware (or lack thereof). Since our
-project relies on the availability of both the camera and microphone, we would
+project relies on the availability of both the camera and the microphone array, we would
 have been unable to work on it without them. Our contact person from Avonic --
 Mr. Kahawati -- informed us that we would only be able to come to the office
 three days a week, which could have prevented us from working on the project
 on the other days.
 
 We were allowed to bring a camera home to test, but that was not an option for
-the large and expensive ceiling microphone. We mitigated this by using a
+the large and expensive ceiling microphone array. We mitigated this by using a
 virtual private network (VPN) connection to the office. This way we had a way
-to access the microphone remotely, although we could not test it very well when
+to access the \gls{microphone} remotely, although we could not test it very well when
 nobody from the group was at the office.
 
-Apart from the camera and the microphone, we also needed an NVIDIA Jetson Nano
+Apart from the camera and the \gls{microphone}, we also needed an Nvidia Jetson Nano
 to run our software. This device became available during the eighth week of the
 project, which caused some new problems to appear in our code. Up until that
 point we had used our own computers to simulate the production environment.
@@ -191,11 +192,11 @@ meetings required a quiet meeting room, which we were not always able to find.
 On the days that we were not able to go to the office, we tried to find a room
 on the TU Delft campus. Whenever we were not able to get a meeting room, we
 went to a public place on campus. In such places, we could still have meetings
-and we could still work closely together. All our meetings with Mr. Kahawati
+and work closely together. All our meetings with Mr. Kahawati
 happened on days we could visit the office, so those meetings did not suffer
-from our limited time at the office.
+from our limited time there.
 
-\section{Ethical implications}
+\section{Ethical implications}\label{sec:ethical-implications}
 We investigated the ethical implications by looking at five categories of
 ethical risks. We discuss all of these categories in
 \hyperref[ch:ethics-appendix]{Appendix A - Ethical implications}. In the current
@@ -206,6 +207,6 @@ unethical actions for which our tracker can be used, could also be done by using
 a smartphone; often in a more effective way. This includes things like
 surveillance and the spreading of personal data. Though it is possible to use
 our tracker to collect personal data without permission, it will be hard to do
-so: the microphone and the camera are difficult to hide and they need to be
+so: the microphone and the camera are difficult to hide, and they need to be
 correctly calibrated. Because of this, we do not expect our tracker to be used
 in any unethical way.

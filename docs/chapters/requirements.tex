@@ -1,8 +1,9 @@
 This chapter presents an overview of the required functionality of the speaker tracking camera.
 These requirements dictate the design of our system.
-We have ordered them using the MoSCoW method\cite{moscow} which we describe in \hyperref[ch:moscow-methodology]{Appendix D - MoSCoW methodology}.
+We have ordered them using the MoSCoW method\cite{moscow}, which we describe in \hyperref[ch:moscow-methodology]{Appendix D - MoSCoW methodology}.
 All of the requirements fall under one of the following categories: ‘Must-have’,
-‘Should-have’, ‘Could-have’, ‘Won't-have’. Furthermore, we also list some non-functional requirements we have for our system.
+‘Should-have’, ‘Could-have’, ‘Won't-have’. Furthermore,
+we also list some non-functional requirements we have for our system.
 Final requirements are listed in \hyperref[section:final-requirements]{Section 3.1}.
 Finally, we also go through the evolution of the requirements in \hyperref[section:evolution-of-requirements]{Section 3.2}.
 \hyperref[ch:requirements-appendix]{Appendix B - Requirements table} shows for each requirement
@@ -14,36 +15,36 @@ This section lists the requirements for the development of MaAT.
 \subsection{Must have}
 Role: The \textbf{user} must
 \begin{itemize}
-  \item Be able to send requests and receive acknowledgments from the Sennheiser TeamConnect Ceiling 2 microphone.
-  \item Be able to get the direction to the speaker’s location from the microphone API.
+  \item Be able to send requests and receive acknowledgments from the Sennheiser TeamConnect Ceiling 2 microphone array.
+  \item Be able to get the direction to the speaker’s location from the \gls{microphone} API.
   \item Be able to send requests to the Avonic CM-70 camera.
   \item Be able to point the camera in a certain direction.
-  \item Be able to point the camera to specific pre-set locations, choosing the closest one to where the microphone is
+  \item Be able to point the camera to specific pre-set locations, choosing the closest one to where the \gls{microphone} is
     currently pointing.
 \end{itemize}
 Role: The \textbf{system} must
 \begin{itemize}
-  \item Be able to follow the speakers, knowing the camera's and microphone's defined position, assuming that all speakers are
-    located in the same plane.
+  \item Be able to follow the speakers, knowing the camera's and \gls{microphone}'s defined position, assuming that all speakers are
+    located on the same plane.
   \item Have a web interface for easy use of the camera’s API.
 \end{itemize}
 \subsection{Should have}
 Role: The \textbf{user} should
 \begin{itemize}
-  \item Be able to calibrate the system with data such as specifying the height of the microphone above the speaker plane.
+  \item Be able to calibrate the system with data such as specifying the height of the microphone above the \gls{speaker-plane}.
 \end{itemize}
 Role: The \textbf{system} should
 \begin{itemize}
-  \item Be able to find the relative position between the camera and the microphone provided only
+  \item Be able to find the relative position between the camera and the \gls{microphone} provided only
     the height of the microphone and the \gls{speaker-plane}.
-  \item Translate the calculated coordinates relative to the microphone to coordinates the camera can point to.
+  \item Translate the calculated coordinates relative to the \gls{microphone} to coordinates the camera can point to.
 \end{itemize}
 \subsection{Could have}
 Role: The \textbf{system} could
 \begin{itemize}
   \item Be able to adapt the camera’s speed depending on how fast the speaker is moving.
-  \item Add visual tracking to improve the positioning of the camera.
-  \item Enable the camera to zoom in appropriately depending on the speaker’s distance from it.
+  \item Make use of visual tracking to improve the positioning of the speaker in the frame.
+  \item Enable the camera to zoom in appropriately depending on the speaker's distance from it.
 \end{itemize}
 \subsection{Won’t have}
 Role: The \textbf{system} won't
@@ -65,7 +66,7 @@ Role: The \textbf{system} won't
 Since the beginning of the project we have come up with few new requirements and have removed others we have deemed unnecessary.
 A short list of the changes we have made is:
 \begin{itemize}
-  \item Added WebUI as a must requirement.
-  \item Added visual tracking as a could requirement.
-  \item Got rid of facial recognition as a could requirement.
+  \item Added WebUI as a must-have requirement.
+  \item Added visual tracking as a could-have requirement.
+  \item Removed facial recognition as a could-have requirement.
 \end{itemize}
