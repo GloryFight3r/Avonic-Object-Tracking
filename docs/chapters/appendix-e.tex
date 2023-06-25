@@ -20,7 +20,7 @@ Render a page that includes only set-up for presets and calibration.
 \paragraph{GET /live-footage} \mbox{} \\
 Render a page that includes only the video stream from the camera.
 
-\section{Camera endpoints}
+\section{Camera}
 \paragraph{POST /camera/address/set} \mbox{} \\
 Endpoint that sets the camera network settings.
 
@@ -238,7 +238,7 @@ Endpoint to get the current pan and tilt values of the camera.
     }
 \end{itemize}
 
-\section{Microphone endpoints}
+\section{Microphone}
 \paragraph{POST /microphone/address/set} \mbox{} \\
 Endpoint that sets the microphone network settings.
 \verb|form:|
@@ -343,7 +343,7 @@ Endpoint to inquire whether anyone is speaking.
     }
 \end{itemize}
 
-\section{Preset endpoints}
+\section{Presets}
 \paragraph{POST /preset/add} \mbox{} \\
 Endpoint that saves a preset to the preset collection.
 
@@ -415,7 +415,27 @@ Endpoint that returns the list of all saved presets.
     \item \verb|"preset-list"|: list of all presets in a JSON format
 \end{itemize}
 
-\section{Tracking endpoints}
+\paragraph{GET /preset/info/$<preset\_name>$} \mbox{} \\
+Endpoint that returns information about a given preset.
+
+\verb|return:|
+\begin{itemize}
+    \item{In case of success:
+        \begin{itemize}
+            \item HTTP 200
+            \item \verb|"position-alpha-value"|: Float from -170 - 170 representing the yaw of the camera
+            \item \verb|"position-beta-value"|: Float from -30 - 90 representing the pitch of the camera
+            \item \verb|"zoom-value"|: Integer with the zoom value $[0, 16384]$
+            \item \verb|"microphone-direction"|: a 3D vector (array) of floats [x, y, z]
+        \end{itemize}
+    }
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 400, empty message
+        \end{itemize}
+    }
+\end{itemize}
+\section{Tracking}
 
 \paragraph{GET /preset/track} \mbox{}
 Endpoint that changes the tracking to use the preset model.
@@ -461,7 +481,7 @@ Endpoint that changes the tracking to use the object tracking model
     \item \verb|"tracking"|: the enum corresponding to the WaitObjectAudioModel
 \end{itemize}
 
-\section{Thread endpoints}
+\section{Thread}
 
 \paragraph{POST /thread/start} \mbox{} \\
 Endpoint that starts the tracking thread
@@ -486,7 +506,7 @@ Endpoint that checks whether the tracking thread is running. This means that the
   \item {\verb|"is-running"|: a boolean value indicating whether the thread is running or not}
 \end{itemize}
 
-\section{Info-thread and update endpoints}
+\section{Info-thread and update}
 
 \paragraph{GET /update/microphone}
 Endpoint that updates the microphone data in the WebUI
@@ -520,7 +540,7 @@ Endpoint that stops the thread that updates all the dynamic data.
   \item{HTTP 200: successfully stopped the info thread.}
 \end{itemize}
 
-\section{Settings endpoints}
+\section{Settings}
 \paragraph{GET /settings/get} \mbox{} \\
 
 Endpoint that returns the settings that are currently active.
@@ -570,7 +590,6 @@ Endpoint that returns the settings that are currently active.
 \end{itemize}
 
 \section{WebSocket}
-\section{Camera frame endpoints}
 Websocket endpoint that sends a new frame in base64 to the web interface
 \verb|return:|
 \begin{itemize}
