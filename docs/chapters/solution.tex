@@ -17,21 +17,22 @@ contains everything related to the user.
 
 \subsection{Technical limitations}
 As outlined in the requirements, the system should act as a middleware device
-that can be put on the same network as the microphone and the camera. This adds
+that can be put on the same network as the \gls{microphone} and the camera. This adds
 a limitation on the amount of available computational resources. We could rely on cloud
 computing power, but that would lead to a big delay in camera movement and
 additional risks to security and maintainability. Additionally, our project
-relies on three special hardware devices -- a camera, a microphone and a
+relies on three special hardware devices -- a camera, a \gls{microphone} and a
 single-board computer (SBC). The final product should account for all the inherent
 limitations of these devices.
 
-It is important to understand that the microphone allows
-us to only retrieve information provided by the Sennheiser which is limited to
-the direction toward the speaker and the peak loudness level, since we do not have access to each individual microphone
-within the array. The biggest limitation is the fact that the
-microphone does not provide the exact origin of the detected sound, as it is
+It is important to understand that the microphone array allows
+us to only retrieve information provided by its external API which is limited to
+the direction toward the speaker and the peak loudness level.
+This means that we do not have access to each individual microphone
+within the array.
+Since the array itself does not provide the exact origin of the detected sound, as it is
 quite a difficult technical challenge to calculate
-this\cite{distance-urbana-champaign}.
+this\cite{distance-urbana-champaign}, we have no way of obtaining the precise position of the speaker.
 
 We formulated three limitations that significantly impact the project:
 \begin{itemize}
@@ -44,7 +45,7 @@ We formulated three limitations that significantly impact the project:
 In addition to technical criteria, the main criterion of the solution we were
 going to implement is based on a certain non-functional requirement which Mr.
 Kahawati has emphasized multiple times during our meetings: the system should be
-easy to install and calibration can be done by teachers or presenters
+easy to install and teachers or presenters should be able to calibrate the system
 themselves. It should not require any technical knowledge or external devices.
 
 As this criterion can be interpreted ambiguously (the difficulty of calibration
@@ -63,7 +64,7 @@ implementation strategies, we identified that the most difficult limitation is
 that the microphone array cannot retrieve distance information. This, combined
 with the fact that the microphone array is in a separate position from the
 camera, meant that generally finding out where the speaker is located becomes
-impossible without hacking the microphone to get access to each individual
+impossible without hacking it to get access to each individual
 microphone within the array. That can be easily shown when one imagines a
 speaker, who starts off standing directly beneath the microphone array, sitting
 down. Our program will then not be able to discern whether to tilt the camera
@@ -72,23 +73,23 @@ This means that we needed to make assumptions about the environment of the room:
 
 
 \begin{enumerate}
-    \item The distance between the speaker and the plane of the ceiling, to which the microphone is mounted, is constant.
-    \item If a camera, a microphone or the ``speaker plane'' (the horizontal plane in which the speaker moves) were moved, the system must be recalibrated.
+    \item The distance between \gls{speaker-plane} and the ceiling, to which the \gls{microphone} is mounted, is constant.
+    \item If the camera, or the \gls{microphone} had been moved, the system must be recalibrated.
     \item The system is well-calibrated and no components of it are moved during the tracking.
 \end{enumerate}
 Through the process of the research and reiteration of our proposals, we found
 this set of assumptions to be the smallest set possible given our limited time
-and the limitations mentioned in \hyperref[sec:solution-challenges]{Section
-4.1}. While assumptions 2 and 3 are in place to guarantee the intended way of
+and the limitations mentioned in \hyperref[sec:solution-challenges]{Section 4.1}.
+While assumptions 2 and 3 are in place to guarantee the intended way of
 using the system, assumption 1 is formulated to determine the distance from the
-microphone to the speaker.
+\gls{microphone} to the speaker.
 
 From all of our attempts to come up with the solution, we have identified that
-the distance of the vector from the microphone to the speaker is crucial.
-Since the microphone's API\cite{microphone-manual} does not have a way to
+the length of the vector from the microphone to the speaker is crucial.
+Since the \gls{microphone}'s API\cite{microphone-manual} does not have a way to
 retrieve this distance, the assumptions are needed to describe the distance
 function in the environment.
-According to our assumptions, the speaker plane represents the set of all
+According to our assumptions, the \gls{speaker-plane} represents the set of all
 locations at which the speaker could be. As was shown by our experiments, small
 deviations from the horizontal speaker plane can be neglected due to their
 small magnitude. Differences in the height of speakers are the most common
@@ -97,15 +98,15 @@ the speakers are sitting. With this in mind, we decided to calculate the
 intersection of the ray from the microphone with the speaker plane to find the
 location of the speaker. In the future, it is possible to extend the model to
 support different shapes and possibly a full 3D scan of the room to represent
-the possible locations of the speaker. We view these options to be infeasible
-for us in 10 weeks.
+the possible locations of the speaker. We view these options to have been infeasible
+for us to implement in 10 weeks.
 
 \subsection{Calibration}\label{subsec:calibration}
-During the calibration stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
-To achieve this, the user first sets the microphone's height above the speaker plane.
+During the \gls{calibration} stage, we calculate the distance from the camera to the microphone and therefore obtain the camera's relative coordinates to the microphone.
+To achieve this, the user first sets the \gls{microphone-height} above the speaker plane.
 Then, a person is sent into the room. They direct the camera at themselves and speak.
 The direction obtained from the camera and microphone combined with the
-microphone's height above the so-called speaker plane is enough to calculate
+microphone's height above the so-called \gls{speaker-plane} is enough to calculate
 the 3D position of the camera relative to the microphone.
 
 A simplified, 2D image is shown in figure \ref{fig:cal2d}. Since the camera
@@ -116,7 +117,7 @@ points towards the z-axis by default, the horizontal axis in the image is the z-
     \caption{Demonstration of the calculation of calibration in 2D, where $M$ is the microphone, $C$ is the camera and $A$ is the speaker}
     \label{fig:cal2d}
 \end{figure}
-We define $M$ as the microphone, $C$ as the camera, and $A$ as the person calibrating the system.
+We define $M$ as the position of the \gls{microphone}, $C$ as the camera, and $A$ as the person calibrating the system.
 After directing the camera at the speaker, we find out angles $\alpha$, $\beta$ and distance $a$ from the right-angled triangle between the speaker plane, the one perpendicular to it from the microphone, and the speaker.
 Angle $\delta$ is easily calculated from the fact that the primary axes of the camera and microphone are orthogonal, and because we know $\gamma$ from having directed the camera at the microphone in the second stage of the calibration.
 Now that we know two angles and one side length of the triangle $CAM$, we can calculate the distance between the camera and microphone -- $d$.
@@ -134,7 +135,7 @@ This means that we can find the angles between them and calculate the triangle.
 \end{figure}
 
 \section{Alternative approaches}\label{sec:alternative-approaches}
-Besides the solution using calibration described above, we considered three
+Besides the solution using \gls{calibration} described above, we considered three
 other approaches. We used these as sources of inpsiration to come up with our
 final solution. These three alternatives are explained in this section together
 with a reasoning of why we did not choose them as our final solution.
@@ -160,9 +161,10 @@ The proposed solution followed the following algorithm for calibration and track
             corresponding camera direction.
 \end{enumerate}
 Although this solution might sound fascinating and simple, it does not work in reality.
-This algorithm would only be possible if the camera was located at the same point as the microphone, or in completely opposite position from the microphone, in relation to the calibration points.
-This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\footnote{www.geogebra.org/apps}.
-Unfortunately, the camera and microphone are not always in the same or opposite
+This algorithm would only be possible if the camera was located at the same point as the microphone,
+or in completely opposite position from the microphone, in relation to the calibration points.
+This can be proven with a geometric proof, or using geometric modeling that we did with GeoGebra\footnote{\url{www.geogebra.org/apps}}.
+Unfortunately, the camera and \gls{microphone} are not always in the same or opposite
 positions, as the system should work with any arbitrary position of the camera.
 For this reason, we left this solution behind.
 
@@ -173,21 +175,20 @@ locations. The idea is that we input all the possible planes on which the
 speaker could be located. For example, if there is an elevated scene somewhere
 at the front of the room we input its size and elevation from the floor. Also,
 there is the possibility to add locations for chairs, stairs, etc. This way we
-have some kind of a room scan with all the objects’ arrangements inside. This
+have a full 3D environment with all the objects’ arrangements inside. This
 scan gives us a more precise idea of where the speaker could be actually
 located. However, this solution has two major drawbacks. First of all, the
 direction from the microphone could still result in multiple possible locations
 of the speaker when considering its intersection with all the given planes. The
 other disadvantage of this approach is that it requires too much work to set up
-the system. As we have stated earlier, this does not align with our
-requirements.
+the system. This does not align with our requirements.
 
 
 \section{Visual object tracking}\label{sec:visual-object-tracking}
 This section discusses the addition of visual object tracking to our audio-based speaker tracking
 system. The combination of both visual and audio information can make the movement of the camera
-smoother and more accurate. Audio discriminates between different people to determine who is
-speaking; video helps to exactly center the camera on this person's face.
+smoother and more accurate. The audio discriminates between different people to determine who is
+speaking; the video helps to exactly center the camera on this person's face.
 \subsection{Object tracking methods}
 For the visual object tracking part of our system, we considered two methods: YOLO and RT-DETR. Both
 are neural networks trained to localize and classify objects in a video. The reason we looked at
@@ -220,11 +221,11 @@ find out which bounding box corresponds to the speaker.
 \paragraph{RT-DETR}\mbox{} \\
 The Real-Time Detection Transformer is the first real-time transformer-based detector. In contrast to the convolutional
 neural network (CNN) detectors, transformer-based detectors do not need a post-processing step with non-maximum
-suppression. This way, RT-DETR manages to achieve a higher speed than YOLO while not losing any accuracy\cite{rt-detr}.
+suppression. This way, RT-DETR manages to achieve a higher speed than YOLO without losing any accuracy\cite{rt-detr}.
 
 Just like YOLO, RT-DETR can be used to track objects in real-time to assist our overall speaker tracking. However,
-despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster
-than the RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
+despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster (on one PC, 2, to be precise)
+than RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
 
 \begin{figure}[h]
     \centering
@@ -235,35 +236,40 @@ than the RT-DETR. This is why we ended up using the latest available version of 
 
 \subsection{Integration of object tracking into our speaker tracker}
 The problem of combining two systems of tracking a speaker, both object tracking and speaker tracking, is discussed in
-this section. A decision has to be made by the system whether to listen to the speaker tracker or the object tracker.
-There are three strategies we experimented with to deal with this problem. We review each of them and explain in what kind of situation the strategies work best. Avonic has asked us to give audio-based speaker tracking priority over object detection using video frames. Because of this, all strategies we tried use audio to determine the location of the speaker for the most important (i.e. biggest) movements.
-Since the last two strategies both improve speaker tracking in different ways, the web UI gives users the option to choose between these methods.
+this subsection. A decision has to be made by the system whether and when to listen to the speaker tracker or the object tracker.
+There are three strategies we experimented with to deal with this problem.
+We review each of them and explain in what kind of situation the strategies work best.
+Avonic has asked us to give audio-based speaker tracking priority over object detection using video frames.
+Because of this, all strategies we tried use audio to determine the location of the speaker for the most important (i.e.\ biggest) movements.
+Since the last two strategies both improve speaker tracking in different ways, the UI (user interface) gives users the option to choose between these methods.
 
 \paragraph{Thresholding of camera movements}\mbox{} \\
 The first solution we came up with was to threshold incoming commands. This means that we ignore the speaker tracking if
-it wants the camera to move a number of degrees lower than the threshold and we ignore the object tracking if it tells
+it wants the camera to move a number of degrees lower than the threshold, and we ignore the object tracking if it tells
 the camera to move a number of degrees higher than the threshold. The envisioned result of this approach would be that
 the speaker tracking moves the camera towards the correct speaker and the object tracker then follows the small
-movements this speaker makes. This uses both the microphone's ability to detect which person is speaking and the object
-detector's ability to precisely localize a person on a frame.
+movements this speaker makes. This uses both the \gls{microphone}'s ability to detect which person is speaking and the object
+detector's ability to precisely (and aesthetically) position a person on a frame.
 
 When we tested this strategy, we found out that the simultaneous signals that are still being sent to the camera can
-make the camera follow the wrong speaker. This happens when the speaker walks away from the center so the microphone
+make the camera follow the wrong speaker. This happens when the speaker walks away from the center, so the microphone
 detects a large movement, but the object detector detects another person near the center of the camera view. The camera
 gets two commands: one telling it to make a big movement and another telling it to make a small movement. Whenever the
 camera receives one signal quickly after another, it stops its movement to follow the last command that it received.
 This means that the big movement to the actual speaker is interrupted by the small movement of someone who is not the
 speaker.
-For this reason, we do not consider the thresholding strategy to be a good strategy in general. The two following strategies give a better user experience in all cases.
+For this reason, we do not consider the thresholding strategy to be a good strategy in general.
+The two following strategies give a better user experience in all cases.
 
 \paragraph{Waiting for small movements}\mbox{} \\
 In order to avoid the problem of sending different signals at the same time, we considered disabling
 object tracking when speaker tracking was running and vice versa. Since the speaker tracking should
 still be responsible for big movements in the system, we decided to wait till the speaker tracker
-points to the same direction for a variable amount of iterations; one iteration means one time the
+points to the same direction for a variable amount of iterations; one iteration means one time
 the microphone detects a sound louder than the defined threshold.
 This means that object tracking is used when someone is not moving a lot, but it will never be used
-simultaneously with speaker tracking. This helps to centralize the speaker on the screen.
+simultaneously with speaker tracking.
+This helps to center the speaker on the screen.
 
 
 \paragraph{Quick change object-audio strategy} \mbox{}
@@ -277,24 +283,24 @@ simultaneously with speaker tracking. This helps to centralize the speaker on th
 The last approach we consider is always relying on microphone coordinates
 when there is an \gls{active-speaker}, but furthermore, adjusts the camera based on
 camera footage and bounding boxes we get from it. When there is an active speaker, we first
-search for their location using the microphone information. If they are in the FoV(Field of View)
-of the camera, we get the bounding speaker boxes from the current frame.
-After translating the microphone direction to a camera direction and finding
-its position on the screen as a pixel, we search which bounding box’s center is
-the closest to that pixel. After finding it, we move the camera, so that this
-bounding box is in the middle of the camera screen.
+search for their location using the \gls{microphone} information. If they are in the FoV (Field of View)
+of the camera, we get the speaker-bounding boxes from the current frame.
+After translating the \gls{microphone} direction to a camera direction and finding
+the presumed position of the speaker on the screen as a point, we search which bounding box's center is
+the closest to that point. After finding it, we direct the camera
+to the center of this box.
 
 If the speaker is not
-currently visible on the screen, we again translate the microphone direction to
+currently visible on the screen, we again translate the \gls{microphone} direction to
 a camera direction and rotate the camera so that it faces that way. Finally,
 in the case that there is no active speaker, we attempt to continue tracking
 the last active speaker. In order to achieve that, we rely on the fact that the
 bounding box of the last active speaker in the current frame should be the
 closest to his new bounding box in the new frame. Assuming that, we get
-all of the new bounding boxes from the new frame and choose to track the one
+all the new bounding boxes from the new frame and choose to track the one
 that has its center the closest to the previous bounding box. A diagram that
-illustrates the possible states we could be in is the depicted in Figure
-\ref{fig:object_strategy}. A visualization of this process can be seen in Figure \ref{fig:obj_detection_image}
+illustrates the possible states we could be in is the depicted in Figure \ref{fig:object_strategy}.
+A visualization of this process can be seen in Figure \ref{fig:obj_detection_image}
 
 
 \begin{figure}[h]
@@ -317,8 +323,8 @@ module and the web interface. Each module is separated in the code in order to m
 for other developers to work on our code.
 
 \subsection{Camera API}
-The Camera API module contains all of the functionality related to
-communication with the camera. This includes sending commands to move or zoom
+The Camera API module contains all the functionality related to
+communication with the camera. This includes sending commands to point or zoom
 the camera and get information about the current state of the camera.
 In this section we discuss the communication method with the camera,
 the design pattern used in the code and the way we get the footage
@@ -329,44 +335,50 @@ We chose to use VISCA commands to communicate with the camera instead of HTTP
 requests. We did this first of all because Mr. Kahawati explained to us that it
 was the standard at Avonic. The second reason was that VISCA was specifically
 made for communication with PTZ cameras and therefore suits our purposes better
-than HTTP. There are two types of VISCA requests: long and short. The
-difference between these two types is the header. Long VISCA requests have a
+than HTTP, the higher-level (and therefore slower) alternative.
+There are two types of VISCA requests: long and short.
+The difference between these two types is the header. Long VISCA requests have a
 header in the request telling the receiver how big the request is and what the
 request counter is. This request counter is also contained in the response, so
 the request and response can be matched. Short VISCA requests lack this header
 and therefore do not provide the possibility to match responses to requests.
 
 We started the project by using short VISCA requests. We had two reasons for
-this: a) they are easier to implement and b) we had low traffic, so we could
+this: they are easier to implement, and we had low traffic, so we could
 assume that the first response we got was the response to the latest request.
 As we started sending more requests to the camera, we found that many responses
 got mixed up. For this reason, we switched to long VISCA requests for any
 request whose response is used by the program. Such requests ask for
-information about the camera such as its position, so every response has to be
+information about the camera such as its position, so every response has to be manually
 matched to the correct request. There are other requests, such as moving the
 camera, that do not require a response. For these requests, we still use short
 VISCA requests.
 
 \paragraph{Adapter pattern}\mbox{} \\
-The implementation of the Camera API uses the adapter design pattern, which is a programming design pattern that allows different interfaces to work together\cite{adapter-pattern}.
-The main advantage of this design pattern in our project is that it makes sure our system still works if the specifics of communication with the camera change; only the adapter itself has to be reimplemented. This makes it easier to adapt our system to other Avonic cameras.
+The implementation of the Camera API uses the adapter design pattern,
+which is a programming design pattern that allows different interfaces to work together\cite{adapter-pattern}.
+The main advantage of this design pattern in our project is that it makes sure our system still works
+if the specifics of communication with the camera change; only the adapter itself has to be reimplemented.
+This makes it easier to adapt our system to other Avonic cameras.
 
 \paragraph{Footage thread}\mbox{} \\
 The final part of the Camera API module is the thread that reads video frames from the camera stream.
-This thread retrieves footage from the Real Time Streaming Protocol (RTSP) stream of the camera using \verb|OpenCV|.
-The frames are continually read by the thread so that the latest frame is always available in the buffer.
-This frame can be requested by the web interface to show the stream to the user or by the tracking thread to localize the speaker.
+This thread retrieves footage from the Real Time Streaming Protocol (RTSP) stream of the camera using OpenCV\footnote{\url{https://opencv.org/}},
+an open source library for computer vision and video-related tasks.
+The frames are continually read by the thread so that the latest frame is always available.
+This frame can be requested by the web interface to show the stream to the user or by the tracking thread,
+which runs YOLO and attempts to find the speaker.
 
 
 \subsection{Microphone API}\label{subsection:mic}
-The Microphone API module contains all of the functionality related to
-communication with the microphone. The most important requests are the one that
-gets the direction from the microphone towards the detected sound and the one
+The Microphone API module contains all the functionality related to
+communication with the \gls{microphone}. The most important requests are the one that
+gets the direction from the \gls{microphone} towards the detected sound and the one
 that gets the peak volume. Like the Camera API, the Microphone API uses an
-adapter pattern to facilitate the use of other microphones in the future. \\
+adapter pattern to facilitate the use of other \glspl{microphone} in the future. \\
 
 \subsection{Tracking}\label{subsection:tracking}
-All of the functionality related to speaker tracking is contained in this
+All functionality related to speaker tracking is contained in this
 module. The most important part of it is the \verb|UpdateThread|. It is
 responsible for continuously calling the method that directs the camera.
 The module is structured in a way that every tracking type is maintained in a
@@ -376,8 +388,8 @@ preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
 The chosen model is instantiated at the beginning of the \verb|run| method and
 is subsequently used to track the speaker until being explicitly stopped by the user.
-Some of the models rely on data stored in JSON files whose location can be
-specified in the settings menu in our WebUI. We currently have the following
+Some models rely on data stored in JSON files whose location can be
+specified in the settings menu of the UI. We currently have the following
 tracking models:
 \begin{enumerate}
 \item Preset Model
@@ -395,7 +407,7 @@ similarity metric compares the directions of vectors while ignoring their norm.
 After finding the closest preset, the camera is pointed towards that preset
 location.
 
-\verb|PresetCollection| can be edited from the WebUI. This is how new preset
+\verb|PresetCollection| can be edited from the UI. This is how new preset
 locations are added or old ones removed. Added preset locations are reloaded
 from a file when the server starts, so there is no need to set preset locations
 every time the server restarts.
