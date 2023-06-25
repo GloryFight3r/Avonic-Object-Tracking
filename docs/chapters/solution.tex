@@ -148,12 +148,12 @@ served as inspiration for the final solution, but it has two important
 problems:
 \begin{itemize}
     \item The distance information from the microphone is not obtainable.
-    \item Manually inputting measures that would describe a coordinate system
+    \item Manually inputting measures that would describe a coordinate systemß
         with coordinates of the camera and the microphone was considered too complex
         by Avonic.
 \end{itemize}
 \subsection{Interpolation model}
-Another solutions we came up with, was inspired by a concept of interpolation.
+Another solution we came up with, was inspired by the concept of interpolation.
 The proposed solution followed the following algorithm for calibration and tracking:
 \begin{enumerate}
     \item Record three positions by retrieving the microphone's beams and the camera's position for each of the recorded placements.
@@ -195,7 +195,7 @@ are neural networks trained to localize and classify objects in a video. The rea
 neural networks instead of traditional image processing techniques is because neural networks
 achieve greater accuracy when large training sets are
 available\cite{image-processing-vs-deep-learning}. Such training sets (e.g. VOC 2007\cite{pascal-voc-2007} and MS COCO\cite{microsoft-coco}) are
-available for object detection and many models have been trained on these sets. We elaborate on two of such models below.
+available for object detection and many models have been trained on these sets. We elaborate on those two models below.
 
 
 \paragraph{YOLO}\mbox{} \\
@@ -208,7 +208,7 @@ the box belongs to; third, a confidence score for that class prediction. As such
 constant size. Since the network often outputs many overlapping boxes, non-maximum suppression is
 used. This is a technique that takes a group of boxes with the center in the same square and only
 keeps the best performing one. The performance of objects during non-maximum suppression is based on
-the intersection-over-union score. This is the score calculated by intersecting one boxes with the
+the intersection-over-union score. This is the score calculated by intersecting one box with the
 other boxes and dividing this by the union of those same boxes; the higher the score, the more
 accurate the prediction.
 
@@ -224,7 +224,7 @@ neural network (CNN) detectors, transformer-based detectors do not need a post-p
 suppression. This way, RT-DETR manages to achieve a higher speed than YOLO without losing any accuracy\cite{rt-detr}.
 
 Just like YOLO, RT-DETR can be used to track objects in real-time to assist our overall speaker tracking. However,
-despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster (on one PC, 2, to be precise)
+despite its claim to improved performance, we noticed that in practice the YOLO algorithm was multiple times faster (on one PC, 2 times, to be precise)
 than RT-DETR. This is why we ended up using the latest available version of YOLO (YOLOv8) as our object detector.
 
 \begin{figure}[h]
@@ -296,8 +296,8 @@ a camera direction and rotate the camera so that it faces that way. Finally,
 in the case that there is no active speaker, we attempt to continue tracking
 the last active speaker. In order to achieve that, we rely on the fact that the
 bounding box of the last active speaker in the current frame should be the
-closest to his new bounding box in the new frame. Assuming that, we get
-all the new bounding boxes from the new frame and choose to track the one
+closest to the new bounding box in the new frame. Assuming that, we get
+all new bounding boxes from the new frame and choose to track the one
 that has its center the closest to the previous bounding box. A diagram that
 illustrates the possible states we could be in is the depicted in Figure \ref{fig:object_strategy}.
 A visualization of this process can be seen in Figure \ref{fig:obj_detection_image}
