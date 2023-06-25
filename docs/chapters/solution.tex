@@ -6,7 +6,7 @@ alternative solutions that we did not choose
 tracking part of our solution (\hyperref[sec:visual-object-tracking]{Section 4.4}) and we
 give an overview of the structure of our application
 (\hyperref[sec:application-overview]{Section 4.5}).
-A diagram showing the use cases for each of the four different
+A diagram showing the use cases for each of the five different
 tracking models we created is shown in Figure \ref{fig:model-use-case-diagram}.
 
 \section{Challenges that must be overcome}\label{sec:solution-challenges}
@@ -234,7 +234,7 @@ than RT-DETR. This is why we ended up using the latest available version of YOLO
     \label{fig:model-use-case-diagram}
 \end{figure}
 
-\subsection{Integration of object tracking into our speaker tracker}
+\subsection{Integration of object tracking into our speaker tracker}\label{subsec:integration-of-object-tracking-into-our-speaker-tracker}
 The problem of combining two systems of tracking a speaker, both object tracking and speaker tracking, is discussed in
 this subsection. A decision has to be made by the system whether and when to listen to the speaker tracker or the object tracker.
 There are three strategies we experimented with to deal with this problem.
@@ -382,18 +382,19 @@ All functionality related to speaker tracking is contained in this
 module. The most important part of it is the \verb|UpdateThread|. It is
 responsible for continuously calling the method that directs the camera.
 The module is structured in a way that every tracking type is maintained in a
-so-called model. Every model inherits from the \verb|TrackingModel| and has
+so-called model. Every model inherits from the \verb|TrackingModel| class and has
 the appropriate implementation of the point method. The user can pick their
 preferred model in the web interface. Figure \ref{fig:model-use-case-diagram}
 can be used to find out which model works best for a given scenario.
 The chosen model is instantiated at the beginning of the \verb|run| method and
 is subsequently used to track the speaker until being explicitly stopped by the user.
 Some models rely on data stored in JSON files whose location can be
-specified in the settings menu of the UI. We currently have the following
+specified in the settings menu of the UI. We currently have the following five
 tracking models:
 \begin{enumerate}
 \item Preset Model
 \item Audio Model
+\item Audio Model Without Adaptive Zooming
 \item Object Tracking Model (wait object-audio model \& quick change object-audio model)
 \end{enumerate}
 
@@ -401,29 +402,29 @@ tracking models:
 The Preset Model makes use of a \verb|PresetCollection| which stores all
 available preset locations. A preset location contains a name, the direction from the
 microphone and the direction of the camera towards it. When fed a direction
-from the microphone, this model finds the preset which is the closest to
-the given microphone direction according to the cosine similarity. This
+from the \gls{microphone}, this model finds the preset which is the closest to
+the given microphone direction according to its cosine similarity. This
 similarity metric compares the directions of vectors while ignoring their norm.
 After finding the closest preset, the camera is pointed towards that preset
 location.
 
-\verb|PresetCollection| can be edited from the UI. This is how new preset
+The \verb|PresetCollection| can be edited from the UI. This is how new preset
 locations are added or old ones removed. Added preset locations are reloaded
-from a file when the server starts, so there is no need to set preset locations
+from a file when the server starts, so there is no need to set them up
 every time the server restarts.
 This preset model is what is mostly used throughout the industry for streaming
 web conferences and round-table meetings. The reason it is so widely used is
 that it is simple to set up for people without technical background and the fact
 that it is very precise in those scenarios. Setting up presets only requires
 recording a couple of possible locations for the speaker in the room. Exactly
-the simplicity of the installation and the wide usage are the reason why we
+this simplicity of the installation and its wide-spread usage are the reason why we
 chose this model as a starting point for our tracking.
 
 \paragraph{Audio model}\mbox{} \\
 The Audio Model achieves the main goal of our application by continuously
 tracking the speaker around the room. Unlike the preset model, it can point the
 camera towards any arbitrary point in the room by performing the calculations
-described in the subsection \ref{subsec:calibration} about calibration. The
+described in subsection \ref{subsec:calibration} about calibration. The
 audio model also keeps track of how much time has passed since someone has last
 spoken. If no one has spoken in some time the camera will zoom out. This model’s
 point method also takes into account how far the speaker is from the camera and
@@ -443,16 +444,16 @@ of tracking the zoom is not changed unless the user expressly does that using
 any mode for controlling the zoom. We decided to add this model because in some
 scenarios the adaptive zooming does not provide a very pleasant flow of the
 tracking. Sometimes the camera zooms in or out unexpectedly or too much.
-Reasons for that inconsistency are the possibility of inaccurate calibration or
-inaccurate readings provided by the microphone.
+Reasons for that inconsistency are the possibility of inaccurate \gls{calibration} or
+inaccurate readings provided by the \gls{microphone}.
 
 \paragraph{Object-tracking model}\mbox{} \\
 The Object Tracking Model is intended to refine our tracking in situations when
 the speaker is not audible or the microphone’s direction towards the speaker is
-not precise enough to accurately center the speaker. After having identified all
+not precise enough to accurately center the speaker. Having identified all
 the people in the frame and having created the corresponding bounding boxes
-around them, it has a method to find the box that is most likely to be the one
-around the speaker. Then another method calculates the relative direction in
+around them, it finds the box that is most likely to be the one
+around the \gls{active-speaker}. Then another method calculates the relative direction in
 which the camera has to move to center the box. It takes into account the
 zooming and field of view of the camera in order to make the calculations. As
 explained in section \ref{sec:visual-object-tracking} about Visual object
@@ -460,7 +461,9 @@ tracking, we chose to use YOLO for our object
 detection and classification. Our YOLO implementation extends an abstract class
 that has methods to calculate and draw bounding boxes. Any object detection
 algorithm can extend this class in order for it to be used in place of the
-currently implemented algorithm.
+currently implemented algorithm, and we have two -- the ``Wait object-audio model''
+and the ``Quick change object-audio model'', both described in detail
+in \ref{subsec:integration-of-object-tracking-into-our-speaker-tracker}.
 
 The object tracking models are often combined with the audio tracking model, so
 two input streams (audio and video) have to be analyzed simultaneously. It would
@@ -504,7 +507,7 @@ contains most of the UI's functionality, is shown in figure \ref{fig:main-ui}.
 \end{figure}
 
 \paragraph{Web UI requirement}\mbox{} \\
-The web UI was moved from a “should have” to a “must have” section after
+The web UI was moved from the “should-have” to the “must-have” section after
 consultation with our TA, as it provides a clearer, more intuitive, and more
 pleasant way for the user to interact with a system. It also opened up space for
 more quality-of-life features, that we have not intended in the original
@@ -516,10 +519,10 @@ visualization.
 The part of our web interface that guides users through the process of
 calibration is shown in figure \ref{fig:calibration-ui}. As is shown, there are
 at most three calibration points that can be set. After at least one point is
-set, the camera direction towards the microphone can be submitted. The reason we
+set, the camera direction towards the \gls{microphone} can be submitted. The reason we
 decided to have a maximum of three points is to give a reasonable guideline to
 the user. From experiments that we have conducted, adding more than three points to calibration does not make it more
-accurate. We found that one calibration point gives good accuracy, which is why we allow
+accurate. We found that even one calibration point usually gives good accuracy, which is why we allow
 the user to end the process after recording one point. The main advantage of
 recording more than one point is to reduce the impact of inaccurate microphone
 directions.
@@ -532,22 +535,22 @@ directions.
 \end{figure}
 
 \paragraph{Integration object}\mbox{} \\
-In the first weeks of working on the project, we experienced multiple issues
+In the first weeks of working on the project, we have experienced multiple issues
 related to sharing access to Camera and Microphone APIs across the endpoints, as
 we could not find a dependency injection solution that would work with modern
 versions of Flask. We decided to unite all objects that needed to be shared
 across the endpoints in a single object and make it accessible for the server
 application — the \verb|GeneralController| object, also referred to as
-``integration’’. It contains variables for thread flow control, camera and
-microphone APIs and all of the threads our application uses -- update thread,
-responsible for tracking, microphone and camera info-threads, responsible for
-sending information updates to the user, footage thread for retrieving frames
+``integration''. It contains variables for thread flow control, camera and
+microphone APIs and all the threads our application uses -- the update thread,
+responsible for tracking; the microphone and camera info-threads, responsible for
+sending information updates to the user; and the footage thread for retrieving frames
 from the camera.
 
 As it is not possible by default to create global variables in Flask, we have
 decided to use vanilla Python features. All of the definitions of the endpoints
-were moved to the \verb|__init__.py| file, so the integration object can be
-passed to every endpoint’s body function. To avoid the bloating of the file, we
+were moved to the \verb|__init__.py| file, so that the integration object can be
+passed to every endpoint’s body function. To avoid bloating of the file, we
 agreed on the rule that every endpoint definition should contain exactly one
 line with the call of the respective function with the actual body of the
 endpoint, which can be found in other files in the WebUI package. After
@@ -559,7 +562,7 @@ necessarily clean solution for this issue.
 By default, Flask applications are run in a single-process development mode,
 which does not use WebSockets. We have decided to pick uWSGI as our production
 server, as it is well documented, fast, compiled, and gets rid of the downsides
-of the development server. A script was created to easily run the server in
+of the development server, Werkzeug. A script was created to easily run the server in
 different modes: with tests, development mode and production mode.
 The script also allows to run the project without footage stream, by supplying
-\verb|NO_FOOTAGE=true| as the environment variable.
+\verb|NO_FOOTAGE=true| as an environment variable.
