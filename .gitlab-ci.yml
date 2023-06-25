@@ -129,6 +129,7 @@ compile-report:
     - biber final-report
     - makeglossaries final-report
     - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf final-report.tex
+    - pdflatex -file-line-error -interaction=nonstopmode -synctex=1 -output-format=pdf final-report.tex
     - exit
   artifacts:
     paths:
