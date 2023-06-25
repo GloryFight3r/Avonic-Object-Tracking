@@ -57,7 +57,7 @@ We now discuss three different solutions that are already available for
 customers. These products were created by companies other than Avonic to solve
 a similar problem to the one described in
 \hyperref[sec:problem-statement]{Section 2.1}. Looking at such products helps to get a
-better idea of the state of the art solutions in this industry. For every case below, we contrast the
+better idea of the state-of-the-art solutions in this industry. For every case below, we contrast the
 solution with Avonic’s vision and explain how it relates to the project we
 worked on.
 
@@ -67,7 +67,7 @@ movements''\cite{aver-camera}. The camera stands alone and is not helped by an
 external microphone. Instead, it has a so-called ``dual-lens design'' that
 allows to keep a secondary panorama view while zooming in on the speaker. In
 this way, new speakers can still be recognized when they are not recorded by
-the zoomed in lens.
+the zoomed-in lens.
 
 Though Avonic has tried to use a dual-lens design before, our project is about
 using a single camera with a single lens. To make up for the lack of multiple
@@ -84,35 +84,34 @@ speaker\cite{yealink-camera}. As audio from a microphone array is used to
 detect the speaker's location, this is similar to our project.
 
 The big difference is that the Yealink microphone is built into the camera,
-which eliminates the need to translate data from the microphone to the camera.
+which eliminates the need to calculate the speaker's position from the microphone and transfer data between the two devices.
 Since we have a seperate microphone at a different position from the camera, we
 face an entirely different problem from Yealink.
 
 \paragraph{Cisco}\mbox{} \\
-Using one camera, Cisco locates the speaker and zooms in on that speaker, while
-another camera is watching the entire room to look for the next
+Using one camera, Cisco locates the speaker and zooms in on them, while
+another camera is watching the entire room to look for the next possible
 speaker\cite{cisco-camera}. This dual-camera approach helps to switch quickly
 between different speakers. It can be compared to the dual-lens design used by
 AVer and Yealink; all these products have an option to search for a new speaker
 while recording the active speaker.
 
-The use of two cameras thus makes it easier for Cisco to localize the speaker.
-The overall problem is made less complex using this approach. Avonic wants to use only
+The use of two cameras thus makes it easier for Cisco to locate the speaker.
+The overall problem is simplified using this approach. We were assigned by Avonic to use only
 one camera and one microphone and try to track speakers as well as companies
 like Cisco do with two or more cameras.
-
-\medskip
-As we can see, the most common approach to the speaker localization problem is
+\\ \\
+As we can see, the most common approach to pinpointing the speaker problem is
 to use a dual-lens or dual-camera design. On behalf of Avonic, we experimented
 with a new approach: one camera and one microphone. This poses new problems.
 Our devised solution is described in \hyperref[ch:solution]{Chapter 4}.
 
 \section{Stakeholders}\label{sec:stakeholders}
 This section describes who the stakeholders of our project are and how we
-considered their interests during the ten week process. The definition of
-stakeholder that we are going to use is as follows: “All those who have an
+considered their interests during the ten-week process. The definition of
+stakeholder that we are going to use is as follows: ``All those who have an
 interest in the system and who will eventually be responsible for its
-acceptance”\cite{stakeholder-definition}. Using this definition, we identified
+acceptance''\cite{stakeholder-definition}. Using this definition, we identified
 four main types of stakeholders. These people are directly affected by the
 result of our project. The types of stakeholders of our project are as follows:
 
