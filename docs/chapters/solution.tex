@@ -270,8 +270,8 @@ simultaneously with speaker tracking. This helps to centralize the speaker on th
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{tree}
-    \label{fig:object_strategy}
     \caption{States diagram of the quick change object-audio strategy, which combines object detection with audio information}
+    \label{fig:object_strategy}
 \end{figure}
 \\
 The last approach we consider is always relying on microphone coordinates
@@ -364,9 +364,6 @@ communication with the microphone. The most important requests are the one that
 gets the direction from the microphone towards the detected sound and the one
 that gets the peak volume. Like the Camera API, the Microphone API uses an
 adapter pattern to facilitate the use of other microphones in the future. \\
-\textbf{NOTE:} In the report we have used "active speaker" in multiple places. By that, we understand a person, who is 
-currently speaking and the Sennheiser microphone is able to detect their voice and their voice volume is 
-greater than the required threshold we have set.
 
 \subsection{Tracking}\label{subsection:tracking}
 All of the functionality related to speaker tracking is contained in this
