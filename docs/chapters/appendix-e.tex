@@ -415,6 +415,83 @@ Endpoint that returns the list of all saved presets.
     \item \verb|"preset-list"|: list of all presets in a JSON format
 \end{itemize}
 
+\section{Calibration endpoints}
+
+\paragraph{POST /calibration/add\_directions\_to\_speaker}
+Endpoint that adds the camera direction towards a new calibration point
+\verb|return:|
+\begin{itemize}
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 504: the error code if no direction could be gotten from either the camera
+                        or the microphone
+        \end{itemize}
+        \verb|"message"|: the exact error message
+    }
+    \item{
+        In case of success:
+        \begin{itemize}
+            \item HTTP 200: success code
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /calibration/add\_directions\_to\_mic}
+Endpoint that adds the direction from the camera towards the microphone to the calibration
+
+\verb|return:|
+\begin{itemize}
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 504: the error code if no direction could be gotten from the camera 
+        \end{itemize}
+        \verb|"message"|: the exact error message
+    }
+    \item{
+        In case of success:
+        \begin{itemize}
+            \item HTTP 200: success code
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /calibration/reset}
+Endpoint that resets the calibration to the default values
+
+\verb|return:|
+\begin{itemize}
+  \item HTTP 200: success code
+\end{itemize}
+
+\paragraph{GET /calibration/is\_set}
+Endpoint that checks whether the calibration is completed and all the
+        needed vectors are calculated
+
+\verb|return:|
+\begin{itemize}
+  \item \verb|"is_set"|: boolean indicating whether calibration has been completed
+  \item HTTP 200: success code
+\end{itemize}
+
+\paragraph{GET /calibration/camera}
+Endpoint that calculates the relative coordinates of the camera in
+    relation to the microphone
+
+\verb|return:|
+\begin{itemize}
+  \item \verb|"camera_coords"|: a 3D array of floats [x, y, z]
+  \item HTTP 200: success code
+\end{itemize}
+
+\paragraph{GET /calibration/number-of-calibrated}
+Endpoint that returns the number of calibration points
+
+\verb|return:|
+\begin{itemize}
+  \item \verb|"speaker-points-length"|: the amount of speaker points that have been set [0 : 3] 
+  \item HTTP 200: success code
+\end{itemize}
+
 \section{Tracking endpoints}
 
 \paragraph{GET /preset/track} \mbox{}
@@ -576,3 +653,5 @@ Websocket endpoint that sends a new frame in base64 to the web interface
 \begin{itemize}
   \item {\verb|"new-frame"|: {\verb|"base64"|: Camera frame in base64}}
 \end{itemize}
+
+
