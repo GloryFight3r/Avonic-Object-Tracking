@@ -13,6 +13,7 @@
 \usepackage{float}
 \usepackage{array}
 \usepackage{amssymb}
+\usepackage{glossaries}
 \usepackage{caption}
 \usepackage{xcolor}
 
@@ -20,6 +21,9 @@
 \graphicspath{ {./images/} }
 \fancyfoot[LE,RO]{\slshape Microphone-array Avonic Tracking}
 \fancyfoot[LO,RE]{\slshape Group 11C}
+
+\makeglossaries
+\input{glossary}
 
 % Document
 \begin{document}
@@ -83,6 +87,11 @@
 
     \printbibliography
     \addcontentsline{toc}{chapter}{References}
+
+    \clearpage
+
+    \printglossaries
+    \addcontentsline{toc}{chapter}{Glossaries}
 
     \appendix
     \chapter{Ethical implications}\label{ch:ethics-appendix}
