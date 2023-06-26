@@ -1,0 +1,681 @@
+Below you find documentation of all of the endpoints provided
+by our application.
+
+\section{Page rendering}
+
+\paragraph{GET /} \mbox{} \\
+Render the main page of the WebUI.
+This page includes everything our application has to offer in one neatly organized package
+
+\paragraph{GET /camera-control} \mbox{} \\
+Render a page that includes only the camera controls.
+
+\paragraph{GET /microphone-control} \mbox{} \\
+Render a page that includes only the microphone information.
+That means the buttons to get its direction and whether someone is currently speaking.
+
+\paragraph{GET /presets-and-calibration} \mbox{} \\
+Render a page that includes only set-up for presets and calibration.
+
+\paragraph{GET /live-footage} \mbox{} \\
+Render a page that includes only the video stream from the camera.
+
+\section{Camera}
+\paragraph{POST /camera/address/set} \mbox{} \\
+Endpoint that sets the camera network settings.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"camera-ip"|: the address of the connected camera.
+    \item \verb|"camera-port"|: the camera port.
+    \item \verb|"camera-http-port"|: the HTTP port of the camera.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP code corresponds to the camera response:
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        Possible HTTP 400: invalid supplied values
+        \begin{itemize}
+            \item \verb|"message"|: ``Invalid address!''
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/reboot} \mbox{} \\
+Endpoint that reboots the camera.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item{
+    Other HTTP codes: HTTP code corresponds to the camera response
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/on} \mbox{} \\
+Endpoint that turns the camera's video on.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item{
+    Other HTTP codes: HTTP code corresponds to the camera response
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/off} \mbox{} \\
+Endpoint that turns the camera's video off.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item{
+    Other HTTP codes: HTTP code corresponds to the camera response
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/move/absolute} \mbox{} \\
+Endpoint that sends a command to the camera to point in a direction relative to the home one.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"absolute-speed-x"|: Integer from 1 -- 24, the pan speed.
+    \item \verb|"absolute-speed-y"|: Integer from 1 -- 20, the tilt speed.
+    \item \verb|"absolute-degrees-x"|: Float from -170 -- 170, the amount of degrees to pan by.
+    \item \verb|"absolute-degrees-y"|: Float from -30 -- 90, the amount of degrees to tilt by.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+    \item{Possible HTTP 400: assertion error of validity of supplied values}
+\end{itemize}
+
+\paragraph{POST /camera/move/relative} \mbox{} \\
+Endpoint that sends a command to the camera to point in a direction relative to the current one.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"relative-speed-x"|: Integer from 1 -- 24, the pan speed.
+    \item \verb|"relative-speed-y"|: Integer from 1 -- 20, the tilt speed.
+    \item \verb|"relative-degrees-x"|: Float from -170 -- 170, the amount of degrees to pan by.
+    \item \verb|"relative-degrees-y"|: Float from -30 -- 90, the amount of degrees to tilt by.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+    \item{Possible HTTP 400: assertion error of validity of supplied values}
+\end{itemize}
+
+\paragraph{POST /camera/move/vector} \mbox{} \\
+Same as \verb|/camera/move/absolute| but a vector is used as a direction instead of two angles.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"vector-speed-x"|: Integer from 1 -- 24, the pan speed.
+    \item \verb|"vector-speed-y"|: Integer from 1 -- 20, the tilt speed.
+    \item \verb|"vector-x"|: Float representing the x-coordinate of the direction vector.
+    \item \verb|"vector-y"|: Float representing the y-coordinate (height) of the direction vector.
+    \item \verb|"vector-z"|: Float representing the z-coordinate of the direction vector.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+    \item{Possible HTTP 400: assertion error of validity of supplied values}
+\end{itemize}
+
+\paragraph{POST /camera/move/home} \mbox{} \\
+Endpoint to move the camera to its home direction $[0, 0, 1]$.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/move/stop} \mbox{} \\
+Endpoint to stop all the camera's movement.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+    HTTP code corresponds to the camera response:
+    \begin{itemize}
+        \item \verb|"message"|: description of the received response code from the camera.
+    \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /camera/zoom/get} \mbox{} \\
+Endpoint to get the zoom value of the camera.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        In case of an error: HTTP code corresponds to the camera response.
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        In case of success: HTTP 200
+        \begin{itemize}
+            \item \verb|"zoom-value"|: Integer in range $[0, 16384]$, the value of the zoom.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /camera/zoom/set} \mbox{} \\
+Endpoint to set the zoom value of the camera.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"zoom-value"|: Integer in range $[0, 16384]$, the value of the zoom
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        In case of an error: HTTP code corresponds to the camera response.
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        Possible HTTP 400: assertion error of validity of supplied values
+    }
+\end{itemize}
+
+\paragraph{GET /camera/position/get} \mbox{} \\
+Endpoint to get the current pan and tilt values of the camera.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        In case of an error: HTTP code corresponds to the camera response.
+        \begin{itemize}
+            \item \verb|"message"|: description of the received response code from the camera.
+        \end{itemize}
+    }
+    \item{
+        In case of success: HTTP 200
+        \begin{itemize}
+            \item \verb|"position-alpha-value"|: pan value of the camera
+            \item \verb|"position-beta-value"|: tilt value of the camera
+        \end{itemize}
+
+    }
+\end{itemize}
+
+\section{Microphone}
+\paragraph{POST /microphone/address/set} \mbox{} \\
+Endpoint that sets the microphone network settings.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"microphone-ip"|: a string, the address of the microphone.
+    \item \verb|"microphone-port"|: the microphone port.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200 or 400: Text of the return message from the microphone.
+
+    }
+    \item{
+        Possible HTTP 400: not valid supplied address or port
+        \begin{itemize}
+            \item \verb|"message"|: ``Invalid address!''
+        \end{itemize}
+
+    }
+\end{itemize}
+
+\paragraph{POST /microphone/height/set} \mbox{} \\
+Endpoint to set the height of the microphone above the speaker plane.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"microphone-height"|: float representing value to be set.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-height"|: with the value that was set.
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /microphone/direction} \mbox{} \\
+Endpoint to get the current direction to the loudest noise in the room from the microphone.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-direction"|: list with 3 float values representing direction of the speaker.
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /microphone/speaker/direction} \mbox{} \\
+Endpoint to get the direction of the active speaker. Used for setting up presets and calibrating.
+Actively loops polling data from the microphone, waits for 5 seconds.
+If nobody has spoken in 5 seconds - returns last direction from the microphone.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-direction"|: list with 3 float values representing direction of the speaker.
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{GET /microphone/speaking} \mbox{} \\
+Endpoint to inquire whether anyone is speaking.
+
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: 
+        \begin{itemize}
+            \item \verb|"microphone-speaking"|: boolean representing is some someone speaking at the moment
+        \end{itemize}
+    }
+    \item{
+        HTTP 504: 
+        \begin{itemize}
+            \item \verb|"message"|: error message returned from the microphone.
+        \end{itemize}
+    }
+\end{itemize}
+
+\section{Presets}
+\paragraph{POST /preset/add} \mbox{} \\
+Endpoint that saves a preset to the preset collection.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"preset-name"|: Unique string representing the name of the preset.
+    \item \verb|"camera-direction-alpha"|: Float from -170 -- 170 representing the yaw of the camera
+    \item \verb|"camera-direction-beta"|: Float from -30 -- 90 representing the pitch of the camera
+    \item \verb|"camera-zoom-value"|: Integer with the zoom value $[0, 16384]$
+    \item \verb|"mic-direction-x"|: Float representing the x-coordinate of the direction vector.
+    \item \verb|"mic-direction-y"|: Float representing the y-coordinate of the direction vector.
+    \item \verb|"mic-direction-z"|: Float representing the z-coordinate of the direction vector.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: success, empty message
+    }
+    \item{
+        HTTP 400: invalid supplied values, empty message
+    }
+\end{itemize}
+
+\paragraph{POST /preset/edit} \mbox{} \\
+Endpoint that edits a preset in the preset collection.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"preset-name"|: String representing the name of the preset.
+    \item \verb|"camera-direction-alpha"|: Float from -170 -- 170 representing the yaw of the camera
+    \item \verb|"camera-direction-beta"|: Float from -30 -- 90 representing the pitch of the camera
+    \item \verb|"camera-zoom-value"|: Integer with the zoom value $[0, 16384]$
+    \item \verb|"mic-direction-x"|: Float representing the x-coordinate of the direction vector.
+    \item \verb|"mic-direction-y"|: Float representing the y-coordinate of the direction vector.
+    \item \verb|"mic-direction-z"|: Float representing the z-coordinate of the direction vector.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: success, empty message
+    }
+    \item{
+        HTTP 400: invalid supplied values, empty message
+    }
+\end{itemize}
+
+\paragraph{POST /preset/remove} \mbox{} \\
+Endpoint that removes the given preset from the preset collection.
+
+\verb|form:|
+\begin{itemize}
+    \item \verb|"preset-name"|: string name for the preset.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{
+        HTTP 200: success, empty message
+    }
+    \item{
+        HTTP 400: invalid supplied values, empty message
+    }
+\end{itemize}
+
+\paragraph{GET /preset/get-list} \mbox{} \\
+Endpoint that returns the list of all saved presets.
+
+\verb|return:|
+\begin{itemize}
+    \item \verb|"preset-list"|: list of all presets in a JSON format
+\end{itemize}
+
+\paragraph{GET /preset/info/$<preset\_name>$} \mbox{} \\
+Endpoint that returns information about a given preset.
+
+\verb|return:|
+\begin{itemize}
+    \item{In case of success:
+        \begin{itemize}
+            \item HTTP 200
+            \item \verb|"position-alpha-value"|: Float from -170 - 170 representing the yaw of the camera
+            \item \verb|"position-beta-value"|: Float from -30 - 90 representing the pitch of the camera
+            \item \verb|"zoom-value"|: Integer with the zoom value $[0, 16384]$
+            \item \verb|"microphone-direction"|: a 3D vector (array) of floats [x, y, z]
+        \end{itemize}
+    }
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 400, empty message
+        \end{itemize}
+    }
+\end{itemize}
+
+\section{Calibration}
+
+\paragraph{POST /calibration/add-directions-to-speaker} \mbox{} \\
+Endpoint that adds the camera direction towards a new calibration point
+
+\verb|return:|
+\begin{itemize}
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 504: the error code if no direction could be gotten from either the camera
+                        or the microphone
+        \end{itemize}
+        \verb|"message"|: the exact error message
+    }
+    \item{
+        In case of success:
+        \begin{itemize}
+            \item HTTP 200: success code
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /calibration/add-direction  -to-mic} \mbox{} \\
+Endpoint that adds the direction from the camera towards the microphone to the calibration
+
+\verb|return:|
+\begin{itemize}
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 504: the error code if no direction could be gotten from the camera 
+        \end{itemize}
+        \verb|"message"|: the exact error message
+    }
+    \item{
+        In case of success:
+        \begin{itemize}
+            \item HTTP 200: success code
+        \end{itemize}
+    }
+\end{itemize}
+
+\paragraph{POST /calibration/reset} \mbox{} \\
+Endpoint that resets the calibration to the default values
+
+\verb|return:|
+\begin{itemize}
+  \item HTTP 200: success code
+\end{itemize}
+
+\paragraph{GET /calibration/is-set} \mbox{} \\
+Endpoint that checks whether the calibration is completed and all the
+        needed vectors are calculated
+
+\verb|return:|
+\begin{itemize}
+  \item \verb|"is-set"|: boolean indicating whether calibration has been completed
+  \item HTTP 200: success code
+\end{itemize}
+
+\paragraph{GET /calibration/camera} \mbox{} \\
+Endpoint that calculates the relative coordinates of the camera in
+    relation to the microphone
+
+\verb|return:|
+\begin{itemize}
+  \item \verb|"camera-coords"|: a 3D vector (array) of floats $[x, y, z]$
+  \item HTTP 200: success code
+\end{itemize}
+
+\paragraph{GET /calibration/number-of-calibrated} \mbox{} \\
+Endpoint that returns the number of calibration points
+
+\verb|return:|
+\begin{itemize}
+  \item \verb|"speaker-points-length"|: the amount of speaker points that have been set $[0, 3]$
+  \item HTTP 200: success code
+\end{itemize}
+
+\section{Tracking}
+
+\paragraph{GET /track/preset} \mbox{} \\
+Endpoint that changes the tracking to use the preset model.
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: success, empty message}
+    \item \verb|"tracking"|: value representing \verb|PresetModel|
+\end{itemize}
+
+\paragraph{GET /track/calibration} \mbox{}\\
+Endpoint that changes the tracking to use the audio model
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: the model has successfully been set to the \verb|AudioModel|}
+    \item \verb|"tracking"|: the enum corresponding to the \verb|AudioModel|
+\end{itemize}
+
+\paragraph{GET /track/calibration-no-zoom} \mbox{}\\
+Endpoint that changes the tracking to use the audio model without adaptive zooming
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: the model has successfully been set to the \verb|AudioModelNoAdaptiveZoom|}
+    \item \verb|"tracking"|: the enum corresponding to the \verb|AudioModelNoAdaptiveZoom|
+\end{itemize}
+
+\paragraph{GET /track/object} \mbox{}\\
+Endpoint that changes the tracking to use the object tracking model
+
+\verb|return:|
+\begin{itemize}
+    \item{HTTP 200: the model has successfully been set to the \verb|WaitObjectAudioModel|}
+    \item \verb|"tracking"|: the enum corresponding to the \verb|WaitObjectAudioModel|
+\end{itemize}
+
+\paragraph{GET /track/hybrid} \mbox{}\\
+Endpoint that changes the tracking to use the hybrid model
+
+\verb|return:|
+\begin{itemize}
+    \item \verb|"tracking"|: value representing quick change object-audio model
+\end{itemize}
+
+\section{Thread}
+
+\paragraph{POST /thread/start} \mbox{} \\
+Endpoint that starts the tracking thread
+\begin{itemize}
+  \item{HTTP 200: the thread has successfully been started}
+  \item{HTTP 403: the thread has already been started before}
+\end{itemize}
+
+\paragraph{POST /thread/stop} \mbox{} \\
+Endpoint that stops the tracking thread
+
+\begin{itemize}
+  \item{HTTP 200: successfully stopped the tracking thread}
+\end{itemize}
+
+\paragraph{GET /thread/running} \mbox{} \\
+Endpoint that checks whether the tracking thread is running. This means that the thread is
+not None and that it is alive.
+
+\verb|return:|
+\begin{itemize}
+  \item {\verb|"is-running"|: a boolean value indicating whether the thread is running or not}
+\end{itemize}
+
+\section{Info-thread and update}
+
+\paragraph{GET /update/microphone}\mbox{} \\
+Endpoint that updates the microphone data in the WebUI
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully updated the microphone coordinates}
+\end{itemize}
+
+\paragraph{GET /update/camera}\mbox{} \\
+Endpoint that updates the camera data in the WebUI
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully updated the camera coordinates}
+\end{itemize}
+
+\paragraph{POST /info-thread/start} \mbox{} \\
+Endpoint that starts the thread that updates all the dynamic data.
+This means the current directions and more for both the camera and microphone.
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully started the info thread.}
+\end{itemize}
+
+\paragraph{POST /info-thread/stop} \mbox{} \\
+Endpoint that stops the thread that updates all the dynamic data.
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: successfully stopped the info thread.}
+\end{itemize}
+
+\section{Settings}
+\paragraph{GET /settings/get} \mbox{} \\
+Endpoint that returns the settings that are currently active.
+
+\verb|return:|
+\begin{itemize}
+  \item{HTTP 200: success and data}
+  \begin{itemize}
+    \item \verb|"camera-ip"|: the address of the connected camera
+    \item \verb|"camera-port"|: the port of the connected camera
+    \item \verb|"camera-http-port"|: the HTTP port of the connected camera
+    \item \verb|"microphone-ip"|: the address of the connected microphone
+    \item \verb|"microphone-port"|: the port of the connected microphone
+    \item \verb|"microphone-tresh"|: an int value between -90 and 0 representing the preferred
+    volume threshold
+    \item \verb|"filepath"|: a string representing the folder in which the settings file is stored
+  \end{itemize}
+\end{itemize}
+
+\paragraph{POST /settings/set} \mbox{} \\
+Endpoint that returns the settings that are currently active.
+
+\verb|form:|
+\begin{itemize}
+  \item \verb|"camera-ip"|: the address of the camera to connect to
+  \item \verb|"camera-port"|: the port of the camera to connect to
+  \item \verb|"camera-http-port"|: the new port for HTTP requests to the camera
+  \item \verb|"microphone-ip"|: the address of the microphone to connect to
+  \item \verb|"microphone-port"|: the port of the microphone to connect to
+  \item \verb|"microphone-tresh"|: an int value between -90 and 0 representing the preferred volume threshold.
+  \item \verb|"filepath"|: a string representing the folder in which to store the settings file.
+\end{itemize}
+\verb|return:|
+\begin{itemize}
+    \item{In case of an error:
+        \begin{itemize}
+            \item HTTP 400: either the threshold or the filepath were not given correctly
+            \item HTTP 500: an error occurred while writing to the settings file
+        \end{itemize}
+        \verb|"message"|: description of the error that was caught
+    }
+    \item{
+        In case of success:
+        \begin{itemize}
+            \item HTTP 200: success code
+        \end{itemize}
+    }
+\end{itemize}
+
+\section{WebSocket}
+Websocket endpoint that sends a new frame in base64 to the web interface
+
+\verb|return:|
+\begin{itemize}
+  \item {\verb|"new-frame"|: {\verb|"base64"|: Camera frame in base64}}
+\end{itemize}
+
+
