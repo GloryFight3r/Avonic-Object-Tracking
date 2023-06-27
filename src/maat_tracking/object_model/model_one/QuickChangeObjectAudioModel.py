@@ -14,7 +14,7 @@ from maat_camera_api.camera_adapter import ResponseCode
 from maat_camera_api.converter import vector_angle
 from maat_microphone_api.microphone_control_api import MicrophoneAPI
 
-class HybridTracker(ObjectModel, AudioModel):
+class QuickChangeObjectAudio(ObjectModel, AudioModel):
     # last bounding box we were tracking
     last_tracked = np.array([0, 0, 0, 0])
 

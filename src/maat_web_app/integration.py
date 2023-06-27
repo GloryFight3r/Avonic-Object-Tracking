@@ -29,7 +29,7 @@ from maat_tracking.preset_model.PresetModel import PresetModel
 from maat_tracking.audio_model.AudioModel import AudioModel
 from maat_tracking.object_model.yolov8 import YOLOPredict
 from maat_tracking.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
-from maat_tracking.object_model.model_one.STModelOne import HybridTracker
+from maat_tracking.object_model.model_one.QuickChangeObjectAudioModel import QuickChangeObjectAudio
 from maat_tracking.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 
 
@@ -220,9 +220,9 @@ class GeneralController:
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
                                         filename=self.filepath + "calibration.json")
         if self.footage_thread_event.value == 1:
-            self.hybrid_model = HybridTracker(self.cam_api, self.mic_api, self.nn,
-                                              self.footage_thread,
-                                              filename=self.filepath + "calibration.json")
+            self.hybrid_model = QuickChangeObjectAudio(self.cam_api, self.mic_api, self.nn,
+                                                       self.footage_thread,
+                                                       filename=self.filepath + "calibration.json")
             self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api,
                                                            self.resolution,
                                                            5, self.nn, self.footage_thread,
@@ -321,8 +321,8 @@ class GeneralController:
         self.thread = None
         self.footage_thread = FootageThread(None, None, self.resolution, None)
 
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api,
-                                          self.nn, self.footage_thread, "")
+        self.hybrid_model = QuickChangeObjectAudio(self.cam_api, self.mic_api,
+                                                   self.nn, self.footage_thread, "")
 
         self.tracking.value = ModelCode.PRESET
 
@@ -338,8 +338,8 @@ class GeneralController:
         self.tracking.value = new_controller.tracking.value
         self.nn = new_controller.nn
         self.footage_thread = new_controller.footage_thread
-        self.hybrid_model = HybridTracker(self.cam_api, self.mic_api,
-                                          self.nn, self.footage_thread, "")
+        self.hybrid_model = QuickChangeObjectAudio(self.cam_api, self.mic_api,
+                                                   self.nn, self.footage_thread, "")
 
     def set_mic_api(self, new_mic_api) -> None:
         self.mic_api = new_mic_api

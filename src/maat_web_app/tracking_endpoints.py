@@ -2,7 +2,7 @@ from flask import make_response, jsonify, request
 from maat_tracking.preset_model.PresetModel import PresetModel
 from maat_tracking.audio_model.AudioModel import AudioModel
 from maat_tracking.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
-from maat_tracking.object_model.model_one.STModelOne import HybridTracker
+from maat_tracking.object_model.model_one.QuickChangeObjectAudioModel import QuickChangeObjectAudio
 from maat_tracking.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 from maat_tracking.updater import UpdateThread
 from maat_tracking.object_model.yolov8 import YOLOPredict
@@ -10,7 +10,7 @@ from maat_web_app.integration import GeneralController, ModelCode
 
 
 def start_thread_endpoint(integration: GeneralController):
-    """ This method starts the thread that controlls the actual tracking and calls
+    """ This method starts the thread that controls the actual tracking and calls
     the corresponding tracking model depending on the user's choice.
     """
     # start (unpause) the thread
@@ -26,9 +26,9 @@ def start_thread_endpoint(integration: GeneralController):
             model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
                                     filename=integration.filepath + "calibration.json")
         elif integration.tracking.value == ModelCode.HYBRID:
-            model = HybridTracker(integration.cam_api, integration.mic_api,
-                                  integration.nn, integration.footage_thread,
-                                  integration.filepath + "calibration.json")
+            model = QuickChangeObjectAudio(integration.cam_api, integration.mic_api,
+                                           integration.nn, integration.footage_thread,
+                                           integration.filepath + "calibration.json")
         else:
             if integration.nn is None:
                 integration.nn = YOLOPredict()
