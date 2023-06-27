@@ -114,7 +114,8 @@ def get_preset_info(integration: GeneralController, preset_name: str):
             "microphone-direction": [info[1][0], info[1][1], info[1][2]],
         }), 200)
     except AssertionError as e:
-        return make_response(jsonify({"message": "Could not retrieve info about preset, " + str(e)}), 400)
+        return make_response(jsonify({"message":
+                                      "Could not retrieve info about preset, " + str(e)}), 400)
 
 
 def point_to_closest_preset(integration: GeneralController):

@@ -123,8 +123,9 @@ class PresetCollection:
                 self.preset_locations = {}
                 for key in data:
                     try:
-                        self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
-                                                            np.array(data[key]["microphone_direction"]))
+                        self.preset_locations[key] = Preset(
+                            np.array(data[key]["camera_info"]),
+                            np.array(data[key]["microphone_direction"]))
                         if len(data[key]["camera_info"]) != 3:
                             self.preset_locations[key].camera_info = \
                                 np.array(PresetCollection.default_camera_info)

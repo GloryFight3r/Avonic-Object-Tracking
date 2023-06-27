@@ -68,8 +68,8 @@ class CameraAPI:
     def reboot(self, new_socket) -> ResponseCode:
         """ Reboots the camera - the camera will do a complete reboot
         """
-        hx, cnt = self.message_counter()
-        self.camera.send_no_response('01 00 00 06 00 00 00' + hx,
+        hx = self.message_counter()
+        self.camera.send_no_response('01 00 00 06 00 00 00' + hx[0],
                                      '81 0A 01 06 01 FF')
 
         response = self.camera.reconnect(new_socket)

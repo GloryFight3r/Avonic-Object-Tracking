@@ -97,7 +97,8 @@ def track_hybrid(integration: GeneralController):
     if integration.footage_thread_event.value == 0:
         return make_response(jsonify({"message": "Object tracking requires footage to be on. " +
                                                  "Please enable it before launching the program. " +
-                                                 "To do this, make sure the NO_FOOTAGE environment " +
+                                                 "To do this, make sure " +
+                                                 "the NO_FOOTAGE environment " +
                                                  "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.HYBRID
     return make_response(jsonify({"tracking": integration.tracking.value}), 200)
@@ -116,7 +117,8 @@ def track_object_continuously(integration: GeneralController):
     if integration.footage_thread_event.value == 0:
         return make_response(jsonify({"message": "Object tracking requires footage to be on. " +
                                                  "Please enable it before launching the program. " +
-                                                 "To do this, make sure the NO_FOOTAGE environment " +
+                                                 "To do this, make sure the " +
+                                                 "NO_FOOTAGE environment " +
                                                  "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.OBJECT
     return make_response(jsonify({"tracking": integration.tracking.value}), 200)

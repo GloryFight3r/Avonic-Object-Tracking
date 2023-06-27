@@ -4,7 +4,7 @@ import cv2
 
 from maat_tracking.object_model.ObjectModel import ObjectModel
 from maat_tracking.object_model.yolov8 import YOLOPredict
-from maat_tracking.utils.coordinate_translation\
+from maat_tracking.utils.coordinate_translation \
     import translate_microphone_to_camera_vector
 from maat_tracking.audio_model.calibration import Calibration
 from maat_tracking.audio_model.AudioModel import AudioModel
@@ -202,7 +202,7 @@ class QuickChangeObjectAudio(ObjectModel, AudioModel):
         closest_distance: float = float('inf')
 
         cur_box_middle: np.ndarray = np.array([(current_box[0] + current_box[2]) / 2,
-                                              (current_box[1] + current_box[3]) / 2])
+                                               (current_box[1] + current_box[3]) / 2])
 
         for bbox in all_boxes:
             # calculate the middle pixel of the current box

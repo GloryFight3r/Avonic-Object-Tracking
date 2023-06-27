@@ -1,6 +1,6 @@
 import time
 from threading import Thread
-from os import getenv
+from os import getenv, getpid
 from time import sleep
 from multiprocessing import Value
 # NOTE: This library is imported only due to
@@ -11,7 +11,6 @@ from multiprocess import Process
 import requests
 import cv2
 import numpy as np
-import os
 from yaml import load, dump
 
 try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
@@ -20,7 +19,8 @@ except ImportError:
     from yaml import Loader, Dumper
 from maat_camera_api.camera_http_request import CameraHTTP
 from maat_camera_api.footage import FootageThread
-from maat_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize, converter, ResponseCode
+from maat_camera_api.camera_control_api import CameraAPI, CompressedFormat,\
+    ImageSize, converter, ResponseCode
 from maat_camera_api.camera_adapter import CameraSocket
 from maat_microphone_api.microphone_control_api import MicrophoneAPI
 from maat_microphone_api.microphone_adapter import MicrophoneSocket
@@ -108,7 +108,7 @@ class GeneralController:
         self.no_settings_sent = True
 
         # PIDs of master and footage processes
-        self.pid = Value("i", os.getpid())
+        self.pid = Value("i", getpid())
         self.footage_pid = Value("i", -1)
 
         self.testing = Value("i", 0, lock=False)
@@ -201,7 +201,8 @@ class GeneralController:
                                           [cv2.CAP_PROP_N_THREADS, 4])  # pragma: no mutate
             self.footage_thread = FootageThread(self.video,
                                                 self.footage_thread_event,
-                                                self.resolution, self.footage_pid)  # pragma: no mutate
+                                                self.resolution,
+                                                self.footage_pid)  # pragma: no mutate
 
             self.footage_process = Process(target=self.footage_thread.run)
             if self.video is not None and self.video.isOpened():
@@ -216,15 +217,18 @@ class GeneralController:
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
-                                                            filename=self.filepath + "calibration.json")
+                                                            filename=self.filepath +
+                                                            "calibration.json")
         if self.footage_thread_event.value == 1:
             self.hybrid_model = QuickChangeObjectAudio(self.cam_api, self.mic_api, self.nn,
                                                        self.footage_thread,
-                                                       filename=self.filepath + "calibration.json")
+                                                       filename=self.filepath +
+                                                       "calibration.json")
             self.object_audio_model = WaitObjectAudioModel(self.cam_api, self.mic_api,
                                                            self.resolution,
                                                            5, self.nn, self.footage_thread,
-                                                           filename=self.filepath + "calibration.json")
+                                                           filename=self.filepath +
+                                                           "calibration.json")
         # Initialize camera and microphone info threads
         self.info_threads_event.value = 0
         self.info_threads_break.value = 0  # THIS IS ONLY FOR DESTROYING THREADS
@@ -420,7 +424,6 @@ class GeneralController:
                     print("Could not update flask at path " + path)
             sleep(0.3)
         print("Closed " + path + " updater thread")
-        return
 
 
 def verify_address(address) -> None:
@@ -435,7 +438,7 @@ def close_running_threads(integration_passed, timeout_seconds: int = 1, raise_ex
     integration_passed.footage_thread_event.value = 0  # pragma: no mutate
     integration_passed.info_threads_break.value = 1  # pragma: no mutate
     for i in range(timeout_seconds * 10):
-        print("Killing footage thread")
+        print("Killing footage thread, try " + str(i) + "/" + str(timeout_seconds * 10))
         integration_passed.footage_process.terminate()  # pragma: no mutate
         time.sleep(0.1)  # pragma: no mutate
         if not integration_passed.footage_process.is_alive():

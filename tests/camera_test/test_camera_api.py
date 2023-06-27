@@ -79,9 +79,9 @@ def generate_codec_tests():
     return [
         (CompressedFormat.MJPEG, 
             '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":1},"nChannel":0}]}}'),
-        (CompressedFormat.H264, 
+        (CompressedFormat.H264,
             '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":5},"nChannel":0}]}}'),
-        (CompressedFormat.H265, 
+        (CompressedFormat.H265,
             '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
     ]
 

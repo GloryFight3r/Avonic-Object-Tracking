@@ -4,9 +4,9 @@ from multiprocessing import Value, Array
 from ctypes import c_int
 import base64
 import copy
+import time
 import numpy as np
 import cv2  # type: ignore
-import time
 
 
 class FootageThread(Thread):

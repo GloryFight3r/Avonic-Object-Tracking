@@ -40,7 +40,8 @@ def set_settings(integration: GeneralController):
     camera_response = maat_web_app.camera_endpoints.address_set_camera_endpoint(integration)
     if camera_response.status_code != 200:
         return camera_response
-    microphone_response = maat_web_app.microphone_endpoints.address_set_microphone_endpoint(integration)
+    microphone_response = maat_web_app.microphone_endpoints.\
+        address_set_microphone_endpoint(integration)
     if microphone_response.status_code != 200:
         return microphone_response
     saved = False

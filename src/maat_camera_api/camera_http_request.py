@@ -1,5 +1,5 @@
-import requests
 from enum import Enum
+import requests
 
 
 class ResponseCodeHTTP(Enum):
