@@ -2,8 +2,8 @@ import json
 from unittest import mock
 from hypothesis import given, strategies as st
 import numpy as np
-from microphone_api.microphone_adapter import MicrophoneSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
+from maat_microphone_api.microphone_adapter import MicrophoneSocket
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
 
 
 

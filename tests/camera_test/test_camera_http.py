@@ -1,8 +1,8 @@
 from unittest import mock
 import pytest
 
-from avonic_camera_api.camera_http_request import ResponseCodeHTTP
-from avonic_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_http_request import ResponseCodeHTTP
+from maat_camera_api.camera_http_request import CameraHTTP
 
 class MockResponse:
     def __init__(self, status_code, content):

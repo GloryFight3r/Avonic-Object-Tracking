@@ -2,11 +2,11 @@ from unittest import mock
 import socket
 import pytest
 import numpy as np
-from web_app.integration import GeneralController
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import CameraSocket
-from avonic_camera_api.camera_http_request import CameraHTTP
-import web_app
+from maat_web_app.integration import GeneralController
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_control_api import CameraSocket
+from maat_camera_api.camera_http_request import CameraHTTP
+import maat_web_app
 
 sock = mock.Mock()
 
@@ -71,7 +71,7 @@ def client(camera, monkeypatch):
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
 
-    app = web_app.create_app(test_controller=test_controller)
+    app = maat_web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
 
     return app.test_client()

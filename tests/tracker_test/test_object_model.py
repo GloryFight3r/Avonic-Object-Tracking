@@ -3,8 +3,8 @@ import pytest
 import numpy as np
 import cv2
 
-from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
+from maat_tracking.object_model.ObjectModel import ObjectModel
+from maat_tracking.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
 
 def generate_box_lists():
     return [

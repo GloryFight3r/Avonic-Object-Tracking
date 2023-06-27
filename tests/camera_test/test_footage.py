@@ -1,7 +1,7 @@
 from multiprocessing import Value
 import numpy as np
 import pytest
-from avonic_camera_api.footage import FootageThread
+from maat_camera_api.footage import FootageThread
 
 class MockedCv:
     def __init__(self):
@@ -30,6 +30,6 @@ class MockedYoloPredict:
 def footage_thread():
     mocked_cam_footage = MockedCv()
     event = Value("i", 1, lock=False)
-    thread = FootageThread(mocked_cam_footage, event, np.array([1920.0, 1080.0]))
+    thread = FootageThread(mocked_cam_footage, event, np.array([1920.0, 1080.0]), Value("i", -1))
 
     return thread

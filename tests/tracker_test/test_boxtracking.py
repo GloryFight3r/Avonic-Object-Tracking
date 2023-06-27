@@ -1,10 +1,10 @@
 import pytest
 import numpy as np
 
-from microphone_api.microphone_control_api import MicrophoneAPI
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.footage import FootageThread
-from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.footage import FootageThread
+from maat_tracking.object_model.ObjectModel import ObjectModel
 
 def generate_tests():
     return [
@@ -36,7 +36,7 @@ def test_camera_track(obj_model, fov, bbox, expected, monkeypatch):
     monkeypatch.setattr(obj_model.cam_api, "move_relative", mocked_move)
     monkeypatch.setattr(obj_model.cam_api, "calculate_fov", mocked_fov)
 
-    obj_model.get_movement_to_box(bbox)
+    obj_model.get_movement_to_box(np.array(bbox))
 
 def generate_errors():
     return [
@@ -59,4 +59,4 @@ def test_camera_assertions(obj_model, fov, bbox, monkeypatch):
     monkeypatch.setattr(obj_model.cam_api, "calculate_fov", mocked_fov)
 
     with pytest.raises(AssertionError):
-        obj_model.get_movement_to_box(bbox)
+        obj_model.get_movement_to_box(np.array(bbox))

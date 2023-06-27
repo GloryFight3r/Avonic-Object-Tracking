@@ -3,13 +3,13 @@ import socket
 import time
 import pytest
 import numpy as np
-from web_app.integration import GeneralController, close_running_threads
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_http_request import CameraHTTP
-from avonic_camera_api.camera_control_api import CameraSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
-import web_app
+from maat_web_app.integration import GeneralController, close_running_threads
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_control_api import CameraSocket
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
+from maat_microphone_api.microphone_adapter import MicrophoneSocket
+import maat_web_app
 
 sock = mock.Mock()
 
@@ -81,15 +81,15 @@ def client(camera, monkeypatch):
     def x3(self):
         pass
 
-    with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
-         with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+    with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
+         with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
              with mock.patch("builtins.open", x):
                 with mock.patch(
-                        "avonic_speaker_tracker.object_model.yolov8.YOLOPredict.__init__", x3):
+                        "maat_tracking.object_model.yolov8.YOLOPredict.__init__", x3):
                     with mock.patch("cv2.VideoCapture", x2):
                         test_controller.load_env()
                         test_controller.ws = mock.Mock()
-                        app = web_app.create_app(test_controller=test_controller)
+                        app = maat_web_app.create_app(test_controller=test_controller)
                         app.config['TESTING'] = True
     return app.test_client()
 

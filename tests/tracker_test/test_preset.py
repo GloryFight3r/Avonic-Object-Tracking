@@ -3,7 +3,7 @@ from unittest import mock
 import json
 import pytest
 import numpy as np
-from avonic_speaker_tracker.preset_model.preset import Preset, PresetCollection
+from maat_tracking.preset_model.preset import Preset, PresetCollection
 
 
 @pytest.fixture()
@@ -185,7 +185,7 @@ def test_set_filename(preset_collection: PresetCollection):
     def x(self):
         pass
 
-    with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+    with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
         assert preset_collection.filename == ""
         preset_collection.set_filename("asdf")
         assert preset_collection.filename == "asdf"

@@ -1,9 +1,9 @@
 import pytest
 import numpy as np
 from CameraMock import CameraMock
-from avonic_camera_api.camera_control_api import CameraAPI, insert_zoom_in_hex
-from avonic_camera_api.camera_adapter import ResponseCode
-from avonic_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_control_api import CameraAPI, insert_zoom_in_hex
+from maat_camera_api.camera_adapter import ResponseCode
+from maat_camera_api.camera_http_request import CameraHTTP
 
 
 def test_get_zoom():
@@ -70,7 +70,7 @@ def test_timeout():
     api = CameraAPI(CameraMock(True), CameraHTTP(("", 1)))
     api.latest_fov = np.array([10, 10])
     ret = api.get_zoom()
-    assert (ret == np.array([10, 10])).all()
+    assert ret == ResponseCode.TIMED_OUT
     assert api.camera.call_count == 0
 
 def generate_fov():

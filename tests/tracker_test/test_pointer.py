@@ -1,8 +1,8 @@
 from unittest import mock
 import numpy as np
-from avonic_speaker_tracker.preset_model.PresetModel import PresetModel
-from avonic_speaker_tracker.audio_model.AudioModel import AudioModel
-from avonic_speaker_tracker.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
+from maat_tracking.preset_model.PresetModel import PresetModel
+from maat_tracking.audio_model.AudioModel import AudioModel
+from maat_tracking.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 
 
 def test_preset_pointer_good_weather():

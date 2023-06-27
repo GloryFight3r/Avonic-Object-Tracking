@@ -1,8 +1,8 @@
 import numpy as np
 from unittest import mock
 import pytest
-from avonic_camera_api.converter import angle_vector, vector_angle
-from avonic_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize
+from maat_camera_api.converter import angle_vector, vector_angle
+from maat_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize
 
 
 def test_angle_vector_basic():
@@ -61,7 +61,7 @@ def test_vector_angle_invalid():
 
 def test_vector_angle_invalid_type():
     with pytest.raises(TypeError) as excinfo:
-        vector_angle([1, 2])
+        vector_angle(np.array([1, 2]))
     assert "Vector must contain three floats and be instance of np.ndarray" == str(excinfo.value)
 
 @pytest.fixture()

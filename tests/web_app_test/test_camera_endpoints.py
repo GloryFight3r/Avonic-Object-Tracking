@@ -3,12 +3,12 @@ from unittest import mock
 import socket
 import pytest
 import numpy as np
-import web_app
-from web_app.camera_endpoints import responses
-from web_app.integration import GeneralController
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import CameraSocket
-from avonic_camera_api.camera_control_api import ResponseCode
+import maat_web_app
+from maat_web_app.camera_endpoints import responses
+from maat_web_app.integration import GeneralController
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_control_api import CameraSocket
+from maat_camera_api.camera_control_api import ResponseCode
 
 sock = mock.Mock()
 @pytest.fixture()
@@ -36,8 +36,6 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), None)
-    def mocked_get_zoom():
-        return 128
     def mocked_get_direction():
         return np.array([2, 3, 5])
     def mocked_turn_on():
@@ -80,7 +78,7 @@ def client(camera, monkeypatch):
     test_controller.ws = mock.Mock()
     #test_controller.footage_thread = FootageThread(None, None)
 
-    app = web_app.create_app(test_controller=test_controller)
+    app = maat_web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
 
     return app.test_client()

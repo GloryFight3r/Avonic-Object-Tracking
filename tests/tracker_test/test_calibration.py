@@ -5,7 +5,7 @@ import json
 import pytest
 import numpy as np
 
-from avonic_speaker_tracker.audio_model.calibration import Calibration, angle_between_vectors
+from maat_tracking.audio_model.calibration import Calibration, angle_between_vectors
 
 def test_set_height():
     cal = Calibration()
@@ -438,7 +438,7 @@ def test_set_filename():
     def mock_load(self):
         pass
 
-    with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", mock_load):
+    with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", mock_load):
         cal = Calibration()
         assert cal.filename == ""
         cal.set_filename("asdf")

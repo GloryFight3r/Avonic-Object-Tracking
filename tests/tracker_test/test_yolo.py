@@ -4,7 +4,7 @@ import torch
 import cv2
 import numpy as np
 
-from avonic_speaker_tracker.object_model.yolov8 import YOLOPredict
+from maat_tracking.object_model.yolov8 import YOLOPredict
 
 class MockedBoxes:
     def __init__(self):

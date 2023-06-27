@@ -2,10 +2,10 @@ import socket
 import math
 import pytest
 import numpy as np
-from avonic_camera_api.camera_control_api import CameraAPI, PAN_STEP, TILT_STEP, degrees_to_command
-from avonic_camera_api.camera_http_request import CameraHTTP
-from avonic_camera_api.camera_adapter import CameraSocket, ResponseCode
-from avonic_camera_api import converter
+from maat_camera_api.camera_control_api import CameraAPI, PAN_STEP, TILT_STEP, degrees_to_command
+from maat_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_adapter import CameraSocket, ResponseCode
+from maat_camera_api import converter
 
 
 def generate_relative_commands():

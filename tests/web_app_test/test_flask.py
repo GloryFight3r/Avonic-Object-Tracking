@@ -4,13 +4,13 @@ import json
 import pytest
 import numpy as np
 
-from web_app.integration import GeneralController, ModelCode
-from avonic_camera_api.camera_http_request import CameraHTTP
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import CameraSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
-import web_app
+from maat_web_app.integration import GeneralController, ModelCode
+from maat_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_control_api import CameraSocket
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
+from maat_microphone_api.microphone_adapter import MicrophoneSocket
+import maat_web_app
 
 mic_sock = mock.Mock()
 
@@ -72,7 +72,7 @@ def client(camera, monkeypatch):
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
 
-    app = web_app.create_app(test_controller=test_controller)
+    app = maat_web_app.create_app(test_controller=test_controller)
 
     app.config['TESTING'] = True
 
@@ -317,13 +317,13 @@ def test_thread(client):
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
-    web_app.integration.tracking.value = ModelCode.AUDIO
+    maat_web_app.integration.tracking.value = ModelCode.AUDIO
     rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
-    web_app.integration.tracking.value = ModelCode.OBJECT
+    maat_web_app.integration.tracking.value = ModelCode.OBJECT
     rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
@@ -581,8 +581,8 @@ def test_settings(client):
         def x(self):
             pass
 
-        with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
-            with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+        with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
+            with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
                 rv = client.post("settings/set", data=expected)
                 assert rv.status_code == 200
         rv = client.get("settings/get")

@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from unittest import mock
 
-from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
+from maat_tracking.object_model.ObjectModel import ObjectModel
 
 def generate_box_lists():
     return [

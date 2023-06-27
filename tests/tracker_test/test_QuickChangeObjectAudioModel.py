@@ -1,12 +1,11 @@
 import pytest
 import numpy as np
-import cv2
 from unittest import mock
 from multiprocessing import Value
-from avonic_speaker_tracker.object_model.model_one.STModelOne import HybridTracker
-from avonic_camera_api.footage import FootageThread
-from avonic_camera_api.camera_adapter import ResponseCode
-from avonic_camera_api.converter import angle_vector
+from maat_tracking.object_model.model_one.STModelOne import HybridTracker
+from maat_camera_api.footage import FootageThread
+from maat_camera_api.camera_adapter import ResponseCode
+from maat_camera_api.converter import angle_vector
 
 class MockedCv:
     def __init__(self):
@@ -125,10 +124,10 @@ def test_no_speaker_talking(obj_tracker: HybridTracker):
         return (np.array([1, 2]), np.array([1, 2]))
 
     with mock.patch(
-        "avonic_speaker_tracker.object_model.model_one.STModelOne.HybridTracker.safely_get_frame",
+        "maat_tracking.object_model.model_one.STModelOne.HybridTracker.safely_get_frame",
         mocked_get_frame):
         with mock.patch(
-            "avonic_speaker_tracker.object_model.model_one.STModelOne.HybridTracker.get_movement_to_box",
+            "maat_tracking.object_model.model_one.STModelOne.HybridTracker.get_movement_to_box",
             mocked_get_movement):
             obj_tracker.last_tracked = np.array([120, 100, 150, 300])
 
@@ -152,7 +151,7 @@ def test_no_speaker_talking_no_last_tracked(obj_tracker: HybridTracker):
         return None
 
     with mock.patch(
-        "avonic_speaker_tracker.object_model.model_one.STModelOne.HybridTracker.safely_get_frame",
+        "maat_tracking.object_model.model_one.STModelOne.HybridTracker.safely_get_frame",
         mocked_get_frame):
 
         obj_tracker.nn.get_bounding_boxes.return_value = []
@@ -170,7 +169,7 @@ def test_no_speaker_talking_no_new_box(obj_tracker: HybridTracker):
     def mocked_get_frame(x):
         return None
     with mock.patch(
-        "avonic_speaker_tracker.object_model.model_one.STModelOne.HybridTracker.safely_get_frame",
+        "maat_tracking.object_model.model_one.STModelOne.HybridTracker.safely_get_frame",
         mocked_get_frame):
 
         obj_tracker.last_tracked = np.array([120, 100, 150, 300])
@@ -348,7 +347,6 @@ def test_even_better_box_relative_exception(footage_thread,monkeypatch):
     monkeypatch.setattr(HybridTracker, "find_box", box)
 
     obj_tracker.point()
-
 
     assert cam_api.move_absolute.call_count == 0
 
