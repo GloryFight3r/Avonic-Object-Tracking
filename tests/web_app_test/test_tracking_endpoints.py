@@ -70,16 +70,16 @@ def client(camera, monkeypatch):
 
 
 def test_track_presets(client):
-    rv = client.get('preset/track')
+    rv = client.get('/track/preset')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":1}\n', "utf-8")
 
 def test_track_continuously(client):
-    rv = client.get('calibration/track')
+    rv = client.get('/track/calibration')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":0}\n', "utf-8")
 
 def test_track_continuously_without_adaptive_zooming(client):
-    rv = client.get('calibration/track/no/zoom')
+    rv = client.get('/track/calibration-no-zoom')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":4}\n', "utf-8")

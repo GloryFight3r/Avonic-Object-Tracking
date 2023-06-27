@@ -235,14 +235,14 @@ def test_get_microphone_direction(client):
 
 def test_add_direction_to_mic(client):
     client.post('/calibration/reset')
-    rv = client.post('/calibration/add_direction_to_mic')
+    rv = client.post('/calibration/add-direction-to-mic')
     assert rv.status_code == 200
 
 
 def test_add_direction_to_speaker(client):
     rv = client.get('/calibration/number-of-calibrated')
     assert rv.status_code == 200 and rv.data == bytes("{\"speaker-points-length\":0}\n", "utf-8")
-    rv = client.post('/calibration/add_directions_to_speaker')
+    rv = client.post('/calibration/add-directions-to-speaker')
     assert rv.status_code == 200
     rv = client.get('/calibration/number-of-calibrated')
     assert rv.status_code == 200 and rv.data == bytes("{\"speaker-points-length\":1}\n", "utf-8")
@@ -254,7 +254,7 @@ def test_calibration_reset(client):
 
 
 def test_calibration_is_set(client):
-    rv = client.get('/calibration/is_set')
+    rv = client.get('/calibration/is-set')
     assert rv.status_code == 200 \
            and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
@@ -645,17 +645,17 @@ def test_live_footage(client, url):
     assert rv.status_code == 200
 
 def test_calibration_track(client):
-    rv = client.get("/calibration/track")
+    rv = client.get("/track/calibration")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":0}\n", "utf-8")
 
 def test_preset_track(client):
-    rv = client.get("/preset/track")
+    rv = client.get("/track/preset")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":1}\n", "utf-8")
 
 def test_object_track(client):
-    rv = client.get("/object/track")
+    rv = client.get("/track/object")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":2}\n", "utf-8")
 
 def test_hybrid_track(client):
-    rv = client.get("/hybrid/track")
+    rv = client.get("/track/hybrid")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":3}\n", "utf-8")

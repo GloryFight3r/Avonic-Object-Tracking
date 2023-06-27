@@ -20,7 +20,7 @@ function addCalibrationSpeaker() {
 
     const body = {method: "post"}
     const button = document.getElementsByClassName("calibration-button")[calibratingSpeakerCount]
-    fetch("/calibration/add_directions_to_speaker", body).then(function (res) {
+    fetch("/calibration/add-directions-to-speaker", body).then(function (res) {
         if (res.status !== 200) {
             onError(button)
         } else {
@@ -44,7 +44,7 @@ function pointCameraCalibration(button) {
     const instructionText = document.getElementById("calibration-instruction");
     button.disabled = true;
     const body = { method: "post", data: {}};
-    fetch("/calibration/add_direction_to_mic", body).then(async function (res) {
+    fetch("/calibration/add-direction-to-mic", body).then(async function (res) {
         button.disabled = false;
         if (res.status !== 200) {
             onError(button);
@@ -63,7 +63,7 @@ function pointCameraCalibration(button) {
 async function calibrationIsSet() {
     const body = { method: "get" };
     const reset_button = document.getElementById("camera-direction-button")
-    fetch("/calibration/is_set", body)
+    fetch("/calibration/is-set", body)
         .then((data) => data.json())
         .then((json) => {
             if (json["is_set"]) {

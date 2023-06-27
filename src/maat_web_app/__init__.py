@@ -250,7 +250,7 @@ def create_app(test_controller=None):
     @app.post('/microphone/address/set')
     def set_microphone_address():
         """
-        Endpoint that sets the camera network settings.
+        Endpoint that sets the microphone network settings.
             form:
                 "microphone-ip": a string, the address of the microphone
                 "microphone-port": the microphone port
@@ -399,7 +399,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.preset_locations_endpoints.point_to_closest_preset(integration)
 
-    @app.get('/preset/track')
+    @app.get('/track/preset')
     def preset_tracker():
         """
         Endpoint that changes the tracking to use the preset model.
@@ -409,7 +409,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.tracking_endpoints.track_presets(integration)
 
-    @app.get('/hybrid/track')
+    @app.get('/track/hybrid')
     def hybrid_tracker():
         """
         Endpoint that changes the tracking to use the hybrid model
@@ -420,7 +420,7 @@ def create_app(test_controller=None):
         return maat_web_app.tracking_endpoints.track_hybrid(integration)
 
 
-    @app.post('/calibration/add_directions_to_speaker')
+    @app.post('/calibration/add-directions-to-speaker')
     def add_calibration_speaker():
         """
         Endpoint that adds the camera direction towards a new calibration point
@@ -436,7 +436,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.calibration_endpoints.add_calibration_speaker(integration)
 
-    @app.post('/calibration/add_direction_to_mic')
+    @app.post('/calibration/add-direction-to-mic')
     def add_calibration_mic():
         """
         Endpoint that adds the direction from the camera towards the microphone to the calibration
@@ -461,7 +461,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.calibration_endpoints.reset_calibration(integration)
 
-    @app.get('/calibration/is_set')
+    @app.get('/calibration/is-set')
     def calibration_is_set():
         """
         Endpoint that checks whether the calibration is completed and all the
@@ -485,7 +485,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.calibration_endpoints.get_calibration(integration)
 
-    @app.get('/calibration/track')
+    @app.get('/track/calibration')
     def continuous_tracker():
         """
         Endpoint that changes the tracking to use the audio model
@@ -496,7 +496,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.tracking_endpoints.track_continuously(integration)
 
-    @app.get('/calibration/track/no/zoom')
+    @app.get('/track/calibration-no-zoom')
     def continuous_tracker_without_adaptive_zoom():
         """
         Endpoint that changes the tracking to use the audio model without adaptive zooming
@@ -541,7 +541,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.camera_endpoints.navigate_camera(integration)
 
-    @app.get('/object/track')
+    @app.get('/track/object')
     def object_tracking_start():
         """
         Endpoint that changes the tracking to use the object tracking model

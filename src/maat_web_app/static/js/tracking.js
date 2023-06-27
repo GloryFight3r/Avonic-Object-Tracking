@@ -9,23 +9,23 @@ async function selectTracking() {
     switch(selected) {
         case "preset":
             header.innerText = "Following using presets 🔭"
-            url = "/preset/track"
+            url = "/track/preset"
             break
         case "calib":
             header.innerText = "Continuous following  with adaptive zooming🔭"
-            url = "/calibration/track"
+            url = "/track/calibration"
             break
         case "hybrid":
             header.innerText = "Hybrid tracking  🔭"
-            url = "/hybrid/track"
+            url = "/track/hybrid"
             break
         case "object":
             header.innerText = "Continuous object tracking  🔭"
-            url = "/object/track"
+            url = "/track/object"
             break;
         case "calibnozoom":
             header.innerText = "Continuous following  without adaptive zooming🔭"
-            url = "/calibration/track/no/zoom"
+            url = "/track/calibration-no-zoom"
             break
         default:
             header.innerText = "Tracking 🔭"
