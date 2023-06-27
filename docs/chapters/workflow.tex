@@ -1,0 +1,155 @@
+The aim of this chapter is to present how we have shaped our workflow during the span of the project. To begin, we will first
+lay down our team's values and teamwork approach in \hyperref[section:values-and-approach]{Section 5.1}.
+After that in \hyperref[section:workflow-practices]{Section 5.2} we discuss what good practices we have striven to follow and talk about
+what our definition of done is. Continuing in \hyperref[section:collaboration]{Section 5.3} our collaboration with Avonic will be discussed.
+In the following \hyperref[section:testing]{Section 5.4} we will elaborate on what means we have taken testing-wise to guarantee that our product
+works just as expected. Finally, in \hyperref[section:challenges]{Section 5.5} we will go through all the challenges that we have faced during the project.
+
+\section{Values and teamwork approach}\label{section:values-and-approach}
+Our team has very specific values which we always aim to follow no matter the circumstances.
+This is how we ensure mutual trust and good understanding in the team.
+
+The most important values to us are hard work and authority.
+It goes without saying that we value hard work since we all aim to complete this project in the best possible way.
+Authority is important to us because we should always respect everyone in our team, Avonic and university staff.
+Without respect there is no trust or quality communication.
+We wish for all communication to be as clear and open as possible, therefore respect and authority are a given.
+Another crucial value in our team is humor.
+It is always better when working becomes a pleasure and not a bore-some duty.
+
+\section{Workflow practices}\label{section:workflow-practices}
+In this section, we discuss the practices we used to improve our teamwork and
+our product. The first three sections are related to practices that improve the
+code, while \hyperref[subsection:communication]{section 5.2.4} discusses our methods of communication.
+
+\subsection{Approaches}
+To ensure a good workflow we decided to use Agile and more specifically -- Scrum.
+Scrum gives teams the ability to cope with dynamic priorities and requirements by introducing sprint planning, retrospectives, and reviews.
+This way of planning helps to organize collaborative work faster and more precisely.
+
+As we had regular sprint planning sessions, planning poker practice fit in well with them.
+However, this did not prove to work well immediately, as our overall vision of the issues seemed to be inaccurate in the beginning.
+We improved at it as the project progressed.
+
+We also decided to employ TDD (test-driven development) as it has been shown to
+reduce number of bugs in the code\cite{test-driven-development}.
+It is also useful to write simple yet reliable code, and motivates a developer to be more conscious of the design decisions and edge cases.
+
+\subsection{Definition of done}\label{subsec:definition-of-done}
+As described in the project plan, at the start of our project, we decided that the minimal viable product would be
+one that has all the must-have requirements. The should-haves would be good to aim
+for and the could-haves would be a bonus if they were fulfilled. For individual requirements
+we also defined a definition of done in GitLab\footnote{\url{gitlab.ewi.tudelft.nl}} so it would be clear when one was
+completed. We only accepted functionality after this definition of done was satisfied.
+
+Apart from the definition of done, we came up with three other requirements to accept
+new functionality:
+\begin{enumerate}
+	\item Must have a test coverage of at least 80\%
+	\item Must have a clear description of the functionality
+	\item Must not break any other functionality
+\end{enumerate}
+
+\subsection{Additional tools}
+In order to ensure the quality of our code, we used five additional tools:
+\begin{itemize}
+	\item \verb|pylint|\footnote{\url{https://pylint.org/}} for styling purposes
+	\item \verb|pytest|\footnote{\url{https://pytest.org/}} for basic testing, \verb|pytest-cov| to calculate coverage
+	\item \verb|mutmut|\footnote{\url{https://mutmut.readthedocs.io/}} for mutation testing
+	\item \verb|git|\footnote{\url{https://git-scm.com/}} for version control using GitLab as the server
+	\item CI (continuous integration) for quality assurance -- runs on GitLab after each change
+\end{itemize}
+
+\subsection{Communication}\label{subsection:communication}
+We made sure all work is done on time and in an upstanding way by meeting every
+day. This happened either on campus, in Avonic's office, or on Discord\footnote{\url{https://discord.com/}} as
+backup. We discussed our progress and helped each other. If any problem arose, we
+brainstormed and came up with solutions together. Mattermost\footnote{\url{mattermost.tudelft.nl}} served as a
+communication channel with our TA. WhatsApp was our final backup in case everything else
+failed.
+
+\section{Collaboration with Avonic} \label{section:collaboration}
+Avonic was open to collaboration and in this section, we give some insights into how it went:
+
+Every week we met with Mr. Kahawati to discuss our progress since the last
+meeting. During these meetings, we would ask for feedback on implemented
+features and their possible extensions. As discussed in
+\hyperref[sec:possible-pitfalls]{possible pitfalls}, we could work in the
+office only a limited amount of time. Avonic gave us one of their cameras and set up a VPN
+for us, so we could continue work on the project even when we were not in the office.
+
+In the beginning of the project, we experienced some problems with the camera timing out after too many requests,
+but the people at Avonic helped us troubleshoot it and found
+out that it was caused by network settings and not us.
+
+\section{Testing}\label{section:testing}
+In this section we elaborate more on our testing experience
+throughout the development process. As mentioned earlier, we encouraged TDD in
+our process, but it was not enforced, as that is impossible. This
+approach once more proved to be a very good practice because we managed to find
+many bugs and unexpected behavior early in development without breaking the
+functionality of our project.
+
+One of our non-functional requirements was reaching at least 80\% test coverage
+of the code. We kept this number up throughout the whole development process.
+During the midterm we were exactly at 80\% coverage with the vision that we
+would increase that number by the end of the project. We indeed met that goal
+by reaching 92\% total coverage.
+
+In order to make sure the quality of the tests we used mutation testing tool \verb|mutmut|.
+During this process we managed to locate bugs throughout the code as well as improve the tests themselves.
+Overall, we made sure all our tests cover and capture all aspects of the functionality we have.
+Running this tool, however, posed a difficulty as our system tests take quite a lot of time to run due to the multithreaded nature of the project.
+That led to one run of \verb|mutmut| taking a few hours which meant we could not do it often.
+In week 5, our mutation score was 56\% and we focused on improving that until the end of the project and reached 62\% in the end.
+
+\section{Challenges}\label{section:challenges}
+In this section, we discuss the challenges we faced as a group and how we solved them.
+\subsection{Web UI design with multiple tabs}
+From the beginning of the project, the user interface was growing on a single page.
+As the size of the application grew, a new vision for the UI’s pages developed in part of the team.
+
+The changes introduced a multiple-tab design instead -- each section would have its own page.
+One would need to switch to a different tab via the menu at the top of the page to go to a different section.
+When a team member presented their changes in the UI design before merging, opinions were divided, as it was not discussed with the whole team prior to implementation.
+Justification of both sides was centered around the comfort of using the WebUI -- one part thought the previous solution was cluttered and hard to use for end users,
+while the other considered the new version unintuitive.
+
+All steps from the Code of conduct were taken to reach a consensus, but the group was still divided after 2 rounds of discussions.
+As we could not reach the decision ourselves, we have decided to ask Mr. Kahawati.
+As described in that meeting, the UI is going to be used by technicians, so having everything on the same page is more practical for them,
+but it can also be used by people with little technical knowledge and a big menu can overwhelm them.
+Therefore, the decision was to combine both designs.
+By default, a user is presented with a page with the whole functionality,
+but if they want to isolate certain aspects of it, they can click on a respective tab at the top of the page.
+
+\subsection{Breaking production server}\label{subsection:breaking-production-server}
+As discussed in subsection about the \hyperref[subsection:solution_webui]{Web UI}, we decided to use uWSGI for production mode.
+When more features that relied on threads were added, some of them started using mutable variables.
+But, as we found out, it does not work when the server is run with uWSGI, which uses multiprocessing to distribute the workload somewhat.
+This lead to a lot of problems, as variables are not shared between processes by default.
+
+We had not noticed it after a few merge requests that were rapidly merged because of the midterm presentation's deadline rapidly approaching.
+We could not conduct a good quality assurance process and testing, which led to the fact that multiple features, like footage and information updates, stopped working.
+As we did not have enough knowledge back in time, it took us a whole day of debugging to identify and fix the problem.
+Since then, our quality assurance procedure was strengthened to make sure that features work both in the production and development modes.
+
+\subsection{Deployment to Jetson Nano}
+At the beginning of the project it was outlined that the system should be capable of running on Nvidia Jetson Nano.
+Mr. Kahawati specified that the application should run in a Docker\footnote{\url{https://www.docker.com/}} container for portability and safety.
+Throughout the duration of the project we did not have access to the development kit, and as outlined in the possible pitfalls section \ref{sec:possible-pitfalls},
+it added to the difficulty of satisfying this requirement. When we first tried, the project did not run well because of the footage thread.
+It was running fine on our computers, but failed to run on the Jetson,
+as OpenCV did not take advantage of multiple cores for video capturing and a single CPU core of the Nano was not up to the task.
+
+We thought that OpenCV compiled with CUDA might resolve it, but it did not help.
+As OpenCV uses FFMPEG\footnote{\url{https://ffmpeg.org/}} as its backend for video capture by default, we figured that this backend was the culprit.
+We managed to compile and patch FFMPEG with necessary codecs, but only on the Nano itself, we failed at doing this in a Docker container.
+It was simply impossible to install all the packages correctly there without a lot of beforehand knowledge, which we did not possess and had no time to acquire.
+FFMPEG would therefore only work with hardware acceleration on the bare metal, but there we did not manage to install our application because of the outdated software.
+
+Therefore, we have identified the video streaming as impossible to achieve on the Nano in such a short amount of time.
+In order to still be able to deploy the project on the target hardware, we modified the project to support launching
+without the footage stream and features that rely on it like object tracking models.
+As camera footage and visual tracking methods are could-have requirements, we and Mr. Kahawati decided this
+was a fair sacrifice to make to preserve good working order of our core functionality.

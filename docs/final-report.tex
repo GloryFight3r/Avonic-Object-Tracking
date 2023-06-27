@@ -10,42 +10,66 @@
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{hyperref}
+\usepackage{float}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{glossaries}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{wasysym}
+
 \pagestyle{fancy}
 \graphicspath{ {./images/} }
-\fancyfoot[LE,RO]{Avonic camera-microphone integration}
-\fancyfoot[LO,RE]{Group 11C}
+\fancyfoot[LE,RO]{\slshape Microphone-array Avonic Tracking}
+\fancyfoot[LO,RE]{\slshape Group 11C}
+
+\makeglossaries
+\input{glossary}
 
 % Document
 \begin{document}
     \begin{titlepage}
         \begin{center}
-            \vspace*{8cm}
+            \vspace*{0.5cm}
             \Huge
-            \textbf{Avonic camera microphone integration}
-
-            \vspace{0.5cm}
-            \LARGE
-            Subtitle
+            \textbf{Microphone-array Avonic Tracking (MaAT)}
+            %\vspace{0.5cm}
+            %\LARGE
+            %Subtitle
 
             \Large
             (CSE2000 Software Project Final Report)
-
+  
+            \vspace*{2.5cm}
+            \begin{figure}[h]
+              \centering
+              \includegraphics[width=1.05\textwidth]{title_page}
+            \end{figure}
             \vfill
+
         \end{center}
         \begin{flushleft}
             \large
             Izzy van der Giessen, Petr Khartskhaev, Yehor Kozyr,\\
             Borislav Semerdzhiev, Ivan Smilenov \\
+            \small
+            With the help of Qun Song, Ali Kahawati, Sven van der Voort and Thomas Overklift \\
             \vspace{0.7cm}
             June 2023
         \end{flushleft}
     \end{titlepage}
 
-    \tableofcontents
-    \addcontentsline{toc}{chapter}{Preface} % https://tex.stackexchange.com/questions/222959/adding-the-preface-to-contents
 
-    \chapter*{Preface}\label{ch:preface}
+    \pagenumbering{arabic}
+    \chapter*{Preface\footnote{In this report, we use the IEEE referencing style.}}\label{ch:preface}
+    \addcontentsline{toc}{chapter}{Preface} % https://tex.stackexchange.com/questions/222959/adding-the-preface-to-contents
     \input{chapters/preface}
+
+    \tableofcontents
+
+    \chapter*{Summary}\label{ch:summary}
+    \addcontentsline{toc}{chapter}{Summary} % https://tex.stackexchange.com/questions/222959/adding-the-preface-to-contents
+    \input{chapters/summary}
 
     \chapter{Introduction}\label{ch:introduction}
     \input{chapters/introduction}
@@ -59,8 +83,8 @@
     \chapter{Solution}\label{ch:solution}
     \input{chapters/solution}
 
-    \chapter{Workflow and Teamwork}\label{ch:workflow-and-teamwork}
-    \input{chapters/workflow-and-teamwork}
+    \chapter{Workflow}\label{ch:workflow}
+    \input{chapters/workflow}
 
     \chapter{Reflection}\label{ch:reflection}
     \input{chapters/reflection}
@@ -68,6 +92,27 @@
     \chapter{Conclusion}\label{ch:conclusion}
     \input{chapters/conclusion}
 
-    \appendix
     \printbibliography
+    \addcontentsline{toc}{chapter}{References}
+
+    \clearpage
+
+    \printglossaries
+    \addcontentsline{toc}{chapter}{Glossaries}
+
+    \appendix
+    \chapter{Ethical implications}\label{ch:ethics-appendix}
+    \input{chapters/appendix-a}
+
+    \chapter{Requirements table}\label{ch:requirements-appendix}
+    \input{chapters/appendix-b}
+
+    \chapter{Division of labor table}\label{ch:labour-division-appendix}
+    \input{chapters/appendix-c}
+
+    \chapter{MoSCoW methodology}\label{ch:moscow-methodology}
+    \input{chapters/appendix-d}
+
+    \chapter{Endpoints documentation}\label{ch:endpoints-documentation}
+    \input{chapters/appendix-e}
 \end{document}
