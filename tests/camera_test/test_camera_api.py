@@ -95,6 +95,11 @@ def test_camera_codec(cam_api, format, expected, monkeypatch):
     cam_api.set_camera_codec(format)
 
 
+def test_camera_codec_invalid(cam_api):
+    with pytest.raises(KeyError):
+        cam_api.set_camera_codec(1)
+
+
 def generate_format_tests():
     return [
         (ImageSize.P1280_720,

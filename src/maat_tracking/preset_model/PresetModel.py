@@ -61,10 +61,6 @@ class PresetModel(TrackingModel):
             direct[1] = direct[1]-360
 
         # If the direction to move is the same as the current direction camera will not move
-        if direct is None:
-            print("Something went wrong with direct here")
-            return self.prev_dir
-
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:
             self.cam_api.move_absolute(24, 20, direct[0], direct[1])
 

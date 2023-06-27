@@ -54,6 +54,7 @@ def test_preset_prev_dir():
     assert cam_api.move_absolute.call_count == 1
 
 
+
 def test_continuous_pointer():
     cam_api = mock.Mock()
     mic_api = mock.Mock()

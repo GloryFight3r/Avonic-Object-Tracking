@@ -624,7 +624,7 @@ def test_settings_invalid(client):
             "camera-port": 123,
             "camera-http-port": 80,
             "microphone-ip": 34,
-            "microphone-port": "asd",
+            "microphone-port": 10000000,
             "microphone-thresh": -5,
             "filepath": "/usr/bin/"
         }

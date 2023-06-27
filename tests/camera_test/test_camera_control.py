@@ -350,6 +350,25 @@ def test_camera_error_second(monkeypatch, camera):
     assert camera.get_direction() == ResponseCode.TIMED_OUT
 
 
+def test_camera_invalid_string(monkeypatch, camera):
+    expected_msg = b'\x01\x00\x00\x05\x00\x00\x00\x01\x81\x09\x06\x12\xFF'
+
+    def mocked_send(message):
+        assert message == expected_msg
+
+    def mocked_return(bytes_receive):
+        return b'\x01\x00\x00\x05\x00\x00\x00\x01\x90\x50\x11\x00\x00\x01\x00\x02\x0B\x0C\xFF'
+
+    def mocked_timeout(ms):
+        pass
+
+    monkeypatch.setattr(camera.camera.sock, "sendall", mocked_send)
+    monkeypatch.setattr(camera.camera.sock, "recv", mocked_return)
+    monkeypatch.setattr(camera.camera.sock, "settimeout", mocked_timeout)
+    camera.latest_direction = np.array([0.0, 0.1, 0.2])
+    assert np.allclose(camera.get_direction(), np.array([0.0, 0.1, 0.2]))
+
+
 def test_send_no_address(monkeypatch, camera):
     camera.camera.address = None
     assert camera.get_direction() == ResponseCode.NO_ADDRESS

@@ -192,3 +192,8 @@ def test_set_filename(preset_collection: PresetCollection):
         assert preset_collection.filename == ""
         preset_collection.set_filename("asdf")
         assert preset_collection.filename == "asdf"
+
+
+def test_str():
+    p = Preset(np.array([1, 2, 5000]), np.array([1, 2, 3]))
+    assert str(p) == f"Preset([   1    2 5000], [1 2 3])"

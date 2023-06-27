@@ -423,16 +423,11 @@ class GeneralController:
         return
 
 
-def verify_address(address) -> bool:
+def verify_address(address) -> None:
     """ Method that verifies that the given address' format is valid.
     """
-    try:
-        assert 0 <= address[1] <= 65535
-        assert isinstance(address[0], str)
-        return True
-    except (AssertionError, TypeError):
-        print("ERROR: Address " + address + " is invalid!")
-        return False
+    assert 0 <= address[1] <= 65535
+    assert isinstance(address[0], str)
 
 
 def close_running_threads(integration_passed, timeout_seconds: int = 1, raise_exit=True) -> None:

@@ -119,3 +119,14 @@ def test_calculate_fov_bad_weather(monkeypatch, zoom):
 
     with pytest.raises(AssertionError):
         api.calculate_fov()
+
+
+def test_calculate_fov_timeout(monkeypatch):
+    api = CameraAPI(None, None)
+
+    def mocked_get_zoom():
+        return ResponseCode.TIMED_OUT
+
+    monkeypatch.setattr(api, "get_zoom", mocked_get_zoom)
+
+    assert api.calculate_fov() == ResponseCode.TIMED_OUT
