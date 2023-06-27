@@ -648,6 +648,7 @@ def test_settings_invalid(client):
 
 def generate_single_page_views():
     return [
+        "/",
         "/live_footage",
         "/camera_control",
         "/microphone_control",
