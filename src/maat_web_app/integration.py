@@ -14,12 +14,11 @@ import numpy as np
 import os
 from yaml import load, dump
 
-from maat_camera_api.camera_http_request import CameraHTTP
-
 try:  # https://pyyaml.org/wiki/PyYAMLDocumentation
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
+from maat_camera_api.camera_http_request import CameraHTTP
 from maat_camera_api.footage import FootageThread
 from maat_camera_api.camera_control_api import CameraAPI, CompressedFormat, ImageSize, converter, ResponseCode
 from maat_camera_api.camera_adapter import CameraSocket
@@ -33,7 +32,7 @@ from maat_tracking.object_model.model_one.QuickChangeObjectAudioModel import Qui
 from maat_tracking.audio_model.AudioModelNoAdaptiveZoom import AudioModelNoAdaptiveZoom
 
 
-class ModelCode():
+class ModelCode:
     AUDIO = 0
     PRESET = 1
     OBJECT = 2
@@ -79,7 +78,7 @@ class GeneralController:
 
         # Filepath for calibration and presets files
         self.filepath: str = ""
-        #self.resolution = np.array([1920.0, 1080.0])
+        # self.resolution = np.array([1920.0, 1080.0])
         self.resolution = np.array([1280.0, 720.0])
 
         # Models, to record all updates onto a disk
@@ -164,7 +163,7 @@ class GeneralController:
                 # set frame rate
                 self.cam_api.set_frame_rate(30)
 
-                #set frame interval
+                # set frame interval
                 self.cam_api.set_i_frame_rate(60)
 
         # Setup microphone API
@@ -210,15 +209,14 @@ class GeneralController:
             else:
                 self.footage_thread_event.value = 0
 
-
-        self.nn:YOLOPredict = YOLOPredict()
+        self.nn: YOLOPredict = YOLOPredict()
         # Initialize models
         self.audio_model = AudioModel(self.cam_api, self.mic_api,
                                       filename=self.filepath + "calibration.json")
         self.preset_model = PresetModel(self.cam_api, self.mic_api,
                                         filename=self.filepath + "presets.json")
         self.audio_no_zoom_model = AudioModelNoAdaptiveZoom(self.cam_api, self.mic_api,
-                                        filename=self.filepath + "calibration.json")
+                                                            filename=self.filepath + "calibration.json")
         if self.footage_thread_event.value == 1:
             self.hybrid_model = QuickChangeObjectAudio(self.cam_api, self.mic_api, self.nn,
                                                        self.footage_thread,
@@ -424,6 +422,7 @@ class GeneralController:
         print("Closed " + path + " updater thread")
         return
 
+
 def verify_address(address) -> bool:
     """ Method that verifies that the given address' format is valid.
     """
@@ -435,7 +434,8 @@ def verify_address(address) -> bool:
         print("ERROR: Address " + address + " is invalid!")
         return False
 
-def close_running_threads(integration_passed, timeout_seconds: int = 1, raise_exit= True) -> None:
+
+def close_running_threads(integration_passed, timeout_seconds: int = 1, raise_exit=True) -> None:
     """This method is used for safe finish of the Flask and all of our threads."""
     integration_passed.footage_thread_event.value = 0  # pragma: no mutate
     integration_passed.info_threads_break.value = 1  # pragma: no mutate

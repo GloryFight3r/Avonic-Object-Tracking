@@ -7,6 +7,7 @@ from maat_tracking.preset_model.preset import PresetCollection
 from maat_tracking.preset_model.preset_control import find_most_similar_preset
 from maat_microphone_api.microphone_control_api import MicrophoneAPI
 
+
 class PresetModel(TrackingModel):
     """ Class that finds the location of the speaker in a set of
     recorded preset locations or the closest one in that set
@@ -50,18 +51,18 @@ class PresetModel(TrackingModel):
         preset = self.preset_locations.get_preset_info(
             preset_names[find_most_similar_preset(mic_direction, presets_mic)])
         direct = np.array([int(np.rad2deg(preset[0][0])) % 360,
-        int(np.rad2deg(preset[0][1]))%360, preset[0][2]])
+                           int(np.rad2deg(preset[0][1])) % 360, preset[0][2]])
 
-        # If either pitch an yaw is more than 180 degrees
+        # If either pitch and yaw is more than 180 degrees
         # camera should rotate in the opposite direction
-        if direct[0]>180:
+        if direct[0] > 180:
             direct[0] = direct[0]-360
-        if direct[1]>180:
+        if direct[1] > 180:
             direct[1] = direct[1]-360
 
         # If the direction to move is the same as the current direction camera will not move
         if direct is None:
-            print("Something wrong with direct here")
+            print("Something went wrong with direct here")
             return self.prev_dir
 
         if self.prev_dir[0] != direct[0] or self.prev_dir[1] != direct[1]:

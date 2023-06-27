@@ -180,6 +180,7 @@ def address_set_camera_endpoint(integration: GeneralController):
     except (AssertionError, ValueError):
         return make_response(jsonify({"message": "Invalid address!"}), 400)
 
+
 def navigate_camera(integration: GeneralController):
     """ Navigates the camera so that the pixel on which the user has clicked is now in the center
 
@@ -208,6 +209,6 @@ def navigate_camera(integration: GeneralController):
 
     # relatively move the camera
     ret = integration.cam_api.move_relative(int(camera_speed[0]), int(camera_speed[1]),
-                                      camera_rotation[0], camera_rotation[1])
+                                            camera_rotation[0], camera_rotation[1])
 
     return make_response(responses()[ret])

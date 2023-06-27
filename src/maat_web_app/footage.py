@@ -9,7 +9,7 @@ def emit_frame(integration: GeneralController):
     """
     if integration.footage_thread_event.value == 0:
         return
-    frame = integration.footage_thread.get_frame() # pragma: no mutate
-    emit("new-frame", { # pragma: no mutate
-        "base64": frame # pragma: no mutate
+    frame = integration.footage_thread.get_frame()  # pragma: no mutate
+    emit("new-frame", {  # pragma: no mutate
+        "base64": frame  # pragma: no mutate
     })

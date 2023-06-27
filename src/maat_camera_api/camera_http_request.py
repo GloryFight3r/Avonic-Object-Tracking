@@ -1,6 +1,7 @@
 import requests
 from enum import Enum
 
+
 class ResponseCodeHTTP(Enum):
     """
     This enum contains the 4 possible camera response codes.
@@ -10,10 +11,11 @@ class ResponseCodeHTTP(Enum):
     NO_CONNECTION = 2
     NO_ADDRESS = 3
 
-class CameraHTTP:
-    address:tuple[str, int]
 
-    def __init__(self, address:tuple[str, int]):
+class CameraHTTP:
+    address: tuple[str, int]
+
+    def __init__(self, address: tuple[str, int]):
         self.address = address
 
         if address is None or address == ('0.0.0.0', 80):
@@ -21,13 +23,14 @@ class CameraHTTP:
             self.address = ('0.0.0.0', 80)
             return
 
-    def send(self, command:str)->tuple[ResponseCodeHTTP, str | None]:
+    def send(self, command: str) -> tuple[ResponseCodeHTTP, str | None]:
         if self.address is None or self.address == ('0.0.0.0', 80):
             print("WARNING: Camera address or port not specified!")
             return ResponseCodeHTTP.NO_ADDRESS, None
 
         try:
-            response = requests.get("http://" + self.address[0] + ":" + str(self.address[1]) + "/ajaxcom?szCmd=" + command, timeout=0.1)
+            response = requests.get("http://" + self.address[0] + ":" +
+                                    str(self.address[1]) + "/ajaxcom?szCmd=" + command, timeout=0.1)
 
             print(response, response.status_code, response.json(), "AS")
 

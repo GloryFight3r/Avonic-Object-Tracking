@@ -1,6 +1,7 @@
 from maat_camera_api.camera_control_api import insert_zoom_in_hex
 from maat_camera_api.camera_adapter import ResponseCode
 
+
 class CameraMock:
     """
     Mock camera class to artificially set the zoom value and keep track of amount of requests sent.

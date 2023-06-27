@@ -20,6 +20,7 @@ class Preset:
     def __str__(self):
         return f"Preset({self.camera_info}, {self.microphone_direction})"
 
+
 class PresetCollection:
     """ This class is a container for all the existing presets.
     """
@@ -28,6 +29,7 @@ class PresetCollection:
 
     default_camera_info: list[float] = [0.0, 0.0, 1.0]
     default_mic_info: list[float] = [0.0, 1.0, 0.0]
+
     def __init__(self, filename: str = ""):
         """ Constructor which loads an existing file containing presets.
         """
@@ -61,7 +63,8 @@ class PresetCollection:
         self.record()
 
     def edit_preset(self, to_edit: str,
-        new_cam_info: np.ndarray, new_microphone_direction: np.ndarray) -> None:
+                    new_cam_info: np.ndarray,
+                    new_microphone_direction: np.ndarray) -> None:
         """ Edits a preset with the given name only if it is already inside the dictionary
 
         Args:
@@ -109,7 +112,7 @@ class PresetCollection:
         """
         if self.filename != "":
             try:
-                with open(self.filename, encoding="utf-8") as f:
+                with open(self.filename, encoding="utf-8"):
                     print("Loading json...")
             except FileNotFoundError:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
@@ -121,7 +124,7 @@ class PresetCollection:
                 for key in data:
                     try:
                         self.preset_locations[key] = Preset(np.array(data[key]["camera_info"]),
-                            np.array(data[key]["microphone_direction"]))
+                                                            np.array(data[key]["microphone_direction"]))
                         if len(data[key]["camera_info"]) != 3:
                             self.preset_locations[key].camera_info = \
                                 np.array(PresetCollection.default_camera_info)
@@ -130,7 +133,7 @@ class PresetCollection:
                             self.preset_locations[key].microphone_direction = \
                                 np.array(PresetCollection.default_mic_info)
                             print("Setting microphone_direction in " +
-                                "one of the presets to default value")
+                                  "one of the presets to default value")
                     except Exception as e:
                         print(e)
                         self.preset_locations[key] = Preset(

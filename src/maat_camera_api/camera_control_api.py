@@ -344,6 +344,8 @@ def degrees_to_command(degree: float, step_size: float) -> str:
 
     Args:
         degree: an angle in degrees, can be a float but precision could be lost
+        step_size: PAN_STEP or TILT_STEP - how many degrees correspond to the
+                                           byte number increment
     Returns:
         A byte code that will be used for a VISCA command call
     """

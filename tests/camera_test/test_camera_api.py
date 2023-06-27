@@ -21,16 +21,18 @@ def test_angle_vector_complex():
     result = np.array([0.25, np.sqrt(3) / 2, np.sqrt(3) / 4])
     assert np.allclose(angle_vector(np.deg2rad(alpha), np.deg2rad(beta)), result)
 
+
 def test_vector_angle_bad_weather():
     # 4 floats
     result = np.array([0.25, np.sqrt(3) / 2, np.sqrt(3) / 4, 0.3])
-    with pytest.raises (TypeError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         vector_angle(result)
     assert "Vector must contain three floats and be instance of np.ndarray" == str(excinfo.value)
     result_int = np.array([1.0, 1.0])
-    with pytest.raises (TypeError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         vector_angle(result_int)
     assert "Vector must contain three floats and be instance of np.ndarray" == str(excinfo.value)
+
 
 def test_vector_angle_basic():
     assert vector_angle(np.array([0.0, 0.0, 1.0])) == (0, 0)
@@ -61,8 +63,9 @@ def test_vector_angle_invalid():
 
 def test_vector_angle_invalid_type():
     with pytest.raises(TypeError) as excinfo:
-        vector_angle(np.array([1, 2]))
+        vector_angle([1, 2])
     assert "Vector must contain three floats and be instance of np.ndarray" == str(excinfo.value)
+
 
 @pytest.fixture()
 def cam_api():
@@ -70,6 +73,7 @@ def cam_api():
     cam_api = CameraAPI(None, mock_cam)
 
     return cam_api
+
 
 def generate_codec_tests():
     return [
@@ -81,6 +85,7 @@ def generate_codec_tests():
             '{"SetEnv":{"VideoEncode":[{"stMaster": {"emVideoCodec":7},"nChannel":0}]}}')
     ]
 
+
 @pytest.mark.parametrize("format, expected", generate_codec_tests())
 def test_camera_codec(cam_api, format, expected, monkeypatch):
     def mocked_method(command):
@@ -88,6 +93,7 @@ def test_camera_codec(cam_api, format, expected, monkeypatch):
 
     monkeypatch.setattr(cam_api.camera_http, "send", mocked_method)
     cam_api.set_camera_codec(format)
+
 
 def generate_format_tests():
     return [
@@ -97,6 +103,7 @@ def generate_format_tests():
             '{"SetEnv":{"VideoEncode":[{"stMaster": {"emImageSize":5},"nChannel":0}]}}'),
     ]
 
+
 @pytest.mark.parametrize("format, expected", generate_format_tests())
 def test_image_size(cam_api, format, expected, monkeypatch):
     def mocked_method(command):
@@ -105,11 +112,13 @@ def test_image_size(cam_api, format, expected, monkeypatch):
     monkeypatch.setattr(cam_api.camera_http, "send", mocked_method)
     cam_api.set_image_size(format)
 
+
 def generate_frame_rate_tests():
     return [
         (25, '{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":25},"nChannel":0}]}}'),
         (50, '{"SetEnv":{"VideoEncode":[{"stMaster": {"nFrameRate":50},"nChannel":0}]}}'),
     ]
+
 
 @pytest.mark.parametrize("frame, expected", generate_frame_rate_tests())
 def test_frame_rate(cam_api, frame, expected, monkeypatch):
@@ -119,23 +128,27 @@ def test_frame_rate(cam_api, frame, expected, monkeypatch):
     monkeypatch.setattr(cam_api.camera_http, "send", mocked_method)
     cam_api.set_frame_rate(frame)
 
+
 def generate_frame_rate_bad_tests():
     return [
-        (0),
-        (-1),
-        (61)
+        0,
+        -1,
+        61
     ]
+
 
 @pytest.mark.parametrize("frame_rate", generate_frame_rate_bad_tests())
 def test_frame_bad_rate(cam_api, frame_rate):
     with pytest.raises(AssertionError):
         cam_api.set_frame_rate(frame_rate)
 
+
 def generate_frame_rate_l_tests():
     return [
         (25, '{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":25},"nChannel":0}]}}'),
         (50, '{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":50},"nChannel":0}]}}'),
     ]
+
 
 @pytest.mark.parametrize("frame_rate_l, expected", generate_frame_rate_l_tests())
 def test_frame_rate_interval(cam_api, frame_rate_l, expected, monkeypatch):
@@ -145,12 +158,14 @@ def test_frame_rate_interval(cam_api, frame_rate_l, expected, monkeypatch):
     monkeypatch.setattr(cam_api.camera_http, "send", mocked_method)
     cam_api.set_i_frame_rate(frame_rate_l)
 
+
 def generate_frame_rate_bad_l_tests():
     return [
-        (0),
-        (-1),
-        (301)
+        0,
+        -1,
+        301
     ]
+
 
 @pytest.mark.parametrize("frame_rate_l", generate_frame_rate_bad_l_tests())
 def test_frame_rate_bad_interval(cam_api, frame_rate_l):

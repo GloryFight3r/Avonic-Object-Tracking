@@ -18,13 +18,13 @@ def start_thread_endpoint(integration: GeneralController):
         integration.event.value = 1
         if integration.tracking.value == ModelCode.PRESET:
             model = PresetModel(integration.cam_api, integration.mic_api,
-                                    filename=integration.filepath + "presets.json")
+                                filename=integration.filepath + "presets.json")
         elif integration.tracking.value == ModelCode.AUDIO:
             model = AudioModel(integration.cam_api, integration.mic_api,
-                                    filename=integration.filepath + "calibration.json")
+                               filename=integration.filepath + "calibration.json")
         elif integration.tracking.value == ModelCode.AUDIONOZOOM:
             model = AudioModelNoAdaptiveZoom(integration.cam_api, integration.mic_api,
-                                    filename=integration.filepath + "calibration.json")
+                                             filename=integration.filepath + "calibration.json")
         elif integration.tracking.value == ModelCode.HYBRID:
             model = QuickChangeObjectAudio(integration.cam_api, integration.mic_api,
                                            integration.nn, integration.footage_thread,
@@ -53,7 +53,7 @@ def start_thread_endpoint(integration: GeneralController):
 
 
 def stop_thread_endpoint(integration: GeneralController):
-    """ Stops(pauses) the thread that controlls the tracking
+    """ Stops(pauses) the thread that controls the tracking
     """
     integration.event.value = 0
     integration.info_threads_event.value = 0
@@ -80,7 +80,7 @@ def update_camera(integration: GeneralController):
 
 
 def is_running_endpoint(integration: GeneralController):
-    """ Returns: Whether the thread that controlls the tracking is currently running
+    """ Returns: Whether the thread that controls the tracking is currently running
     """
     return make_response(
         jsonify({"is-running": integration.thread and integration.thread.is_alive()}))
@@ -90,7 +90,7 @@ def track_presets(integration: GeneralController):
     """ Sets the current tracking model to PresetModel
     """
     integration.tracking.value = ModelCode.PRESET
-    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+    return make_response(jsonify({"tracking": integration.tracking.value}), 200)
 
 
 def track_hybrid(integration: GeneralController):
@@ -100,14 +100,14 @@ def track_hybrid(integration: GeneralController):
                                                  "To do this, make sure the NO_FOOTAGE environment " +
                                                  "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.HYBRID
-    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+    return make_response(jsonify({"tracking": integration.tracking.value}), 200)
 
 
 def track_continuously(integration: GeneralController):
     """ Sets the current tracking model to the AudioModel
     """
     integration.tracking.value = ModelCode.AUDIO
-    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+    return make_response(jsonify({"tracking": integration.tracking.value}), 200)
 
 
 def track_object_continuously(integration: GeneralController):
@@ -119,11 +119,11 @@ def track_object_continuously(integration: GeneralController):
                                                  "To do this, make sure the NO_FOOTAGE environment " +
                                                  "variable is not set to \"true\"."}), 503)
     integration.tracking.value = ModelCode.OBJECT
-    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+    return make_response(jsonify({"tracking": integration.tracking.value}), 200)
 
 
 def track_continuously_without_adaptive_zooming(integration: GeneralController):
     """ Sets the current tracking model to AudioModelNoAdaptiveZoom
     """
     integration.tracking.value = ModelCode.AUDIONOZOOM
-    return make_response(jsonify({"tracking":integration.tracking.value}), 200)
+    return make_response(jsonify({"tracking": integration.tracking.value}), 200)

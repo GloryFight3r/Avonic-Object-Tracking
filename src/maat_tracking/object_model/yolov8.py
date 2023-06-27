@@ -3,8 +3,9 @@ import numpy as np
 from ultralytics import YOLO
 import torch
 
+
 class YOLOPredict:
-    def __init__(self, conf_level = 0.0):
+    def __init__(self, conf_level=0.0):
         self.model = YOLO("yolov8m.pt")
 
         # change conf_level to a higher number to filter low confidence boxes
@@ -29,4 +30,4 @@ class YOLOPredict:
 
     def draw_prediction(self, img, label, left, top, right, bottom):
         cv2.rectangle(img, (left, top), (right, bottom), [0, 0, 0], 2)
-        cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0, 0, 0], 2)
+        cv2.putText(img, label, (left-10, top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, [0, 0, 0], 2)

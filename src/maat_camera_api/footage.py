@@ -5,14 +5,15 @@ from ctypes import c_int
 import base64
 import copy
 import numpy as np
-import cv2 # type: ignore
+import cv2  # type: ignore
 import time
+
 
 class FootageThread(Thread):
     buffer = Array('c', b'\0' * 1000000, lock=False)
     buflen = Value('i', 320000, lock=False)
 
-    def __init__(self, footage: cv2.VideoCapture, event: c_int, resolution:np.ndarray, pid: c_int):
+    def __init__(self, footage: cv2.VideoCapture, event: c_int, resolution: np.ndarray, pid: c_int):
         """ Constructor for the footage thread
 
             Params:
@@ -30,8 +31,8 @@ class FootageThread(Thread):
 
         self.box_frame = None
         self.bbxes = np.array([])
-        self.pixel:np.ndarray | None = None
-        self.focused_box:np.ndarray | None = None
+        self.pixel: np.ndarray | None = None
+        self.focused_box: np.ndarray | None = None
 
     def run(self):
         self.pid.value = os.getpid()
@@ -54,11 +55,11 @@ class FootageThread(Thread):
         Returns:
             Stringified base64 encoded frame
         """
-        #if self.box_frame is not None:
-        #    return str(base64.b64encode(self.box_frame), 'ascii')
-        #self.draw_bb()
-        return str(base64.b64encode(self.buffer.raw[:self.buflen.value])
-            , 'ascii')
+        # if self.box_frame is not None:
+        #     return str(base64.b64encode(self.box_frame), 'ascii')
+        # self.draw_bb()
+        return str(base64.b64encode(self.buffer.raw[:self.buflen.value]),
+                   'ascii')
 
     def draw_bb(self):
         cur_frame = copy.deepcopy(self.frame)
@@ -68,7 +69,8 @@ class FootageThread(Thread):
         if self.pixel is not None:
             print(self.pixel)
             self.draw_prediction(cur_frame, "pixel", self.pixel[0],
-            self.pixel[1], self.pixel[0], self.pixel[1], [255, 0, 0])
+                                 self.pixel[1], self.pixel[0],
+                                 self.pixel[1], [255, 0, 0])
         if self.focused_box is not None:
             (x, y, x2, y2) = self.focused_box
             self.draw_prediction(cur_frame, "person", x, y, x2, y2, [0, 0, 255])
@@ -79,4 +81,4 @@ class FootageThread(Thread):
 
     def draw_prediction(self, img, label, left, top, right, bottom, clr):
         cv2.rectangle(img, (left, top), (right, bottom), clr, 2)
-        cv2.putText(img, label, (left-10,top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, clr, 2)
+        cv2.putText(img, label, (left-10, top-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, clr, 2)

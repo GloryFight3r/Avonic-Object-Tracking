@@ -40,7 +40,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         # the amount of iterations of small or no camera movements
         self.time_without_movement = 0
 
-        # how how time_without_movement has to be before object tracking starts
+        # how time_without_movement has to be before object tracking starts
         self.wait = 10
 
         self.object_tracking_counter = 0
@@ -53,7 +53,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         if not self.is_object_tracking or self.object_tracking_counter % 40 != 0:
             return
 
-        # read the fream from the footage thread
+        # read the frame from the footage thread
         im_arr = np.frombuffer(self.stream.buffer.raw[:self.stream.buflen.value], np.byte)
         frame = cv2.imdecode(im_arr, cv2.IMREAD_COLOR)
 
@@ -108,7 +108,7 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
                                                             self.calibration.mic_height)
             vec_len = np.sqrt(cam_vec.dot(cam_vec))
             vec_len = min(vec_len, 10.0)
-            zoom_val = (int)((vec_len / 10.0) * 16000)
+            zoom_val = int((vec_len / 10.0) * 16000)
 
             direct = vector_angle(cam_vec)
             direct_np = np.array([int(np.rad2deg(direct[0])), int(np.rad2deg(direct[1])), zoom_val])
@@ -129,24 +129,24 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
             start_object_tracking = False
 
         # Sets the rotation speed depending on how much the camera has to move
-        diffX = math.fabs(self.prev_dir[0] - direct_np[0]) * 2
-        diffY = math.fabs(self.prev_dir[1] - direct_np[1]) * 2
+        diff_x = math.fabs(self.prev_dir[0] - direct_np[0]) * 2
+        diff_y = math.fabs(self.prev_dir[1] - direct_np[1]) * 2
 
-        speedX = (int)(13 + diffX / 360 * 11)
-        speedY = (int)(11 + diffY / 120 * 9)
+        speed_x = int(13 + diff_x / 360 * 11)
+        speed_y = int(11 + diff_y / 120 * 9)
 
-        speedX = min(speedX, 24)
-        speedY = min(speedY, 20)
+        speed_x = min(speed_x, 24)
+        speed_y = min(speed_y, 20)
 
         if direct_np is None:
             return
 
-        # Only move the camera if there has been a big movement lately. Otherwise
+        # Only move the camera if there has been a big movement lately. Otherwise,
         # track_object will move the camera.
         if self.time_without_movement < self.wait:
             if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
                 try:
-                    self.cam_api.move_absolute(speedX, speedY, direct_np[0], direct_np[1])
+                    self.cam_api.move_absolute(speed_x, speed_y, direct_np[0], direct_np[1])
                 except AssertionError as e:
                     print(e)
         elif self.time_without_movement >= self.wait:

@@ -4,6 +4,7 @@ from maat_camera_api.camera_control_api import CameraAPI
 from maat_microphone_api.microphone_control_api import MicrophoneAPI
 from maat_tracking.utils.TrackingModel import TrackingModel
 
+
 class UpdateThread(Thread):
 
     def __init__(self, event: c_int,

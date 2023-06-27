@@ -9,6 +9,7 @@ import maat_web_app
 
 sock = mock.Mock()
 
+
 @pytest.fixture()
 def camera(monkeypatch):
     def mocked_connect(addr, self=None):
@@ -34,8 +35,10 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), None)
+
     def mocked_get_zoom():
         return 128
+
     def mocked_get_direction():
         return np.array([0, 0, 0])
 
@@ -44,12 +47,12 @@ def camera(monkeypatch):
 
     return cam_api
 
+
 mic_api = mock.Mock()
+
 
 @pytest.fixture
 def client(camera, monkeypatch):
-
-
     mic_api.height = 1
 
     cam_api = camera
@@ -67,17 +70,17 @@ def client(camera, monkeypatch):
     return app.test_client()
 
 
-
-
 def test_track_presets(client):
     rv = client.get('/track/preset')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":1}\n', "utf-8")
 
+
 def test_track_continuously(client):
     rv = client.get('/track/calibration')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":0}\n', "utf-8")
+
 
 def test_track_continuously_without_adaptive_zooming(client):
     rv = client.get('/track/calibration-no-zoom')

@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import maat_tracking.utils.coordinate_translation
 
+
 def generate_good_pairs_of_combinations():
     # Check values at:
     # Point C - camera, S - speaker, M - microphone
@@ -13,58 +14,61 @@ def generate_good_pairs_of_combinations():
     #   expected vector of correct distance camera-to-speaker
     return [
         (np.array([1.8, 1.8, 6]), np.array([1.9, -1.2, 2.7]),
-        1.2, np.array([3.7, 0.6, 8.7])),
+         1.2, np.array([3.7, 0.6, 8.7])),
         (np.array([1.8, 1.8, 6]), np.array([-3.6, -1.2, 2.7]),
-        1.2, np.array([-1.8, 0.6, 8.7])),
+         1.2, np.array([-1.8, 0.6, 8.7])),
         (np.array([1.8, 1.8, 6]), np.array([-3.6, -1.2, -2.1]),
-        1.2, np.array([-1.8, 0.6, 3.9])),
+         1.2, np.array([-1.8, 0.6, 3.9])),
         (np.array([1.8, 1.8, 6]), np.array([2.5, -1.2, -2.1]),
-        1.2, np.array([4.3, 0.6, 3.9])),
+         1.2, np.array([4.3, 0.6, 3.9])),
         (np.array([-2.8, 1.8, -3.5]), np.array([2.5, -1.2, -2.1]),
-        1.2, np.array([-0.3, 0.6, -5.6]))
+         1.2, np.array([-0.3, 0.6, -5.6]))
 
     ]
+
 
 def generate_bad_pairs_of_combinations():
     return [
         (np.array([-1.9, 1.3, -1.5, 1]), np.array([-1.4, -1.7, -0.1]),
-        1.7),
+         1.7),
         (np.array([-1.9, 1.3, -1.5, 1]), np.array([-1.4, -1.7, -0.1]),
-        1.7),
+         1.7),
         (np.array([[-1.9, 1.3, -1.5, 1], [1.0, -2.0, 3.0, 4.0]]), np.array([-1.4, -1.7, -0.1]),
-        1.7),
+         1.7),
         (np.array([-1.9, 1.3]), np.array([-1.4, -1.7, -0.1]),
-        1.7),
+         1.7),
         (np.array([[-1.9], [1.3], [1.7]]), np.array([-1.4, -1.7, -0.1]),
-        1.7),
+         1.7),
         (np.array([-1.4, -1.7, -0.1]), np.array([[-1.9], [1.3], [1.7]]),
-        1.7),
+         1.7),
         (np.array([[-1.9, 1.3, -1.5], [1, 2, 4]]), np.array([-1.4, -1.7, -0.1, 2]),
-        1.7),
+         1.7),
         (np.array([[-1.5, 3, 0.3]]), np.array([2.8, -2.1, 5.2]),
-        2.1),
+         2.1),
         (np.array([-1.5, 3, 0.3]), np.array([[2.8, -2.1, 5.2]]),
-        2.1),
+         2.1),
         (np.array([-1.9, 1.3, -1.5]), np.array([[-1.4, -1.7, -0.1], [1, 1, 1]]),
-        1.7),
+         1.7),
         (np.array([-1.9, 1.3, -1.5]), np.array([[-1.4, -1.7, -0.1, 1], [2, 2, 2, 3]]),
-        1.7),
+         1.7),
     ]
+
 
 @pytest.mark.parametrize("camera_to_microphone, from_microphone_to_speaker,\
      from_speaker_ceiling_distance, expected", generate_good_pairs_of_combinations())
 def test_translate_good_weather(camera_to_microphone,
-    from_microphone_to_speaker, from_speaker_ceiling_distance, expected):
+                                from_microphone_to_speaker, from_speaker_ceiling_distance, expected):
     assert np.allclose(
         maat_tracking.utils.coordinate_translation.translate_microphone_to_camera_vector(
             camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance)
-            , expected)
+        , expected)
+
 
 @pytest.mark.parametrize("camera_to_microphone, from_microphone_to_speaker,\
      from_speaker_ceiling_distance", generate_bad_pairs_of_combinations())
 def test_translate_bad_weather(camera_to_microphone,
-    from_microphone_to_speaker, from_speaker_ceiling_distance):
-    with pytest.raises (TypeError) as excinfo:
+                               from_microphone_to_speaker, from_speaker_ceiling_distance):
+    with pytest.raises(TypeError) as excinfo:
         maat_tracking.utils.coordinate_translation.translate_microphone_to_camera_vector(
             camera_to_microphone, from_microphone_to_speaker, from_speaker_ceiling_distance)
     assert "Not a 3D vector" == str(excinfo.value)

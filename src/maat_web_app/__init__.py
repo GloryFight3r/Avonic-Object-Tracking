@@ -11,13 +11,14 @@ import maat_web_app.settings_endpoints
 from maat_web_app.integration import GeneralController, close_running_threads
 
 # While testing to keep the log clean
-#import logging
-#log = logging.getLogger('werkzeug')
-#log.setLevel(logging.ERROR)
+# import logging
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 
 integration = GeneralController()
 
 restart_queue = None
+
 
 def create_app(test_controller=None):
     # create and configure the app
@@ -418,7 +419,6 @@ def create_app(test_controller=None):
                 "tracking": value representing hybrid model
         """
         return maat_web_app.tracking_endpoints.track_hybrid(integration)
-
 
     @app.post('/calibration/add-directions-to-speaker')
     def add_calibration_speaker():

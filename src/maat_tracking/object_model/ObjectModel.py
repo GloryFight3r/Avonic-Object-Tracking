@@ -6,7 +6,8 @@ from maat_camera_api.footage import FootageThread
 from maat_microphone_api.microphone_control_api import MicrophoneAPI
 from maat_tracking.object_model.yolov8 import YOLOPredict
 
-class ObjectModel():
+
+class ObjectModel:
     """ Class with helper methods for object tracking. This class has to be
     extended so that track_object can be implemented. This facilitates using
     different strategies of dealing with both the object detection and the
@@ -74,45 +75,45 @@ class ObjectModel():
         # The height is divided by two so the upper half of the person's body is used
 
         current_box = [current_box[0], current_box[1], current_box[2], current_box[3]-box_height/2]
-        bbox:np.ndarray = np.array([current_box[0],
-                                    current_box[1],
-                                    current_box[2] - current_box[0],
-                                    current_box[3] - current_box[1]
-                                   ])
+        bbox: np.ndarray = np.array([current_box[0],
+                                     current_box[1],
+                                     current_box[2] - current_box[0],
+                                     current_box[3] - current_box[1]
+                                     ])
 
         # calculate the middle of the box in the format [x, y]
-        box_middles:np.ndarray = (np.array([bbox[2], bbox[3]]) / 2)\
+        box_middles: np.ndarray = (np.array([bbox[2], bbox[3]]) / 2)\
             + np.array([bbox[0], bbox[1]])
 
         assert 0 <= box_middles[0] <= self.resolution[0]
         assert 0 <= box_middles[1] <= self.resolution[1]
 
         # calculate the middle of the screen
-        screen_middles:np.ndarray = self.resolution / 2.0
+        screen_middles: np.ndarray = self.resolution / 2.0
 
         # find the distance from the screen middle to the box middle
-        distance_to_middle:np.ndarray = box_middles - screen_middles
+        distance_to_middle: np.ndarray = box_middles - screen_middles
 
-        # flip the sign of the x axis distance
+        # flip the sign of the x-axis distance
         distance_to_middle[1] = -distance_to_middle[1]
 
         # calculate current FoV of the camera
         try:
-            cam_fov:np.ndarray = self.cam_api.calculate_fov()
+            cam_fov: np.ndarray = self.cam_api.calculate_fov()
         except AssertionError as e:
             print(e)
-            return ([20, 20], [0, 0])
+            return np.array([20, 20]), np.array([0, 0])
 
         # calculate how many degrees correspond to one pixel
-        angular_resolution:np.ndarray = cam_fov / self.resolution
+        angular_resolution: np.ndarray = cam_fov / self.resolution
 
         # find the relative angle the camera must rotate so that it centers on the bounding box
-        rotate_angle:np.ndarray = angular_resolution * distance_to_middle
+        rotate_angle: np.ndarray = angular_resolution * distance_to_middle
 
         # pick a good rotation speed according to the rotation angle it has to make
-        rotate_speed:np.ndarray = self.calculate_speed(rotate_angle)
+        rotate_speed: np.ndarray = self.calculate_speed(rotate_angle)
 
-        return (rotate_speed, rotate_angle)
+        return rotate_speed, rotate_angle
 
     def calculate_speed(self, rotate_angle):
         """ Picks a rotation speed depending on the rotation angle
@@ -124,9 +125,9 @@ class ObjectModel():
             Rotation speed for the next camera rotation
         """
 
-        speedAlpha = math.fabs(rotate_angle[0])/340.0*11.0+13.0
-        speedBeta = math.fabs(rotate_angle[1])/120.0*9.0+11.0
-        return [int(speedAlpha), int(speedBeta)]
+        speed_alpha = math.fabs(rotate_angle[0])/340.0*11.0+13.0
+        speed_beta = math.fabs(rotate_angle[1])/120.0*9.0+11.0
+        return [int(speed_alpha), int(speed_beta)]
 
     def track_object(self):
         pass

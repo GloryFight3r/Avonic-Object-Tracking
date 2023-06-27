@@ -77,14 +77,14 @@ class AudioModel(TrackingModel):
         vec_len = np.sqrt(cam_vec.dot(cam_vec))
         vec_len = min(vec_len, 10.0)
 
-        # Sets the zoom value to an appropriate value depending the the distance
+        # Sets the zoom value to an appropriate value depending on the distance
         zoom_val = int((vec_len/10.0)*16000)
 
         direct = vector_angle(cam_vec)
         direct_np = np.array([int(np.rad2deg(direct[0])) % 360,
                               int(np.rad2deg(direct[1])) % 360, zoom_val])
 
-        # If either pitch an yaw is more than 180 degrees
+        # If either pitch and yaw is more than 180 degrees
         # camera should rotate in the opposite direction
         if direct_np[0] > 180:
             direct_np[0] = direct_np[0]-360
@@ -99,8 +99,8 @@ class AudioModel(TrackingModel):
         speed_x: int = int(13 + diff_x*11.0)
         speed_y: int = int(11 + diff_y*9.0)
 
-        speed_x = min(speed_x,24)
-        speed_y = min(speed_y,20)
+        speed_x = min(speed_x, 24)
+        speed_y = min(speed_y, 20)
 
         # If the direction to move is the same as the current direction camera will not move
         if direct is None:

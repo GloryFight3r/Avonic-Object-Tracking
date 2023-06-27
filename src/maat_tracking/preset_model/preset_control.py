@@ -35,5 +35,5 @@ def find_most_similar_preset(current: np.ndarray, presets: list[np.ndarray]) -> 
     """
     if len(presets) == 0:
         raise ValueError("Empty list of presets given")
-    similartity = np.apply_along_axis(lambda x: cos_similarity(current, x), 1, np.array(presets))
-    return int(np.argmax(similartity))
+    similarity = np.apply_along_axis(lambda x: cos_similarity(current, x), 1, np.array(presets))
+    return int(np.argmax(similarity))

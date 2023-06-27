@@ -25,7 +25,8 @@ class MicrophoneSocket:
         """
         try:
             self.sock.close()
-        except:
+        except Exception as e:
+            print(e)
             pass
 
     def connect(self, address=None) -> bool:

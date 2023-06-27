@@ -2,6 +2,7 @@ import json
 import numpy as np
 from maat_tracking.utils.persistency_utils import CustomEncoder
 
+
 class Calibration:
     default_camera_vec: list[float] = [0.0, 0.0, 1.0]
     default_mic_vec: list[float] = [0.0, 1.0, 0.0]
@@ -97,8 +98,8 @@ class Calibration:
             # calculate the two angles needed
             alpha_cos = angle_between_vectors(cam_vecw, mic_vecw)
             beta_cos = angle_between_vectors(cam_vecw, self.to_mic_direction)
-            alpha_sin = (1- alpha_cos**2)**0.5
-            beta_sin = (1- beta_cos**2)**0.5
+            alpha_sin = (1 - alpha_cos**2)**0.5
+            beta_sin = (1 - beta_cos**2)**0.5
             assert abs(beta_sin) >= 1e-5
 
             mic_to_cam_dist = np.linalg.norm(mic_vec) / beta_sin * alpha_sin
@@ -115,7 +116,7 @@ class Calibration:
         if self.filename != "":
             with open(self.filename, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps({
-                    "speaker_points" :self.speaker_points,
+                    "speaker_points": self.speaker_points,
                     "to_mic_direction": self.to_mic_direction,
                     "mic_height": self.mic_height
                     }, indent=4, cls=CustomEncoder))
@@ -125,7 +126,7 @@ class Calibration:
         """
         if self.filename != "":
             try:
-                with open(self.filename, encoding="utf-8") as f:
+                with open(self.filename, encoding="utf-8"):
                     print(f"Loading calibration json from {self.filename}...")
             except FileNotFoundError:
                 with open(self.filename, "x", encoding="utf-8") as outfile:
@@ -140,7 +141,7 @@ class Calibration:
                 self.speaker_points = []
                 try:
                     data = json.load(f)
-                except:
+                except json.JSONDecodeError:
                     self.record()
                 if "speaker_points" in data.keys():
                     for key in data["speaker_points"]:
@@ -149,17 +150,17 @@ class Calibration:
                             if len(key[0]) != 3:
                                 tuple_to_add[0] = np.array(Calibration.default_camera_vec)
                                 print("Setting one fo the values in " +
-                                    "speaker_points to default value")
+                                      "speaker_points to default value")
                             if len(key[1]) != 3:
                                 tuple_to_add[1] = np.array(Calibration.default_mic_vec)
                                 print("Setting one fo the values in " +
-                                    "speaker_points to default value")
+                                      "speaker_points to default value")
                             self.speaker_points.append((tuple_to_add[0], tuple_to_add[1]))
                         except Exception as e:
                             print(e)
                             self.speaker_points.append(
                                 (np.array(Calibration.default_camera_vec),
-                                np.array(Calibration.default_mic_vec)))
+                                 np.array(Calibration.default_mic_vec)))
                             print("Setting one fo the values in speaker_points to default value")
                 try:
                     self.to_mic_direction = np.array(data["to_mic_direction"])

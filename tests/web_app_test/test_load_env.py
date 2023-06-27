@@ -13,9 +13,11 @@ import maat_web_app
 
 sock = mock.Mock()
 
+
 @pytest.fixture()
 def camera(monkeypatch):
     cam_sock = socket.socket
+
     def mocked_connect(t, self=None):
         pass
 
@@ -42,10 +44,13 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)), CameraHTTP(("", 1)))
+
     def mocked_camera_reconnect():
         pass
+
     def mocked_get_zoom():
         return 128
+
     def mocked_get_direction():
         return np.array([0, 0, 0])
 
@@ -59,7 +64,9 @@ def camera(monkeypatch):
 
     return cam_api
 
+
 test_controller = GeneralController()
+
 
 @pytest.fixture
 def client(camera, monkeypatch):
@@ -82,8 +89,8 @@ def client(camera, monkeypatch):
         pass
 
     with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
-         with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
-             with mock.patch("builtins.open", x):
+        with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
+            with mock.patch("builtins.open", x):
                 with mock.patch(
                         "maat_tracking.object_model.yolov8.YOLOPredict.__init__", x3):
                     with mock.patch("cv2.VideoCapture", x2):
@@ -97,7 +104,7 @@ def client(camera, monkeypatch):
 def test_load_env(client):
     time.sleep(0.5)
     test_controller.footage_thread_event.value = 0
-    #test_controller.info_threads_break.value = 1
+    # test_controller.info_threads_break.value = 1
 
     rv = client.post("/info-thread/start")
     assert rv.status_code == 200

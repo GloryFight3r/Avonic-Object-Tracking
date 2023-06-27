@@ -1,5 +1,6 @@
 from maat_web_app.integration import GeneralController
 
+
 def test_general_controller_constructor():
     subject = GeneralController()
 

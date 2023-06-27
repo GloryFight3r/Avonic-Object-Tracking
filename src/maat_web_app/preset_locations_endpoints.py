@@ -2,6 +2,7 @@ import numpy as np
 from flask import make_response, jsonify, request
 from maat_web_app.integration import GeneralController
 
+
 def success():
     return make_response(jsonify({}), 200)
 
@@ -28,7 +29,7 @@ def add_preset_location(integration: GeneralController):
             float(data["mic-direction-z"])
         ])
         integration.preset_model.preset_locations.add_preset(data["preset-name"],
-             camera_info, microphone_direction)
+                                                             camera_info, microphone_direction)
     except (AssertionError, ValueError) as e:
         return make_response(jsonify({"message": "Could not create endpoint, " + str(e)}), 400)
     return success()
@@ -56,7 +57,7 @@ def edit_preset_location(integration: GeneralController):
             float(data["mic-direction-z"])
         ])
         integration.preset_model.preset_locations.edit_preset(data["preset-name"],
-                                                 camera_info, microphone_direction)
+                                                              camera_info, microphone_direction)
     except (AssertionError, ValueError) as e:
         return make_response(jsonify({"message": "Could not edit endpoint, " + str(e)}), 400)
     return success()
@@ -90,7 +91,7 @@ def get_preset_list(integration: GeneralController):
     """
     return make_response(
         jsonify({"preset-list": integration.preset_model.preset_locations.get_preset_list()}
-        ), 200)
+                ), 200)
 
 
 def get_preset_info(integration: GeneralController, preset_name: str):

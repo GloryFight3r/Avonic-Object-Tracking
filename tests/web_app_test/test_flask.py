@@ -40,7 +40,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(sock=cam_sock,
-        address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
+                                     address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
 
     def mocked_get_zoom():
         return 128
@@ -329,6 +329,7 @@ def test_thread(client):
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
+
 def test_is_speaking(client):
     mic_sock.sendto.return_value = 48
     mic_sock.recvfrom.return_value = \
@@ -506,29 +507,29 @@ def test_get_preset_list(client):
     assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200 \
-           and rv.data == bytes("{\"preset-list\":[\"test-preset-name\"," \
+           and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","
                                 + "\"test-another-preset-name\"]}\n", "utf-8")
     mic_sock.recvfrom.return_value = \
         (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
     rv = client.get("preset/info/test-non-existent-preset-name")
     assert rv.status_code == 400
     rv = client.get("preset/info/test-preset-name")
-    assert rv.status_code == 200 and bytes("{" \
-                                           + "\"camera-direction-alpha\":0," \
-                                           + "\"camera-direction-beta\":0," \
-                                           + "\"camera-direction-value\":0," \
-                                           + "\"mic-direction-x\":1," \
-                                           + "\"mic-direction-y\":0," \
-                                           + "\"mic-direction-z\":0," \
+    assert rv.status_code == 200 and bytes("{"
+                                           + "\"camera-direction-alpha\":0,"
+                                           + "\"camera-direction-beta\":0,"
+                                           + "\"camera-direction-value\":0,"
+                                           + "\"mic-direction-x\":1,"
+                                           + "\"mic-direction-y\":0,"
+                                           + "\"mic-direction-z\":0,"
                                            + "\"preset-name\":\"test-preset-name\"}\n", "utf-8")
     rv = client.get("preset/info/test-another-preset-name")
-    assert rv.status_code == 200 and bytes("{" \
-                                           + "\"camera-direction-alpha\":0," \
-                                           + "\"camera-direction-beta\":0," \
-                                           + "\"camera-direction-value\":0," \
-                                           + "\"mic-direction-x\":0," \
-                                           + "\"mic-direction-y\":1," \
-                                           + "\"mic-direction-z\":0," \
+    assert rv.status_code == 200 and bytes("{"
+                                           + "\"camera-direction-alpha\":0,"
+                                           + "\"camera-direction-beta\":0,"
+                                           + "\"camera-direction-value\":0,"
+                                           + "\"mic-direction-x\":0,"
+                                           + "\"mic-direction-y\":1,"
+                                           + "\"mic-direction-z\":0,"
                                            + "\"preset-name\":\"test-another-preset-name\"}\n",
                                            "utf-8")
     rv = client.post("preset/remove",
@@ -621,7 +622,7 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
-            "camera-http-port":80,
+            "camera-http-port": 80,
             "microphone-ip": 34,
             "microphone-port": "asd",
             "microphone-thresh": -5,
@@ -632,7 +633,7 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
-            "camera-http-port":80,
+            "camera-http-port": 80,
             "microphone-ip": "gugu",
             "microphone-port": 456,
             "microphone-thresh": "asdf",
@@ -659,17 +660,21 @@ def test_live_footage(client, url):
     rv = client.get(url)
     assert rv.status_code == 200
 
+
 def test_calibration_track(client):
     rv = client.get("/track/calibration")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":0}\n", "utf-8")
+
 
 def test_preset_track(client):
     rv = client.get("/track/preset")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":1}\n", "utf-8")
 
+
 def test_object_track(client):
     rv = client.get("/track/object")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":2}\n", "utf-8")
+
 
 def test_hybrid_track(client):
     rv = client.get("/track/hybrid")

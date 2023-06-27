@@ -15,6 +15,7 @@ def test_get_zoom():
     assert ret == api.camera.zoom
     assert api.camera.call_count == 1
 
+
 def test_direct_zoom():
     """
     Test to set the zoom of the camera.
@@ -26,6 +27,7 @@ def test_direct_zoom():
     api.direct_zoom(test_zoom)
     assert api.camera.zoom == test_zoom
     assert api.camera.call_count == 1
+
 
 def test_insert_zoom_in_hex():
     """
@@ -43,6 +45,7 @@ def test_insert_zoom_in_hex():
     for test in zip(zoom_values, results):
         assert insert_zoom_in_hex(message, test[0]) == test[1]
 
+
 def test_insert_zoom_out_of_range():
     """
     Test inserting zoom values that are out of range.
@@ -53,6 +56,7 @@ def test_insert_zoom_out_of_range():
 
     with pytest.raises(AssertionError):
         insert_zoom_in_hex(message, -1)
+
 
 def test_insert_zoom_wrong_size_hex():
     """
@@ -73,21 +77,24 @@ def test_timeout():
     assert ret == ResponseCode.TIMED_OUT
     assert api.camera.call_count == 0
 
+
 def generate_fov():
     return [
         (1000,
-        [60.38 - ((60.38 - 3.72) * (1000 / 16384)), 35.80 - ((35.80 - 2.14) * (1000 / 16384))]),
+         [60.38 - ((60.38 - 3.72) * (1000 / 16384)), 35.80 - ((35.80 - 2.14) * (1000 / 16384))]),
         (0,
-        [60.38 - ((60.38 - 3.72) * (0 / 16384)), 35.80 - ((35.80 - 2.14) * (0 / 16384))]),
+         [60.38 - ((60.38 - 3.72) * (0 / 16384)), 35.80 - ((35.80 - 2.14) * (0 / 16384))]),
         (16384,
-        [60.38 - ((60.38 - 3.72) * (16384 / 16384)), 35.80 - ((35.80 - 2.14) * (16384 / 16384))]),
+         [60.38 - ((60.38 - 3.72) * (16384 / 16384)), 35.80 - ((35.80 - 2.14) * (16384 / 16384))]),
     ]
+
 
 def generate_incorrect_fov():
     return [
         -1,
         16385,
     ]
+
 
 @pytest.mark.parametrize("zoom, expected", generate_fov())
 def test_calculate_fov(monkeypatch, zoom, expected):
@@ -99,6 +106,7 @@ def test_calculate_fov(monkeypatch, zoom, expected):
     monkeypatch.setattr(api, "get_zoom", mocked_get_zoom)
 
     assert np.array_equal(api.calculate_fov(), expected)
+
 
 @pytest.mark.parametrize("zoom", generate_incorrect_fov())
 def test_calculate_fov_bad_weather(monkeypatch, zoom):

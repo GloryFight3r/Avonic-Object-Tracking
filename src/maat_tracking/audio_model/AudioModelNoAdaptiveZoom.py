@@ -9,6 +9,7 @@ from maat_tracking.utils.coordinate_translation\
 from maat_tracking.audio_model.calibration import Calibration
 from maat_microphone_api.microphone_control_api import MicrophoneAPI
 
+
 class AudioModelNoAdaptiveZoom(TrackingModel):
     """ Class for tracking a speaker using the audio information from the microphone.
     Given that information it calculates the direction to which to point the camera
@@ -48,45 +49,45 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
 
         try:
             cam_vec = translate_microphone_to_camera_vector(-self.calibration.mic_to_cam,
-                                                        mic_direction,
-                                                        self.calibration.mic_height)
+                                                            mic_direction,
+                                                            self.calibration.mic_height)
         except AssertionError:
             return self.prev_dir
 
-        # Calculates the distance from the camera to the speaker
-        vec_len = np.sqrt(cam_vec.dot(cam_vec))
-        vec_len = min(vec_len,10.0)
-
-
         direct = vector_angle(cam_vec)
 
-        direct_np = np.array([int(np.rad2deg(direct[0]))%360,
-                int(np.rad2deg(direct[1]))%360, self.prev_dir[2]])
+        direct_np = np.array([int(np.rad2deg(direct[0])) % 360,
+                              int(np.rad2deg(direct[1])) % 360, self.prev_dir[2]])
 
-        # If either pitch an yaw is more than 180 degrees
-        # camera should rotate in the opposite direction
-        if direct_np[0]>180:
+        # If either pitch or yaw is more than 180 degrees
+        # the camera should rotate in the opposite direction
+        if direct_np[0] > 180:
             direct_np[0] = direct_np[0]-360
-        if direct_np[1]>180:
+        if direct_np[1] > 180:
             direct_np[1] = direct_np[1]-360
 
         # Calculates the relative rotation of the camera
-        diffX = math.fabs(self.prev_dir[0]-direct_np[0])*2.0/360.0
-        diffY = math.fabs(self.prev_dir[1]-direct_np[1])*2.0/120.0
+        diff_x = math.fabs(self.prev_dir[0]-direct_np[0])*2.0/360.0
+        diff_y = math.fabs(self.prev_dir[1]-direct_np[1])*2.0/120.0
 
         # Sets the rotation speed depending on the amount of rotation
-        speedX : int = int(13 + diffX*11.0)
-        speedY : int = int(11 + diffY*9.0)
+        speed_x: int = int(13 + diff_x*11.0)
+        speed_y: int = int(11 + diff_y*9.0)
 
-        speedX = min(speedX,24)
-        speedY = min(speedY,20)
+        speed_x = min(speed_x, 24)
+        speed_y = min(speed_y, 20)
 
         # If the direction to move is the same as the current direction camera will not move
         if direct is None:
             return self.prev_dir
 
         if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
-            self.cam_api.move_absolute(speedX, speedY, direct_np[0], direct_np[1])
+            try:
+                self.cam_api.move_absolute(speed_x, speed_y, direct_np[0], direct_np[1])
+            except AssertionError:
+                pass
+            except Exception as e:
+                print("Unexpected error while trying to move camera: ", e)
 
         if self.prev_dir[2] != direct_np[2]:
             self.cam_api.direct_zoom(direct_np[2])

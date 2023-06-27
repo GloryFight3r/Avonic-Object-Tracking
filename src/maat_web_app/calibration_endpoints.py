@@ -7,10 +7,12 @@ from maat_camera_api.camera_adapter import ResponseCode
 def success():
     return make_response(jsonify({}), 200)
 
+
 def get_number_of_speaker_points(integration: GeneralController):
     return make_response(jsonify({
         "speaker-points-length": len(integration.audio_model.calibration.speaker_points)
     }), 200)
+
 
 def add_calibration_speaker(integration: GeneralController):
     """ Adds a speaker point to the calibration. This includes
