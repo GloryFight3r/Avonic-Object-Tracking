@@ -79,6 +79,8 @@ class HybridTracker(ObjectModel, AudioModel):
             if isinstance(cur_angle, ResponseCode):
                 return
 
+            cur_angle: np.ndarray = vector_angle(cur_angle)
+
             # if the point that the camera has to turn to is on the screen, we need to choose
             # the bounding box of the most likely speaker
             if cam_angles[0] - (cur_fov[0] / 2) <= cur_angle[0] <= cam_angles[0] + (cur_fov[0] / 2) \
@@ -108,7 +110,7 @@ class HybridTracker(ObjectModel, AudioModel):
                 #visualisation purposes
                 #self.stream.pixel = pixels
 
-                # find nearest box we should be tracking
+                # find the nearest box we should be tracking
                 speaker_box:np.ndarray | None = self.find_box(all_boxes, pixels)
 
                 if speaker_box is None:
