@@ -587,6 +587,21 @@ def test_settings(client):
                 assert rv.status_code == 200
         rv = client.get("settings/get")
         assert rv.status_code == 200 and json.loads(rv.data) == expected
+        expected = {
+            "camera-ip": "1.1.1.1",
+            "camera-port": 123,
+            "camera-http-port": 72,
+            "microphone-ip": "2.2.2.2",
+            "microphone-port": 456,
+            "microphone-thresh": -5,
+            "filepath": "/app/exe"
+        }
+        with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
+            with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
+                rv = client.post("settings/set", data=expected)
+                assert rv.status_code == 200
+        rv = client.get("settings/get")
+        assert rv.status_code == 200 and json.loads(rv.data)["filepath"] == "/app/exe/"
 
 
 def test_settings_invalid(client):
