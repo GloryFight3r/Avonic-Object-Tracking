@@ -23,7 +23,6 @@ async function onDirectionGet(data) {
 
 async function onSpeaking(data) {
     const d = await data;
-    const isSpeaking = d["microphone-speaking"]
-    document.getElementById("speaking").value = isSpeaking;
+    document.getElementById("speaking").value = d["microphone-speaking"];
 }
 

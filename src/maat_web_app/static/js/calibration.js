@@ -3,7 +3,7 @@ let calibratingSpeakerCount = 0
 let isCalibrating = false
 
 function addCalibrationSpeaker() {
-    if(calibratingSpeakerCount == totalCalibrations)
+    if(calibratingSpeakerCount === totalCalibrations)
         return;
 
     isCalibrating = false

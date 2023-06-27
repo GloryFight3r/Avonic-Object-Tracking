@@ -125,6 +125,6 @@ function loadPresets() {
     requestPresetList();
 }
 
-if (presetform !== null) {
+if (presetform !== undefined) {
     loadPresets();
 }
