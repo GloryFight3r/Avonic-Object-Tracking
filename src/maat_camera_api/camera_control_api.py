@@ -26,9 +26,6 @@ class ImageSize(Enum):
 class CameraAPI:
     latest_direction: np.ndarray | None = None
 
-    # The FOV of the camera when fully zoomed in
-    latest_fov = 0
-
     MIN_FOV = np.array([3.72, 2.14])
     # The FOV of the camera when fully zoomed out
     MAX_FOV = np.array([60.38, 35.80])
@@ -208,8 +205,7 @@ class CameraAPI:
         if isinstance(ret, ResponseCode):
             return ret
         hex_res = ret[7] + ret[9] + ret[11] + ret[13]
-        self.latest_fov = int(hex_res, 16)
-        return self.latest_fov
+        return int(hex_res, 16)
 
     def direct_zoom(self, zoom: int) -> ResponseCode | str:
         """ Change the value of the zoom to the specified value.
@@ -225,10 +221,10 @@ class CameraAPI:
                                 final_message, cnt)
 
     def get_direction(self) -> np.ndarray | ResponseCode:
-        """ Get the direction, pan and tilt, from the camera.
+        """ Get the direction, pan and tilt, from the camera as a unit vector.
 
             Returns:
-                (pan, tilt): The pan and tilt of the camera.
+                The pan and tilt of the camera converted into a unit vector:
                     Pan ranges between 0xF670 (-2447) and 0x0990 (2448)
                         while pan_adjusted ranges between (-170°) and (+170°)
                     Tilt ranges between 0xFE45 (-442) and 0x0510 (1296)
@@ -322,7 +318,7 @@ class CameraAPI:
             '{"SetEnv":{"VideoEncode":[{"stMaster": {"nIFrameInterval":%d},"nChannel":0}]}}'
             % selected)
 
-    def calculate_fov(self) -> ResponseCode | int:
+    def calculate_fov(self) -> ResponseCode | np.ndarray:
         """ Calculate the current FoV based on the current zoom
 
             Returns:
