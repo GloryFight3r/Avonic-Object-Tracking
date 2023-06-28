@@ -30,8 +30,7 @@ class QuickChangeObjectAudio(ObjectModel, AudioModel):
     def point(self):
         """
         Overrides the point method from TrackingModel.
-        This method uses both:with expression as target:pass
-        object tracking and the audio speaker tracking in order to achieve
+        This method uses both object tracking and the audio speaker tracking in order to achieve
         better accuracy. It works in the following way
 
         1. A speaker is talking

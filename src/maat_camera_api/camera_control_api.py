@@ -56,7 +56,7 @@ class CameraAPI:
         Increments the count for next message.
 
         Returns:
-            The current message count TODO: and what
+            The current message counter in hex and the message counter
         """
         cnt_hex = self.counter.value.to_bytes(1, 'big').hex()
 
