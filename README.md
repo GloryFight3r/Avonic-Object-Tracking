@@ -33,4 +33,4 @@ To build the docker container on an **ARM** (`aarch64`) machine, run:
 
 After that, run the container:
 
-`# docker run -it --rm -p 80:8000 maat`
+`# docker run -it --rm -p 80:8000 -v $(pwd)/config:/usr/app maat`
