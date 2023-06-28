@@ -116,7 +116,10 @@ class PresetCollection:
                 with open(self.filename, encoding="utf-8"):
                     print("Loading json...")
             except FileNotFoundError:
-                os.makedirs(os.path.dirname(self.filename), exist_ok=True)
+                try:
+                    os.makedirs(os.path.dirname(self.filename), exist_ok=True)
+                except FileNotFoundError:
+                    pass
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print("Create new preset json...")
                     outfile.write(json.dumps({}, indent=4, cls=CustomEncoder))

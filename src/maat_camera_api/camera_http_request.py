@@ -38,7 +38,8 @@ class CameraHTTP:
                 return ResponseCodeHTTP.OK, response.json()
             else:
                 return ResponseCodeHTTP.ERROR, None
-        except (requests.exceptions.ConnectTimeout, requests.exceptions.InvalidURL, TypeError) as e:
+        except (requests.exceptions.ConnectTimeout, requests.exceptions.InvalidURL,
+                requests.exceptions.ReadTimeout, TypeError) as e:
             print(type(e))
             print(e)
             return ResponseCodeHTTP.NO_CONNECTION, None
