@@ -37,7 +37,10 @@ class UpdateThread(Thread):
         the camera.
         """
         while self.event.value != 0:
-            self.model.point()
+            try:
+                self.model.point()
+            except Exception as e:
+                print(e)
             self.model.sleep()
 
         print("Exiting thread")
