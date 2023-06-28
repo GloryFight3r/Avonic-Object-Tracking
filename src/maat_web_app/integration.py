@@ -1,6 +1,6 @@
 import time
 from threading import Thread
-from os import getenv, getpid
+from os import getenv, getpid, makedirs
 from time import sleep
 from multiprocessing import Value
 # NOTE: This library is imported only due to
@@ -127,7 +127,7 @@ class GeneralController:
 
         # Load settings file
         try:
-            with open("settings.yaml", "r", encoding="utf-8") as f:
+            with open("config/settings.yaml", "r", encoding="utf-8") as f:
                 settings = load(f, Loader=Loader)
         except IOError as e:
             print("Could not open settings.yaml file, proceeding without it.")
@@ -139,13 +139,12 @@ class GeneralController:
                 "microphone-ip": "0.0.0.0",
                 "microphone-port": 45,
                 "microphone-thresh": -55,
-                "filepath": "",
+                "filepath": "./config/",
                 "secret-key": "test"
             }
             self.no_settings_sent = False
 
         # Setup camera API
-        cam_addr = None
         cam_port = settings["camera-port"]
         cam_http_port = settings["camera-http-port"]
         cam_addr = (settings["camera-ip"], int(cam_port))
@@ -169,7 +168,6 @@ class GeneralController:
             self.cam_api = CameraAPI(CameraSocket(), CameraHTTP(("0.0.0.0", 80)))
 
         # Setup microphone API
-        mic_addr = None
         mic_port = settings["microphone-port"]
         mic_addr = (settings["microphone-ip"], int(mic_port))
         try:
@@ -253,7 +251,8 @@ class GeneralController:
             False on error
         """
         try:
-            with open("settings.yaml", "w", encoding="utf-8") as f:
+            makedirs("config", exist_ok=True)
+            with open("config/settings.yaml", "w", encoding="utf-8") as f:
                 cam_addr = self.cam_api.camera.address
                 cam_http_port = self.cam_api.camera_http.address[1]
                 mic_addr = self.mic_api.sock.address

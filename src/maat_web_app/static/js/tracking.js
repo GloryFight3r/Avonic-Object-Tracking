@@ -12,11 +12,11 @@ async function selectTracking() {
             url = "/track/preset"
             break
         case "calib":
-            header.innerText = "Continuous following  with adaptive zooming🔭"
+            header.innerText = "Continuous following  with adaptive zooming 🔭"
             url = "/track/calibration"
             break
         case "hybrid":
-            header.innerText = "Hybrid tracking  🔭"
+            header.innerText = "Quick change Object-Audio tracking 🔭"
             url = "/track/hybrid"
             break
         case "object":
@@ -24,7 +24,7 @@ async function selectTracking() {
             url = "/track/object"
             break;
         case "calibnozoom":
-            header.innerText = "Continuous following  without adaptive zooming🔭"
+            header.innerText = "Continuous following without adaptive zooming 🔭"
             url = "/track/calibration-no-zoom"
             break
         default:

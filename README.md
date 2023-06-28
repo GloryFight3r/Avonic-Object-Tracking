@@ -27,10 +27,10 @@ To run tests:
 `$ ./run.sh test`
 
 ### Docker
-To build the docker container on an **ARM** (`aarch64`) machine, run:
+To build the docker container, run:
 
 `# docker build -t maat .`
 
 After that, run the container:
 
-`# docker run -it --rm -p 80:8000 -v $(pwd)/config:/usr/app maat`
+`# docker run -it --rm -p 80:8000 -v $(pwd)/config:/usr/app/config maat`
