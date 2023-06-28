@@ -146,7 +146,8 @@ class WaitObjectAudioModel(ObjectModel, AudioModel):
         if self.time_without_movement < self.wait:
             if self.prev_dir[0] != direct_np[0] or self.prev_dir[1] != direct_np[1]:
                 try:
-                    self.cam_api.move_absolute(speed_x, speed_y, direct_np[0], direct_np[1])
+                    if self.mic_api.is_speaking():
+                        self.cam_api.move_absolute(speed_x, speed_y, direct_np[0], direct_np[1])
                 except AssertionError as e:
                     print(e)
         elif self.time_without_movement >= self.wait:

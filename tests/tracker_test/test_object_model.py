@@ -72,6 +72,9 @@ class MockedMicAPI:
     def get_direction(self):
         return np.array([3, 2, 1])
 
+    def is_speaking(self):
+        return True
+
 
 class MockedMicAPIWrongDirection:
     def __init__(self):
