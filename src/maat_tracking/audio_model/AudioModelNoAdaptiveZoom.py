@@ -40,6 +40,8 @@ class AudioModelNoAdaptiveZoom(TrackingModel):
             In addition to calculating the direction, performs movement of the camera.
             Returns: the vector in which direction the camera should point and zoom value.
         """
+        if not self.mic_api.is_speaking():
+            return self.prev_dir
         mic_direction = self.mic_api.get_direction()
         print("Current calibration mic -> cam vector: ", self.calibration.mic_to_cam)
 

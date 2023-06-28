@@ -33,6 +33,8 @@ class PresetModel(TrackingModel):
             Returns: the vector in which direction the camera should point and zoom value
         """
         print("Using presets point method")
+        if not self.mic_api.is_speaking():
+            return self.prev_dir
         preset_names: np.ndarray = np.array(self.preset_locations.get_preset_list())
         mic_direction = self.mic_api.get_direction()
         if isinstance(mic_direction, str):
