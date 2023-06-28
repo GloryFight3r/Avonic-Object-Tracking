@@ -129,7 +129,7 @@ class GeneralController:
         try:
             with open("config/settings.yaml", "r", encoding="utf-8") as f:
                 settings = load(f, Loader=Loader)
-        except IOError as e:
+        except (IOError, FileNotFoundError) as e:
             print("Could not open settings.yaml file, proceeding without it.")
             print(e)
             settings = {

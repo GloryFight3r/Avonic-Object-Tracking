@@ -1,4 +1,5 @@
 import json
+import os.path
 import numpy as np
 from maat_tracking.utils.persistency_utils import CustomEncoder
 
@@ -129,6 +130,7 @@ class Calibration:
                 with open(self.filename, encoding="utf-8"):
                     print(f"Loading calibration json from {self.filename}...")
             except FileNotFoundError:
+                os.makedirs(os.path.dirname(self.filename), exist_ok=True)
                 with open(self.filename, "x", encoding="utf-8") as outfile:
                     print(f"No file {self.filename} was found. Create new preset json...")
                     outfile.write(json.dumps({
