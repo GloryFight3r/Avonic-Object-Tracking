@@ -84,6 +84,29 @@ def test_direction_recv_error():
     assert json.loads(api.get_direction())[0] == 400
 
 
+def test_direction_sendto_exception():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto = mock.Mock(side_effect=OSError)
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert json.loads(api.get_direction())[0] == 408
+
+
+def test_direction_recvfrom_exception():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom = mock.Mock(side_effect=OSError)
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert json.loads(api.get_direction())[0] == 408
+
+
 def test_speaking_recv_error():
     """ Invalid command
     """

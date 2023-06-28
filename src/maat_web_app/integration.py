@@ -373,15 +373,19 @@ class GeneralController:
 
         Returns: dictionary with "camera-direction", "camera-video", and "zoom-value" entries
         """
-        direction = self.cam_api.get_direction()
-        zoom = self.cam_api.get_zoom()
+        try:
+            direction = self.cam_api.get_direction()
+        except AssertionError:
+            direction = np.array([0.0, 0.0, 1.0])
+        try:
+            zoom = self.cam_api.get_zoom()
+        except (IndexError, AssertionError):
+            zoom = 0
         if isinstance(direction, ResponseCode):
             direction = np.array([0.0, 0.0, 1.0])
-        if isinstance(zoom, ResponseCode):
-            zoom = 0
-        angles = converter.vector_angle(direction)
         if not isinstance(zoom, int):
             zoom = 0
+        angles = converter.vector_angle(direction)
         return {
             "camera-direction": {
                 "position-alpha-value": angles[0],
