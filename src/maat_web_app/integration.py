@@ -148,12 +148,12 @@ class GeneralController:
         cam_addr = None
         cam_port = settings["camera-port"]
         cam_http_port = settings["camera-http-port"]
-        if cam_port and cam_http_port is not None:
-            cam_addr = (settings["camera-ip"], int(cam_port))
-            if cam_addr is not None and verify_address(cam_addr):
-                self.cam_api = CameraAPI(CameraSocket(address=cam_addr),
-                                         CameraHTTP((cam_addr[0], cam_http_port)))
-
+        cam_addr = (settings["camera-ip"], int(cam_port))
+        try:
+            verify_address(cam_addr)
+            self.cam_api = CameraAPI(CameraSocket(address=cam_addr),
+                                     CameraHTTP((cam_addr[0], cam_http_port)))
+            if cam_addr is not None:
                 # set codec to MJPEG
                 self.cam_api.set_camera_codec(CompressedFormat.MJPEG)
 
@@ -165,16 +165,19 @@ class GeneralController:
 
                 # set frame interval
                 self.cam_api.set_i_frame_rate(60)
+        except AssertionError:
+            self.cam_api = CameraAPI(CameraSocket(), CameraHTTP(("0.0.0.0", 80)))
 
         # Setup microphone API
         mic_addr = None
         mic_port = settings["microphone-port"]
-        print(mic_port, mic_port is None)
-        if mic_port is not None:
-            mic_addr = (settings["microphone-ip"], int(mic_port))
-            if mic_addr is not None and verify_address(mic_addr):
-                self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr),
-                                             int(settings["microphone-thresh"]))
+        mic_addr = (settings["microphone-ip"], int(mic_port))
+        try:
+            verify_address(mic_addr)
+            self.mic_api = MicrophoneAPI(MicrophoneSocket(address=mic_addr),
+                                         int(settings["microphone-thresh"]))
+        except AssertionError:
+            self.mic_api = MicrophoneAPI(MicrophoneSocket())
 
         # Setup secret
         self.secret = settings["secret-key"]
@@ -435,6 +438,7 @@ def verify_address(address) -> None:
     """
     assert 0 <= address[1] <= 65535
     assert isinstance(address[0], str)
+    assert address[0] != ""
 
 
 def close_running_threads(integration_passed, timeout_seconds: int = 1, raise_exit=True) -> None:

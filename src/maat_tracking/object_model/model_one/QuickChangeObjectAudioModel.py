@@ -54,7 +54,7 @@ class QuickChangeObjectAudio(ObjectModel, AudioModel):
             Start tracking this chosen bounding box
         """
         # get information about current speaker
-        if self.mic_api.is_speaking():  # he is currently speaking
+        if self.mic_api.is_speaking():  # they are currently speaking
             # Get the speaker direction
             mic_direction: np.ndarray | None = self.mic_api.get_direction()
 
@@ -73,7 +73,10 @@ class QuickChangeObjectAudio(ObjectModel, AudioModel):
 
             # calculate the current FoV so that we can determine if the camera direction
             # we should look to is current visible on the screen
-            cur_fov: np.ndarray = np.deg2rad(self.cam_api.calculate_fov())
+            fov = self.cam_api.calculate_fov()
+            if isinstance(fov, ResponseCode):
+                return
+            cur_fov: np.ndarray = np.deg2rad(fov)
 
             # transform the 3D vector to a pan and tilt numpy array
             cur_angle = self.cam_api.get_direction()
