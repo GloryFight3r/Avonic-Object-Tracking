@@ -505,7 +505,7 @@ def test_get_preset_list(client):
     assert rv.status_code == 200
     rv = client.post("preset/point", data={})
     assert rv.status_code == 200
-    rv = client.get("preset/get_list")
+    rv = client.get("preset/get-list")
     assert rv.status_code == 200 \
            and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","
                                 + "\"test-another-preset-name\"]}\n", "utf-8")
@@ -543,13 +543,13 @@ def test_get_preset_list(client):
     assert rv.status_code == 400
     rv = client.get("preset/info/test-another-preset-name")
     assert rv.status_code == 400
-    rv = client.get("preset/get_list")
+    rv = client.get("preset/get-list")
     assert rv.status_code == 200 \
            and rv.data == bytes("{\"preset-list\":[\"test-preset-name\"]}\n", "utf-8")
     rv = client.post("preset/remove",
                      data={"preset-name": "test-preset-name"})
     assert rv.status_code == 200
-    rv = client.get("preset/get_list")
+    rv = client.get("preset/get-list")
     assert rv.status_code == 200 and rv.data == bytes("{\"preset-list\":[]}\n", "utf-8")
     rv = client.get("preset/info/test-preset-name")
     assert rv.status_code == 400
@@ -649,10 +649,10 @@ def test_settings_invalid(client):
 def generate_single_page_views():
     return [
         "/",
-        "/live_footage",
-        "/camera_control",
-        "/microphone_control",
-        "/presets_and_calibration"
+        "/live-footage",
+        "/camera-control",
+        "/microphone-control",
+        "/presets-and-calibration"
     ]
 
 

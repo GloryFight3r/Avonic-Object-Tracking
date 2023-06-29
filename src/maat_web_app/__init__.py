@@ -47,7 +47,7 @@ def create_app(test_controller=None):
                      "footage", "thread", "scene", "socket", "settings", "tracking"]
         return render_template('view.html', to_import=to_import, page_name="Main page")
 
-    @app.get('/camera_control')
+    @app.get('/camera-control')
     def camera_view():
         """
         Render a page that includes only the camera controls.
@@ -56,7 +56,7 @@ def create_app(test_controller=None):
         return render_template('single_page.html', name="camera", to_import=to_import,
                                page_name="Camera View")
 
-    @app.get('/microphone_control')
+    @app.get('/microphone-control')
     def microphone_view():
         """
         Render a page that includes only the microphone information.
@@ -66,7 +66,7 @@ def create_app(test_controller=None):
         return render_template('single_page.html', name="microphone", to_import=to_import,
                                page_name="Microphone View")
 
-    @app.get('/presets_and_calibration')
+    @app.get('/presets-and-calibration')
     def presets_and_calibration_view():
         """
         Render a page that includes only set-up for presets and calibration.
@@ -75,7 +75,7 @@ def create_app(test_controller=None):
         return render_template('single_page.html', name="presets_and_calibration",
                                to_import=to_import, page_name="Presets & Calibration View")
 
-    @app.get('/live_footage')
+    @app.get('/live-footage')
     def live_footage_view():
         """
         Render a page that includes only the video stream from the camera.
@@ -365,7 +365,7 @@ def create_app(test_controller=None):
         """
         return maat_web_app.preset_locations_endpoints.remove_preset_location(integration)
 
-    @app.get('/preset/get_list')
+    @app.get('/preset/get-list')
     def get_preset_list():
         """
         Endpoint that returns the list of all saved presets.
@@ -513,13 +513,13 @@ def create_app(test_controller=None):
         Endpoint that returns the number of calibration points
 
             return:
-                "speaker-points-length": the amount of speaker points that have been set [0 : 3]
+                "speaker-points-length": the amount of speaker points that have been set
                 HTTP 200: success code
 
         """
         return maat_web_app.calibration_endpoints.get_number_of_speaker_points(integration)
 
-    @app.post('/navigate/camera')
+    @app.post('/camera/navigate')
     def navigate_camera():
         """
         Endpoint that navigates the camera so that the clicked pixel is centered in the frame
@@ -655,7 +655,7 @@ def create_app(test_controller=None):
     @app.post('/settings/set')
     def settings_set():
         """
-        Endpoint that sets the following settings to the ones given.
+        Endpoint that sets the settings to the ones given.
 
             form:
                 "camera-ip": the address of the camera to connect to
