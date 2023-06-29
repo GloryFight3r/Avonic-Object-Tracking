@@ -1,7 +1,7 @@
 from unittest import mock
 from multiprocessing import Value
 import numpy as np
-from avonic_speaker_tracker.updater import UpdateThread
+from maat_tracking.updater import UpdateThread
 
 
 def test_constructor():
@@ -11,7 +11,7 @@ def test_constructor():
     mic_api.is_speaking.return_value = True
     cam_api = mock.Mock()
     model = mock.Mock()
-    ct = UpdateThread(e, cam_api, mic_api, model, [])
+    ct = UpdateThread(e, cam_api, mic_api, model, "")
     assert ct.event == e
     assert ct.mic_api == mic_api
     assert ct.cam_api == cam_api

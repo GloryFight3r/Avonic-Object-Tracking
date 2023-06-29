@@ -2,13 +2,13 @@ from unittest import mock
 import socket
 import pytest
 import numpy as np
-from web_app.integration import GeneralController
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import CameraSocket
-import web_app
-from web_app.tracking_endpoints import track_presets, track_continuously
+from maat_web_app.integration import GeneralController
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_control_api import CameraSocket
+import maat_web_app
 
 sock = mock.Mock()
+
 
 @pytest.fixture()
 def camera(monkeypatch):
@@ -35,8 +35,10 @@ def camera(monkeypatch):
     monkeypatch.setattr(sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(sock=sock, address=('0.0.0.0', 52381)), None)
+
     def mocked_get_zoom():
         return 128
+
     def mocked_get_direction():
         return np.array([0, 0, 0])
 
@@ -45,12 +47,12 @@ def camera(monkeypatch):
 
     return cam_api
 
+
 mic_api = mock.Mock()
+
 
 @pytest.fixture
 def client(camera, monkeypatch):
-
-
     mic_api.height = 1
 
     cam_api = camera
@@ -62,25 +64,25 @@ def client(camera, monkeypatch):
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
 
-    app = web_app.create_app(test_controller=test_controller)
+    app = maat_web_app.create_app(test_controller=test_controller)
     app.config['TESTING'] = True
 
     return app.test_client()
 
 
-
-
 def test_track_presets(client):
-    rv = client.get('preset/track')
+    rv = client.get('/track/preset')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":1}\n', "utf-8")
 
+
 def test_track_continuously(client):
-    rv = client.get('calibration/track')
+    rv = client.get('/track/calibration')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":0}\n', "utf-8")
 
+
 def test_track_continuously_without_adaptive_zooming(client):
-    rv = client.get('calibration/track/no/zoom')
+    rv = client.get('/track/calibration-no-zoom')
     assert rv.status_code == 200
     assert rv.data == bytes('{"tracking":4}\n', "utf-8")

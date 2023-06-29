@@ -1,0 +1,46 @@
+<dialog id="settings">
+    <article>
+        <a href="#" aria-label="Close"
+           class="close" data-target="settings"
+           onclick="toggleSettings()"></a>
+        <h1>Settings 🔧</h1>
+        <p>
+            Welcome to the settings menu!
+            Here you can set the addresses of both the camera and microphone,
+            and a few more things.
+        </p>
+        <b>
+            If you are seeing this menu unprompted,
+            you have not set this application up or your settings could not be retrieved.
+        </b>
+        <br />
+        <form id="settings-form" action="/settings/set" method="post">
+            <div class="grid">
+                <label for="settings-camera-ip">Camera address (IP, port, http-port)</label>
+                <input id="settings-camera-ip" name="camera-ip" />
+                <input id="settings-camera-port" name="camera-port" type="number" min="0" max="65535" />
+                <input id="settings-camera-http-port" name="camera-http-port" type="number" value="80" min="0" max="65535" />
+            </div>
+            <div class="grid">
+                <label for="settings-microphone-ip">Microphone address (IP, port)</label>
+                <input id="settings-microphone-ip" name="microphone-ip" />
+                <input id="settings-microphone-port" name="microphone-port" type="number" min="0" max="65535" />
+            </div>
+            <div class="grid">
+                <label for="settings-microphone-thresh">Microphone loudness threshold (-90 - 0 dB)</label>
+                <input id="settings-microphone-thresh" name="microphone-thresh" type="number" min="-90" max="0" />
+            </div>
+            <div class="grid">
+                <label for="settings-files-path">Path to presets and calibration storage files</label>
+                <input id="settings-files-path" name="filepath" />
+            </div>
+            <footer>
+                <button id="settings-save-button" type="submit"
+                        data-tooltip="This will restart the server, might take long if you entered incorrect data!">
+                    Save
+                </button>
+
+            </footer>
+        </form>
+    </article>
+</dialog>

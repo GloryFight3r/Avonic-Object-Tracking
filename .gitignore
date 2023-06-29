@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 __pycache__/
+config/
 *.py[cod]
 docs/build/
 git.html
@@ -11,7 +12,6 @@ build/
 cov.xml
 html_cov/
 .coverage
-.env
 calibration.json
 presets.json
 html/
@@ -26,6 +26,5 @@ run_pylint.sh
 *.avi
 .DS_Store
 src/.DS_Store
-src/avonic_speaker_tracker_system.egg-info/
-src/avonic_speaker_tracker.egg-info/
+src/maat.egg-info
 settings.yaml

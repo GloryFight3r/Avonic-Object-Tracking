@@ -4,13 +4,13 @@ import json
 import pytest
 import numpy as np
 
-from web_app.integration import GeneralController, ModelCode
-from avonic_camera_api.camera_http_request import CameraHTTP
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_control_api import CameraSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
-import web_app
+from maat_web_app.integration import GeneralController, ModelCode
+from maat_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_control_api import CameraSocket
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
+from maat_microphone_api.microphone_adapter import MicrophoneSocket
+import maat_web_app
 
 mic_sock = mock.Mock()
 
@@ -40,7 +40,7 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(sock=cam_sock,
-        address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
+                                     address=('0.0.0.1', 52381)), CameraHTTP(("0.0.0.1", 80)))
 
     def mocked_get_zoom():
         return 128
@@ -72,7 +72,7 @@ def client(camera, monkeypatch):
     test_controller.set_mic_api(mic_api)
     test_controller.ws = mock.Mock()
 
-    app = web_app.create_app(test_controller=test_controller)
+    app = maat_web_app.create_app(test_controller=test_controller)
 
     app.config['TESTING'] = True
 
@@ -235,13 +235,17 @@ def test_get_microphone_direction(client):
 
 def test_add_direction_to_mic(client):
     client.post('/calibration/reset')
-    rv = client.post('/calibration/add_direction_to_mic')
+    rv = client.post('/calibration/add-direction-to-mic')
     assert rv.status_code == 200
 
 
 def test_add_direction_to_speaker(client):
-    rv = client.post('/calibration/add_directions_to_speaker')
+    rv = client.get('/calibration/number-of-calibrated')
+    assert rv.status_code == 200 and rv.data == bytes("{\"speaker-points-length\":0}\n", "utf-8")
+    rv = client.post('/calibration/add-directions-to-speaker')
     assert rv.status_code == 200
+    rv = client.get('/calibration/number-of-calibrated')
+    assert rv.status_code == 200 and rv.data == bytes("{\"speaker-points-length\":1}\n", "utf-8")
 
 
 def test_calibration_reset(client):
@@ -250,7 +254,7 @@ def test_calibration_reset(client):
 
 
 def test_calibration_is_set(client):
-    rv = client.get('/calibration/is_set')
+    rv = client.get('/calibration/is-set')
     assert rv.status_code == 200 \
            and rv.data == bytes("{\"is_set\":false}\n", "utf-8")
 
@@ -313,17 +317,18 @@ def test_thread(client):
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
-    web_app.integration.tracking.value = ModelCode.AUDIO
+    maat_web_app.integration.tracking.value = ModelCode.AUDIO
     rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
 
-    web_app.integration.tracking.value = ModelCode.OBJECT
+    maat_web_app.integration.tracking.value = ModelCode.OBJECT
     rv = client.post('/thread/start')
     assert rv.status_code == 200
     rv = client.post('/thread/stop')
     assert rv.status_code == 200
+
 
 def test_is_speaking(client):
     mic_sock.sendto.return_value = 48
@@ -502,29 +507,29 @@ def test_get_preset_list(client):
     assert rv.status_code == 200
     rv = client.get("preset/get_list")
     assert rv.status_code == 200 \
-           and rv.data == bytes("{\"preset-list\":[\"test-preset-name\"," \
+           and rv.data == bytes("{\"preset-list\":[\"test-preset-name\","
                                 + "\"test-another-preset-name\"]}\n", "utf-8")
     mic_sock.recvfrom.return_value = \
         (bytes('{"m":{"in1":{"peak":-54}}}\r\n', "ascii"), None)
     rv = client.get("preset/info/test-non-existent-preset-name")
     assert rv.status_code == 400
     rv = client.get("preset/info/test-preset-name")
-    assert rv.status_code == 200 and bytes("{" \
-                                           + "\"camera-direction-alpha\":0," \
-                                           + "\"camera-direction-beta\":0," \
-                                           + "\"camera-direction-value\":0," \
-                                           + "\"mic-direction-x\":1," \
-                                           + "\"mic-direction-y\":0," \
-                                           + "\"mic-direction-z\":0," \
+    assert rv.status_code == 200 and bytes("{"
+                                           + "\"camera-direction-alpha\":0,"
+                                           + "\"camera-direction-beta\":0,"
+                                           + "\"camera-direction-value\":0,"
+                                           + "\"mic-direction-x\":1,"
+                                           + "\"mic-direction-y\":0,"
+                                           + "\"mic-direction-z\":0,"
                                            + "\"preset-name\":\"test-preset-name\"}\n", "utf-8")
     rv = client.get("preset/info/test-another-preset-name")
-    assert rv.status_code == 200 and bytes("{" \
-                                           + "\"camera-direction-alpha\":0," \
-                                           + "\"camera-direction-beta\":0," \
-                                           + "\"camera-direction-value\":0," \
-                                           + "\"mic-direction-x\":0," \
-                                           + "\"mic-direction-y\":1," \
-                                           + "\"mic-direction-z\":0," \
+    assert rv.status_code == 200 and bytes("{"
+                                           + "\"camera-direction-alpha\":0,"
+                                           + "\"camera-direction-beta\":0,"
+                                           + "\"camera-direction-value\":0,"
+                                           + "\"mic-direction-x\":0,"
+                                           + "\"mic-direction-y\":1,"
+                                           + "\"mic-direction-z\":0,"
                                            + "\"preset-name\":\"test-another-preset-name\"}\n",
                                            "utf-8")
     rv = client.post("preset/remove",
@@ -577,12 +582,27 @@ def test_settings(client):
         def x(self):
             pass
 
-        with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
-            with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
+        with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
+            with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
                 rv = client.post("settings/set", data=expected)
                 assert rv.status_code == 200
         rv = client.get("settings/get")
         assert rv.status_code == 200 and json.loads(rv.data) == expected
+        expected = {
+            "camera-ip": "1.1.1.1",
+            "camera-port": 123,
+            "camera-http-port": 72,
+            "microphone-ip": "2.2.2.2",
+            "microphone-port": 456,
+            "microphone-thresh": -5,
+            "filepath": "/app/exe"
+        }
+        with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
+            with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
+                rv = client.post("settings/set", data=expected)
+                assert rv.status_code == 200
+        rv = client.get("settings/get")
+        assert rv.status_code == 200 and json.loads(rv.data)["filepath"] == "/app/exe/"
 
 
 def test_settings_invalid(client):
@@ -602,9 +622,9 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
-            "camera-http-port":80,
+            "camera-http-port": 80,
             "microphone-ip": 34,
-            "microphone-port": "asd",
+            "microphone-port": 10000000,
             "microphone-thresh": -5,
             "filepath": "/usr/bin/"
         }
@@ -613,7 +633,7 @@ def test_settings_invalid(client):
         data = {
             "camera-ip": "1.1.1.1",
             "camera-port": 123,
-            "camera-http-port":80,
+            "camera-http-port": 80,
             "microphone-ip": "gugu",
             "microphone-port": 456,
             "microphone-thresh": "asdf",
@@ -628,6 +648,7 @@ def test_settings_invalid(client):
 
 def generate_single_page_views():
     return [
+        "/",
         "/live_footage",
         "/camera_control",
         "/microphone_control",
@@ -640,14 +661,22 @@ def test_live_footage(client, url):
     rv = client.get(url)
     assert rv.status_code == 200
 
+
 def test_calibration_track(client):
-    rv = client.get("/calibration/track")
+    rv = client.get("/track/calibration")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":0}\n", "utf-8")
 
+
 def test_preset_track(client):
-    rv = client.get("/preset/track")
+    rv = client.get("/track/preset")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":1}\n", "utf-8")
 
+
 def test_object_track(client):
-    rv = client.get("/object/track")
+    rv = client.get("/track/object")
     assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":2}\n", "utf-8")
+
+
+def test_hybrid_track(client):
+    rv = client.get("/track/hybrid")
+    assert rv.status_code == 200 and rv.data == bytes("{\"tracking\":3}\n", "utf-8")

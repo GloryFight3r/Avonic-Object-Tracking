@@ -3,9 +3,9 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "avonic_speaker_tracker_system"
-version = "0.1.0"
-description = "A program for tracking the speaker using an Avonic camera using data from a Sennheiser TeamConnect Ceiling 2 microphone."
+name = "maat"
+version = "1.0.0"
+description = "A program for tracking a speaker using an Avonic camera using data from a Sennheiser TeamConnect Ceiling 2 microphone."
 readme = "README.md"
 authors = [
     {name = "Izzy van der Giessen", email = "i.vandergiessen@student.tudelft.nl"},
@@ -14,7 +14,7 @@ authors = [
     {name = "Borislav Semerdzhiev", email = "b.n.semerdzhiev@student.tudelft.nl"},
     {name = "Ivan Smilenov", email = "i.y.smilenov@student.tudelft.nl"}
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "flask",
     "flask-socketio",
@@ -30,7 +30,6 @@ dependencies = [
 test = [
     "build",
     "pylint",
-    "black",
     "pytest",
     "pytest-cov",
     "mutmut",
@@ -53,15 +52,11 @@ norecursedirs = [
     ".git",
     ".pytest_cache",
     ".vscode",
+    "venv"
 ]
 
 [tool.coverage.run]
 source = ["src"]
-
-[tool.black]
-line-length = 127
-target-version = ['py310']
-include = '\.pyi?$'
 
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3

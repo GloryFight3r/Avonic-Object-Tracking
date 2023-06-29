@@ -1,5 +1,6 @@
-from avonic_camera_api.camera_control_api import insert_zoom_in_hex
-from avonic_camera_api.camera_adapter import ResponseCode
+from maat_camera_api.camera_control_api import insert_zoom_in_hex
+from maat_camera_api.camera_adapter import ResponseCode
+
 
 class CameraMock:
     """

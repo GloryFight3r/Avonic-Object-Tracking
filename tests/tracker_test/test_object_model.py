@@ -3,8 +3,9 @@ import pytest
 import numpy as np
 import cv2
 
-from avonic_speaker_tracker.object_model.ObjectModel import ObjectModel
-from avonic_speaker_tracker.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
+from maat_tracking.object_model.ObjectModel import ObjectModel
+from maat_tracking.object_model.model_two.WaitObjectAudioModel import WaitObjectAudioModel
+
 
 def generate_box_lists():
     return [
@@ -16,22 +17,26 @@ def generate_box_lists():
          np.array([200, 400]), np.array([110, 10, 120, 220]))
     ]
 
+
 @pytest.mark.parametrize("boxes, resolution, center", generate_box_lists())
 def test_get_center_box(boxes, resolution, center):
     obj_model = ObjectModel(None, None, None, None, resolution)
     assert (obj_model.get_center_box(boxes) == center).all()
 
+
 def test_calculate_speed():
     obj_model = ObjectModel(None, None, None, None, np.array([100, 80]))
     assert obj_model.calculate_speed(np.array([0, 0])) == [13, 11]
 
+
 def generate_box_with_movement():
     return [
-            (np.array([0, 0, 10, 10]), np.array([10, 10]),
-                (np.array([13, 12]), np.array([0, 25]))),
-            (np.array([5, 5, 10, 10]), np.array([10, 10]),
-                (np.array([13, 11]), np.array([25, -12.5])))
+        (np.array([0, 0, 10, 10]), np.array([10, 10]),
+         (np.array([13, 12]), np.array([0, 25]))),
+        (np.array([5, 5, 10, 10]), np.array([10, 10]),
+         (np.array([13, 11]), np.array([25, -12.5])))
     ]
+
 
 @pytest.mark.parametrize("box, resolution, movement", generate_box_with_movement())
 def test_get_movement_to_box(box, resolution, movement):
@@ -59,12 +64,17 @@ class MockedCamAPI:
     def direct_zoom(self, value):
         pass
 
+
 class MockedMicAPI:
     def __init__(self):
         pass
 
     def get_direction(self):
         return np.array([3, 2, 1])
+
+    def is_speaking(self):
+        return True
+
 
 class MockedMicAPIWrongDirection:
     def __init__(self):
@@ -97,6 +107,7 @@ def test_track_object(monkeypatch):
     object_audio_model2.object_tracking_counter = 40
     object_audio_model2.track_object()
 
+
 def test_point(monkeypatch):
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPI(),
                                               np.array([100, 100]), 0,
@@ -106,6 +117,7 @@ def test_point(monkeypatch):
     object_audio_model.point()
     assert (object_audio_model.prev_dir == np.array([139, -35, 9715])).all()
 
+
 def test_point_zoom(monkeypatch):
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(), MockedMicAPI(),
                                               np.array([100, 100]), 0,
@@ -114,6 +126,7 @@ def test_point_zoom(monkeypatch):
     monkeypatch.setattr(object_audio_model.calibration, "mic_height", 1.5)
     object_audio_model.speak_delay = 100
     assert not object_audio_model.point()
+
 
 def test_point_wrong_direction():
     object_audio_model = WaitObjectAudioModel(MockedCamAPI(),

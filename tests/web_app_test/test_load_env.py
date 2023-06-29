@@ -3,19 +3,21 @@ import socket
 import time
 import pytest
 import numpy as np
-from web_app.integration import GeneralController
-from avonic_camera_api.camera_control_api import CameraAPI
-from avonic_camera_api.camera_http_request import CameraHTTP
-from avonic_camera_api.camera_control_api import CameraSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
-from microphone_api.microphone_adapter import MicrophoneSocket
-import web_app
+from maat_web_app.integration import GeneralController, close_running_threads
+from maat_camera_api.camera_control_api import CameraAPI
+from maat_camera_api.camera_http_request import CameraHTTP
+from maat_camera_api.camera_control_api import CameraSocket
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
+from maat_microphone_api.microphone_adapter import MicrophoneSocket
+import maat_web_app
 
 sock = mock.Mock()
+
 
 @pytest.fixture()
 def camera(monkeypatch):
     cam_sock = socket.socket
+
     def mocked_connect(t, self=None):
         pass
 
@@ -42,10 +44,13 @@ def camera(monkeypatch):
     monkeypatch.setattr(cam_sock, "settimeout", mocked_timeout)
 
     cam_api = CameraAPI(CameraSocket(cam_sock, (None, 1259)), CameraHTTP(("", 1)))
+
     def mocked_camera_reconnect():
         pass
+
     def mocked_get_zoom():
         return 128
+
     def mocked_get_direction():
         return np.array([0, 0, 0])
 
@@ -59,7 +64,9 @@ def camera(monkeypatch):
 
     return cam_api
 
+
 test_controller = GeneralController()
+
 
 @pytest.fixture
 def client(camera, monkeypatch):
@@ -81,15 +88,15 @@ def client(camera, monkeypatch):
     def x3(self):
         pass
 
-    with mock.patch("avonic_speaker_tracker.audio_model.calibration.Calibration.load", x):
-         with mock.patch("avonic_speaker_tracker.preset_model.preset.PresetCollection.load", x):
-             with mock.patch("builtins.open", x):
+    with mock.patch("maat_tracking.audio_model.calibration.Calibration.load", x):
+        with mock.patch("maat_tracking.preset_model.preset.PresetCollection.load", x):
+            with mock.patch("builtins.open", x):
                 with mock.patch(
-                        "avonic_speaker_tracker.object_model.yolov8.YOLOPredict.__init__", x3):
+                        "maat_tracking.object_model.yolov8.YOLOPredict.__init__", x3):
                     with mock.patch("cv2.VideoCapture", x2):
                         test_controller.load_env()
                         test_controller.ws = mock.Mock()
-                        app = web_app.create_app(test_controller=test_controller)
+                        app = maat_web_app.create_app(test_controller=test_controller)
                         app.config['TESTING'] = True
     return app.test_client()
 
@@ -97,4 +104,12 @@ def client(camera, monkeypatch):
 def test_load_env(client):
     time.sleep(0.5)
     test_controller.footage_thread_event.value = 0
-    test_controller.info_threads_break.value = 1
+    # test_controller.info_threads_break.value = 1
+
+    rv = client.post("/info-thread/start")
+    assert rv.status_code == 200
+    time.sleep(1)
+    rv = client.post("/info-thread/stop")
+    assert rv.status_code == 200
+
+    close_running_threads(test_controller, 1, False)
