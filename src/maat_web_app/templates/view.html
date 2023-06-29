@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'head.html' %}
+
+<body>
+  {% include 'settings.html' %}
+  {% include 'navigation.html' %}
+  <main>
+    <div class="grid">
+      <div class="container">
+        {% include 'camera.html' %}
+        {% include 'thread.html' %}
+      </div>
+      <div class="container">
+        <div>
+        {% include 'microphone.html' %}
+        {% include 'presets_and_calibration.html' %}
+        {% include 'tracking.html' %}
+        </div>
+
+      </div>
+    </div>
+    <article>
+      <div class="grid">
+        <h1 id="footage-vis-title"></h1>
+        <select id="footage-vis-select" onchange="selectFootageTab()">
+          <option value="footage-tab">Footage</option>
+          <option value="vis-tab">Visualization</option>
+        </select>
+      </div>
+      <div id="vis-tab">
+        {% include 'visualisation.html' %}
+      </div>
+      <div id="footage-tab">
+        {% include 'live_footage.html' %}
+      </div>
+    </article>
+  </main>
+</body>
+
+</html>

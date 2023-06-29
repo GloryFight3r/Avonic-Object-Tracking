@@ -1,0 +1,29 @@
+:root {
+    --primary: #3d7cc9 !important;
+    --secondary: #0643a3 !important;
+    margin-left: 1rem !important;
+    margin-right: 1rem !important;
+}
+
+main {
+    padding: 1rem !important;
+}
+
+article {
+    margin-top: 0.5rem !important;
+    padding: 0.5rem !important;
+}
+
+.contrast {
+    background-color: #ff6929;
+}
+
+#viscanv {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.close {
+    margin-top: 0 !important;
+}

@@ -1,0 +1,24 @@
+<article id="mic">
+  <h1>Microphone 🎙️</h1>
+  <form action="/microphone/height/set" method="post" id="microphone-set-height-form" class="grid">
+    <label for="microphone-height">Height [m]: </label>
+    <input type="number" id="microphone-height" name="microphone-height" step="0.01" value="1">
+    <button type="submit" role="button"
+            data-tooltip="Set the height of the microphone above the speaker plane"
+            data-placement="left">Set</button>
+  </form>
+  <form action="/microphone/direction" method="get" id="microphone-get-direction-form" class="grid">
+    <label for="mic-direction-x">Direction [x, y, z]: </label>
+    <input id="mic-direction-x" value="0" readonly>
+    <input id="mic-direction-y" value="0" readonly>
+    <input id="mic-direction-z" value="0" readonly>
+    <button type="submit" data-tooltip="Get the loudest speaker's direction from the microphone"
+            data-placement="left">Get</button>
+  </form>
+  <form action="/microphone/speaking" method="get" id="microphone-speaking-form" class="grid">
+    <button type="submit" data-tooltip="Is the peak loudness detected by the microphone larger than the threshold?">
+      Is someone speaking?
+    </button>
+    <input id="speaking" readonly>
+  </form>
+</article>

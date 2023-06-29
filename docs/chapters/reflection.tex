@@ -1,2 +1,69 @@
-\section{What we did right}
-\section{What we could have done differently}
+In this chapter we reflect on both the process and the result of our project.
+When we discuss the process, we focus on things that could have been done
+better by our team in terms of practices.
+When we discuss technological improvements, we focus on what can be changed in
+order to improve the overall performance of our tracker.
+
+\section{Process reflection}
+Many things went well in the process of creating the speaker tracker. However,
+there are two points of improvement that we want to reflect on. We also
+highlight our testing practice because of how helpful it was during the
+entirety of the project.
+
+\paragraph{Production server} \mbox{} \\
+As discussed in \hyperref[subsection:breaking-production-server]{section 5.5.2}
+we had some problems with the production server. This was because we were
+sometimes using the development server to test our code without realizing that
+it works fundamentally differently from the production server. The production
+server uses multiprocessing, while the development server does not. This caused
+problems with sharing data between threads.
+After encountering this issue, we started using the production server for
+everything. If we had done so from the start, we could have avoided many issues
+related to multithreading.
+
+\paragraph{Access to SBC} \mbox{} \\
+It took eight weeks until we got access to the NVIDIA Jetson. This meant that we
+had only slightly more than one week left to fix the issues that arose from deploying
+our software on the SBC for the first time. For access to the NVIDIA Jetson, we
+had to wait on Avonic to provide us with one. Therefore, the problem was mostly
+out of our control.
+If we had had access to the SBC at an earlier stage of the project, any bugs
+related to the SBC would have been caught and hopefully ironed out.
+
+\paragraph{Testing} \mbox{} \\
+Throughout the project, we always tested our code before merging into the main
+branch on GitLab. We were dedicated to keeping the test coverage above 80\%.
+This high coverage helped us to make sure no other functionality was broken when
+new functionality was added. Many bugs have been caught this way before they
+were merged.
+
+\section{Technological improvements}
+If Avonic wants to continue to work on our tracker, we would advise them to
+focus on two improvements. Both of them are related to the quality of the video
+stream. In this section we discuss how these changes would help to improve
+our speaker tracker.
+
+\paragraph{Dependency injection} \mbox{} \\
+As described in subsection \ref{subsection:solution_webui} on the web UI,
+we struggled with dependency injection for our Flask application.
+In the next iteration of the project, this problem should be addressed 
+by a different choice of the framework for the web UI or by a proper
+implementation of dependency injection.
+
+\paragraph{Tracking with adaptive zoom} \mbox{} \\
+The audio model described in \hyperref[subsection:tracking]{section 4.5.3} uses
+adaptive zooming. However, the constant zooming may not pleasant to look at.
+Sometimes the speaker goes out of view, because the zooming increases the impact
+of inaccurate microphone directions. Even when the speaker stays in view, the
+zooming may be distracting to the viewers, because it can happen too fast and
+too often.
+For future improvements of the audio model, we would suggest to make the zoom
+speed depend on the speed of its change. Another way to improve the adaptive
+zooming would be to change the zoom less often. This would make the video stream
+more pleasant to watch.
+
+\paragraph{Porting YOLO} \mbox{} \\
+When discussing object detecting models with Avonic, we discovered that they use an
+in-house version of YOLO ported to TensorRT\footnote{\url{https://developer.nvidia.com/tensorrt}}, which allows for better performance
+of the model. This would reduce the load of the system, allowing for more features,
+and deployment on platforms with less powerful hardware.

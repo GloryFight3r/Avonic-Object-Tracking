@@ -5,18 +5,13 @@ WORKDIR /usr/app
 COPY ./src ./src
 COPY README.md .
 COPY pyproject.toml .
+COPY run.sh .
 
-RUN python -m venv venv && \
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y && \
     pip install -e '.[prod]'
 
-ENV SERVER_ADDRESS=0.0.0.0:8000
-ENV CAM_IP=1
-ENV CAM_PORT=1
-ENV MIC_IP=1
-ENV MIC_PORT=1
-ENV MIC_THRESH=-55
-ENV SECRET_KEY=test
-
+ENV SERVER_ADDRESS=127.0.0.1:8000
+ENV NO_FOOTAGE=true
 EXPOSE 8000
 
-CMD uwsgi --http :8000 --gevent 1000 --http-websockets --master --module web_app
+CMD ./run.sh jetson

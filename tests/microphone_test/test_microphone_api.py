@@ -1,46 +1,41 @@
+import json
 from unittest import mock
-import pytest
 from hypothesis import given, strategies as st
 import numpy as np
-from microphone_api.microphone_adapter import MicrophoneSocket
-from microphone_api.microphone_control_api import MicrophoneAPI
+from maat_microphone_api.microphone_adapter import MicrophoneSocket
+from maat_microphone_api.microphone_control_api import MicrophoneAPI
 
 
-def test_set_height_api():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    assert api.height == 0
-    api.set_height(10)
-    assert api.height == 10
+def test_init():
+    sock = MicrophoneSocket(None)
+    mic = MicrophoneAPI(sock)
 
-
-def test_set_height_negative():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    with pytest.raises(AssertionError):
-        api.set_height(-1)
-
-
-def test_set_height_float():
-    mic = MicrophoneSocket(None)
-    api = MicrophoneAPI(mic)
-    api.set_height(2.5)
-    assert api.height == 2.5
+    assert mic.elevation == 0.0
+    assert mic.azimuth == 0.0
+    assert mic.speaking is False
+    assert mic.threshold == -55
 
 
 def test_elevation():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":90}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":90}}}\r\n',
+                                  "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     assert api.get_elevation() == np.deg2rad(90)
     assert api.elevation == np.deg2rad(90)
+
 
 def test_azimuth():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":46}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    sock.recvfrom.return_value = (bytes('{"m":{"beam":{"azimuth":46}}}\r\n',
+                                  "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     assert api.get_azimuth() == np.deg2rad(46)
     assert api.azimuth == np.deg2rad(46)
 
@@ -51,8 +46,11 @@ def test_elevation_recv_error():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+         "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     api.elevation = 0.5
     assert api.get_elevation() == 0.5
 
@@ -63,36 +61,180 @@ def test_azimuth_recv_error():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+         "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     api.azimuth = 0.5
     assert api.get_azimuth() == 0.5
+
+
+def test_direction_recv_error():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+         "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert json.loads(api.get_direction())[0] == 400
+
+
+def test_direction_sendto_exception():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto = mock.Mock(side_effect=OSError)
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert json.loads(api.get_direction())[0] == 408
+
+
+def test_direction_recvfrom_exception():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom = mock.Mock(side_effect=OSError)
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert json.loads(api.get_direction())[0] == 408
+
+
+def test_speaking_recv_error():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('{"osc":{"error":[400,{"desc":"message not understood"}]}}\r\n',
+         "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert json.loads(api.is_speaking())[0] == 400
+
+
+def test_direction_recv_invalid_json():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('{"not":"a microphone"}', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert api.get_direction() == "Unable to get direction from microphone,"\
+        + " response was: {\"not\":\"a microphone\"}"
+
+
+def test_speaking_recv_invalid_json():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('{"i am a":"rocket launcher"}', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert api.is_speaking() == "Unable to get peak loudness,"\
+        + " response was: {\"i am a\":\"rocket launcher\"}"
+
+
+def test_direction_recv_gibberish():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('asdf', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert api.get_direction() == "Did not receive a valid JSON," \
+                                  " are you sure you are communicating with the microphone?"\
+                                  + " Received: asdf"
+
+
+def test_speaking_recv_gibberish():
+    """ Invalid command
+    """
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = \
+        (bytes('gugu gaga', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert api.is_speaking() == "Did not receive a valid JSON," \
+                                " are you sure you are communicating with the microphone?"\
+                                + " Received: gugu gaga"
+
+
+def test_elevation_sendto_error():
+    """ Invalid address given
+    """
+    api = MicrophoneAPI(MicrophoneSocket())
+    api.elevation = 0.5
+    assert api.get_elevation() == 0.5
 
 
 def test_azimuth_sendto_error():
     """ Invalid address given
     """
     api = MicrophoneAPI(MicrophoneSocket())
-    with pytest.raises(Exception):
-        api.get_azimuth()
+    api.azimuth = 0.5
+    assert api.get_azimuth() == 0.5
+
+
+def test_direction_sendto_error():
+    """ Invalid address given
+    """
+    api = MicrophoneAPI(MicrophoneSocket())
+    api.elevation = np.pi/2
+    api.azimuth = 0
+    assert api.get_direction() == "Microphone returned nothing."
+
+
+def test_speaking_sendto_error():
+    """ Invalid address given
+    """
+    api = MicrophoneAPI(MicrophoneSocket())
+    api.speaking = True
+    assert api.is_speaking() == "Microphone returned nothing."
+
 
 def test_direction_basic():
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":0}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+
     assert np.allclose(api.get_direction(), [0.0, 0.0, 1.0])
     assert api.azimuth == np.deg2rad(0)
     assert api.elevation == np.deg2rad(0)
 
 
-def test_direction_vertical():
+def test_direction_vertical(monkeypatch):
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
-        (bytes('{"m":{"beam":{"azimuth":0,"elevation":90}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":90}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    monkeypatch.setattr(api, "is_speaking", lambda: True)
     # this is the correct value for a microphone pointing downwards, do not edit!!
     assert np.allclose(api.get_direction(), [0.0, -1.0, 0.0])
     assert api.azimuth == np.deg2rad(0)
@@ -102,17 +244,44 @@ def test_direction_vertical():
 def test_speaking():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-5}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-5}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     assert api.is_speaking()
     assert api.speaking
+
+
+def test_reverse_order_speaking(monkeypatch):
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value =\
+        (bytes('{"m":{"beam":{"azimuth":0,"elevation":90}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    monkeypatch.setattr(api, "is_speaking", lambda: True)
+    assert np.allclose(api.get_direction(), [0.0, -1.0, 0.0])
+
+
+def test_reverse_order_direction():
+    sock = mock.Mock()
+    sock.sendto.return_value = 48
+    sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-5}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
+    assert np.allclose(api.get_direction(), [0.0, 0.0, 1.0])
+    assert api.speaking is True
 
 
 def test_not_speaking():
     sock = mock.Mock()
     sock.sendto.return_value = 48
-    sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-70}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+    sock.recvfrom.return_value = (bytes('{"m":{"in1":{"peak":-70}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     assert not api.is_speaking()
     assert not api.speaking
 
@@ -124,8 +293,10 @@ def test_direction_unit(alpha, beta):
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = \
         (bytes('{"m":{"beam":{"azimuth":' + str(alpha) +
-               ',"elevation":' + str(beta) + '}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+               ',"elevation":' + str(beta) + '}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     res = api.get_direction()
     sumofsquares = np.sum(res ** 2)
     assert np.isclose(api.azimuth, np.deg2rad(alpha))
@@ -141,8 +312,10 @@ def test_elevation_prop(a):
     sock = mock.Mock()
     sock.sendto.return_value = 48
     sock.recvfrom.return_value = (bytes('{"m":{"beam":{"elevation":' +
-                                        str(a) + '}}}\r\n', "ascii"), None)
-    api = MicrophoneAPI(MicrophoneSocket(sock=sock))
+                                        str(a) + '}}}\r\n', "ascii"), ("0.0.0.1", 45))
+    mic_sock = MicrophoneSocket(sock=sock)
+    mic_sock.address = ("0.0.0.1", 45)
+    api = MicrophoneAPI(mic_sock)
     assert np.isclose(api.get_elevation(), np.deg2rad(a))
     assert np.isclose(api.elevation, np.deg2rad(a))
 
