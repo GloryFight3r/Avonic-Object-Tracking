@@ -40,7 +40,7 @@ async function setNewPreset(data) {
 const set_mic_button = document.getElementById("set-mic-button")
 
 async function requestPresetList() {
-    const response = await fetch("/preset/get_list", {
+    const response = await fetch("/preset/get-list", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
     });

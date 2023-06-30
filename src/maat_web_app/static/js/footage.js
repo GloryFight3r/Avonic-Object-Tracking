@@ -41,7 +41,7 @@ footage_img.addEventListener("click", function(event) {
 
     var form = document.createElement("form");
     form.setAttribute("method", "post");
-    form.setAttribute("action", "/navigate/camera");
+    form.setAttribute("action", "/camera/navigate");
 
     var x_input = document.createElement("input");
     x_input.setAttribute("name", "x-pos")

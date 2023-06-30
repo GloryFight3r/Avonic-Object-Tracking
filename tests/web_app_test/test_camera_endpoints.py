@@ -148,7 +148,7 @@ def test_navigate(client, x, y, exp_x, exp_y, monkeypatch):
     monkeypatch.setattr(CameraAPI, "calculate_fov", mocked_get_fov)
 
     monkeypatch.setattr(CameraAPI, "move_relative", mocked_move_relative)
-    rv = client.post('navigate/camera', data=data)
+    rv = client.post('camera/navigate', data=data)
 
     assert rv.status_code == 200
 
@@ -178,7 +178,7 @@ def test_navigate_bad_weather(client, x, y, monkeypatch):
     monkeypatch.setattr(CameraAPI, "calculate_fov", mocked_get_fov)
 
     monkeypatch.setattr(CameraAPI, "move_relative", mocked_move_relative)
-    rv = client.post('navigate/camera', data=data)
+    rv = client.post('camera/navigate', data=data)
     assert rv.status_code == 400
 
 
